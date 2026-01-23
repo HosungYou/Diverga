@@ -3,9 +3,9 @@
 ## 목차
 
 1. [시스템 요구사항](#시스템-요구사항)
-2. [설치 방법](#설치-방법)
-3. [설치 확인](#설치-확인)
-4. [설정](#설정)
+2. [마켓플레이스 설치 (권장)](#마켓플레이스-설치-권장)
+3. [로컬 설치 (개발용)](#로컬-설치-개발용)
+4. [설치 확인](#설치-확인)
 5. [업데이트](#업데이트)
 6. [제거](#제거)
 7. [문제 해결](#문제-해결)
@@ -16,198 +16,154 @@
 
 ### 필수 요구사항
 
-- **Claude Code**: v1.0 이상
-- **Git**: 레포지토리 클론용
+- **Claude Code CLI**: v1.0 이상 ([설치 방법](https://claude.ai/code))
 - **운영체제**: macOS, Linux, Windows (WSL)
 
-### 권장 환경
+### 확인 방법
 
-- Claude Code가 Skills 시스템을 지원하는 최신 버전
-- `~/.claude/skills/` 디렉토리 접근 권한
+```bash
+# Claude Code 버전 확인
+claude --version
+```
 
 ---
 
-## 설치 방법
+## 마켓플레이스 설치 (권장)
 
-### 방법 1: 자동 설치 (권장)
+> **v2.1.0 신규**: 단일 플러그인 설치로 21개 스킬 모두 사용 가능!
+
+### 설치 (단 2줄)
 
 ```bash
-# 1. 레포지토리 클론
+# Step 1: 마켓플레이스 추가 (최초 1회)
+claude plugin marketplace add HosungYou/research-coordinator
+
+# Step 2: 플러그인 설치 (21개 스킬 모두 포함)
+claude plugin install research-coordinator
+```
+
+### 설치 스크립트 사용 (대안)
+
+```bash
+curl -sL https://raw.githubusercontent.com/HosungYou/research-coordinator/main/scripts/install-all-plugins.sh | bash
+```
+
+### 설치 확인
+
+```bash
+claude plugin list | grep research-coordinator
+```
+
+출력 예시:
+```
+❯ research-coordinator@research-coordinator-skills
+  Version: 50d43876e8c5
+  Scope: user
+  Status: ✔ enabled
+```
+
+### 포함된 스킬 (21개)
+
+| 카테고리 | 스킬 명령어 |
+|----------|------------|
+| **마스터** | `/research-coordinator` |
+| **A: 연구 설계** | `/research-question-refiner`, `/theoretical-framework-architect`, `/devils-advocate`, `/research-ethics-advisor` |
+| **B: 문헌 검토** | `/systematic-literature-scout`, `/evidence-quality-appraiser`, `/effect-size-extractor`, `/research-radar` |
+| **C: 방법론** | `/research-design-consultant`, `/statistical-analysis-guide`, `/analysis-code-generator`, `/sensitivity-analysis-designer` |
+| **D: 품질 검증** | `/internal-consistency-checker`, `/checklist-manager`, `/reproducibility-auditor`, `/bias-detector` |
+| **E: 출판** | `/journal-matcher`, `/academic-communicator`, `/peer-review-strategist`, `/preregistration-composer` |
+
+---
+
+## 로컬 설치 (개발용)
+
+마켓플레이스가 아닌 로컬 개발 환경에서 사용하려는 경우:
+
+### 자동 설치
+
+```bash
 git clone https://github.com/HosungYou/research-coordinator.git
-
-# 2. 프로젝트 디렉토리로 이동
 cd research-coordinator
-
-# 3. 설치 스크립트 실행
-chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-설치 스크립트가 자동으로:
-- `~/.claude/skills/` 디렉토리 생성 (없는 경우)
-- 마스터 스킬 심볼릭 링크 생성
-- 개별 에이전트 스킬 심볼릭 링크 생성
-
-### 방법 2: 수동 설치
+### 수동 설치
 
 ```bash
-# 1. 레포지토리 클론
 git clone https://github.com/HosungYou/research-coordinator.git
 cd research-coordinator
 
-# 2. 스킬 디렉토리 생성
+# 스킬 디렉토리 생성
 mkdir -p ~/.claude/skills
 
-# 3. 심볼릭 링크 생성
-ln -sf "$(pwd)/.claude/skills/research-coordinator" ~/.claude/skills/research-coordinator
-ln -sf "$(pwd)/.claude/skills/research-agents" ~/.claude/skills/research-agents
+# 심볼릭 링크 생성
+ln -sf "$(pwd)/.claude/skills/research-coordinator" ~/.claude/skills/
+ln -sf "$(pwd)/.claude/skills/research-agents" ~/.claude/skills/
 ```
-
-### 방법 3: 직접 복사 (심볼릭 링크 미지원 환경)
-
-```bash
-# 스킬 파일 직접 복사
-cp -r .claude/skills/research-coordinator ~/.claude/skills/
-cp -r .claude/skills/research-agents ~/.claude/skills/
-```
-
-**주의**: 직접 복사의 경우 업데이트 시 수동으로 다시 복사해야 합니다.
 
 ---
 
 ## 설치 확인
 
-### 디렉토리 구조 확인
-
-```bash
-# 마스터 스킬 확인
-ls -la ~/.claude/skills/research-coordinator/
-# 출력: SKILL.md
-
-# 개별 에이전트 확인
-ls ~/.claude/skills/research-agents/
-# 출력: 01-research-question-refiner/ ~ 20-preregistration-composer/
-```
-
-### 스킬 파일 확인
-
-```bash
-# 마스터 스킬 내용 확인
-head -20 ~/.claude/skills/research-coordinator/SKILL.md
-
-# 개별 에이전트 확인
-head -10 ~/.claude/skills/research-agents/01-research-question-refiner/SKILL.md
-```
-
-### Claude Code에서 확인
-
-Claude Code를 실행하고 다음 명령어로 테스트:
+### Claude Code에서 테스트
 
 ```
 /research-coordinator
 ```
 
-정상적으로 마스터 코디네이터가 활성화되면 설치 완료입니다.
+마스터 코디네이터가 활성화되면 성공입니다.
 
----
+### 개별 스킬 테스트
 
-## 설정
-
-### 기본 설정
-
-Research Coordinator는 기본 설정으로 바로 사용 가능합니다.
-추가 설정이 필요한 경우 아래를 참조하세요.
-
-### 에이전트 커스터마이징
-
-개별 에이전트의 동작을 수정하려면 해당 SKILL.md 파일을 편집합니다:
-
-```bash
-# 예: 연구 질문 정제기 커스터마이징
-code ~/.claude/skills/research-agents/01-research-question-refiner/SKILL.md
+```
+/statistical-analysis-guide
 ```
 
-커스터마이징 가능한 항목:
-- **description**: 트리거 키워드 수정
-- **프롬프트 템플릿**: 에이전트 동작 방식 변경
-- **출력 형식**: 결과물 구조 변경
-
-### 새 에이전트 추가
-
-1. 새 디렉토리 생성:
-```bash
-mkdir -p ~/.claude/skills/research-agents/21-custom-agent
 ```
-
-2. SKILL.md 파일 작성:
-```markdown
----
-name: custom-agent
-description: |
-  커스텀 에이전트 설명
-  Use when: [트리거 조건]
-  트리거: [키워드1], [키워드2]
----
-
-# 커스텀 에이전트
-
-## 개요
-[에이전트 설명]
-
-## 사용 시점
-- [상황 1]
-- [상황 2]
-
-## 프롬프트 템플릿
-[실행 프롬프트]
+/systematic-literature-scout
 ```
 
 ---
 
 ## 업데이트
 
-### 심볼릭 링크 설치의 경우
+### 마켓플레이스 설치 업데이트
 
 ```bash
-# 레포지토리 디렉토리로 이동
-cd /path/to/research-coordinator
+# 마켓플레이스 캐시 업데이트
+claude plugin marketplace update research-coordinator-skills
 
-# 최신 버전 가져오기
-git pull origin main
+# 플러그인 업데이트
+claude plugin update research-coordinator
 ```
 
-심볼릭 링크가 자동으로 업데이트된 내용을 반영합니다.
-
-### 직접 복사 설치의 경우
+### 로컬 설치 업데이트
 
 ```bash
-# 레포지토리 업데이트
 cd /path/to/research-coordinator
 git pull origin main
-
-# 스킬 재복사
-cp -r .claude/skills/research-coordinator ~/.claude/skills/
-cp -r .claude/skills/research-agents ~/.claude/skills/
 ```
 
 ---
 
 ## 제거
 
-### 자동 제거
+### 마켓플레이스 플러그인 제거
 
 ```bash
-cd /path/to/research-coordinator
-chmod +x scripts/uninstall.sh
-./scripts/uninstall.sh
+# 플러그인 제거
+claude plugin uninstall research-coordinator
+
+# (선택) 마켓플레이스 제거
+claude plugin marketplace remove research-coordinator-skills
 ```
 
-### 수동 제거
+### 로컬 설치 제거
 
 ```bash
 # 심볼릭 링크 제거
 rm ~/.claude/skills/research-coordinator
-rm ~/.claude/skills/research-agents
+rm -rf ~/.claude/skills/research-agents
 
 # (선택) 레포지토리 삭제
 rm -rf /path/to/research-coordinator
@@ -217,61 +173,52 @@ rm -rf /path/to/research-coordinator
 
 ## 문제 해결
 
-### 문제: 스킬이 인식되지 않음
+### 문제: 마켓플레이스 추가 실패
 
-**증상**: `/research-coordinator` 명령이 작동하지 않음
+**증상**: `Plugin not found in any configured marketplace`
 
 **해결 방법**:
-1. 심볼릭 링크 상태 확인:
 ```bash
-ls -la ~/.claude/skills/
+# 마켓플레이스 목록 확인
+claude plugin marketplace list
+
+# 마켓플레이스 다시 추가
+claude plugin marketplace remove research-coordinator-skills 2>/dev/null
+claude plugin marketplace add HosungYou/research-coordinator
 ```
 
-2. SKILL.md 파일 존재 확인:
+### 문제: 스킬 명령어 인식 안됨
+
+**증상**: `/research-coordinator` 등 명령어 미작동
+
+**해결 방법**:
+1. 플러그인 설치 상태 확인:
 ```bash
-cat ~/.claude/skills/research-coordinator/SKILL.md | head -20
+claude plugin list | grep research-coordinator
+```
+
+2. 플러그인 재설치:
+```bash
+claude plugin uninstall research-coordinator
+claude plugin install research-coordinator
 ```
 
 3. Claude Code 재시작
 
-### 문제: 심볼릭 링크 오류
-
-**증상**: "Too many levels of symbolic links" 오류
+### 문제: 업데이트 후 작동 안함
 
 **해결 방법**:
 ```bash
-# 기존 링크 제거
-rm ~/.claude/skills/research-coordinator
-rm ~/.claude/skills/research-agents
+# 캐시 업데이트
+claude plugin marketplace update research-coordinator-skills
 
-# 절대 경로로 재생성
-ln -sf "/absolute/path/to/research-coordinator/.claude/skills/research-coordinator" ~/.claude/skills/
-ln -sf "/absolute/path/to/research-coordinator/.claude/skills/research-agents" ~/.claude/skills/
+# 플러그인 재설치
+claude plugin uninstall research-coordinator
+claude plugin install research-coordinator
 ```
-
-### 문제: 권한 오류
-
-**증상**: "Permission denied" 오류
-
-**해결 방법**:
-```bash
-# 디렉토리 권한 확인 및 수정
-chmod 755 ~/.claude/skills
-chmod -R 644 ~/.claude/skills/research-coordinator
-chmod -R 644 ~/.claude/skills/research-agents
-```
-
-### 문제: Windows에서 심볼릭 링크 실패
-
-**증상**: Windows에서 심볼릭 링크 생성 불가
-
-**해결 방법**:
-1. 관리자 권한으로 PowerShell 실행
-2. 개발자 모드 활성화: Settings > For developers > Developer Mode 켜기
-3. 또는 직접 복사 방식 사용
 
 ### 추가 도움
 
-문제가 지속되면:
-- [GitHub Issues](https://github.com/HosungYou/research-coordinator/issues)에 문제 보고
-- 오류 메시지와 환경 정보 포함
+- [GitHub Issues](https://github.com/HosungYou/research-coordinator/issues)
+- [CHANGELOG.md](./CHANGELOG.md) - 버전별 변경사항
+- [USAGE-EXAMPLES.md](./USAGE-EXAMPLES.md) - 사용 예시
