@@ -1,9 +1,9 @@
-# Agent Registry - Research Coordinator v2.1.0
+# Agent Registry - Research Coordinator v3.0.0
 # Centralized agent capabilities, schemas, and metadata
 # Based on: Codex Review architectural recommendations
 
-version: "2.1.0"
-last_updated: "2025-01-22"
+version: "3.0.0"
+last_updated: "2025-01-23"
 
 # =============================================================================
 # REGISTRY METADATA
@@ -13,6 +13,42 @@ registry:
   description: "Centralized registry for 20 research agents with VS methodology"
   schema_version: "1.0.0"
   contract_reference: "agent-contract-schema.md"
+
+# =============================================================================
+# V3.0 ENHANCEMENTS
+# =============================================================================
+
+v3_config:
+  modular_structure:
+    core: ["vs-engine.md", "t-score-dynamic.md"]
+    creativity: ["forced-analogy.md", "iterative-loop.md", "semantic-distance.md", "temporal-reframing.md", "community-simulation.md"]
+    interaction: ["user-checkpoints.md"]
+
+  upgrade_levels:
+    FULL:
+      agents: ["02", "03", "05", "10", "16"]
+      features:
+        - dynamic_t_score: true
+        - all_creativity_modules: true
+        - all_checkpoints: true
+    ENHANCED:
+      agents: ["01", "04", "06", "07", "08", "09"]
+      features:
+        - dynamic_t_score: true
+        - selective_creativity: true
+        - key_checkpoints: true
+    LIGHT:
+      agents: ["11", "12", "13", "14", "15", "17", "18", "19", "20"]
+      features:
+        - static_t_score: true
+        - no_creativity: true
+        - minimal_checkpoints: true
+
+  creativity_activation:
+    Conservative: []
+    Balanced: ["forced-analogy", "iterative-loop", "semantic-distance"]
+    Innovative: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
+    Extreme: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
 
 # =============================================================================
 # CATEGORY A: THEORY & RESEARCH DESIGN (01-04)
@@ -56,6 +92,13 @@ agents:
     dependencies:
       sequential_next: ["02-theoretical-framework-architect"]
       parallel_compatible: ["05-systematic-literature-scout"]
+
+    # v3.0 enhancements
+    upgrade_level: "ENHANCED"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-VS-001"]
 
   "02-theoretical-framework-architect":
     name: "Theoretical Framework Architect"
@@ -102,6 +145,13 @@ agents:
 
     self_critique_required: true
 
+    # v3.0 enhancements
+    upgrade_level: "FULL"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-INIT-003", "CP-VS-001", "CP-VS-002", "CP-VS-003"]
+
   "03-devils-advocate":
     name: "Devil's Advocate"
     icon: "😈"
@@ -144,6 +194,13 @@ agents:
 
     self_critique_required: true
 
+    # v3.0 enhancements
+    upgrade_level: "FULL"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-INIT-003", "CP-VS-001", "CP-VS-002", "CP-VS-003"]
+
   "04-research-ethics-advisor":
     name: "Research Ethics Advisor"
     icon: "⚖️"
@@ -178,6 +235,13 @@ agents:
 
     dependencies:
       parallel_compatible: ["09-research-design-consultant"]
+
+    # v3.0 enhancements
+    upgrade_level: "ENHANCED"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-VS-001"]
 
 # =============================================================================
 # CATEGORY B: LITERATURE & EVIDENCE (05-08)
@@ -223,6 +287,13 @@ agents:
 
     self_critique_required: true
 
+    # v3.0 enhancements
+    upgrade_level: "FULL"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-INIT-003", "CP-VS-001", "CP-VS-002", "CP-VS-003"]
+
   "06-evidence-quality-appraiser":
     name: "Evidence Quality Appraiser"
     icon: "⭐"
@@ -237,6 +308,13 @@ agents:
 
     triggers:
       keywords: ["품질 평가", "RoB", "GRADE", "비뚤림 위험"]
+
+    # v3.0 enhancements
+    upgrade_level: "ENHANCED"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-VS-001"]
 
   "07-effect-size-extractor":
     name: "Effect Size Extractor"
@@ -253,6 +331,13 @@ agents:
     triggers:
       keywords: ["효과크기", "effect size", "Cohen's d", "Hedges' g"]
 
+    # v3.0 enhancements
+    upgrade_level: "ENHANCED"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-VS-001"]
+
   "08-research-radar":
     name: "Research Radar"
     icon: "📡"
@@ -267,6 +352,13 @@ agents:
 
     triggers:
       keywords: ["최신 연구", "트렌드", "citation alert"]
+
+    # v3.0 enhancements
+    upgrade_level: "ENHANCED"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-VS-001"]
 
 # =============================================================================
 # CATEGORY C: METHODOLOGY & ANALYSIS (09-12)
@@ -286,6 +378,13 @@ agents:
 
     triggers:
       keywords: ["연구 설계", "실험 설계", "sampling", "검정력"]
+
+    # v3.0 enhancements
+    upgrade_level: "ENHANCED"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-VS-001"]
 
   "10-statistical-analysis-guide":
     name: "Statistical Analysis Guide"
@@ -310,6 +409,13 @@ agents:
 
     self_critique_required: true
 
+    # v3.0 enhancements
+    upgrade_level: "FULL"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-INIT-003", "CP-VS-001", "CP-VS-002", "CP-VS-003"]
+
   "11-analysis-code-generator":
     name: "Analysis Code Generator"
     icon: "💻"
@@ -324,6 +430,13 @@ agents:
 
     triggers:
       keywords: ["R 코드", "Python 코드", "SPSS", "Stata"]
+
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
 
   "12-sensitivity-analysis-designer":
     name: "Sensitivity Analysis Designer"
@@ -340,6 +453,13 @@ agents:
     triggers:
       keywords: ["민감도 분석", "robustness", "multiverse"]
 
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
+
 # =============================================================================
 # CATEGORY D: QUALITY & VALIDATION (13-16)
 # =============================================================================
@@ -354,6 +474,13 @@ agents:
     triggers:
       keywords: ["일관성", "consistency", "논리적 검증"]
 
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
+
   "14-checklist-manager":
     name: "Checklist Manager"
     icon: "📋"
@@ -364,6 +491,13 @@ agents:
     triggers:
       keywords: ["PRISMA", "CONSORT", "STROBE", "체크리스트"]
 
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
+
   "15-reproducibility-auditor":
     name: "Reproducibility Auditor"
     icon: "🛡️"
@@ -373,6 +507,13 @@ agents:
 
     triggers:
       keywords: ["재현성", "OSF", "오픈 사이언스"]
+
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
 
   "16-bias-detector":
     name: "Bias Detector"
@@ -397,6 +538,13 @@ agents:
 
     self_critique_required: true
 
+    # v3.0 enhancements
+    upgrade_level: "FULL"
+    v3_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"]
+      checkpoints: ["CP-INIT-001", "CP-INIT-002", "CP-INIT-003", "CP-VS-001", "CP-VS-002", "CP-VS-003"]
+
 # =============================================================================
 # CATEGORY E: PUBLICATION & COMMUNICATION (17-20)
 # =============================================================================
@@ -411,6 +559,13 @@ agents:
     triggers:
       keywords: ["저널", "투고", "impact factor"]
 
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
+
   "18-academic-communicator":
     name: "Academic Communicator"
     icon: "🎤"
@@ -420,6 +575,13 @@ agents:
 
     triggers:
       keywords: ["초록", "plain language", "프레스 릴리즈"]
+
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
 
   "19-peer-review-strategist":
     name: "Peer Review Strategist"
@@ -431,6 +593,13 @@ agents:
     triggers:
       keywords: ["리뷰어", "심사평", "response letter"]
 
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
+
   "20-preregistration-composer":
     name: "Pre-registration Composer"
     icon: "📄"
@@ -440,6 +609,13 @@ agents:
 
     triggers:
       keywords: ["사전등록", "OSF", "AsPredicted"]
+
+    # v3.0 enhancements
+    upgrade_level: "LIGHT"
+    v3_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["CP-INIT-001"]
 
 # =============================================================================
 # WORKFLOW ORCHESTRATION
@@ -481,6 +657,13 @@ workflows:
   "quick-review":
     description: "Rapid literature review"
     agents: ["01", "05", "14"]
+
+  "v3-creative-research":
+    description: "v3.0 creativity-enhanced research workflow"
+    creativity_level: "Innovative"
+    agents: ["01", "02", "03", "05", "10", "16"]
+    creativity_modules_enabled: true
+    checkpoints_enabled: true
 
 # =============================================================================
 # EVALUATION METRICS
