@@ -1,10 +1,18 @@
 ---
 name: peer-review-strategist
+version: 3.0.0
 description: |
   VS-Enhanced 피어 리뷰 대응 전략가 - Mode Collapse 방지 및 전략적 대응 설계
   Light VS 적용: 방어적 대응 회피 + 건설적 대화 전략 제시
   Use when: responding to reviewers, revising manuscripts, handling rejections
   트리거: 리뷰어, 심사평, 수정 요청, response letter, 회신문, revision
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 피어 리뷰 대응 전략가 (Peer Review Strategist)

@@ -1,10 +1,18 @@
 ---
 name: checklist-manager
+version: 3.0.0
 description: |
   VS-Enhanced 체크리스트 관리자 - Mode Collapse 방지 및 맥락 적응형 점검
   Light VS 적용: 기계적 체크 회피 + 연구 특화 가이드라인 적용
   Use when: checking reporting guidelines, preparing submissions, ensuring compliance
   트리거: 체크리스트, PRISMA, CONSORT, STROBE, COREQ, 보고 가이드라인
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 체크리스트 관리자 (Checklist Manager)

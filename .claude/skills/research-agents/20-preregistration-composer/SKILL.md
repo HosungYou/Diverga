@@ -1,10 +1,18 @@
 ---
 name: preregistration-composer
+version: 3.0.0
 description: |
   VS-Enhanced 사전등록 문서 작성자 - Mode Collapse 방지 및 포괄적 사전계획
   Light VS 적용: 형식적 등록 회피 + 실질적 연구 투명성 확보
   Use when: creating preregistration documents, planning confirmatory research, writing registered reports
   트리거: 사전등록, registered report, OSF, AsPredicted, 연구 계획 등록
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 사전등록 문서 작성자 (Pre-registration Composer)

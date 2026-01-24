@@ -1,10 +1,18 @@
 ---
 name: sensitivity-analysis-designer
+version: 3.0.0
 description: |
   VS-Enhanced 민감도 분석 설계자 - Mode Collapse 방지 및 포괄적 강건성 검증
   Light VS 적용: 모달 민감도 접근 인식 + 확장된 분석 전략 제시
   Use when: testing robustness, validating conclusions, exploring analytical decisions
   트리거: 민감도 분석, robustness, specification curve, 강건성, 분석적 결정
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 민감도 분석 설계자 (Sensitivity Analysis Designer)

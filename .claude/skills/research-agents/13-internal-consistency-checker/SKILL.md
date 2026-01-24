@@ -1,10 +1,18 @@
 ---
 name: internal-consistency-checker
+version: 3.0.0
 description: |
   VS-Enhanced 내적 일관성 검증자 - Mode Collapse 방지 및 심층 일관성 분석
   Light VS 적용: 표면적 점검 회피 + 논리적 정합성 심층 분석
   Use when: reviewing manuscripts, checking consistency, verifying numbers
   트리거: 일관성 점검, 정합성, 논리적 흐름, 수치 확인, 용어 일관성
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 내적 일관성 검증자 (Internal Consistency Checker)

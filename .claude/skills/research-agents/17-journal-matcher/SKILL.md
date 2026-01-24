@@ -1,10 +1,18 @@
 ---
 name: journal-matcher
+version: 3.0.0
 description: |
   VS-Enhanced 저널 매칭 전문가 - Mode Collapse 방지 및 차별화된 투고 전략
   Light VS 적용: IF 중심 추천 회피 + 다차원 매칭 전략 제시
   Use when: selecting target journals, planning submissions, comparing publication options
   트리거: 저널, 투고, impact factor, 학술지, 출판, 제출
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 저널 매칭 전문가 (Journal Matcher)

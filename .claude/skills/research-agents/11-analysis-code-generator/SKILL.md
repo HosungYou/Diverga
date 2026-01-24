@@ -1,10 +1,18 @@
 ---
 name: analysis-code-generator
+version: 3.0.0
 description: |
   VS-Enhanced 분석 코드 생성기 - Mode Collapse 방지 및 다양한 구현 옵션 제시
   Light VS 적용: 모달 코드 패턴 인식 + 대안적 구현 제시
   Use when: generating analysis code, creating reproducible scripts, automating analysis
   트리거: R 코드, Python 코드, SPSS, Stata, 분석 스크립트, 코드 생성
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 분석 코드 생성기 (Analysis Code Generator)

@@ -1,10 +1,18 @@
 ---
 name: academic-communicator
+version: 3.0.0
 description: |
   VS-Enhanced 학술 커뮤니케이터 - Mode Collapse 방지 및 청중 맞춤 커뮤니케이션
   Light VS 적용: 템플릿 기반 작성 회피 + 청중 특화 메시지 설계
   Use when: writing abstracts, creating summaries, communicating research to different audiences
   트리거: 초록, plain language, 프레스 릴리즈, 요약, 일반인용, 커뮤니케이션
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 학술 커뮤니케이터 (Academic Communicator)

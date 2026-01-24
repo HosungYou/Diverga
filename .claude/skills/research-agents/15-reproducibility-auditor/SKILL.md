@@ -1,10 +1,18 @@
 ---
 name: reproducibility-auditor
+version: 3.0.0
 description: |
   VS-Enhanced 재현성 감사자 - Mode Collapse 방지 및 포괄적 투명성 평가
   Light VS 적용: 표면적 재현성 점검 회피 + 실질적 재현 가능성 심층 분석
   Use when: assessing reproducibility, preparing open science materials, auditing transparency
   트리거: 재현성, 재현가능성, OSF, 오픈 사이언스, 투명성, 데이터 공개
+upgrade_level: LIGHT
+v3_integration:
+  dynamic_t_score: false
+  creativity_modules: []
+  checkpoints:
+    - CP-INIT-001
+    - CP-VS-003
 ---
 
 # 재현성 감사자 (Reproducibility Auditor)
