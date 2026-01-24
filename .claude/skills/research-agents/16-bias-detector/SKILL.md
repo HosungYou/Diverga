@@ -1,10 +1,29 @@
 ---
 name: bias-detector
+version: 3.0.0
 description: |
   VS-Enhanced 편향 탐지기 - Mode Collapse 방지 및 맥락별 우선순위화
   Full VS 5단계 프로세스 적용: 일반적 편향 지적 회피, 연구 특화 편향 분석
   Use when: detecting biases, reviewing research integrity, checking for p-hacking
   트리거: 편향, bias, p-hacking, HARKing, 선택적 보고, 확증 편향
+upgrade_level: FULL
+v3_integration:
+  dynamic_t_score: true
+  creativity_modules:
+    - forced-analogy
+    - iterative-loop
+    - semantic-distance
+    - temporal-reframing
+    - community-simulation
+  checkpoints:
+    - CP-VS-001
+    - CP-VS-002
+    - CP-VS-003
+    - CP-AG-003
+    - CP-IL-001
+    - CP-TR-001
+    - CP-CS-001
+    - CP-CS-002
 ---
 
 # 편향 탐지기 (Bias Detector)
@@ -465,8 +484,56 @@ VS-Research 방법론을 적용하여 이 연구에 특화된 편향 분석을 �
 
 ---
 
+## v3.0 창의적 장치 통합
+
+### 활용 가능한 창의적 장치
+
+이 에이전트는 FULL 업그레이드 레벨로, 모든 5개 창의적 장치를 활용할 수 있습니다:
+
+| 장치 | 적용 시점 | 활용 예시 |
+|------|----------|----------|
+| **Forced Analogy** | Phase 2 | 다른 분야의 편향 탐지 패턴 유추 적용 |
+| **Iterative Loop** | Phase 2-4 | 4라운드 편향 분석 정제 사이클 |
+| **Semantic Distance** | Phase 2 | 의미적으로 먼 숨겨진 편향 발견 |
+| **Temporal Reframing** | Phase 1-2 | 과거/미래 관점에서 편향 패턴 검토 |
+| **Community Simulation** | Phase 4 | 7명 가상 연구자의 편향 관점 종합 |
+
+### 체크포인트 통합
+
+```yaml
+적용 체크포인트:
+  - CP-INIT-002: 창의성 수준 선택
+  - CP-VS-001: 편향 분석 방향 선택 (다중)
+  - CP-VS-002: 숨겨진 편향 탐지 경고
+  - CP-VS-003: 편향 분석 만족도 확인
+  - CP-AG-003: 편향 인지 및 수용 확인 ⚠️ GUARDRAIL
+  - CP-IL-001~004: 분석 정제 라운드 진행
+  - CP-TR-001: 시간 관점 선택
+  - CP-CS-001: 피드백 페르소나 선택
+  - CP-CS-002: 피드백 반영 여부
+```
+
+### 모듈 참조
+
+```
+../../research-coordinator/core/vs-engine.md
+../../research-coordinator/core/t-score-dynamic.md
+../../research-coordinator/creativity/forced-analogy.md
+../../research-coordinator/creativity/iterative-loop.md
+../../research-coordinator/creativity/semantic-distance.md
+../../research-coordinator/creativity/temporal-reframing.md
+../../research-coordinator/creativity/community-simulation.md
+../../research-coordinator/interaction/user-checkpoints.md
+```
+
+---
+
 ## 참고 자료
 
+- **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
+- **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
+- **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
+- **User Checkpoints**: `../../research-coordinator/interaction/user-checkpoints.md`
 - **VS-Research Framework**: `../../research-coordinator/references/VS-Research-Framework.md`
 - **Self-Critique Framework**: `../../research-coordinator/references/self-critique-framework.md`
 - **Agent Contract Schema**: `../../research-coordinator/references/agent-contract-schema.md`

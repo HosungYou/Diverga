@@ -1,10 +1,29 @@
 ---
 name: devils-advocate
+version: 3.0.0
 description: |
   VS-Enhanced 악마의 옹호자 - Mode Collapse 방지 및 독창적 비판 생성
   Full VS 5단계 프로세스 적용: 뻔한 비판 회피, 창의적 대안적 설명 생성
   Use when: reviewing research design, anticipating reviewer criticism, stress-testing assumptions
   트리거: 비판, 약점, reviewer 2, 대안적 설명, 반박, 문제점
+upgrade_level: FULL
+v3_integration:
+  dynamic_t_score: true
+  creativity_modules:
+    - forced-analogy
+    - iterative-loop
+    - semantic-distance
+    - temporal-reframing
+    - community-simulation
+  checkpoints:
+    - CP-VS-001
+    - CP-VS-002
+    - CP-VS-003
+    - CP-AG-002
+    - CP-IL-001
+    - CP-TR-001
+    - CP-CS-001
+    - CP-CS-002
 ---
 
 # 악마의 옹호자 (Devil's Advocate)
@@ -426,8 +445,56 @@ VS-Research 방법론을 적용하여 독창적이고 통찰력 있는 비판을
 
 ---
 
+## v3.0 창의적 장치 통합
+
+### 활용 가능한 창의적 장치
+
+이 에이전트는 FULL 업그레이드 레벨로, 모든 5개 창의적 장치를 활용할 수 있습니다:
+
+| 장치 | 적용 시점 | 활용 예시 |
+|------|----------|----------|
+| **Forced Analogy** | Phase 2 | 다른 분야의 비판 패턴을 유추 적용 |
+| **Iterative Loop** | Phase 2-4 | 4라운드 반복으로 비판 정제 |
+| **Semantic Distance** | Phase 2 | 의미적으로 먼 대안적 설명 생성 |
+| **Temporal Reframing** | Phase 2 | 과거/미래 관점에서 비판 재구성 |
+| **Community Simulation** | Phase 4 | 7명 가상 리뷰어의 다양한 비판 관점 |
+
+### 체크포인트 통합
+
+```yaml
+적용 체크포인트:
+  - CP-INIT-002: 창의성 수준 선택
+  - CP-VS-001: 비판 방향 선택 (다중)
+  - CP-VS-002: 저-전형성 비판 경고
+  - CP-VS-003: 만족도 확인
+  - CP-AG-002: 비판 수용 여부 확인
+  - CP-IL-001~004: 반복 라운드 진행 확인
+  - CP-TR-001: 시간 관점 선택
+  - CP-CS-001: 리뷰어 페르소나 선택
+  - CP-CS-002: 피드백 반영 여부
+```
+
+### 모듈 참조
+
+```
+../../research-coordinator/core/vs-engine.md
+../../research-coordinator/core/t-score-dynamic.md
+../../research-coordinator/creativity/forced-analogy.md
+../../research-coordinator/creativity/iterative-loop.md
+../../research-coordinator/creativity/semantic-distance.md
+../../research-coordinator/creativity/temporal-reframing.md
+../../research-coordinator/creativity/community-simulation.md
+../../research-coordinator/interaction/user-checkpoints.md
+```
+
+---
+
 ## 참고 자료
 
+- **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
+- **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
+- **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
+- **User Checkpoints**: `../../research-coordinator/interaction/user-checkpoints.md`
 - **VS-Research Framework**: `../../research-coordinator/references/VS-Research-Framework.md`
 - **Self-Critique Framework**: `../../research-coordinator/references/self-critique-framework.md`
 - **Agent Contract Schema**: `../../research-coordinator/references/agent-contract-schema.md`

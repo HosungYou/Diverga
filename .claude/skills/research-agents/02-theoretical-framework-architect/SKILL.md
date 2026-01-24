@@ -1,10 +1,30 @@
 ---
 name: theoretical-framework-architect
+version: 3.0.0
 description: |
   VS-Enhanced 이론적 프레임워크 설계자 - Mode Collapse 방지 및 창의적 이론 추천
   Full VS 5단계 프로세스 적용: 모달 이론 회피, Long-tail 탐색, 차별화된 프레임워크 제시
   Use when: building theoretical foundations, designing conceptual models, deriving hypotheses
   트리거: 이론적 프레임워크, theoretical framework, conceptual model, 개념적 모형, 가설 도출
+upgrade_level: FULL
+v3_integration:
+  dynamic_t_score: true
+  creativity_modules:
+    - forced-analogy
+    - iterative-loop
+    - semantic-distance
+    - temporal-reframing
+    - community-simulation
+  checkpoints:
+    - CP-VS-001
+    - CP-VS-002
+    - CP-VS-003
+    - CP-FA-001
+    - CP-FA-002
+    - CP-IL-001
+    - CP-SD-001
+    - CP-TR-001
+    - CP-CS-001
 ---
 
 # 이론적 프레임워크 설계자 (Theoretical Framework Architect)
@@ -433,8 +453,55 @@ VS-Research 방법론을 적용하여 이론적 프레임워크를 설계해주�
 
 ---
 
+## v3.0 창의적 장치 통합
+
+### 활용 가능한 창의적 장치
+
+이 에이전트는 FULL 업그레이드 레벨로, 모든 5개 창의적 장치를 활용할 수 있습니다:
+
+| 장치 | 적용 시점 | 활용 예시 |
+|------|----------|----------|
+| **Forced Analogy** | Phase 2 (Long-tail) | 다른 학문 분야의 이론을 현재 연구에 유추 적용 |
+| **Iterative Loop** | Phase 2-3 | 4라운드 발산-수렴으로 최적 이론 정제 |
+| **Semantic Distance** | Phase 2 | 의미적으로 먼 이론 조합 추천 |
+| **Temporal Reframing** | Phase 1-2 | 과거/미래 관점에서 이론 적용 재검토 |
+| **Community Simulation** | Phase 4-5 | 7명 가상 연구자의 다양한 관점 종합 |
+
+### 체크포인트 통합
+
+```yaml
+적용 체크포인트:
+  - CP-INIT-002: 창의성 수준 선택 (균형/탐험/혁신)
+  - CP-VS-001: Phase 2 탐색 방향 선택 (다중 선택)
+  - CP-VS-002: Phase 3 저-전형성 경고 (T < 0.3)
+  - CP-VS-003: Phase 5 만족도 확인
+  - CP-FA-001: Forced Analogy 소스 분야 선택
+  - CP-FA-002: 유추 매핑 승인
+  - CP-SD-001: Semantic Distance 임계값 설정
+  - CP-CS-001: Community Simulation 페르소나 선택
+```
+
+### 모듈 참조
+
+```
+../../research-coordinator/core/vs-engine.md
+../../research-coordinator/core/t-score-dynamic.md
+../../research-coordinator/creativity/forced-analogy.md
+../../research-coordinator/creativity/iterative-loop.md
+../../research-coordinator/creativity/semantic-distance.md
+../../research-coordinator/creativity/temporal-reframing.md
+../../research-coordinator/creativity/community-simulation.md
+../../research-coordinator/interaction/user-checkpoints.md
+```
+
+---
+
 ## 참고 자료
 
+- **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
+- **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
+- **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
+- **User Checkpoints**: `../../research-coordinator/interaction/user-checkpoints.md`
 - **VS-Research Framework**: `../../research-coordinator/references/VS-Research-Framework.md`
 - **Self-Critique Framework**: `../../research-coordinator/references/self-critique-framework.md`
 - **Agent Contract Schema**: `../../research-coordinator/references/agent-contract-schema.md`
