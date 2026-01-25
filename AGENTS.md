@@ -1,10 +1,10 @@
 # AGENTS.md
 
-> AI-readable documentation for NovaScholar v5.0 (Sisyphus Edition)
+> AI-readable documentation for Diverga v5.0 (Sisyphus Edition)
 
 ## Project Overview
 
-**NovaScholar** is a Claude Code Skills-based AI research assistant system that breaks free from mode collapse through **Verbalized Sampling (VS) methodology**. It provides context-persistent support for the complete research lifecycle with a focus on **creative, defensible research choices**.
+**Diverga** is a Claude Code Skills-based AI research assistant system that breaks free from mode collapse through **Verbalized Sampling (VS) methodology**. It provides context-persistent support for the complete research lifecycle with a focus on **creative, defensible research choices**.
 
 **Version**: 5.0.0 (Sisyphus Edition)
 **Generated**: 2025-01-25
@@ -104,7 +104,7 @@ Generated documents:
 
 ### 27 Specialized Research Agents Across 8 Categories
 
-NovaScholar v5.0 introduces comprehensive coverage of all research paradigms through 27 specialized agents organized into 8 functional categories.
+Diverga v5.0 introduces comprehensive coverage of all research paradigms through 27 specialized agents organized into 8 functional categories.
 
 ---
 
@@ -293,7 +293,7 @@ Guide for AI agents to select appropriate agents based on research paradigm.
 
 ### Philosophy
 
-"NovaScholar never says 'done' prematurely. Like Sisyphus pushing the boulder, we persist until the research task is genuinely complete."
+"Diverga never says 'done' prematurely. Like Sisyphus pushing the boulder, we persist until the research task is genuinely complete."
 
 ### Completion Criteria by Paradigm
 
@@ -754,7 +754,7 @@ Detailed agent orchestration sequences for common research types.
 
 ## AI Orchestration Guidelines (Sisyphus Protocol)
 
-**For Claude Code and AI assistants using NovaScholar v5.0**
+**For Claude Code and AI assistants using Diverga v5.0**
 
 ### 1. Detecting Research Paradigm
 
@@ -878,4 +878,4 @@ Detect user language:
 
 ---
 
-*This file enables AI assistants to understand NovaScholar v5.0's architecture and operate effectively within it.*
+*This file enables AI assistants to understand Diverga v5.0's architecture and operate effectively within it.*

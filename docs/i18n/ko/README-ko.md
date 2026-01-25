@@ -1,4 +1,4 @@
-# NovaScholar 🌟
+# Diverga 🌟
 
 **Beyond Modal: 창의적으로 생각하는 AI 연구 어시스턴트**
 
@@ -9,7 +9,7 @@
 
 ---
 
-## 🌟 왜 "Nova"인가? Mode Collapse에서 벗어나기
+## 🌟 왜 "Diverga"인가? Mode Collapse에서 벗어나기
 
 대부분의 AI 연구 어시스턴트는 **mode collapse** 문제를 겪습니다 - 항상 같은 뻔한 옵션만 추천합니다:
 
@@ -17,7 +17,7 @@
 > ❌ "메타분석에는 랜덤 효과 모형을 사용하세요." (항상 같은 답)
 > ❌ "질적 연구에는 주제 분석을 시도해보세요." (뻔한 선택)
 
-**NovaScholar는 다릅니다.** **Verbalized Sampling (VS) 방법론** (arXiv:2510.01171)을 기반으로 mode collapse를 능동적으로 방지하고 **창의적이면서도 방어 가능한 연구 선택**으로 안내합니다.
+**Diverga는 다릅니다.** **Verbalized Sampling (VS) 방법론** (arXiv:2510.01171)을 기반으로 mode collapse를 능동적으로 방지하고 **창의적이면서도 방어 가능한 연구 선택**으로 안내합니다.
 
 ---
 
@@ -32,9 +32,9 @@ AI 시스템은 통계적으로 가장 흔한 옵션 - **modal 추천**을 권�
 
 ### 해결책: Dynamic T-Score 시스템
 
-NovaScholar는 모든 추천에 **전형성 점수 (T-Score)**를 부여합니다:
+Diverga는 모든 추천에 **전형성 점수 (T-Score)**를 부여합니다:
 
-| T-Score | 해석 | NovaScholar 행동 |
+| T-Score | 해석 | Diverga 행동 |
 |---------|------|-----------------|
 | `T > 0.8` | **Modal** (가장 흔함) | ⚠️ "예측 가능함" 표시 - 차별화 경고 |
 | `T 0.5-0.8` | **확립된 대안** | ✅ 균형 잡힌 선택으로 제안 |
@@ -43,7 +43,7 @@ NovaScholar는 모든 추천에 **전형성 점수 (T-Score)**를 부여합니�
 
 ### 5가지 창의성 메커니즘
 
-NovaScholar는 다섯 가지 인지 메커니즘으로 비뻔한 옵션을 생성합니다:
+Diverga는 다섯 가지 인지 메커니즘으로 비뻔한 옵션을 생성합니다:
 
 | 메커니즘 | 설명 | 예시 |
 |----------|------|------|
@@ -61,10 +61,10 @@ NovaScholar는 다섯 가지 인지 메커니즘으로 비뻔한 옵션을 생�
    AI: "기술수용모델(TAM)을 추천합니다."
    (매번 같은 답, T=0.92)
 
-✅ VS 적용 (NovaScholar):
+✅ VS 적용 (Diverga):
    사용자: "AI 채택 연구를 위한 이론적 프레임워크 선택을 도와주세요"
 
-   NovaScholar: "전형성 스펙트럼에 걸쳐 옵션을 분석해 보겠습니다:
+   Diverga: "전형성 스펙트럼에 걸쳐 옵션을 분석해 보겠습니다:
 
    [Modal 인식] TAM (T=0.92)과 UTAUT (T=0.85)은 예측 가능한 선택입니다.
    대부분의 심사자가 예상하지만, 차별화가 제한적입니다.
@@ -86,13 +86,13 @@ NovaScholar는 다섯 가지 인지 메커니즘으로 비뻔한 옵션을 생�
 
 ---
 
-## 🎯 NovaScholar가 다른 점
+## 🎯 Diverga가 다른 점
 
 ### 1. **창의적 안내, 단순 답변이 아님**
-NovaScholar는 질문에만 답하지 않습니다 - 당신이 몰랐던 옵션을 보여줌으로써 사고를 확장합니다.
+Diverga는 질문에만 답하지 않습니다 - 당신이 몰랐던 옵션을 보여줌으로써 사고를 확장합니다.
 
 ### 2. **맥락 지속성**
-일반 AI 도구와 달리 NovaScholar는 연구 맥락을 유지합니다:
+일반 AI 도구와 달리 Diverga는 연구 맥락을 유지합니다:
 - 연구 질문과 이론적 프레임워크
 - 방법론적 결정과 그 근거
 - 문헌 검색 전략과 결과
@@ -121,7 +121,7 @@ NovaScholar는 질문에만 답하지 않습니다 - 당신이 몰랐던 옵션�
 
 ### 14개 사용자 체크포인트
 
-NovaScholar는 중요한 지점에서 결정을 확인합니다:
+Diverga는 중요한 지점에서 결정을 확인합니다:
 
 | 코드 | 체크포인트 | 목적 |
 |------|-----------|------|
@@ -277,7 +277,7 @@ ralph: 연구 설계해줘   # 완료까지 지속
 - 발견의 해석
 - 윤리적 트레이드오프
 
-### NovaScholar가 처리하는 것
+### Diverga가 처리하는 것
 - 20,000+ 논문 검색
 - 평가자간 신뢰도 계산
 - PRISMA 흐름도 생성
@@ -288,7 +288,7 @@ ralph: 연구 설계해줘   # 완료까지 지속
 
 ## 🌐 다국어 지원
 
-NovaScholar는 **한국어와 영어**를 완벽히 지원합니다:
+Diverga는 **한국어와 영어**를 완벽히 지원합니다:
 
 ```
 English: "I want to conduct a systematic review"
@@ -307,9 +307,9 @@ MIT License - [LICENSE](LICENSE) 참조
 ## 📖 인용
 
 ```bibtex
-@software{novascholar,
+@software{diverga,
   author = {You, Hosung},
-  title = {NovaScholar: Beyond Modal AI Research Assistant},
+  title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2025},
   version = {5.0.0},
   url = {https://github.com/HosungYou/research-coordinator},
@@ -321,4 +321,4 @@ MIT License - [LICENSE](LICENSE) 참조
 
 **Made with 🌟 for Social Science Researchers**
 
-*NovaScholar: 창의성과 엄밀함이 만나는 곳. 뻔한 것을 넘어, 혁신을 향해.*
+*Diverga: 창의성과 엄밀함이 만나는 곳. 뻔한 것을 넘어, 혁신을 향해.*

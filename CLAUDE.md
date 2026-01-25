@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-# NovaScholar v5.0.0 (Sisyphus Edition)
+# Diverga v5.0.0 (Sisyphus Edition)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
@@ -10,7 +10,7 @@ AI Research Assistant for the Complete Research Lifecycle - from question formul
 
 ## Project Overview
 
-NovaScholar provides **context-persistent research support** through 27 specialized agents across 8 categories (A-H). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), NovaScholar uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
+Diverga provides **context-persistent research support** through 27 specialized agents across 8 categories (A-H). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
 
 ## Core Value Proposition
 
@@ -26,7 +26,7 @@ NovaScholar provides **context-persistent research support** through 27 speciali
 
 ## Quick Start
 
-Simply tell NovaScholar what you want to do:
+Simply tell Diverga what you want to do:
 
 ```
 "I want to conduct a systematic review on AI in education"
@@ -108,7 +108,7 @@ https://github.com/HosungYou/research-coordinator
 
 ## OMC Integration (v3.2.0+)
 
-NovaScholar integrates with **oh-my-claudecode** for parallel processing and smart model routing.
+Diverga integrates with **oh-my-claudecode** for parallel processing and smart model routing.
 
 ### Human Checkpoints
 
@@ -138,7 +138,7 @@ ralph: 연구 설계 완료해줘  # persistence until done
 
 ## Sisyphus Protocol (v5.0)
 
-NovaScholar embodies the **Sisyphus philosophy**: **Never claim completion without verification**.
+Diverga embodies the **Sisyphus philosophy**: **Never claim completion without verification**.
 
 ### Continuation Enforcement
 
@@ -196,7 +196,7 @@ Before ANY claim of "done", "fixed", or "complete":
 
 ## Paradigm Detection (Auto-Activation)
 
-NovaScholar automatically detects research paradigm and activates appropriate agent packs.
+Diverga automatically detects research paradigm and activates appropriate agent packs.
 
 ### Auto-Detection Triggers
 

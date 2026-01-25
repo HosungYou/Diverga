@@ -1,20 +1,20 @@
 # Changelog
 
-All notable changes to NovaScholar (formerly NovaScholar) will be documented in this file.
+All notable changes to Diverga (formerly Research Coordinator) will be documented in this file.
 
 ## [5.0.0] - 2025-01-25 (Sisyphus Edition)
 
 ### Overview
 
-NovaScholar v5.0.0 represents a major architectural redesign, expanding from 21 to 27 agents across 8 categories (A-H). This release introduces the Sisyphus continuation enforcement pattern, automatic paradigm detection, and comprehensive support for qualitative and mixed methods research.
+Diverga v5.0.0 represents a major architectural redesign, expanding from 21 to 27 agents across 8 categories (A-H). This release introduces the Sisyphus continuation enforcement pattern, automatic paradigm detection, and comprehensive support for qualitative and mixed methods research.
 
 **Core Theme**: "Beyond Modal - Creative, Defensible Research Choices"
 
-### Project Renamed: NovaScholar → NovaScholar
+### Project Renamed: Research Coordinator → Diverga
 
-This release marks the **official renaming** of the project to **NovaScholar** to better reflect its core mission:
+This release marks the **official renaming** of the project to **Diverga** to better reflect its core mission:
 
-- **"Nova"** = New star, new discovery, beyond the obvious
+- **"Diverga"** = Divergent thinking, breaking free from the obvious
 - **Breaking free from mode collapse** through Verbalized Sampling (VS) methodology
 - **T-Score system** for rating typicality of recommendations (0-1 scale)
 - **5 Creativity Mechanisms**: Forced Analogy, Iterative Refinement, Semantic Distance, Temporal Reframing, Community Simulation
@@ -23,9 +23,9 @@ This release marks the **official renaming** of the project to **NovaScholar** t
 
 #### Verbalized Sampling (VS) Methodology
 
-NovaScholar's **core innovation** that prevents mode collapse:
+Diverga's **core innovation** that prevents mode collapse:
 
-| T-Score | Interpretation | NovaScholar Behavior |
+| T-Score | Interpretation | Diverga Behavior |
 |---------|----------------|---------------------|
 | `T > 0.8` | Modal (predictable) | ⚠️ Flags and warns about differentiation |
 | `T 0.5-0.8` | Established alternative | ✅ Suggests as balanced choice |
@@ -280,7 +280,7 @@ python scripts/validate_agents.py
   - ~60% token savings compared to all-Opus approach
 
 - **Research Orchestrator Skill** (`.omc/skills/research-orchestrator/SKILL.md`)
-  - Coordinates NovaScholar with OMC execution modes
+  - Coordinates Diverga with OMC execution modes
   - Agent-tier quick reference table
   - Integration with ultrawork, ecomode, ralph modes
 
@@ -398,7 +398,7 @@ ralph: 연구 설계해줘   # Persistence until done
 
 ## Contributors
 
-- NovaScholar v5.0.0 design based on oh-my-opencode Sisyphus pattern
+- Diverga v5.0.0 design based on oh-my-opencode Sisyphus pattern
 - Benchmarked against: Agent Laboratory, LLM-SLR, Agentic Research Lab
 - Implementation: Claude Opus 4.5 with OMC orchestration
 - Architect Verification: Passed

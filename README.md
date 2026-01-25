@@ -1,4 +1,4 @@
-# NovaScholar 🌟
+# Diverga 🌟
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
@@ -10,7 +10,7 @@
 
 ---
 
-## 🌟 Why "Nova"? Breaking Free from Mode Collapse
+## 🌟 Why "Diverga"? Breaking Free from Mode Collapse
 
 Most AI research assistants suffer from **mode collapse** - they always recommend the same predictable options:
 
@@ -18,7 +18,7 @@ Most AI research assistants suffer from **mode collapse** - they always recommen
 > ❌ "For your meta-analysis, use random effects model." (always)
 > ❌ "Try thematic analysis for your qualitative study." (the obvious choice)
 
-**NovaScholar is different.** Built on **Verbalized Sampling (VS) methodology** (arXiv:2510.01171), it actively prevents mode collapse and guides you toward **creative, defensible research choices**.
+**Diverga is different.** Built on **Verbalized Sampling (VS) methodology** (arXiv:2510.01171), it actively prevents mode collapse and guides you toward **creative, defensible research choices**.
 
 ---
 
@@ -33,9 +33,9 @@ AI systems tend to recommend the most statistically common options - what we cal
 
 ### The Solution: Dynamic T-Score System
 
-NovaScholar assigns **Typicality Scores (T-Score)** to all recommendations:
+Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 
-| T-Score | Interpretation | NovaScholar Behavior |
+| T-Score | Interpretation | Diverga Behavior |
 |---------|----------------|---------------------|
 | `T > 0.8` | **Modal** (most common) | ⚠️ Flags as "predictable" - warns about differentiation |
 | `T 0.5-0.8` | **Established alternative** | ✅ Suggests as balanced choice |
@@ -44,7 +44,7 @@ NovaScholar assigns **Typicality Scores (T-Score)** to all recommendations:
 
 ### 5 Creativity Mechanisms
 
-NovaScholar uses five cognitive mechanisms to generate non-obvious options:
+Diverga uses five cognitive mechanisms to generate non-obvious options:
 
 | Mechanism | Description | Example |
 |-----------|-------------|---------|
@@ -62,10 +62,10 @@ NovaScholar uses five cognitive mechanisms to generate non-obvious options:
    AI: "I recommend Technology Acceptance Model (TAM)."
    (Same answer every time, T=0.92)
 
-✅ WITH VS (NovaScholar):
+✅ WITH VS (Diverga):
    User: "Help me choose a theoretical framework for AI adoption study"
 
-   NovaScholar: "Let me analyze options across the typicality spectrum:
+   Diverga: "Let me analyze options across the typicality spectrum:
 
    [Modal Awareness] TAM (T=0.92) and UTAUT (T=0.85) are predictable choices.
    Most reviewers expect these, but they offer limited differentiation.
@@ -87,13 +87,13 @@ NovaScholar uses five cognitive mechanisms to generate non-obvious options:
 
 ---
 
-## 🎯 What Makes NovaScholar Different
+## 🎯 What Makes Diverga Different
 
 ### 1. **Creative Guidance, Not Just Answers**
-NovaScholar doesn't just answer questions - it expands your thinking by showing options you didn't know existed.
+Diverga doesn't just answer questions - it expands your thinking by showing options you didn't know existed.
 
 ### 2. **Context Persistence**
-Unlike general AI tools, NovaScholar maintains your research context:
+Unlike general AI tools, Diverga maintains your research context:
 - Research question and theoretical framework
 - Methodological decisions and rationale
 - Literature search strategies and results
@@ -122,7 +122,7 @@ Different agents apply VS at different intensities:
 
 ### 14 User Checkpoints
 
-NovaScholar confirms decisions at critical points:
+Diverga confirms decisions at critical points:
 
 | Code | Checkpoint | Purpose |
 |------|-----------|---------|
@@ -279,7 +279,7 @@ ralph: 연구 설계해줘   # Persistence until done
 - Interpretation of findings
 - Ethical trade-offs
 
-### What NovaScholar Handles
+### What Diverga Handles
 - Searching 20,000+ papers across databases
 - Calculating inter-rater reliability
 - Generating PRISMA flow diagrams
@@ -311,7 +311,7 @@ ralph: 연구 설계해줘   # Persistence until done
 
 ## 🌐 Multilingual Support
 
-NovaScholar fully supports **Korean and English**:
+Diverga fully supports **Korean and English**:
 
 ```
 English: "I want to conduct a systematic review"
@@ -350,9 +350,9 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## 📖 Citation
 
 ```bibtex
-@software{novascholar,
+@software{diverga,
   author = {You, Hosung},
-  title = {NovaScholar: Beyond Modal AI Research Assistant},
+  title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2025},
   version = {5.0.0},
   url = {https://github.com/HosungYou/research-coordinator},
@@ -364,4 +364,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Made with 🌟 for Social Science Researchers**
 
-*NovaScholar: Where creativity meets rigor. Beyond the obvious, toward the innovative.*
+*Diverga: Where creativity meets rigor. Beyond the obvious, toward the innovative.*
