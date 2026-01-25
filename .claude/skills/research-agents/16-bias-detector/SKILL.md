@@ -7,6 +7,7 @@ description: |
   Use when: detecting biases, reviewing research integrity, checking for p-hacking
   Triggers: bias, p-hacking, HARKing, selective reporting, confirmation bias
 upgrade_level: FULL
+tier: Core
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

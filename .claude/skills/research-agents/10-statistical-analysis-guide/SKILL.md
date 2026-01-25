@@ -7,6 +7,7 @@ description: |
   Use when: selecting statistical methods, interpreting results, checking assumptions
   Triggers: statistical analysis, ANOVA, regression, t-test, power analysis, assumption checking, effect size
 upgrade_level: FULL
+tier: Flagship
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

@@ -7,6 +7,7 @@ description: |
   Use when: selecting target journals, planning submissions, comparing publication options
   Triggers: journal, submission, impact factor, academic journal, publication, submit
 upgrade_level: LIGHT
+tier: Core
 v3_integration:
   dynamic_t_score: false
   creativity_modules: []

@@ -7,6 +7,7 @@ description: |
   Use when: conducting literature reviews, systematic reviews, meta-analyses, finding prior research
   Triggers: literature review, PRISMA, systematic review, meta-analysis, prior research
 upgrade_level: FULL
+tier: Core
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

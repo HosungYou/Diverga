@@ -7,6 +7,7 @@ description: |
   Use when: selecting research design, planning methodology, choosing between approaches
   Triggers: research design, RCT, quasi-experimental, experimental design, survey design, methodology
 upgrade_level: ENHANCED
+tier: Core
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

@@ -1,0 +1,62 @@
+# Human Decision Checkpoints for Research Coordinator
+# These checkpoints REQUIRE human approval before proceeding
+
+checkpoints:
+  # REQUIRED (Red) - Must have human approval
+  CP_RESEARCH_DIRECTION:
+    level: required
+    description: "Research direction and question approval"
+    applies_to: [01-research-question-refiner]
+    human_action: "Review and approve research question"
+    cannot_proceed_without: true
+
+  CP_THEORY_SELECTION:
+    level: required
+    description: "Theoretical framework selection"
+    applies_to: [02-theoretical-framework-architect]
+    human_action: "Select and approve theoretical framework"
+    cannot_proceed_without: true
+
+  CP_METHODOLOGY_APPROVAL:
+    level: required
+    description: "Research methodology approval"
+    applies_to: [04-research-ethics-advisor, 09-research-design-consultant]
+    human_action: "Approve research design and methodology"
+    cannot_proceed_without: true
+
+  # RECOMMENDED (Orange) - Should have human review
+  CP_ANALYSIS_PLAN:
+    level: recommended
+    description: "Analysis plan review"
+    applies_to: [10-statistical-analysis-guide]
+    human_action: "Review statistical analysis plan"
+    can_auto_proceed: true
+    auto_proceed_delay: 30
+
+  CP_QUALITY_REVIEW:
+    level: recommended
+    description: "Quality review of outputs"
+    applies_to: [21-conceptual-framework-visualizer]
+    human_action: "Review generated visualization quality"
+    can_auto_proceed: false
+
+  # OPTIONAL (Yellow) - Human can choose to review
+  CP_VISUALIZATION_PREFERENCE:
+    level: optional
+    description: "Visualization direction selection"
+    applies_to: [21-conceptual-framework-visualizer]
+    human_action: "Select visualization direction (A/B/C)"
+    default_if_skipped: "B"
+
+  CP_RENDERING_METHOD:
+    level: optional
+    description: "Rendering method selection"
+    applies_to: [21-conceptual-framework-visualizer]
+    human_action: "Choose Code-First, Nanobanana, or Hybrid"
+    default_if_skipped: "Hybrid"
+
+# Checkpoint validation rules
+validation:
+  required_checkpoints_must_pass: true
+  max_auto_proceed_time: 60
+  notify_on_checkpoint: true

@@ -7,6 +7,7 @@ description: |
   Use when: extracting effect sizes, converting statistics, preparing meta-analysis data
   Triggers: effect size, Cohen's d, Hedges' g, correlation, conversion, meta-analysis data
 upgrade_level: ENHANCED
+tier: Support
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

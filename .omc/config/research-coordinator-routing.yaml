@@ -1,0 +1,238 @@
+# Research Coordinator Model Routing Configuration
+# Version: 3.2.0
+# Core Principle: 인간이 할 일은 인간이, AI는 인간 범위를 벗어난 작업 수행
+
+# Tier Definitions
+tiers:
+  HIGH:
+    model: opus
+    description: "Strategic decisions, critical thinking, complex reasoning"
+    cost_factor: 3.0
+    use_when:
+      - "Research direction decisions"
+      - "Theoretical framework design"
+      - "Critical analysis and challenge"
+      - "Strategic peer review responses"
+
+  MEDIUM:
+    model: sonnet
+    description: "Standard analysis, quality assessment, documentation"
+    cost_factor: 1.0
+    use_when:
+      - "Quality evaluation with criteria"
+      - "Statistical method selection"
+      - "Document writing"
+      - "Journal matching"
+
+  LOW:
+    model: haiku
+    description: "Automated tasks, calculations, searches"
+    cost_factor: 0.2
+    use_when:
+      - "Literature search"
+      - "Formula application"
+      - "Code generation"
+      - "Checklist verification"
+
+# Agent-to-Tier Mapping
+agent_routing:
+  # Category A: Theory & Design
+  "01-research-question-refiner":
+    tier: HIGH
+    model: opus
+    rationale: "Strategic research direction - requires deep reasoning"
+    human_checkpoint: CP_RESEARCH_DIRECTION
+
+  "02-theoretical-framework-architect":
+    tier: HIGH
+    model: opus
+    rationale: "Complex theoretical integration across disciplines"
+    human_checkpoint: CP_THEORY_SELECTION
+
+  "03-devils-advocate":
+    tier: HIGH
+    model: opus
+    rationale: "Critical thinking requires sophisticated reasoning"
+    human_checkpoint: null
+    parallel_with: ["02-theoretical-framework-architect"]
+
+  "04-research-ethics-advisor":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Regulatory compliance - criteria-based evaluation"
+    human_checkpoint: CP_METHODOLOGY_APPROVAL
+
+  # Category B: Literature & Evidence
+  "05-systematic-literature-scout":
+    tier: LOW
+    model: haiku
+    rationale: "Search automation - no complex reasoning needed"
+    human_checkpoint: null
+    parallelizable: true
+    spawn_multiple: true  # Can spawn per-database
+
+  "06-evidence-quality-appraiser":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Quality criteria application requires judgment"
+    human_checkpoint: null
+    parallelizable: true
+    spawn_multiple: true  # Can spawn per-paper
+
+  "07-effect-size-extractor":
+    tier: LOW
+    model: haiku
+    rationale: "Formula application - computational task"
+    human_checkpoint: null
+    parallelizable: true
+    spawn_multiple: true  # Can spawn per-study
+
+  "08-research-radar":
+    tier: LOW
+    model: haiku
+    rationale: "Monitoring and alerting - background task"
+    human_checkpoint: null
+    parallelizable: true
+
+  # Category C: Methodology & Analysis
+  "09-research-design-consultant":
+    tier: HIGH
+    model: opus
+    rationale: "Strategic design decisions with tradeoffs"
+    human_checkpoint: CP_METHODOLOGY_APPROVAL
+
+  "10-statistical-analysis-guide":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Method matching with assumptions checking"
+    human_checkpoint: CP_ANALYSIS_PLAN
+
+  "11-analysis-code-generator":
+    tier: LOW
+    model: haiku
+    rationale: "Code generation from templates"
+    human_checkpoint: null
+    parallelizable: true
+
+  "12-sensitivity-analysis-designer":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Analysis design requires methodological judgment"
+    human_checkpoint: null
+
+  # Category D: Quality & Validation
+  "13-internal-consistency-checker":
+    tier: LOW
+    model: haiku
+    rationale: "Pattern matching and verification"
+    human_checkpoint: null
+    parallelizable: true
+
+  "14-checklist-manager":
+    tier: LOW
+    model: haiku
+    rationale: "Checklist verification - rule-based"
+    human_checkpoint: null
+    parallelizable: true
+
+  "15-reproducibility-auditor":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Reproducibility assessment requires judgment"
+    human_checkpoint: null
+    parallelizable: true
+
+  "16-bias-detector":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Bias analysis requires methodological understanding"
+    human_checkpoint: null
+
+  # Category E: Publication & Communication
+  "17-journal-matcher":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Matching algorithm with multiple criteria"
+    human_checkpoint: null
+
+  "18-academic-communicator":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Multi-audience writing requires adaptation"
+    human_checkpoint: null
+    parallelizable: true
+    spawn_multiple: true  # Can spawn per-audience
+
+  "19-peer-review-strategist":
+    tier: HIGH
+    model: opus
+    rationale: "Strategic response requires sophisticated reasoning"
+    human_checkpoint: CP_RESPONSE_APPROVAL
+
+  "20-preregistration-composer":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Document composition with structure"
+    human_checkpoint: CP_PREREGISTRATION_APPROVAL
+
+  "21-conceptual-framework-visualizer":
+    tier: MEDIUM
+    model: sonnet
+    rationale: "Visualization with Nanobanana integration"
+    human_checkpoints:
+      - CP_VISUALIZATION_PREFERENCE
+      - CP_RENDERING_METHOD
+      - CP_QUALITY_REVIEW
+
+# Routing Rules
+routing_rules:
+  # Auto-trigger patterns
+  auto_triggers:
+    - pattern: ["연구 질문", "research question", "PICO", "SPIDER"]
+      route_to: "01-research-question-refiner"
+      tier: HIGH
+
+    - pattern: ["이론", "theory", "프레임워크", "framework", "conceptual model"]
+      route_to: "02-theoretical-framework-architect"
+      tier: HIGH
+
+    - pattern: ["문헌 검색", "literature search", "PRISMA", "systematic review"]
+      route_to: "05-systematic-literature-scout"
+      tier: LOW
+      allow_parallel: true
+
+    - pattern: ["통계", "분석", "ANOVA", "regression", "회귀"]
+      route_to: "10-statistical-analysis-guide"
+      tier: MEDIUM
+
+    - pattern: ["저널", "journal", "투고", "submission"]
+      route_to: "17-journal-matcher"
+      tier: MEDIUM
+
+    - pattern: ["시각화", "visualization", "그래프", "figure", "diagram"]
+      route_to: "21-conceptual-framework-visualizer"
+      tier: MEDIUM
+
+  # Fallback behavior
+  fallback:
+    unknown_pattern: "general-purpose"
+    default_tier: MEDIUM
+    default_model: sonnet
+
+# Token Efficiency Settings
+efficiency:
+  prefer_lower_tier: true  # When in doubt, use lower tier
+  batch_parallel_tasks: true  # Batch similar tasks
+  reuse_context: true  # Reuse context across related agents
+
+  estimated_savings:
+    low_tier_vs_high: 0.80  # 80% savings
+    medium_tier_vs_high: 0.50  # 50% savings
+    overall_average: 0.60  # 60% average savings
+
+# Logging
+logging:
+  log_tier_selection: true
+  log_checkpoint_decisions: true
+  log_parallel_execution: true
+  log_file: ".omc/logs/routing.log"

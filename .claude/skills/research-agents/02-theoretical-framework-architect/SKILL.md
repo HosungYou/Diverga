@@ -7,6 +7,7 @@ description: |
   Use when: building theoretical foundations, designing conceptual models, deriving hypotheses
   Triggers: theoretical framework, 이론적 프레임워크, conceptual model, 개념적 모형, hypothesis derivation
 upgrade_level: FULL
+tier: Flagship
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

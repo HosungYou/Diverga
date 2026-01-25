@@ -321,12 +321,16 @@ All agents understand both languages and respond appropriately.
 
 ## 📚 Documentation
 
-- [Installation Guide](docs/SETUP.md)
-- [Usage Examples](docs/USAGE-EXAMPLES.md)
-- [Agent Reference](docs/AGENT-REFERENCE.md)
-- [한국어 문서](docs/README-ko.md)
-- [PRISMA 2020 Workflow](docs/PRISMA-WORKFLOW.md)
-- [Integration Setup](docs/INTEGRATION-SETUP.md)
+| Document | Description |
+|----------|-------------|
+| [Quick Start](docs/QUICKSTART.md) | Get started in 5 minutes |
+| [Installation](docs/SETUP.md) | Full setup instructions |
+| [Usage Examples](docs/USAGE-EXAMPLES.md) | Common use cases |
+| [Agent Reference](docs/AGENT-REFERENCE.md) | 21 agents detailed reference |
+| [OMC Integration](docs/OMC-INTEGRATION.md) | oh-my-claudecode integration |
+| [Roadmap](docs/ROADMAP.md) | Future development plans |
+| [Changelog](docs/CHANGELOG.md) | Version history |
+| [한국어 문서](docs/i18n/ko/README-ko.md) | Korean documentation |
 
 ## 🔧 Requirements
 

@@ -7,6 +7,7 @@ description: |
   Use when: checking ethical considerations, preparing IRB submissions, reviewing consent procedures
   Triggers: ethics, IRB, consent, informed consent, privacy, vulnerable populations
 upgrade_level: ENHANCED
+tier: Support
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

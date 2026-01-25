@@ -7,6 +7,7 @@ description: |
   Use when: Research Discussion images, theoretical model diagrams, variable relationship maps, Conceptual Framework generation needed
   Triggers: conceptual framework, 개념적 모형, theoretical model visualization, Discussion figure, variable relationship diagram, framework diagram
 upgrade_level: FULL
+tier: Flagship
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

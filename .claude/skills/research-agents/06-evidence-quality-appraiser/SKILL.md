@@ -7,6 +7,7 @@ description: |
   Use when: appraising study quality, assessing risk of bias, grading evidence
   Triggers: quality appraisal, RoB, GRADE, Newcastle-Ottawa, risk of bias, methodological quality
 upgrade_level: ENHANCED
+tier: Core
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

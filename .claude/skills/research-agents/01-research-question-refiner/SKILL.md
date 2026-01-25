@@ -7,6 +7,7 @@ description: |
   Use when: refining research ideas, formulating research questions, clarifying scope
   Triggers: research question, 연구 질문, PICO, SPIDER, research idea
 upgrade_level: ENHANCED
+tier: Core
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

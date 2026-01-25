@@ -7,6 +7,7 @@ description: |
   Use when: reviewing research design, anticipating reviewer criticism, stress-testing assumptions
   Triggers: criticism, weakness, reviewer 2, alternative explanation, rebuttal, 비판, 약점
 upgrade_level: FULL
+tier: Flagship
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

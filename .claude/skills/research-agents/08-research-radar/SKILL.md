@@ -7,6 +7,7 @@ description: |
   Use when: tracking new publications, monitoring research trends, staying updated
   Triggers: latest research, trends, new publications, recent papers, research developments
 upgrade_level: ENHANCED
+tier: Support
 v3_integration:
   dynamic_t_score: true
   creativity_modules:

@@ -1,0 +1,229 @@
+# Parallel Execution Rules
+# Defines which agents can run simultaneously
+
+parallel_groups:
+  # Phase 1: Research Planning (mostly sequential)
+  planning_parallel:
+    agents: [02-theoretical-framework-architect, 03-devils-advocate]
+    requires_before: CP_RESEARCH_DIRECTION
+    requires_after: CP_THEORY_SELECTION
+    max_concurrent: 2
+    description: "Theory selection and critical review can run together"
+
+  ethics_design_parallel:
+    agents: [04-research-ethics-advisor, 09-research-design-consultant]
+    requires_before: CP_THEORY_SELECTION
+    requires_after: CP_METHODOLOGY_APPROVAL
+    max_concurrent: 2
+    description: "Ethics and methodology can be designed in parallel"
+
+  # Phase 2: Literature Review (highly parallel)
+  literature_parallel:
+    agents: [05-systematic-literature-scout, 08-research-radar]
+    can_run_independently: true
+    no_checkpoint_required: true
+    max_concurrent: 5
+    description: "Literature search across multiple databases"
+
+  quality_parallel:
+    agents: [06-evidence-quality-appraiser]
+    per_item: true  # Can spawn multiple instances per paper
+    no_checkpoint_required: true
+    max_concurrent: 10
+    description: "Quality appraisal can process multiple papers simultaneously"
+
+  effect_size_parallel:
+    agents: [07-effect-size-extractor]
+    can_run_independently: true
+    no_checkpoint_required: true
+    max_concurrent: 3
+    description: "Effect size extraction from multiple papers"
+
+  # Phase 3: Analysis (partially parallel)
+  analysis_parallel:
+    agents: [11-analysis-code-generator, 12-sensitivity-analysis-designer]
+    requires_before: CP_ANALYSIS_PLAN
+    can_run_independently: true
+    max_concurrent: 3
+    description: "Code generation and sensitivity analysis design"
+
+  # Phase 4: Quality (highly parallel)
+  quality_check_parallel:
+    agents: [13-internal-consistency-checker, 14-checklist-manager, 15-reproducibility-auditor]
+    can_run_independently: true
+    no_checkpoint_required: true
+    max_concurrent: 5
+    description: "Multiple quality checks can run simultaneously"
+
+  bias_journal_parallel:
+    agents: [16-bias-detector, 17-journal-matcher]
+    can_run_independently: true
+    no_checkpoint_required: true
+    max_concurrent: 2
+    description: "Bias detection and journal matching are independent"
+
+  # Phase 5: Publication (sequential with parallel outputs)
+  communication_parallel:
+    agents: [18-academic-communicator]
+    per_audience: true  # Can spawn for different audiences
+    no_checkpoint_required: true
+    max_concurrent: 3
+    description: "Can generate communications for multiple audiences in parallel"
+
+  visualization_parallel:
+    agents: [19-peer-review-strategist, 21-conceptual-framework-visualizer]
+    can_run_independently: true
+    requires_before: CP_ANALYSIS_PLAN
+    max_concurrent: 2
+    description: "Peer review strategy and conceptual framework visualization can run in parallel"
+
+  publication_output_parallel:
+    agents: [20-preregistration-composer]
+    can_run_independently: true
+    no_checkpoint_required: true
+    max_concurrent: 2
+    description: "Pre-registration document preparation"
+
+# Sequential requirements
+sequential_chains:
+  research_flow:
+    description: "Core research design flow - must be sequential"
+    order: [01, 02, 09, 10]
+    agent_names:
+      - "01-research-question-refiner"
+      - "02-theoretical-framework-architect"
+      - "09-research-design-consultant"
+      - "10-statistical-analysis-guide"
+    checkpoints_between: [CP_RESEARCH_DIRECTION, CP_THEORY_SELECTION, CP_METHODOLOGY_APPROVAL, CP_ANALYSIS_PLAN]
+    cannot_parallelize: true
+
+  analysis_flow:
+    description: "Analysis execution flow"
+    order: [10, 11, 16]
+    agent_names:
+      - "10-statistical-analysis-guide"
+      - "11-analysis-code-generator"
+      - "16-bias-detector-and-mitigator"
+    checkpoints_between: [CP_ANALYSIS_PLAN]
+    can_parallelize_within_stages: true
+
+  publication_flow:
+    description: "Publication preparation flow"
+    order: [17, 20]
+    agent_names:
+      - "17-journal-matcher"
+      - "20-preregistration-composer"
+    checkpoints_between: []
+    can_parallelize_within_stages: true
+
+# Agent dependencies
+dependencies:
+  01-research-question-refiner:
+    depends_on: []
+    enables: [02, 03, 05, 08]
+
+  02-theoretical-framework-architect:
+    depends_on: [01]
+    enables: [04, 09, 21]
+
+  03-devils-advocate:
+    depends_on: [01]
+    enables: []
+    role: "advisory"
+
+  04-research-ethics-advisor:
+    depends_on: [02]
+    enables: [09]
+
+  05-systematic-literature-scout:
+    depends_on: [01]
+    enables: [06, 07]
+
+  06-evidence-quality-appraiser:
+    depends_on: [05]
+    enables: []
+
+  07-effect-size-extractor:
+    depends_on: [05]
+    enables: []
+
+  08-research-radar:
+    depends_on: [01]
+    enables: []
+
+  09-research-design-consultant:
+    depends_on: [02, 04]
+    enables: [10]
+
+  10-statistical-analysis-guide:
+    depends_on: [09]
+    enables: [11, 12]
+
+  11-analysis-code-generator:
+    depends_on: [10]
+    enables: [13, 14, 15, 16, 17]
+
+  12-sensitivity-analysis-designer:
+    depends_on: [10]
+    enables: [16]
+
+  13-internal-consistency-checker:
+    depends_on: [11]
+    enables: []
+
+  14-checklist-manager:
+    depends_on: [11]
+    enables: []
+
+  15-reproducibility-auditor:
+    depends_on: [11]
+    enables: []
+
+  16-bias-detector-and-mitigator:
+    depends_on: [11]
+    enables: [18, 19]
+
+  17-journal-matcher:
+    depends_on: [18]
+    enables: [20]
+
+  18-academic-communicator:
+    depends_on: [16, 17]
+    enables: [20]
+
+  19-peer-review-strategist:
+    depends_on: [18]
+    enables: [20]
+
+  20-preregistration-composer:
+    depends_on: [17, 19]
+    enables: []
+
+  21-conceptual-framework-visualizer:
+    depends_on: [02]
+    enables: []
+    requires_checkpoint: CP_VISUALIZATION_PREFERENCE
+
+
+# Parallelization strategies
+strategies:
+  literature_review_phase:
+    description: "Maximum parallelization for literature search and quality appraisal"
+    agents: [05, 06, 07, 08]
+    strategy: "spawn_per_database"
+    max_workers: 10
+
+  quality_assurance_phase:
+    description: "Parallel quality checks after analysis"
+    agents: [13, 14, 15, 16, 17]
+    strategy: "all_parallel"
+    max_workers: 5
+
+  publication_preparation_phase:
+    description: "Parallel output generation for publication"
+    agents: [17, 18, 19, 20, 21]
+    strategy: "staged_parallel"
+    stages:
+      - [17, 18, 19]  # Journal matching, communication, peer review strategy
+      - [20, 21]  # Pre-registration and conceptual framework
+    max_workers: 3
