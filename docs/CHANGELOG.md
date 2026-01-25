@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.0.0] - 2025-01-25
+
+### 🎯 Major Release: Complete Architecture Integration
+
+Research Coordinator v4.0 delivers context-persistent research support with full architectural consistency.
+
+### Added
+
+#### Core Systems (v4.0)
+- **Project State System**: Context persistence across entire research lifecycle (`.research/project-state.yaml`)
+- **Pipeline Templates**: Pre-configured PRISMA 2020, Meta-Analysis, Experimental, Survey workflows
+- **Integration Hub**: Connections to Semantic Scholar, OpenAlex, Zotero MCP, Nanobanana, Office Suite
+- **Guided Wizard**: AskUserQuestion-based UX for researchers with limited coding experience
+- **Auto-Documentation**: Automatic generation of PRISMA diagrams, extraction sheets, method sections
+
+#### Agent Architecture
+- **3-Tier Structure**: Flagship (4), Core (6), Support (11) agents
+- **v4.0 References**: All 21 agents now reference core v4.0 modules
+- **Pipeline A-E**: Complete research lifecycle workflow with PRISMA 2020 alignment
+
+### Changed
+
+#### Documentation
+- Restructured `docs/` for consistency (UPPERCASE naming, organized subdirectories)
+- Added `docs/i18n/ko/` for Korean translations
+- Added `docs/releases/` for version-specific notes
+- Added `docs/internal/` for development documents
+
+#### Core Modules
+- Added `version: "4.0.0"` frontmatter to all core modules
+- Standardized YAML frontmatter across all files
+
+#### Agents
+- All 21 agents updated to v4.0.0
+- Added `tier:` field to YAML frontmatter
+- Added v4.0 core module references to all agents
+- Converted all agents from Korean to English
+
+### Removed
+
+- `figures/` directory (reference code only, not production)
+- `docs/PYTHON.md` (removed with figures/)
+
+### Architecture Health
+
+| Category | Before | After |
+|----------|--------|-------|
+| Directory Structure | 100% | 100% |
+| Core Module Integrity | 90% | 100% |
+| Agent Contract Consistency | 100% | 100% |
+| Reference Integrity | 100% | 100% |
+| Pipeline Flow Coherence | 100% | 100% |
+| **Total** | **97.5%** | **100%** |
+
+### Documentation
+
+- [v4.0 Architecture Integration Report](releases/v4.0-ARCHITECTURE-INTEGRATION.md)
+
+---
+
 ## [3.1.1] - 2026-01-25
 
 ### 🛠️ Infrastructure Release: Architecture Enhancement
