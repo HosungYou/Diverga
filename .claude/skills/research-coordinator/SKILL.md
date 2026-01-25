@@ -1,559 +1,521 @@
 ---
 name: research-coordinator
 description: |
-  VS-Enhanced 사회과학 연구 에이전트 코디네이터 v3.1.
-  Verbalized Sampling + 5개 창의성 모듈 + 사용자 체크포인트 시스템 + Conceptual Framework 시각화.
-  Use when starting research, designing studies, reviewing literature,
-  analyzing data, preparing publications, or creating conceptual framework visualizations.
-  Automatically dispatches appropriate agents with VS methodology and creativity mechanisms.
-  트리거: 연구 질문, 이론적 프레임워크, 가설, 문헌 검토, 메타분석,
-  효과크기, IRB, PRISMA, 통계 분석, 표본 크기, 편향, 저널, 피어리뷰,
-  conceptual framework, 개념적 모형, 시각화, Discussion figure
-version: "3.1.0"
+  Research Coordinator v4.0 - AI Research Assistant for the Complete Research Lifecycle.
+  Context-persistent platform supporting researchers from question formulation to publication.
+  Features: Project State Management, PRISMA 2020 Pipeline, Integration Hub, Guided Dialogue.
+  Supports both English and Korean (한국어) inputs.
+  Triggers: research question, theoretical framework, hypothesis, literature review, meta-analysis,
+  effect size, IRB, PRISMA, statistical analysis, sample size, bias, journal, peer review,
+  conceptual framework, visualization, systematic review
+version: "4.0.0"
 ---
 
-# Research Coordinator v3.1 (VS-Enhanced + Creativity Suite + Visualization)
+# Research Coordinator v4.0
 
-사회과학 연구자를 위한 **21개 전문 에이전트**를 **Verbalized Sampling(VS) 방법론**과 **5개 창의성 모듈**, **사용자 체크포인트 시스템**과 함께 제공하는 코디네이터입니다.
+Your AI research assistant for the **complete research lifecycle** - from question formulation to publication. Designed for researchers who need context-maintained support throughout their entire project.
 
-**v3.1 신규:** 21-Conceptual-Framework-Visualizer 에이전트 추가 (Full VS, Code-First 시각화)
-
-## VS-Research 방법론
-
-본 시스템은 **arXiv:2510.01171** 기반의 Verbalized Sampling을 학술 연구에 적용하여 **Mode Collapse**를 방지합니다.
-
-### Mode Collapse 방지 원리
-
-```
-일반 LLM: "이론 추천" → TAM (80%) → 모든 연구가 비슷해짐
-
-VS-Enhanced: "이론 추천"
-  → Phase 1: TAM/UTAUT 식별 (모달 = 금지)
-  → Phase 2: Long-tail 탐색 (T-Score 기반)
-  → Phase 3: 차별화된 이론 선택
-  → 결과: 이론적 기여 가능한 연구
-```
-
-### VS 적용 수준
-
-| 수준 | 에이전트 | 특징 |
-|------|---------|------|
-| **Full VS** | 02, 03, 05, 10, 16, **21** | 5단계 전체 + T-Score 명시 |
-| **Enhanced VS** | 01, 04, 06, 07, 08, 09 | 3단계 간소화 |
-| **Light VS** | 11-15, 17-20 | 모달 인식 + 대안 제시 |
+**Language Support**: English base with Korean recognition (한국어 입력 지원)
 
 ---
 
-## v3.0 신규 기능
+## What Makes This Different
 
-### 모듈화된 아키텍처
+Research Coordinator isn't just another AI tool. Its **real value** is:
+
+1. **Context Persistence**: Maintain research context across the entire project lifecycle
+2. **Single Platform**: No more switching between tools and losing context
+3. **Research Pipeline**: Structured workflow from idea to publication
+4. **Tool Discovery**: Easy access to tools/platforms you didn't know existed
+5. **Human-Centered**: AI assists, humans decide
+
+> **Core Principle**: "Human decisions remain with humans. AI handles what's beyond human scope."
+> "인간이 할 일은 인간이, AI는 인간의 범주를 벗어난 것을 수행"
+
+---
+
+## Quick Start
+
+### For New Users
+
+Simply tell Research Coordinator what you want to do:
+
+```
+"I want to conduct a systematic review on AI in education"
+"메타분석 연구를 시작하고 싶어"
+"Help me design an experimental study"
+```
+
+The system will guide you through a **conversational wizard** with clear choice points.
+
+### Entry Point
+
+When Research Coordinator activates, you'll see options like:
+
+| Option | Description |
+|--------|-------------|
+| Start a new research project | Set up systematic review, experiment, or survey |
+| Continue existing project | Resume work on a project in progress |
+| Get help with a specific task | Literature search, statistics, writing, etc. |
+| Learn about available tools | See integrations and features |
+
+---
+
+## Core Systems (v4.0)
+
+### 1. Research Project State
+
+Maintains context throughout your entire research journey. No need to re-explain your research question, methodology, or decisions.
+
+**Location**: `.research/project-state.yaml`
+
+```yaml
+project:
+  name: "Your Project Name"
+  type: "systematic_review"  # or: meta_analysis, experimental, survey
+  current_stage: 3
+
+research_context:
+  research_question:
+    main: "How does GenAI affect learning outcomes?"
+    pico_elements:
+      population: "Higher education students"
+      intervention: "Generative AI tools"
+      comparison: "Traditional instruction"
+      outcome: "Learning outcomes"
+
+  theoretical_framework:
+    primary_theory: "AIMC Model"
+    hypotheses:
+      - id: "H1"
+        statement: "GenAI improves learning outcomes"
+```
+
+**Reference**: `core/project-state.md`
+
+---
+
+### 2. Pipeline Templates
+
+Pre-configured workflows for common research types following established guidelines.
+
+#### Systematic Review & Meta-Analysis (PRISMA 2020)
+
+```
+Stage 1: Protocol Development
+  ├─ Define research question (PICO/SPIDER)
+  ├─ Select theoretical framework
+  └─ Register protocol (PROSPERO)
+
+Stage 2: Literature Search
+  ├─ Execute database searches
+  └─ Document search strings
+
+Stage 3: Screening
+  ├─ Title/abstract screening
+  └─ Full-text assessment
+
+Stage 4: Data Extraction
+  ├─ Extract study characteristics
+  └─ Code moderators
+
+Stage 5: Quality Assessment
+  ├─ Risk of bias (RoB 2, ROBINS-I)
+  └─ GRADE assessment
+
+Stage 6: Statistical Analysis
+  ├─ Meta-analytic model
+  ├─ Moderator analyses
+  └─ Publication bias tests
+
+Stage 7: Manuscript Preparation
+  └─ IMRAD structure
+
+Stage 8: Publication & Dissemination
+  └─ OSF, supplementary materials
+```
+
+**Reference**: `core/pipeline-templates.md`
+
+---
+
+### 3. Integration Hub
+
+Connect with tools that support your research workflow.
+
+#### Ready to Use (No Setup)
+
+| Tool | Purpose | How to Use |
+|------|---------|------------|
+| Excel | Data extraction, coding | "Create extraction spreadsheet" |
+| PowerPoint | Presentations | "Create conference slides" |
+| Word | Manuscript drafting | "Export methods to Word" |
+| BibTeX | Citations | "Generate bibliography" |
+| Mermaid | Diagrams | "Create PRISMA flow diagram" |
+| Python | Analysis | Built-in |
+
+#### Needs Setup
+
+| Tool | Purpose | Setup |
+|------|---------|-------|
+| Semantic Scholar | Literature search (200M+ papers) | API key |
+| OpenAlex | Literature search (250M+ works) | Email only |
+| Zotero | Reference management | MCP server |
+| R Scripts | Statistical analysis | Local R installation |
+| Nanobanana | AI visualization | Gemini API key |
+
+**Reference**: `core/integration-hub.md`
+
+---
+
+### 4. Guided Dialogue (Wizard)
+
+Research Coordinator uses explicit choice points for important decisions, followed by natural language conversation.
+
+**How It Works**:
+1. Clear options presented (using AskUserQuestion)
+2. You select your choice
+3. Natural conversation continues
+4. Next checkpoint when needed
+
+**Example Checkpoint**:
+```
+Question: "Which research direction aligns best with your goals?"
+
+Options:
+1. Direction A: Narrow Focus (T=0.65) 🟢
+   Safe, well-supported approach
+
+2. Direction B: Balanced (T=0.45) 🔵
+   Some novelty, defensible
+
+3. Direction C: Innovative (T=0.25) 🟡
+   High contribution, needs strong defense
+```
+
+**Reference**: `core/guided-wizard.md`
+
+---
+
+### 5. Auto-Documentation
+
+Research Coordinator automatically generates documentation as you progress.
+
+**Auto-Generated Documents**:
+- Decision Log (all research decisions with timestamps)
+- PRISMA Checklist (tracked automatically)
+- Methods Section Draft
+- Research Audit Trail
+- Supplementary Materials Package
+- OSF Submission Package
+
+**Commands**:
+```
+"Show my decision log"
+"Generate PRISMA flow diagram"
+"Draft my methods section"
+"Prepare OSF submission package"
+```
+
+**Reference**: `core/auto-documentation.md`
+
+---
+
+## Agent System
+
+### Three-Tier Structure
+
+| Tier | Agents | Characteristics |
+|------|--------|-----------------|
+| **Flagship** | #02, #03, #10, #21 | Full VS methodology, strategic decisions |
+| **Core** | #01, #05, #06, #09, #16, #17 | Essential capabilities, enhanced VS |
+| **Support** | #04, #07-08, #11-15, #18-20 | Specialized tasks, light VS |
+
+### Agent Catalog
+
+#### Category A: Theory & Research Design
+
+| ID | Agent | Purpose | Tier |
+|----|-------|---------|------|
+| 01 | Research Question Refiner | Refine research questions (PICO/SPIDER) | Core |
+| 02 | Theoretical Framework Architect | Theory selection with VS | Flagship |
+| 03 | Devil's Advocate | Critical review, anticipate reviewers | Flagship |
+| 04 | Research Ethics Advisor | IRB, consent, ethics | Support |
+
+#### Category B: Literature & Evidence
+
+| ID | Agent | Purpose | Tier |
+|----|-------|---------|------|
+| 05 | Systematic Literature Scout | PRISMA-compliant search | Core |
+| 06 | Evidence Quality Appraiser | RoB, GRADE assessment | Core |
+| 07 | Effect Size Extractor | Calculate/convert effect sizes | Support |
+| 08 | Research Radar | Track recent publications | Support |
+
+#### Category C: Methodology & Analysis
+
+| ID | Agent | Purpose | Tier |
+|----|-------|---------|------|
+| 09 | Research Design Consultant | Study design guidance | Core |
+| 10 | Statistical Analysis Guide | Statistical method selection | Flagship |
+| 11 | Analysis Code Generator | R/Python code generation | Support |
+| 12 | Sensitivity Analysis Designer | Robustness testing | Support |
+
+#### Category D: Quality & Validation
+
+| ID | Agent | Purpose | Tier |
+|----|-------|---------|------|
+| 13 | Internal Consistency Checker | Logic flow verification | Support |
+| 14 | Checklist Manager | CONSORT, STROBE, PRISMA | Support |
+| 15 | Reproducibility Auditor | OSF, open science | Support |
+| 16 | Bias Detector | p-hacking, HARKing detection | Core |
+
+#### Category E: Publication & Communication
+
+| ID | Agent | Purpose | Tier |
+|----|-------|---------|------|
+| 17 | Journal Matcher | Find target journals | Core |
+| 18 | Academic Communicator | Plain language summaries | Support |
+| 19 | Peer Review Strategist | Response to reviewers | Support |
+| 20 | Preregistration Composer | OSF, Registered Reports | Support |
+| 21 | Conceptual Framework Visualizer | Mermaid → Nanobanana pipeline | Flagship |
+
+---
+
+## VS-Research Methodology
+
+Research Coordinator applies **Verbalized Sampling (VS)** to prevent "mode collapse" - the tendency of AI to always recommend the most common approaches.
+
+### The Problem
+
+```
+Standard AI: "Recommend a theory" → TAM (80% of the time)
+             → All research looks similar
+             → Limited theoretical contribution
+
+VS-Enhanced: "Recommend a theory"
+             → Step 1: Identify TAM as modal (explicitly avoid)
+             → Step 2: Explore long-tail alternatives
+             → Step 3: Select based on T-Score and context
+             → Result: Differentiated, publishable research
+```
+
+### T-Score (Typicality Score)
+
+| T-Score | Label | Meaning |
+|---------|-------|---------|
+| ≥ 0.7 | Common | Highly typical, safe but limited novelty |
+| 0.4-0.7 | Moderate | Balanced risk-novelty |
+| 0.2-0.4 | Innovative | Novel, requires strong justification |
+| < 0.2 | Experimental | Highly novel, high risk/reward |
+
+### Simplified VS Process (v4.0)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                Research Coordinator v3.0                     │
+│                    VS-Research 3-Stage                       │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  core/                    creativity/                       │
-│  ├── vs-engine.md        ├── forced-analogy.md             │
-│  └── t-score-dynamic.md  ├── iterative-loop.md             │
-│                          ├── semantic-distance.md           │
-│                          ├── temporal-reframing.md          │
-│                          └── community-simulation.md        │
+│  Stage 1: Context & Modal Identification                    │
+│    ├─ Understand research context                           │
+│    └─ Identify "obvious" recommendations (to avoid)         │
 │                                                             │
-│  interaction/            references/                        │
-│  └── user-checkpoints.md ├── agent-registry.yaml           │
-│                          ├── creativity-mechanisms.md       │
-│                          ├── user-checkpoint-schema.md      │
-│                          └── dynamic-t-score-spec.md        │
+│  Stage 2: Divergent Exploration                             │
+│    ├─ Direction A (T≈0.6): Safe but differentiated         │
+│    ├─ Direction B (T≈0.4): Balanced novelty                │
+│    └─ Direction C (T<0.3): Innovative/experimental         │
+│                                                             │
+│  Stage 3: Selection & Execution                             │
+│    ├─ Present options with T-Scores                         │
+│    ├─ Human selects direction                               │
+│    └─ Execute with academic rigor                           │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 5개 창의성 모듈
+---
 
-| 모듈 | 목적 | 체크포인트 |
-|------|------|-----------|
-| **Forced Analogy** | 다른 분야에서 개념 매핑 | CP-FA-001, CP-FA-002 |
-| **Iterative Loop** | 발산-수렴 4라운드 사이클 | CP-IL-001~004 |
-| **Semantic Distance** | 임베딩 기반 거리 추천 | CP-SD-001, CP-SD-002 |
-| **Temporal Reframing** | 시간 관점 전환 | CP-TR-001 |
-| **Community Simulation** | 7명 가상 연구자 피드백 | CP-CS-001, CP-CS-002 |
+## Human Checkpoints
 
-### 사용자 체크포인트 시스템
+Strategic decisions remain with the researcher. AI provides options; humans decide.
 
-| 유형 | 아이콘 | 용도 |
-|------|--------|------|
-| PREFERENCE | 🔵 | 사용자 선호 선택 |
-| APPROVAL | 🟡 | 명시적 승인 필요 |
-| GUARDRAIL | 🔴 | 위험 인지 확인 |
-| ITERATION | 🟢 | 프로세스 제어 |
+### Required Checkpoints (🔴)
 
-### 동적 T-Score
+| Checkpoint | When | Decision |
+|------------|------|----------|
+| CP_RESEARCH_DIRECTION | Research question finalized | Confirm scope and direction |
+| CP_THEORY_SELECTION | Framework chosen | Approve theoretical approach |
+| CP_METHODOLOGY_APPROVAL | Design complete | Approve methodology |
 
-```
-dynamic_t_score = base_score + recency_modifier + domain_modifier + trend_modifier
+### Recommended Checkpoints (🟠)
 
-모드:
-- 정적 (Static): 사전 정의된 테이블 사용
-- 동적 (Dynamic): API로 실시간 계산 (권장)
-- 하이브리드 (Hybrid): 정적 기준선 + 트렌드 보정
-```
+| Checkpoint | When | Decision |
+|------------|------|----------|
+| CP_ANALYSIS_PLAN | Before analysis | Review statistical approach |
+| CP_QUALITY_REVIEW | Quality assessment done | Approve quality judgments |
 
-### 창의성 수준 선택
+### Optional Checkpoints (🟡)
 
-| 수준 | T-Score 범위 | 창의성 모듈 | 적합 대상 |
-|------|-------------|-------------|----------|
-| Conservative | T ≥ 0.5 | 없음 | 첫 출판, 보수적 저널 |
-| Balanced (권장) | T ≥ 0.3 | 선택적 3개 | 대부분 연구 |
-| Innovative | T ≥ 0.2 | 전체 5개 | 혁신 지향 저널 |
-| Extreme | T < 0.2 | 전체 5개 | 탑티어, 패러다임 전환 |
+| Checkpoint | When | Decision |
+|------------|------|----------|
+| CP_VISUALIZATION_PREFERENCE | Creating figures | Style preferences |
+| CP_RENDERING_METHOD | Export options | Output format |
 
 ---
 
-## 에이전트 카탈로그
+## Auto-Trigger Keywords
 
-### Category A: 이론 및 연구 설계 (Theory & Design)
+Research Coordinator automatically recognizes these keywords (English and Korean):
 
-| ID | 에이전트 | Skill | VS 수준 | 트리거 키워드 |
-|----|---------|-------|---------|--------------|
-| 01 | 연구 질문 정제기 | `/research-question-refiner` | Enhanced | 연구 질문, research question, PICO, SPIDER |
-| 02 | 이론적 프레임워크 설계자 | `/theoretical-framework-architect` | **Full** | 이론적 프레임워크, conceptual model, 개념적 모형 |
-| 03 | 악마의 옹호자 | `/devils-advocate` | **Full** | 비판, 약점, reviewer 2, 대안적 설명 |
-| 04 | 연구 윤리 자문관 | `/research-ethics-advisor` | Enhanced | 윤리, IRB, 동의서, informed consent |
-
-### Category B: 문헌 및 증거 (Literature & Evidence)
-
-| ID | 에이전트 | Skill | VS 수준 | 트리거 키워드 |
-|----|---------|-------|---------|--------------|
-| 05 | 체계적 문헌 탐색자 | `/systematic-literature-scout` | **Full** | 문헌 검토, PRISMA, 체계적 리뷰, 메타분석 |
-| 06 | 증거 품질 평가자 | `/evidence-quality-appraiser` | Enhanced | 품질 평가, RoB, GRADE, Newcastle-Ottawa |
-| 07 | 효과크기 추출기 | `/effect-size-extractor` | Enhanced | 효과크기, Cohen's d, 상관계수, 변환 |
-| 08 | 최신 연구 레이더 | `/research-radar` | Enhanced | 최신 연구, 트렌드, 신규 출판 |
-
-### Category C: 방법론 및 분석 (Methodology & Analysis)
-
-| ID | 에이전트 | Skill | VS 수준 | 트리거 키워드 |
-|----|---------|-------|---------|--------------|
-| 09 | 연구 설계 컨설턴트 | `/research-design-consultant` | Enhanced | 연구 설계, RCT, 준실험, 설계 유형 |
-| 10 | 통계 분석 가이드 | `/statistical-analysis-guide` | **Full** | 통계 분석, ANOVA, 회귀, t-test, 검정력 |
-| 11 | 분석 코드 생성기 | `/analysis-code-generator` | Light | R 코드, Python 코드, SPSS, Stata |
-| 12 | 민감도 분석 설계자 | `/sensitivity-analysis-designer` | Light | 민감도 분석, robustness, specification curve |
-
-### Category D: 품질 및 검증 (Quality & Validation)
-
-| ID | 에이전트 | Skill | VS 수준 | 트리거 키워드 |
-|----|---------|-------|---------|--------------|
-| 13 | 내적 일관성 검증자 | `/internal-consistency-checker` | Light | 일관성 점검, 정합성, 논리적 흐름 |
-| 14 | 체크리스트 관리자 | `/checklist-manager` | Light | 체크리스트, CONSORT, STROBE, COREQ |
-| 15 | 재현성 감사자 | `/reproducibility-auditor` | Light | 재현성, OSF, 오픈 사이언스 |
-| 16 | 편향 탐지기 | `/bias-detector` | **Full** | 편향, p-hacking, HARKing, 선택적 보고 |
-
-### Category E: 출판 및 커뮤니케이션 (Publication & Communication)
-
-| ID | 에이전트 | Skill | VS 수준 | 트리거 키워드 |
-|----|---------|-------|---------|--------------|
-| 17 | 저널 매칭 전문가 | `/journal-matcher` | Light | 저널, 투고, impact factor |
-| 18 | 학술 커뮤니케이터 | `/academic-communicator` | Light | 초록, plain language, 프레스 릴리즈 |
-| 19 | 피어 리뷰 대응 전략가 | `/peer-review-strategist` | Light | 리뷰어, 수정 요청, response letter |
-| 20 | 사전등록 문서 작성자 | `/preregistration-composer` | Light | 사전등록, registered report, OSF |
-| 21 | **개념적 프레임워크 시각화** | `/conceptual-framework-visualizer` | **Full** | conceptual framework, 개념적 모형, 시각화, Discussion figure |
+| Keywords | Agent Activated |
+|----------|-----------------|
+| "research question", "연구 질문", "PICO" | #01 Research Question Refiner |
+| "theoretical framework", "이론", "conceptual model" | #02 Theoretical Framework Architect |
+| "literature review", "PRISMA", "systematic review" | #05 Systematic Literature Scout |
+| "statistics", "ANOVA", "regression", "통계 분석" | #10 Statistical Analysis Guide |
+| "journal", "submission", "투고" | #17 Journal Matcher |
+| "visualization", "figure", "시각화" | #21 Conceptual Framework Visualizer |
+| "IRB", "ethics", "윤리" | #04 Research Ethics Advisor |
+| "reviewer", "peer review", "리뷰어" | #19 Peer Review Strategist |
 
 ---
 
-## VS 워크플로우
+## Tool Integration Commands
 
-### Full VS 에이전트 실행 시
-
-Full VS 에이전트(02, 03, 05, 10, 16)가 활성화되면 다음 5단계를 실행합니다:
+### Office Suite (via Skills)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    VS-Research 5단계                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  Phase 0: 맥락 수집                                         │
-│    └─ 연구 분야, 질문, 유형, 대상 저널 확인                 │
-│         ↓                                                   │
-│  Phase 1: 모달 응답 식별                                    │
-│    └─ "가장 뻔한 추천은 X" → 명시적 금지                    │
-│         ↓                                                   │
-│  Phase 2: Long-Tail 샘플링                                  │
-│    ├─ 방향 A (T≈0.7): 안전하지만 차별화                    │
-│    ├─ 방향 B (T≈0.4): 독특하고 정당화 가능                 │
-│    └─ 방향 C (T<0.2): 혁신적/실험적                        │
-│         ↓                                                   │
-│  Phase 3: 저-전형성 선택                                    │
-│    └─ 맥락에 맞는 가장 낮은 T-Score 선택                   │
-│         ↓                                                   │
-│  Phase 4: 실행                                              │
-│    └─ 학술적 엄격성 유지하며 구체화                        │
-│         ↓                                                   │
-│  Phase 5: 독창성 검증                                       │
-│    └─ "80% AI가 이 답변을 할까?" → NO 확인                 │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+"Create an Excel spreadsheet for data extraction"
+→ Generates formatted template with validation
+
+"Create a PowerPoint for my defense"
+→ Generates presentation with IMRAD structure
+
+"Export methods section to Word"
+→ APA 7th edition formatted document
 ```
 
-### v3.0 Enhanced VS 워크플로우
-
-v3.0에서는 사용자 체크포인트와 창의성 모듈이 통합됩니다:
+### Statistical Analysis
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                VS Engine v3.0 실행 흐름                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ▶ 초기화 체크포인트                                        │
-│    🔵 CP-INIT-001: 연구 유형 선택                           │
-│    🔵 CP-INIT-002: 창의성 수준 선택                         │
-│    🔵 CP-INIT-003: T-Score 모드 선택                        │
-│         │                                                   │
-│         ▼                                                   │
-│  ▶ Phase 0-1: 맥락 수집 + 모달 식별                        │
-│         │                                                   │
-│         ▼                                                   │
-│  ▶ Phase 2: Long-Tail 샘플링 (5-7개 방향 확장)             │
-│    🔵 CP-VS-001: 탐색 방향 선택 (다중 선택)                 │
-│         │                                                   │
-│         ▼                                                   │
-│  ▶ Phase 3: 저-전형성 선택                                 │
-│    🔴 CP-VS-002: 위험 경고 (T < 0.3인 경우)                │
-│         │                                                   │
-│         ▼                                                   │
-│  ▶ Phase 4: 실행 + 창의성 모듈                             │
-│    ┌─────────────────────────────────────────────────┐     │
-│    │ IF creativity_level >= "Innovative":            │     │
-│    │   → Forced Analogy (CP-FA-001, 002)            │     │
-│    │   → Iterative Loop (CP-IL-001~004)             │     │
-│    │   → Semantic Distance (CP-SD-001, 002)         │     │
-│    │   → Temporal Reframing (CP-TR-001)             │     │
-│    │   → Community Simulation (CP-CS-001, 002)      │     │
-│    └─────────────────────────────────────────────────┘     │
-│         │                                                   │
-│         ▼                                                   │
-│  ▶ Phase 5: 독창성 검증                                    │
-│    🟢 CP-VS-003: 만족도 확인                                │
-│         │ (불만족 시 Phase 2로 복귀)                       │
-│         ▼                                                   │
-│  ▶ 출력 + Self-Critique                                    │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+"Generate R code for three-level meta-analysis"
+→ Complete, runnable R script with metafor
+
+"Create forest plot"
+→ R code for publication-quality visualization
 ```
 
-### Enhanced VS 에이전트 실행 시
-
-Enhanced VS 에이전트(01, 04, 06, 07, 08, 09)는 간소화된 3단계:
+### Literature Search
 
 ```
-Phase 1: 모달 식별 → Phase 2: 대안 제시 → Phase 4: 실행
+"Search Semantic Scholar for AI tutoring studies"
+→ API search with filters (requires API key)
+
+"Help me search KCI for Korean literature"
+→ Search strategy guidance for Korean databases
 ```
 
-### Light VS 에이전트 실행 시
-
-Light VS 에이전트(11-20)는 모달 인식만:
+### Visualization
 
 ```
-"가장 일반적인 접근은 X입니다.
- 그러나 [맥락]을 고려하면 [대안]도 고려해 볼 수 있습니다."
+"Create conceptual framework diagram"
+→ Mermaid structure → Nanobanana rendering (if API available)
+
+"Generate PRISMA flow diagram"
+→ Auto-populated from screening numbers
 ```
 
 ---
 
-## 자동 트리거 로직
+## OMC Integration
 
-다음 키워드가 대화에서 감지되면 해당 에이전트가 자동으로 활성화됩니다:
+Research Coordinator integrates with **oh-my-claudecode** for parallel processing and smart model routing.
 
-### 우선순위 1 (즉시 실행)
-- "IRB", "윤리", "동의서" → **04-research-ethics-advisor**
-- "리뷰어", "수정 요청" → **19-peer-review-strategist**
+### Model Routing
 
-### 우선순위 2 (연구 기획)
-- "연구 질문", "PICO", "SPIDER" → **01-research-question-refiner**
-- "이론적 프레임워크", "개념적 모형" → **02-theoretical-framework-architect** (Full VS)
-- "연구 설계", "RCT", "실험 설계" → **09-research-design-consultant**
+| Tier | Model | Agents | Use Case |
+|------|-------|--------|----------|
+| HIGH | Opus | #01, #02, #03, #09, #19 | Strategic decisions |
+| MEDIUM | Sonnet | #04, #06, #10, #12, #15-18, #20-21 | Standard analysis |
+| LOW | Haiku | #05, #07, #08, #11, #13-14 | Search, calculation |
 
-### 우선순위 3 (문헌 및 분석)
-- "문헌 검토", "PRISMA", "체계적 리뷰" → **05-systematic-literature-scout** (Full VS)
-- "메타분석", "효과크기" → **05 + 06 + 07** (병렬)
-- "통계 분석", "ANOVA", "회귀" → **10-statistical-analysis-guide** (Full VS)
+### Parallel Execution
 
-### 우선순위 4 (품질 및 출판)
-- "저널", "투고" → **17-journal-matcher**
-- "재현성", "OSF" → **15-reproducibility-auditor**
-- "편향", "p-hacking" → **16-bias-detector** (Full VS)
-
----
-
-## 병렬 실행 그룹
-
-다음 에이전트 조합은 단일 요청에서 동시에 실행될 수 있습니다:
+Agents can run in parallel between human checkpoints:
 
 ```
-그룹 1 (연구 설계 초기):
-  01-research-question-refiner + 02-theoretical-framework-architect + 03-devils-advocate
+[CP_RESEARCH_DIRECTION] 🔴 User approval
+    ↓
+[#02 + #03 parallel] (Theory + Devil's Advocate)
+    ↓
+[CP_THEORY_SELECTION] 🔴 User selection
+```
 
-그룹 2 (문헌 검토):
-  05-systematic-literature-scout + 06-evidence-quality-appraiser + 08-research-radar
+### OMC Mode Commands
 
-그룹 3 (분석 설계):
-  09-research-design-consultant + 10-statistical-analysis-guide + 12-sensitivity-analysis-designer
-
-그룹 4 (품질 검증):
-  13-internal-consistency-checker + 14-checklist-manager + 15-reproducibility-auditor + 16-bias-detector
-
-그룹 5 (출판 준비):
-  17-journal-matcher + 18-academic-communicator + 19-peer-review-strategist
+```
+ulw: 문헌 검색해줘     # ultrawork - maximum parallelism
+eco: 통계 분석해줘     # ecomode - token efficient
+ralph: 연구 설계 완료해줘  # persistence until done
 ```
 
 ---
 
-## 순차 실행 파이프라인
+## Quality Guardrails (Non-Negotiable)
 
-의존성이 있는 에이전트는 순서대로 실행됩니다:
+Even with VS creativity, these standards are absolute:
 
-```
-연구 기획 파이프라인:
-01 → 02 → 09 → 04 → 20
-
-문헌 리뷰 파이프라인:
-05 → 06 → 07
-
-분석 파이프라인:
-10 → 11 → 12 → 16
-
-출판 파이프라인:
-13 → 14 → 17 → 19
-```
+| Guardrail | Description | Verification |
+|-----------|-------------|--------------|
+| Methodological Soundness | Defensible in peer review | Literature support |
+| Internal Validity | Threats acknowledged | Explicit limitations |
+| Reproducibility | Full documentation | Checklist completion |
+| Ethical Compliance | IRB/ethics met | Approval documentation |
 
 ---
 
-## 사용 방법
+## Module Reference
 
-### 1. 마스터 스킬 호출 (VS 자동 적용)
+### Core Modules
 
-대화를 시작하면 맥락을 분석하여 적절한 에이전트를 자동으로 선택하고 VS 수준에 따라 실행합니다.
+| Module | Path | Purpose |
+|--------|------|---------|
+| Project State | `core/project-state.md` | Context persistence |
+| Pipeline Templates | `core/pipeline-templates.md` | Research workflows |
+| Integration Hub | `core/integration-hub.md` | Tool connections |
+| Guided Wizard | `core/guided-wizard.md` | Conversation UX |
+| Auto-Documentation | `core/auto-documentation.md` | Document generation |
 
-```
-사용자: "AI 보조 학습이 학업 성취에 미치는 효과를 메타분석하려고 해"
+### Configuration Files
 
-Research Coordinator:
-  [감지된 키워드: "메타분석", "효과"]
-  [활성화 에이전트: 05 (Full VS), 06 (Enhanced), 07 (Enhanced)]
-
-  메타분석 연구 설계를 시작하겠습니다.
-
-  📊 05-systematic-literature-scout (Full VS):
-
-  ## Phase 1: 모달 응답 식별
-  ⚠️ 가장 예측 가능한 검색 전략:
-  - PubMed 단일 검색 (T=0.9)
-  - 키워드만 사용 (T=0.85)
-
-  ➡️ 이것은 기준선입니다. 이 이상을 탐색합니다.
-
-  ## Phase 2: Long-Tail 샘플링
-  **방향 A** (T=0.6): 다중 데이터베이스 + 인용 추적
-  **방향 B** (T=0.4): 전문가 상담 + Grey literature
-  **방향 C** (T=0.25): AI-assisted screening + Living review
-
-  [계속...]
-```
-
-### 2. 개별 에이전트 직접 호출
-
-특정 에이전트가 필요한 경우 직접 호출할 수 있습니다:
-
-```
-/research-question-refiner
-/statistical-analysis-guide
-/peer-review-strategist
-```
-
-### 3. VS 수준 명시적 요청
-
-```
-"Full VS로 이론적 프레임워크 추천해줘"
-"Enhanced VS로 연구 설계 도와줘"
-```
+| File | Path | Purpose |
+|------|------|---------|
+| Project State | `.research/project-state.yaml` | Current project context |
+| Decision Log | `.research/decision-log.yaml` | Research decisions |
+| PRISMA Checklist | `.research/prisma-checklist.yaml` | Checklist tracking |
+| Routing Config | `.omc/config/research-coordinator-routing.yaml` | Model routing |
+| Checkpoints | `.omc/checkpoints/checkpoint-definitions.yaml` | Human checkpoints |
 
 ---
 
-## 품질 가드레일 (NON-NEGOTIABLE)
+## Version History
 
-VS로 창의성을 추구하더라도 다음은 절대 타협 불가:
-
-| 가드레일 | 설명 | 검증 방법 |
-|---------|------|----------|
-| **방법론적 건전성** | 피어리뷰에서 방어 가능 | 문헌 근거 제시 |
-| **내적 타당도** | 위협 인정 및 대응 | 명시적 한계 섹션 |
-| **재현가능성** | 절차 완전 문서화 | 체크리스트 완료 |
-| **윤리적 준수** | IRB/연구윤리 충족 | 승인 문서 확인 |
+- **v4.0.0**: Context persistence, pipeline templates, integration hub, guided wizard, auto-documentation, English base
+- **v3.2.0**: OMC integration, model routing, parallel execution
+- **v3.1.0**: Conceptual Framework Visualizer (#21)
+- **v3.0.0**: Creativity modules, user checkpoints, dynamic T-Score
 
 ---
 
-## 연구 단계별 권장 워크플로우
+## Getting Started
+
+1. **Start a conversation** with your research topic
+2. **Follow the guided wizard** through choice points
+3. **Let Research Coordinator maintain context** throughout your project
+4. **Use tool integrations** when needed (Excel, R, etc.)
+5. **Export documentation** when ready
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                   연구 생애주기별 에이전트 배치                    │
-├──────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  📋 1단계: 연구 기획                                              │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  #01(E) → #02(F) → #09(E) → #04(E) → #20(L)              │ │
-│  │  질문     이론     설계     윤리     사전등록               │ │
-│  │          [VS]                                              │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  📚 2단계: 문헌 연구                                              │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  #05(F) → #06(E) → #07(E)                                 │ │
-│  │  문헌     품질     효과크기                                 │ │
-│  │  [VS]    └→ #08(E) (병렬 모니터링)                        │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  🔬 3단계: 데이터 분석                                            │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  #10(F) → #11(L) → #12(L)                                 │ │
-│  │  분석     코드     민감도                                   │ │
-│  │  [VS]            └→ #16(F) (편향 탐지) [VS]               │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  ✍️ 4단계: 논문 작성                                              │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  #13(L) → #14(L) → #15(L)                                 │ │
-│  │  일관성    체크     재현성                                  │ │
-│  │          └→ #03(F) (최종 검토) [VS]                       │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  📤 5단계: 출판 & 확산                                            │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  #17(L) → #19(L) → #18(L)                                 │ │
-│  │  저널     리뷰     커뮤니                                   │ │
-│  │  매칭     대응     케이션                                   │ │
-│  │          └→ #21(F) (시각화) [VS]                          │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  🎨 시각화 파이프라인 (v3.1 신규)                                 │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  #02(F) + #10(F) → #21(F) → #03(F) → #18(L)              │ │
-│  │  이론    통계      시각화    검토     캡션                   │ │
-│  │  [입력]           [VS]     [피드백]  [출력]                 │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  범례: (F)=Full VS, (E)=Enhanced VS, (L)=Light VS               │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+"I want to start a systematic review on AI in higher education"
 ```
 
----
-
-## 에이전트 실행 템플릿
-
-Task tool을 사용하여 에이전트를 실행할 때 VS 수준에 따라 다음 형식을 사용합니다:
-
-### Full VS 에이전트
-
-```
-Task(
-  subagent_type="general-purpose",
-  description="[Agent ID]: [에이전트 이름] (Full VS)",
-  prompt="""
-  [해당 에이전트의 SKILL.md에서 정의된 프롬프트 템플릿]
-
-  VS-Research 5단계를 적용하여 응답하세요:
-  1. Phase 1: 모달 응답 식별
-  2. Phase 2: Long-Tail 샘플링 (방향 A, B, C)
-  3. Phase 3: 저-전형성 선택
-  4. Phase 4: 실행
-  5. Phase 5: 독창성 검증
-  """
-)
-```
-
-### Enhanced VS 에이전트
-
-```
-Task(
-  subagent_type="general-purpose",
-  description="[Agent ID]: [에이전트 이름] (Enhanced VS)",
-  prompt="""
-  [해당 에이전트의 SKILL.md에서 정의된 프롬프트 템플릿]
-
-  VS-Research 간소화 프로세스 적용:
-  1. 일반적 접근 명시 (회피 또는 보완 필요)
-  2. 대안적 접근 제시
-  3. 추천 및 근거
-  """
-)
-```
-
----
-
-## 비활성화 조건
-
-다음 상황에서는 에이전트가 실행되지 않습니다:
-
-1. **단순 질문**: "메타분석이 뭐야?" → 에이전트 없이 설명만 제공
-2. **명시적 거부**: "에이전트 없이 직접 해줘" → 직접 응답
-3. **VS 거부**: "VS 없이 일반 추천해줘" → 모달 응답 허용
-4. **비연구 맥락**: 코딩, 시스템 설정 등 연구 외 작업
-5. **중복 방지**: 동일 세션에서 같은 에이전트 재실행 방지
-
----
-
-## 관련 스킬
-
-개별 에이전트 스킬은 `research-agents/` 디렉토리에서 찾을 수 있습니다:
-
-**Full VS 에이전트:**
-- `/theoretical-framework-architect` (02)
-- `/devils-advocate` (03)
-- `/systematic-literature-scout` (05)
-- `/statistical-analysis-guide` (10)
-- `/bias-detector` (16)
-
-**Enhanced VS 에이전트:**
-- `/research-question-refiner` (01)
-- `/research-ethics-advisor` (04)
-- `/evidence-quality-appraiser` (06)
-- `/effect-size-extractor` (07)
-- `/research-radar` (08)
-- `/research-design-consultant` (09)
-
-**Light VS 에이전트:**
-- `/analysis-code-generator` (11)
-- `/sensitivity-analysis-designer` (12)
-- `/internal-consistency-checker` (13)
-- `/checklist-manager` (14)
-- `/reproducibility-auditor` (15)
-- `/journal-matcher` (17)
-- `/academic-communicator` (18)
-- `/peer-review-strategist` (19)
-- `/preregistration-composer` (20)
-
----
-
-## 참고 자료
-
-### 핵심 문서
-- **VS Engine v3.0**: `core/vs-engine.md` - 체크포인트 통합 VS 엔진
-- **Dynamic T-Score**: `core/t-score-dynamic.md` - 동적 T-Score 시스템
-- **User Checkpoints**: `interaction/user-checkpoints.md` - 사용자 체크포인트 정의
-- **VS-Research Framework**: `references/VS-Research-Framework.md`
-- **Agent Registry v3.0**: `references/agent-registry.yaml` - 중앙 에이전트 레지스트리
-- **Creativity Mechanisms**: `references/creativity-mechanisms.md` - 창의성 모듈 참조
-- **Checkpoint Schema**: `references/user-checkpoint-schema.md` - 체크포인트 스키마
-- **T-Score Spec**: `references/dynamic-t-score-spec.md` - T-Score 기술 사양
-
-### 창의성 모듈
-- **Forced Analogy**: `creativity/forced-analogy.md`
-- **Iterative Loop**: `creativity/iterative-loop.md`
-- **Semantic Distance**: `creativity/semantic-distance.md`
-- **Temporal Reframing**: `creativity/temporal-reframing.md`
-- **Community Simulation**: `creativity/community-simulation.md`
-
-### 외부 참조
-- **arXiv:2510.01171**: Verbalized Sampling 방법론
-- **Guilford's Divergent Thinking**: 창의성 이론적 기반
-- **OECD PISA 2022**: 창의적 사고 평가 프레임워크
+Research Coordinator will guide you from there.

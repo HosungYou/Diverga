@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 버전 정보
-VERSION="3.0.0"
+VERSION="3.1.0"
 
 # 로고 출력
 echo -e "${BLUE}"

@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.1] - 2026-01-25
+
+### 🛠️ Infrastructure Release: Architecture Enhancement
+
+Research Coordinator의 개발 인프라 및 아키텍처를 대폭 강화했습니다.
+
+### Added
+
+#### Agent Contract Validation System
+- **`scripts/validate_agents.py`**: SKILL.md 계약 검증기
+  - 외부 의존성 없는 YAML 파서
+  - 필수 프론트매터 필드 검증
+  - 시맨틱 버전 형식 검사
+  - FULL/ENHANCED/LIGHT 레벨별 요구사항 검증
+  - JSON 출력 옵션 (CI/CD 통합용)
+
+#### Cross-Platform CLI Tool
+- **`scripts/rc`**: Bash CLI (macOS/Linux)
+- **`scripts/rc.py`**: Python CLI (모든 OS)
+- 명령어: help, status, list, validate, info, doctor
+
+#### Windows Support
+- **`scripts/install.ps1`**: PowerShell 설치 스크립트
+  - 심볼릭 링크 / 복사 모드 선택
+  - 관리자 권한 자동 감지
+  - 설치 제거 기능
+
+#### Testing & Quality
+- **`tests/test_validate_agents.py`**: 18개 단위 테스트
+- **`pyproject.toml`**: Python 프로젝트 구성
+- **`requirements-dev.txt`**: 개발 의존성
+
+#### Documentation
+- **`CONTRIBUTING.md`**: 기여 가이드라인
+- **`docs/QUICKSTART.md`**: 5분 빠른 시작 가이드
+- **`docs/V3.1-ENHANCEMENT-REPORT.md`**: 개선 보고서
+
+### Changed
+
+- `scripts/install.sh`: VERSION을 3.1.0으로 업데이트
+- 동적 에이전트 수 계산 (CLI list 명령)
+
+### Validation Results
+
+```
+============================================================
+ Research Coordinator Agent Validation Results
+============================================================
+
+✅ 21/21 agents passed validation
+```
+
+---
+
 ## [3.1.0] - 2025-01-24
 
 ### 🎨 Feature Release: Conceptual Framework Visualizer
@@ -317,6 +371,8 @@ claude plugin install research-coordinator  # 21개 스킬 모두 설치됨
 
 | Version | Date | Key Changes |
 |---------|------|-------------|
+| 3.1.1 | 2026-01-25 | **Infrastructure**: Contract validation, CLI tools, Windows support, testing |
+| 3.1.0 | 2025-01-24 | **Feature**: Conceptual Framework Visualizer (21번째 에이전트) |
 | 3.0.0 | 2025-01-24 | **VS-Research v3.0**: Dynamic T-Score, 5 Creativity Mechanisms, 14 User Checkpoints |
 | 2.1.0 | 2025-01-23 | Single plugin with all 21 skills |
 | 2.0.1 | 2025-01-23 | Marketplace schema fix |

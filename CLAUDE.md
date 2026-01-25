@@ -1,91 +1,102 @@
 # CLAUDE.md
 
-Research Coordinator - 사회과학 연구자를 위한 20개 전문 에이전트 시스템
+# Research Coordinator v4.0
 
-## 프로젝트 개요
+AI Research Assistant for the Complete Research Lifecycle - from question formulation to publication.
 
-이 프로젝트는 Claude Code Skills 시스템을 활용하여 사회과학 연구의 전체 프로세스를 지원하는 20개 전문 에이전트를 제공합니다.
+**Language**: English base with Korean support (한국어 입력 지원)
 
-## 스킬 구조
+## Project Overview
+
+Research Coordinator provides **context-persistent research support** through 21 specialized agents. Unlike other AI tools, its real value is maintaining research context across the entire project lifecycle in a single platform.
+
+## Core Value Proposition
+
+1. **Context Persistence**: No re-explaining your research question, methodology, or decisions
+2. **Single Platform**: Claude Code as your unified research environment
+3. **Research Pipeline**: Structured workflow from idea to publication
+4. **Tool Discovery**: Easy access to tools/platforms you didn't know existed
+5. **Human-Centered**: AI assists, humans decide
+
+> **Core Principle**: "Human decisions remain with humans. AI handles what's beyond human scope."
+> "인간이 할 일은 인간이, AI는 인간의 범주를 벗어난 것을 수행"
+
+## Quick Start
+
+Simply tell Research Coordinator what you want to do:
 
 ```
-.claude/skills/
-├── research-coordinator/        # 마스터 스킬 (코디네이터)
-│   └── SKILL.md
-└── research-agents/             # 20개 개별 에이전트
-    ├── 01-research-question-refiner/
-    ├── 02-theoretical-framework-architect/
-    ...
-    └── 20-preregistration-composer/
+"I want to conduct a systematic review on AI in education"
+"메타분석 연구를 시작하고 싶어"
+"Help me design an experimental study"
 ```
 
-## 에이전트 카테고리
+The system guides you through a conversational wizard with clear choice points.
 
-### Category A: 이론 및 연구 설계 (01-04)
-- 연구 질문 정제기
-- 이론적 프레임워크 설계자
-- 악마의 옹호자
-- 연구 윤리 자문관
+## Core Systems (v4.0)
 
-### Category B: 문헌 및 증거 (05-08)
-- 체계적 문헌 탐색자
-- 증거 품질 평가자
-- 효과크기 추출기
-- 최신 연구 레이더
+| System | Purpose | Location |
+|--------|---------|----------|
+| Project State | Context persistence | `.research/project-state.yaml` |
+| Pipeline Templates | PRISMA 2020 workflow | `core/pipeline-templates.md` |
+| Integration Hub | Tool connections | `core/integration-hub.md` |
+| Guided Wizard | AskUserQuestion UX | `core/guided-wizard.md` |
+| Auto-Documentation | Document generation | `core/auto-documentation.md` |
 
-### Category C: 방법론 및 분석 (09-12)
-- 연구 설계 컨설턴트
-- 통계 분석 가이드
-- 분석 코드 생성기
-- 민감도 분석 설계자
+## Agent Structure (3-Tier)
 
-### Category D: 품질 및 검증 (13-16)
-- 내적 일관성 검증자
-- 체크리스트 관리자
-- 재현성 감사자
-- 편향 탐지기
+| Tier | Agents | Purpose |
+|------|--------|---------|
+| **Flagship** | #02, #03, #10, #21 | Full VS methodology, strategic decisions |
+| **Core** | #01, #05, #06, #09, #16, #17 | Essential capabilities |
+| **Support** | #04, #07-08, #11-15, #18-20 | Specialized tasks |
 
-### Category E: 출판 및 커뮤니케이션 (17-20)
-- 저널 매칭 전문가
-- 학술 커뮤니케이터
-- 피어 리뷰 대응 전략가
-- 사전등록 문서 작성자
+## Tool Integrations
 
-## 사용 방법
+### Ready to Use (No Setup)
+- **Excel**: Data extraction, coding → "Create extraction spreadsheet"
+- **PowerPoint**: Presentations → "Create conference slides"
+- **Word**: Manuscripts → "Export methods to Word"
+- **Python**: Analysis → Built-in
+- **Mermaid**: Diagrams → "Create PRISMA flow diagram"
 
-### 마스터 스킬 호출
-```
-/research-coordinator
-```
-마스터 스킬은 사용자의 맥락을 분석하여 적절한 에이전트를 자동으로 선택합니다.
-
-### 개별 에이전트 직접 호출
-```
-/research-question-refiner
-/theoretical-framework-architect
-/statistical-analysis-guide
-```
-
-## 자동 트리거 키워드
-
-다음 키워드가 감지되면 해당 에이전트가 자동으로 활성화됩니다:
-
-| 키워드 | 에이전트 |
-|--------|----------|
-| "연구 질문", "research question" | 01-research-question-refiner |
-| "이론적 프레임워크", "conceptual model" | 02-theoretical-framework-architect |
-| "문헌 검토", "PRISMA" | 05-systematic-literature-scout |
-| "통계 분석", "ANOVA", "회귀" | 10-statistical-analysis-guide |
-| "저널", "투고" | 17-journal-matcher |
-
-## 설치
-
-```bash
-./scripts/install.sh
-```
-
-설치 후 `~/.claude/skills/` 디렉토리에 심볼릭 링크가 생성됩니다.
+### Needs Setup
+- **Semantic Scholar**: API key for literature search
+- **OpenAlex**: Email for polite pool
+- **Zotero**: MCP server for references
+- **R Scripts**: Local R installation
+- **Nanobanana**: Gemini API key for visualization
 
 ## GitHub Repository
 
 https://github.com/HosungYou/research-coordinator
+
+---
+
+## OMC Integration (v3.2.0+)
+
+Research Coordinator integrates with **oh-my-claudecode** for parallel processing and smart model routing.
+
+### Human Checkpoints
+
+| Level | Checkpoints | Action |
+|-------|-------------|--------|
+| 🔴 REQUIRED | CP_RESEARCH_DIRECTION, CP_THEORY_SELECTION, CP_METHODOLOGY_APPROVAL | User approval required |
+| 🟠 RECOMMENDED | CP_ANALYSIS_PLAN, CP_QUALITY_REVIEW | Review recommended |
+| 🟡 OPTIONAL | CP_VISUALIZATION_PREFERENCE, CP_RENDERING_METHOD | Defaults available |
+
+### Model Routing
+
+| Tier | Model | Agents |
+|------|-------|--------|
+| HIGH | Opus | #01, #02, #03, #09, #19 |
+| MEDIUM | Sonnet | #04, #06, #10, #12, #15-18, #20-21 |
+| LOW | Haiku | #05, #07, #08, #11, #13-14 |
+
+### OMC Modes
+
+```bash
+ulw: 문헌 검색해줘     # ultrawork - maximum parallelism
+eco: 통계 분석해줘     # ecomode - token efficient
+ralph: 연구 설계 완료해줘  # persistence until done
+```
