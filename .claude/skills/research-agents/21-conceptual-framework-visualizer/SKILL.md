@@ -16,6 +16,7 @@ v3_integration:
   checkpoints:
     - CP_VISUALIZATION_PREFERENCE
     - CP_T_SCORE_APPROVAL
+    - CP_RENDERING_METHOD
     - CP_CODE_EXECUTION
     - CP_ORIGINALITY_CHECK
 ---
@@ -351,8 +352,208 @@ plt.savefig('conceptual_framework.svg', format='svg', transparent=True, dpi=300)
 |------|------|------|
 | CP_VISUALIZATION_PREFERENCE | 🔵 PREFERENCE | 시각화 방향 선택 (A/B/C) |
 | CP_T_SCORE_APPROVAL | 🟡 APPROVAL | T-Score 범위 승인 |
+| CP_RENDERING_METHOD | 🔵 PREFERENCE | 렌더링 방식 선택 (Code/Nanobanana) |
 | CP_CODE_EXECUTION | 🟢 ITERATION | 코드 수정/재생성 |
 | CP_ORIGINALITY_CHECK | 🔴 GUARDRAIL | 독창성 검증 통과 |
+
+---
+
+## 🍌 CP_RENDERING_METHOD: Nanobanana (Gemini Image Generation) 통합
+
+Phase 4 코드 생성 완료 후, 사용자에게 렌더링 방식을 선택하도록 합니다.
+
+### 렌더링 방식 선택지
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│           CP_RENDERING_METHOD: 렌더링 방식 선택                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  🅰️ Code-First (기본값)                                        │
+│     └─ Python/Mermaid/Graphviz/D3.js 코드 실행                 │
+│     └─ 장점: 정확한 레이아웃, 벡터 품질, 수정 가능              │
+│     └─ 단점: 복잡한 시각화는 코드 디버깅 필요                   │
+│                                                                 │
+│  🅱️ Nanobanana (Gemini Image Generation)                       │
+│     └─ Google Gemini API로 이미지 직접 생성                    │
+│     └─ 장점: 복잡한 시각화도 자연어로 생성, 빠른 프로토타이핑   │
+│     └─ 단점: API 키 필요, 미세 조정 어려움                      │
+│                                                                 │
+│  🅲️ Hybrid (권장)                                              │
+│     └─ Code로 구조 설계 → Nanobanana로 최종 렌더링             │
+│     └─ 장점: 정확한 구조 + 고품질 렌더링                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Nanobanana 사용 전제조건
+
+1. **Google API 키 설정**
+   ```bash
+   # 환경변수 설정
+   export GOOGLE_API_KEY="your-api-key"
+   # 또는
+   export GEMINI_API_KEY="your-api-key"
+   ```
+
+   API 키 획득: https://aistudio.google.com/apikey
+
+2. **google-genai 패키지 설치**
+   ```bash
+   pip install google-genai
+   ```
+
+### Nanobanana 프롬프트 템플릿
+
+Gemini에 전달할 시각화 프롬프트 구조:
+
+```
+Create a professional academic diagram for "{framework_name}".
+
+## Structure:
+{structural_description}
+- 핵심 개념 및 위치
+- 계층/레이어 구조
+- 변수 간 관계 (화살표, 연결선)
+
+## Visual Requirements:
+- Clean, minimalist academic style suitable for journal publication
+- {color_scheme} palette
+- Clear labels with appropriate font sizes
+- {specific_elements} (범례, 제목, 출처 등)
+
+## Style:
+- Professional, publication-ready quality
+- No decorative elements, pure academic visualization
+- High contrast for readability
+- Sans-serif fonts (Arial or similar)
+
+Generate a 2K resolution image (2048x1536 pixels).
+```
+
+### Nanobanana 실행 코드 (일반 템플릿)
+
+```python
+#!/usr/bin/env python3
+"""
+Conceptual Framework Visualization - Gemini Nanobanana Integration
+==================================================================
+Uses Google's Gemini API to generate professional academic visualizations.
+
+Setup:
+    pip install google-genai
+    export GOOGLE_API_KEY="your-api-key"
+"""
+
+import os
+from pathlib import Path
+
+# Check for API key
+API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+
+if not API_KEY:
+    print("❌ GOOGLE_API_KEY 환경변수가 설정되지 않았습니다.")
+    print("   설정 방법: export GOOGLE_API_KEY='your-api-key'")
+    print("   API 키 획득: https://aistudio.google.com/apikey")
+    exit(1)
+
+try:
+    from google import genai
+except ImportError:
+    print("❌ google-genai 패키지가 설치되지 않았습니다.")
+    print("   설치 방법: pip install google-genai")
+    exit(1)
+
+
+def generate_framework_image(prompt: str, output_path: str = "framework.png"):
+    """Generate framework visualization using Gemini API."""
+
+    client = genai.Client(api_key=API_KEY)
+
+    # Try available models in order
+    models = [
+        "gemini-2.0-flash-exp",
+        "gemini-2.0-flash-preview-image-generation",
+    ]
+
+    for model in models:
+        try:
+            print(f"🎨 Generating with {model}...")
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config={"response_modalities": ["TEXT", "IMAGE"]}
+            )
+
+            # Extract image
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, 'inline_data') and part.inline_data is not None:
+                    # Save image
+                    with open(output_path, "wb") as f:
+                        f.write(part.inline_data.data)
+                    print(f"✅ Saved: {output_path}")
+                    return True
+
+        except Exception as e:
+            print(f"   ⚠️ {model} failed: {str(e)[:80]}")
+            continue
+
+    print("❌ All models failed.")
+    return False
+
+
+# Example usage:
+# FRAMEWORK_PROMPT = """..."""
+# generate_framework_image(FRAMEWORK_PROMPT, "my_framework.png")
+```
+
+### 워크플로우 통합
+
+```
+Phase 4 (코드 생성) 완료
+         ↓
+   [CP_RENDERING_METHOD]
+         ↓
+┌────────┴────────┐
+│ 사용자 선택     │
+├─────────────────┤
+│ A: Code-First   │──→ 코드 실행 → 이미지 생성
+│ B: Nanobanana   │──→ API 키 확인 → Gemini 생성
+│ C: Hybrid       │──→ 코드 구조 확인 → Gemini 렌더링
+└─────────────────┘
+         ↓
+   [CP_ORIGINALITY_CHECK]
+```
+
+### Nanobanana 선택 시 질문 순서
+
+1. **API 키 확인**
+   ```
+   GOOGLE_API_KEY 환경변수가 설정되어 있나요?
+   - 예: 계속 진행
+   - 아니오: 설정 안내 제공
+   ```
+
+2. **프롬프트 확인**
+   ```
+   생성된 시각화 프롬프트를 확인해 주세요:
+   [프롬프트 미리보기]
+
+   수정이 필요하시면 말씀해 주세요.
+   ```
+
+3. **생성 실행**
+   ```
+   Gemini API로 이미지를 생성합니다...
+   ✅ 완료: framework_name.png
+   ```
+
+4. **결과 확인 및 정제**
+   ```
+   생성된 이미지를 확인해 주세요.
+   수정이 필요하시면 정제 요청을 입력해 주세요.
+   (예: "글씨 크기 키워줘", "색상 대비 높여줘")
+   ```
 
 ---
 
