@@ -1,3 +1,11 @@
+---
+name: project-state
+version: "4.0.0"
+description: |
+  Research Project State System - Maintains context throughout the entire research lifecycle.
+  Core v4.0 feature enabling context persistence across agents and stages.
+---
+
 # Research Project State System
 
 ## Overview

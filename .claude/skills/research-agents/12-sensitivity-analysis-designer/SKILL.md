@@ -335,6 +335,14 @@ forest(loo)
 
 ## References
 
+- **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
+- **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
+- **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
+- **Project State v4.0**: `../../research-coordinator/core/project-state.md`
+- **Pipeline Templates v4.0**: `../../research-coordinator/core/pipeline-templates.md`
+- **Integration Hub v4.0**: `../../research-coordinator/core/integration-hub.md`
+- **Guided Wizard v4.0**: `../../research-coordinator/core/guided-wizard.md`
+- **Auto-Documentation v4.0**: `../../research-coordinator/core/auto-documentation.md`
 - Simonsohn et al. (2020). Specification Curve Analysis
 - Steegen et al. (2016). Increasing Transparency Through a Multiverse Analysis
 - Thabane et al. (2013). A tutorial on sensitivity analyses in clinical trials

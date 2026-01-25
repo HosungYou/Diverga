@@ -1,3 +1,11 @@
+---
+name: auto-documentation
+version: "4.0.0"
+description: |
+  Automatic Documentation System - Generates research documentation as you progress.
+  Decision logs, PRISMA diagrams, data extraction sheets, and method sections.
+---
+
 # Automatic Documentation System
 
 ## Overview

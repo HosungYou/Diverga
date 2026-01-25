@@ -1,3 +1,11 @@
+---
+name: integration-hub
+version: "4.0.0"
+description: |
+  Integration Hub - Connects Research Coordinator to external tools and platforms.
+  Office Suite, Literature APIs, Reference Management, Statistics, and Visualization.
+---
+
 # Integration Hub: Tools & Skills Guide
 
 ## Overview

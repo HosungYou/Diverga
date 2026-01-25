@@ -448,5 +448,10 @@ Applied Checkpoints:
 - **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
 - **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
 - **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
+- **Project State v4.0**: `../../research-coordinator/core/project-state.md`
+- **Pipeline Templates v4.0**: `../../research-coordinator/core/pipeline-templates.md`
+- **Integration Hub v4.0**: `../../research-coordinator/core/integration-hub.md`
+- **Guided Wizard v4.0**: `../../research-coordinator/core/guided-wizard.md`
+- **Auto-Documentation v4.0**: `../../research-coordinator/core/auto-documentation.md`
 - Grant, C., & Osanloo, A. (2014). Understanding, selecting, and integrating a theoretical framework
 - Ravitch, S. M., & Riggan, M. (2016). Reason & Rigor: How Conceptual Frameworks Guide Research

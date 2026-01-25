@@ -376,6 +376,14 @@ Applied Checkpoints:
 
 ## References
 
+- **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
+- **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
+- **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
+- **Project State v4.0**: `../../research-coordinator/core/project-state.md`
+- **Pipeline Templates v4.0**: `../../research-coordinator/core/pipeline-templates.md`
+- **Integration Hub v4.0**: `../../research-coordinator/core/integration-hub.md`
+- **Guided Wizard v4.0**: `../../research-coordinator/core/guided-wizard.md`
+- **Auto-Documentation v4.0**: `../../research-coordinator/core/auto-documentation.md`
 - Shadish, Cook, & Campbell (2002). Experimental and Quasi-Experimental Designs
 - Creswell & Creswell (2018). Research Design
 - Dillman et al. (2014). Internet, Phone, Mail, and Mixed-Mode Surveys

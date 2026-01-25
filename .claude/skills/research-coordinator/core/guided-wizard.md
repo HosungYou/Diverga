@@ -1,3 +1,11 @@
+---
+name: guided-wizard
+version: "4.0.0"
+description: |
+  Guided Conversation Wizard - AskUserQuestion-based UX for researchers with limited coding experience.
+  Provides explicit choice points and natural language dialogue for accessibility.
+---
+
 # Guided Conversation Wizard
 
 ## Overview

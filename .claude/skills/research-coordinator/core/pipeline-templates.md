@@ -1,3 +1,11 @@
+---
+name: pipeline-templates
+version: "4.0.0"
+description: |
+  Research Pipeline Templates - Pre-configured workflows for systematic reviews, meta-analyses,
+  experimental studies, and surveys. Implements PRISMA 2020 compliance.
+---
+
 # Research Pipeline Templates
 
 ## Overview
