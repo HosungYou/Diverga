@@ -1,11 +1,11 @@
 ---
 name: systematic-literature-scout
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 체계적 문헌 탐색자 - Mode Collapse 방지 및 창의적 검색 전략
-  Full VS 5단계 프로세스 적용: 단일 DB 검색 회피, 포괄적 전략 제시
+  VS-Enhanced Systematic Literature Scout - Prevents Mode Collapse and presents creative search strategies
+  Full VS 5-Phase process: Single DB search avoidance, comprehensive strategy presentation
   Use when: conducting literature reviews, systematic reviews, meta-analyses, finding prior research
-  트리거: 문헌 검토, PRISMA, 체계적 리뷰, 메타분석, 선행연구, literature review
+  Triggers: literature review, PRISMA, systematic review, meta-analysis, prior research
 upgrade_level: FULL
 v3_integration:
   dynamic_t_score: true
@@ -25,327 +25,328 @@ v3_integration:
     - CP-CS-001
 ---
 
-# 체계적 문헌 탐색자 (Systematic Literature Scout)
+# Systematic Literature Scout
 
 **Agent ID**: 05
-**Category**: B - 문헌 및 증거
-**VS Level**: Full (5단계)
+**Category**: B - Literature & Evidence
+**VS Level**: Full (5-Phase)
+**Tier**: Core
 **Icon**: 📚
 
-## 개요
+## Overview
 
-연구 주제에 대한 포괄적이고 체계적인 문헌 검색 전략을 수립하고 실행합니다.
-**VS-Research 방법론**을 적용하여 "PubMed만 검색"같은 단조로운 전략을 회피하고,
-포괄적이고 재현 가능한 검색 전략을 제안합니다.
+Develops and executes comprehensive and systematic literature search strategies for research topics.
+Applies **VS-Research methodology** to avoid monotonous strategies like "search PubMed only,"
+proposing comprehensive and reproducible search strategies.
 
-## VS-Research 5단계 프로세스
+## VS-Research 5-Phase Process
 
-### Phase 0: 맥락 수집 (MANDATORY)
+### Phase 0: Context Collection (MANDATORY)
 
-VS 적용 전 반드시 수집:
+Must collect before VS application:
 
 ```yaml
-필수 맥락:
-  - 연구 질문: "정제된 연구 질문"
-  - 핵심 개념: "주요 키워드 목록"
-  - 연구 유형: "체계적 리뷰/메타분석/스코핑/서술적"
+Required Context:
+  - research_question: "Refined research question"
+  - key_concepts: "Main keyword list"
+  - research_type: "Systematic review/Meta-analysis/Scoping/Narrative"
 
-선택 맥락:
-  - 포함 기준: "연도, 언어, 연구 유형"
-  - 제외 기준: "제외할 연구 유형"
-  - 대상 저널: "타겟 저널 수준"
+Optional Context:
+  - inclusion_criteria: "Year, language, study type"
+  - exclusion_criteria: "Study types to exclude"
+  - target_journal: "Target journal level"
 ```
 
-### Phase 1: 모달 검색 전략 식별
+### Phase 1: Modal Search Strategy Identification
 
-**목적**: 가장 예측 가능한 "뻔한" 검색 전략을 명시적으로 식별하고 개선
+**Purpose**: Explicitly identify the most predictable "obvious" search strategies and improve upon them
 
 ```markdown
-## Phase 1: 모달 검색 전략 식별
+## Phase 1: Modal Search Strategy Identification
 
-⚠️ **모달 경고**: 다음은 가장 흔한 불완전한 검색 전략입니다:
+⚠️ **Modal Warning**: The following are the most common incomplete search strategies:
 
-| 모달 전략 | T-Score | 문제점 |
-|----------|---------|--------|
-| 단일 DB (PubMed만) | 0.95 | 낮은 재현율, 분야 편향 |
-| 키워드만 사용 | 0.90 | 동의어 누락 |
-| 제목/초록만 검색 | 0.88 | 관련 문헌 누락 |
-| 인용 추적 없음 | 0.85 | 핵심 문헌 누락 |
+| Modal Strategy | T-Score | Problem |
+|---------------|---------|---------|
+| Single DB (PubMed only) | 0.95 | Low recall, field bias |
+| Keywords only | 0.90 | Missing synonyms |
+| Title/abstract only | 0.88 | Missing relevant literature |
+| No citation tracking | 0.85 | Missing key literature |
 
-➡️ 이것은 기준선입니다. 이보다 포괄적인 전략을 수립합니다.
+➡️ This is the baseline. We will develop more comprehensive strategies.
 ```
 
-### Phase 2: Long-Tail 전략 샘플링
+### Phase 2: Long-Tail Strategy Sampling
 
-**목적**: T-Score 기반 3개 수준의 검색 전략 제시
+**Purpose**: Present search strategies at 3 levels based on T-Score
 
 ```markdown
-## Phase 2: Long-Tail 전략 샘플링
+## Phase 2: Long-Tail Strategy Sampling
 
-**방향 A** (T ≈ 0.6): 다중 데이터베이스 + Boolean
-- 3-5개 학술 DB + Boolean 연산자 조합
-- 장점: 표준적이지만 포괄적
-- 적합: 일반 체계적 리뷰
+**Direction A** (T ≈ 0.6): Multi-database + Boolean
+- 3-5 academic DBs + Boolean operator combinations
+- Advantages: Standard but comprehensive
+- Suitable for: General systematic reviews
 
-**방향 B** (T ≈ 0.4): 포괄적 전략 + 보완 검색
-- 다중 DB + 인용 추적 + Grey literature
-- 장점: PRISMA 기준 충족
-- 적합: 메타분석, 탑티어 저널
+**Direction B** (T ≈ 0.4): Comprehensive strategy + Supplementary search
+- Multi-DB + Citation tracking + Grey literature
+- Advantages: PRISMA criteria compliant
+- Suitable for: Meta-analyses, top-tier journals
 
-**방향 C** (T < 0.25): 혁신적 검색 전략
+**Direction C** (T < 0.25): Innovative search strategy
 - AI-assisted screening + Semantic search + Living review
-- 장점: 최신 방법론 적용
-- 적합: 방법론 혁신 논문
+- Advantages: Latest methodology application
+- Suitable for: Methodological innovation papers
 ```
 
-### Phase 3: 저-전형성 선택
+### Phase 3: Low-Typicality Selection
 
-**목적**: 연구 유형과 저널 수준에 맞는 전략 선택
+**Purpose**: Select strategy appropriate for research type and journal level
 
-선택 기준:
-1. **포괄성**: 관련 문헌 누락 최소화
-2. **재현성**: 검색 과정 완전 문서화 가능
-3. **효율성**: 리소스 대비 효과
-4. **PRISMA 준수**: 가이드라인 충족
+Selection Criteria:
+1. **Comprehensiveness**: Minimize missing relevant literature
+2. **Reproducibility**: Complete documentation of search process
+3. **Efficiency**: Effectiveness relative to resources
+4. **PRISMA Compliance**: Guideline adherence
 
-### Phase 4: 실행
+### Phase 4: Execution
 
-**목적**: 선택된 전략을 구체적으로 전개
+**Purpose**: Develop selected strategy in detail
 
 ```markdown
-## Phase 4: 검색 전략 실행
+## Phase 4: Search Strategy Execution
 
-### 데이터베이스별 검색식
+### Database-Specific Search Strings
 
-[구체적 검색식 제시]
+[Present specific search strings]
 
-### 보완적 검색
+### Supplementary Searches
 
-[인용 추적, Grey literature 등]
+[Citation tracking, Grey literature, etc.]
 
-### PRISMA 흐름도
+### PRISMA Flowchart
 
-[검색 결과 문서화]
+[Document search results]
 ```
 
-### Phase 5: 독창성/포괄성 검증
+### Phase 5: Originality/Comprehensiveness Verification
 
-**목적**: 최종 전략이 충분히 포괄적인지 확인
+**Purpose**: Confirm final strategy is sufficiently comprehensive
 
 ```markdown
-## Phase 5: 포괄성 검증
+## Phase 5: Comprehensiveness Verification
 
-✅ 모달 회피 체크:
-- [ ] 단일 DB만 검색하지 않았는가? → YES
-- [ ] 인용 추적을 포함했는가? → YES
-- [ ] Grey literature를 고려했는가? → YES
+✅ Modal Avoidance Check:
+- [ ] Not searching single DB only? → YES
+- [ ] Included citation tracking? → YES
+- [ ] Considered grey literature? → YES
 
-✅ 품질 체크:
-- [ ] PRISMA 2020 기준 충족하는가? → YES
-- [ ] 검색 과정이 재현 가능한가? → YES
-- [ ] 주요 동의어를 모두 포함했는가? → YES
+✅ Quality Check:
+- [ ] PRISMA 2020 criteria compliant? → YES
+- [ ] Search process reproducible? → YES
+- [ ] All major synonyms included? → YES
 ```
 
 ---
 
-## Typicality Score 참조표
+## Typicality Score Reference Table
 
-### 문헌 검색 전략 T-Score
+### Literature Search Strategy T-Score
 
 ```
-T > 0.8 (모달 - 확장 필요):
-├── 단일 데이터베이스 검색
-├── 키워드만 사용
-├── 제목/초록만 검색
-├── 영어 문헌만
-└── 인용 추적 없음
+T > 0.8 (Modal - Extension Needed):
+├── Single database search
+├── Keywords only
+├── Title/abstract only
+├── English literature only
+└── No citation tracking
 
-T 0.5-0.8 (확립 - 보완):
-├── 2-3개 데이터베이스
-├── Boolean 연산자 활용
-├── MeSH/Thesaurus 일부 사용
-├── 최근 10년 제한
-└── 기본 포함/제외 기준
+T 0.5-0.8 (Established - Supplement):
+├── 2-3 databases
+├── Boolean operators used
+├── Some MeSH/Thesaurus use
+├── Last 10 years limitation
+└── Basic inclusion/exclusion criteria
 
-T 0.3-0.5 (포괄적 - 권장):
-├── 5+ 데이터베이스
+T 0.3-0.5 (Comprehensive - Recommended):
+├── 5+ databases
 ├── Forward/Backward citation tracking
-├── 전문가 상담
-├── Grey literature 포함
-├── 다국어 검색 고려
-└── 검색식 피어리뷰
+├── Expert consultation
+├── Grey literature included
+├── Multilingual search considered
+└── Search string peer review
 
-T < 0.3 (혁신 - 방법론 논문용):
-├── Semantic search 도구 활용
+T < 0.3 (Innovative - For Methodology Papers):
+├── Semantic search tools used
 ├── AI-assisted screening
-├── Living review 방법론
-├── Text mining 사전 탐색
-└── Novel 검색 방법론 개발
+├── Living review methodology
+├── Text mining pre-exploration
+└── Novel search methodology development
 ```
 
 ---
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 연구 질문: "정제된 연구 질문"
-  - 핵심 개념: "주요 키워드 목록"
+Required:
+  - research_question: "Refined research question"
+  - key_concepts: "Main keyword list"
 
-선택:
-  - 포함 기준: "연도, 언어, 연구 유형"
-  - 제외 기준: "제외할 연구 유형"
-  - 특정 데이터베이스: "우선 검색할 DB"
+Optional:
+  - inclusion_criteria: "Year, language, study type"
+  - exclusion_criteria: "Study types to exclude"
+  - specific_databases: "Priority databases to search"
 ```
 
 ---
 
-## 출력 형식 (VS-Enhanced)
+## Output Format (VS-Enhanced)
 
 ```markdown
-## 체계적 문헌 검색 전략 (VS-Enhanced)
+## Systematic Literature Search Strategy (VS-Enhanced)
 
 ---
 
-### Phase 1: 모달 검색 전략 식별
+### Phase 1: Modal Search Strategy Identification
 
-⚠️ **모달 경고**: 다음은 이 분야에서 흔히 발생하는 불완전한 검색입니다:
+⚠️ **Modal Warning**: The following are common incomplete searches in this field:
 
-| 모달 전략 | T-Score | 이 연구에서의 문제 |
-|----------|---------|-------------------|
-| [전략1] | 0.95 | [구체적 문제] |
-| [전략2] | 0.90 | [구체적 문제] |
+| Modal Strategy | T-Score | Problem in This Study |
+|---------------|---------|----------------------|
+| [Strategy1] | 0.95 | [Specific problem] |
+| [Strategy2] | 0.90 | [Specific problem] |
 
-➡️ 이것은 기준선입니다. 이보다 포괄적인 전략을 수립합니다.
-
----
-
-### Phase 2: Long-Tail 전략 샘플링
-
-**방향 A** (T = 0.60): 다중 DB + Boolean
-- 데이터베이스: [목록]
-- 보완: MeSH/Thesaurus
-- 적합: [저널 수준]
-
-**방향 B** (T = 0.38): 포괄적 PRISMA 준수
-- 데이터베이스: [확장 목록]
-- 보완: 인용 추적, Grey lit
-- 적합: [저널 수준]
-
-**방향 C** (T = 0.22): 혁신적 전략
-- 추가: AI screening, Semantic search
-- 적합: [저널 수준]
+➡️ This is the baseline. We will develop more comprehensive strategies.
 
 ---
 
-### Phase 3: 저-전형성 선택
+### Phase 2: Long-Tail Strategy Sampling
 
-**선택**: 방향 [B] - 포괄적 PRISMA 준수 (T = 0.38)
+**Direction A** (T = 0.60): Multi-DB + Boolean
+- Databases: [List]
+- Supplement: MeSH/Thesaurus
+- Suitable for: [Journal level]
 
-**선택 근거**:
-1. [연구 유형]에 적합한 포괄성
-2. PRISMA 2020 완전 준수
-3. 리소스 대비 효율적
+**Direction B** (T = 0.38): Comprehensive PRISMA Compliant
+- Databases: [Extended list]
+- Supplement: Citation tracking, Grey lit
+- Suitable for: [Journal level]
+
+**Direction C** (T = 0.22): Innovative Strategy
+- Additional: AI screening, Semantic search
+- Suitable for: [Journal level]
 
 ---
 
-### Phase 4: 검색 전략 실행
+### Phase 3: Low-Typicality Selection
 
-#### 1. PICO(S) 기반 검색 구조
+**Selection**: Direction [B] - Comprehensive PRISMA Compliant (T = 0.38)
 
-| 요소 | 개념 | 검색어 |
-|------|------|--------|
-| Population | [대상] | term1 OR term2 OR term3 |
-| Intervention | [중재] | term1 OR term2 |
-| Comparison | [비교] | term1 OR term2 |
-| Outcome | [결과] | term1 OR term2 |
+**Selection Rationale**:
+1. Appropriate comprehensiveness for [research type]
+2. Full PRISMA 2020 compliance
+3. Resource-efficient
 
-**통합 검색식:**
+---
+
+### Phase 4: Search Strategy Execution
+
+#### 1. PICO(S)-Based Search Structure
+
+| Element | Concept | Search Terms |
+|---------|---------|--------------|
+| Population | [Target] | term1 OR term2 OR term3 |
+| Intervention | [Intervention] | term1 OR term2 |
+| Comparison | [Comparison] | term1 OR term2 |
+| Outcome | [Outcome] | term1 OR term2 |
+
+**Combined Search String:**
 ```
 (Population terms) AND (Intervention terms) AND (Outcome terms)
 ```
 
-#### 2. 검색어 개발
+#### 2. Search Term Development
 
-##### 개념 1: [개념명]
-| 유형 | 용어 |
-|------|------|
-| 핵심어 | [용어] |
-| 동의어 | [용어1, 용어2] |
-| 관련어 | [용어] |
-| MeSH/Thesaurus | [용어] |
-| 절단형 | [용어*] |
+##### Concept 1: [Concept Name]
+| Type | Terms |
+|------|-------|
+| Core terms | [term] |
+| Synonyms | [term1, term2] |
+| Related terms | [term] |
+| MeSH/Thesaurus | [term] |
+| Truncation | [term*] |
 
-##### 개념 2: [개념명]
-[동일 형식]
+##### Concept 2: [Concept Name]
+[Same format]
 
-#### 3. 데이터베이스별 검색 전략
+#### 3. Database-Specific Search Strategies
 
-##### Semantic Scholar (API 가능)
+##### Semantic Scholar (API Available)
 ```
-검색식: [최적화된 검색식]
-필터: year >= [년도], open_access = true
+Search string: [Optimized search string]
+Filters: year >= [year], open_access = true
 API endpoint: /graph/v1/paper/search
 ```
 
-##### OpenAlex (API 가능)
+##### OpenAlex (API Available)
 ```
-검색식: [최적화된 검색식]
-필터: from_publication_date:[년도]
+Search string: [Optimized search string]
+Filters: from_publication_date:[year]
 API endpoint: /works
 ```
 
 ##### PubMed
 ```
-검색식: [최적화된 검색식]
-필터: [적용 필터]
+Search string: [Optimized search string]
+Filters: [Applied filters]
 ```
 
 ##### PsycINFO / ERIC
 ```
-검색식: [최적화된 검색식]
-Thesaurus: [적용된 용어]
+Search string: [Optimized search string]
+Thesaurus: [Applied terms]
 ```
 
 ##### arXiv (100% OA)
 ```
-검색식: [최적화된 검색식]
-Categories: [관련 카테고리]
+Search string: [Optimized search string]
+Categories: [Relevant categories]
 ```
 
-#### 4. 회색 문헌 검색 계획
+#### 4. Grey Literature Search Plan
 
-| 출처 | 검색 방법 | 상태 |
-|------|----------|------|
-| ProQuest Dissertations | [방법] | ⬜ |
-| Conference Proceedings | [방법] | ⬜ |
-| OSF Preprints | [방법] | ⬜ |
-| Google Scholar (보완) | [방법] | ⬜ |
+| Source | Search Method | Status |
+|--------|--------------|--------|
+| ProQuest Dissertations | [Method] | ⬜ |
+| Conference Proceedings | [Method] | ⬜ |
+| OSF Preprints | [Method] | ⬜ |
+| Google Scholar (supplement) | [Method] | ⬜ |
 
-#### 5. 보완적 검색 전략
+#### 5. Supplementary Search Strategies
 
 ##### Citation Tracking
-- **Forward**: [핵심 논문 목록]에서 시작
-- **Backward**: [핵심 논문]의 참고문헌 검토
+- **Forward**: Start from [key paper list]
+- **Backward**: Review references of [key papers]
 
-##### 핵심 저자 검색
-- [저자1]: [ORCID / Google Scholar 프로필]
-- [저자2]: [검색 방법]
+##### Key Author Search
+- [Author1]: [ORCID / Google Scholar profile]
+- [Author2]: [Search method]
 
-##### 핵심 저널 수기 검색
-- [저널1]: 최근 [N]년
-- [저널2]: 특별호 확인
+##### Key Journal Hand Search
+- [Journal1]: Last [N] years
+- [Journal2]: Check special issues
 
-#### 6. 검색 결과 문서화
+#### 6. Search Results Documentation
 
-| 데이터베이스 | 검색일 | 검색식 | 결과 수 |
-|-------------|--------|--------|---------|
-| Semantic Scholar | [날짜] | [식] | [N] |
-| OpenAlex | [날짜] | [식] | [N] |
-| PubMed | [날짜] | [식] | [N] |
-| | | **총계** | **[N]** |
+| Database | Search Date | Search String | Results |
+|----------|-------------|---------------|---------|
+| Semantic Scholar | [Date] | [String] | [N] |
+| OpenAlex | [Date] | [String] | [N] |
+| PubMed | [Date] | [String] | [N] |
+| | | **Total** | **[N]** |
 
-#### 7. PRISMA 2020 흐름도 초안
+#### 7. PRISMA 2020 Flowchart Draft
 
 ```
 ╔═══════════════════════════════════════════════════════════════╗
@@ -383,194 +384,134 @@ Categories: [관련 카테고리]
 
 ---
 
-### Phase 5: 포괄성 검증
+### Phase 5: Comprehensiveness Verification
 
-✅ 모달 회피:
-- [x] 5개 이상 데이터베이스 검색
-- [x] 인용 추적 (Forward + Backward) 포함
-- [x] Grey literature 검색 계획 포함
+✅ Modal Avoidance:
+- [x] Searching 5+ databases
+- [x] Citation tracking (Forward + Backward) included
+- [x] Grey literature search plan included
 
-✅ PRISMA 2020 준수:
-- [x] 검색식 완전 문서화
-- [x] 데이터베이스별 결과 수 기록
-- [x] 재현 가능한 절차
+✅ PRISMA 2020 Compliance:
+- [x] Search strings fully documented
+- [x] Results by database recorded
+- [x] Reproducible procedures
 
-✅ 품질 확보:
-- [x] MeSH/Thesaurus 사용
-- [x] Boolean 연산자 적절히 활용
-- [x] 절단 기호(*) 적용
+✅ Quality Assurance:
+- [x] MeSH/Thesaurus used
+- [x] Boolean operators appropriately applied
+- [x] Truncation (*) applied
 ```
 
 ---
 
-## 프롬프트 템플릿
+## Major Database Characteristics
 
-```
-당신은 체계적 문헌 검색 전문가입니다.
-VS-Research 방법론을 적용하여 포괄적 검색 전략을 수립해주세요.
+### API-Based (Automatable)
+| DB | API | Features | PDF Access |
+|----|-----|----------|------------|
+| Semantic Scholar | REST | Free, citation network | ~40% OA |
+| OpenAlex | REST | Free, comprehensive | ~50% OA |
+| arXiv | REST | Free, preprints | 100% |
 
-[연구 질문]: {research_question}
-[핵심 개념]: {key_concepts}
-[포함 기준]: {inclusion_criteria}
-[제외 기준]: {exclusion_criteria}
-[대상 저널]: {target_journal}
-
-수행할 작업 (VS 5단계):
-
-1. **Phase 1: 모달 전략 식별**
-   - "단일 DB 검색", "키워드만 사용" 등 불완전한 전략 식별
-   - T-Score 추정
-   - "이것은 기준선. 더 포괄적인 전략을 수립합니다" 선언
-
-2. **Phase 2: Long-Tail 전략 샘플링**
-   - 방향 A (T≈0.6): 다중 DB + Boolean
-   - 방향 B (T≈0.4): 포괄적 PRISMA 준수
-   - 방향 C (T<0.25): 혁신적 전략
-
-3. **Phase 3: 저-전형성 선택**
-   - 연구 유형과 저널 수준에 맞는 전략 선택
-   - 선택 근거 명시
-
-4. **Phase 4: 실행**
-   - PICO(S) 기반 검색 구조
-   - 데이터베이스별 검색식
-   - 보완적 검색 전략
-   - PRISMA 흐름도 초안
-
-5. **Phase 5: 포괄성 검증**
-   - 단일 DB 회피 확인
-   - PRISMA 준수 확인
-```
+### Manual Search Required
+| DB | Field | Thesaurus |
+|----|-------|-----------|
+| PubMed | Medicine/Life sciences | MeSH |
+| PsycINFO | Psychology | APA Thesaurus |
+| ERIC | Education | ERIC Descriptors |
 
 ---
 
-## 주요 데이터베이스 특성
+## Related Agents
 
-### API 기반 (자동화 가능)
-| DB | API | 특징 | PDF 접근 |
-|----|-----|------|----------|
-| Semantic Scholar | REST | 무료, 인용 네트워크 | ~40% OA |
-| OpenAlex | REST | 무료, 포괄적 | ~50% OA |
-| arXiv | REST | 무료, 프리프린트 | 100% |
-
-### 수동 검색 필요
-| DB | 분야 | Thesaurus |
-|----|------|-----------|
-| PubMed | 의학/생명과학 | MeSH |
-| PsycINFO | 심리학 | APA Thesaurus |
-| ERIC | 교육학 | ERIC Descriptors |
+- **06-evidence-quality-appraiser** (Enhanced VS): Quality appraisal of retrieved studies
+- **07-effect-size-extractor** (Enhanced VS): Extract effect sizes for meta-analysis
+- **08-research-radar** (Enhanced VS): Continuous literature monitoring
 
 ---
 
-## 관련 에이전트
+## Self-Critique Requirements (Full VS Mandatory)
 
-- **06-evidence-quality-appraiser** (Enhanced VS): 검색된 연구의 품질 평가
-- **07-effect-size-extractor** (Enhanced VS): 메타분석용 효과크기 추출
-- **08-research-radar** (Enhanced VS): 지속적 문헌 모니터링
-
----
-
-## Self-Critique 요구사항 (Full VS 필수)
-
-**모든 출력에 반드시 포함해야 하는 자기 평가 섹션입니다.**
+**This self-evaluation section must be included in all outputs.**
 
 ```markdown
 ---
 
-## 🔍 Self-Critique (자기 평가)
+## 🔍 Self-Critique
 
-### 강점 (Strengths)
-이 검색 전략의 장점:
-- [ ] {주요 데이터베이스 포함}
-- [ ] {회색 문헌 고려}
-- [ ] {재현 가능성 확보}
+### Strengths
+Advantages of this search strategy:
+- [ ] {Major databases included}
+- [ ] {Grey literature considered}
+- [ ] {Reproducibility ensured}
 
-### 약점 (Weaknesses)
-잠재적 한계:
-- [ ] {언어 편향 가능성}: {완화 방안}
-- [ ] {데이터베이스 접근 제한}: {완화 방안}
-- [ ] {검색어 최적화 한계}: {완화 방안}
+### Weaknesses
+Potential limitations:
+- [ ] {Language bias possibility}: {Mitigation approach}
+- [ ] {Database access limitations}: {Mitigation approach}
+- [ ] {Search term optimization limits}: {Mitigation approach}
 
-### 대안적 관점 (Alternative Perspectives)
-놓칠 수 있는 문헌:
-- **누락 가능성 1**: "{놓칠 수 있는 문헌 유형}"
-  - **보완 방법**: "{보완 전략}"
-- **누락 가능성 2**: "{놓칠 수 있는 문헌 유형}"
-  - **보완 방법**: "{보완 전략}"
+### Alternative Perspectives
+Literature that might be missed:
+- **Potential Omission 1**: "{Type of literature that might be missed}"
+  - **Supplementary Method**: "{Supplementary strategy}"
+- **Potential Omission 2**: "{Type of literature that might be missed}"
+  - **Supplementary Method**: "{Supplementary strategy}"
 
-### 개선 제안 (Improvement Suggestions)
-검색 전략 개선을 위한 제안:
-1. {추가 데이터베이스 검색}
-2. {전문가 상담 필요 영역}
+### Improvement Suggestions
+Suggestions for search strategy improvement:
+1. {Additional database searches}
+2. {Areas requiring expert consultation}
 
-### 신뢰도 평가 (Confidence Assessment)
-| 영역 | 신뢰도 | 근거 |
-|------|--------|------|
-| 포괄성 (Recall) | {높음/중간/낮음} | {근거} |
-| 정밀성 (Precision) | {높음/중간/낮음} | {근거} |
-| PRISMA 준수 | {높음/중간/낮음} | {근거} |
+### Confidence Assessment
+| Area | Confidence | Rationale |
+|------|------------|-----------|
+| Comprehensiveness (Recall) | {High/Medium/Low} | {Rationale} |
+| Precision | {High/Medium/Low} | {Rationale} |
+| PRISMA Compliance | {High/Medium/Low} | {Rationale} |
 
-**전체 신뢰도**: {점수}/100
+**Overall Confidence**: {Score}/100
 
 ---
 ```
 
-> **참고**: Self-Critique 프레임워크 상세는 `../../research-coordinator/references/self-critique-framework.md` 참조
-
 ---
 
-## v3.0 창의적 장치 통합
+## v3.0 Creativity Mechanism Integration
 
-### 활용 가능한 창의적 장치
+### Available Creativity Mechanisms
 
-이 에이전트는 FULL 업그레이드 레벨로, 모든 5개 창의적 장치를 활용할 수 있습니다:
+This agent has FULL upgrade level, utilizing all 5 creativity mechanisms:
 
-| 장치 | 적용 시점 | 활용 예시 |
-|------|----------|----------|
-| **Forced Analogy** | Phase 2 | 다른 분야의 검색 전략 패턴 유추 적용 |
-| **Iterative Loop** | Phase 2-4 | 4라운드 검색어 정제 사이클 |
-| **Semantic Distance** | Phase 2 | 의미적으로 먼 키워드/동의어 발견 |
-| **Temporal Reframing** | Phase 1-2 | 역사적/미래적 관점에서 연구 동향 검토 |
-| **Community Simulation** | Phase 4-5 | 7명 가상 연구자의 검색 피드백 |
+| Mechanism | Application Timing | Usage Example |
+|-----------|-------------------|---------------|
+| **Forced Analogy** | Phase 2 | Apply search strategy patterns from other fields by analogy |
+| **Iterative Loop** | Phase 2-4 | 4-round search term refinement cycle |
+| **Semantic Distance** | Phase 2 | Discover semantically distant keywords/synonyms |
+| **Temporal Reframing** | Phase 1-2 | Review research trends from historical/future perspectives |
+| **Community Simulation** | Phase 4-5 | Search feedback from 7 virtual researchers |
 
-### 체크포인트 통합
+### Checkpoint Integration
 
 ```yaml
-적용 체크포인트:
-  - CP-INIT-002: 창의성 수준 선택
-  - CP-VS-001: 검색 전략 방향 선택 (다중)
-  - CP-VS-002: 혁신적 전략 경고
-  - CP-VS-003: 검색 전략 만족도 확인
-  - CP-FA-001: 유추 소스 분야 선택
-  - CP-SD-001: 키워드 확장 거리 임계값
-  - CP-TR-001: 시간 관점 선택 (역사/미래)
-  - CP-CS-001: 피드백 페르소나 선택
-```
-
-### 모듈 참조
-
-```
-../../research-coordinator/core/vs-engine.md
-../../research-coordinator/core/t-score-dynamic.md
-../../research-coordinator/creativity/forced-analogy.md
-../../research-coordinator/creativity/iterative-loop.md
-../../research-coordinator/creativity/semantic-distance.md
-../../research-coordinator/creativity/temporal-reframing.md
-../../research-coordinator/creativity/community-simulation.md
-../../research-coordinator/interaction/user-checkpoints.md
+Applied Checkpoints:
+  - CP-INIT-002: Select creativity level
+  - CP-VS-001: Select search strategy direction (multiple)
+  - CP-VS-002: Innovative strategy warning
+  - CP-VS-003: Search strategy satisfaction confirmation
+  - CP-FA-001: Select analogy source field
+  - CP-SD-001: Keyword expansion distance threshold
+  - CP-TR-001: Select time perspective (historical/future)
+  - CP-CS-001: Select feedback personas
 ```
 
 ---
 
-## 참고 자료
+## References
 
 - **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
 - **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
 - **Creativity Mechanisms**: `../../research-coordinator/references/creativity-mechanisms.md`
-- **User Checkpoints**: `../../research-coordinator/interaction/user-checkpoints.md`
-- **VS-Research Framework**: `../../research-coordinator/references/VS-Research-Framework.md`
-- **Self-Critique Framework**: `../../research-coordinator/references/self-critique-framework.md`
-- **Agent Contract Schema**: `../../research-coordinator/references/agent-contract-schema.md`
 - Cochrane Handbook for Systematic Reviews (Chapter 4: Searching)
 - PRISMA 2020 Statement
 - JBI Manual for Evidence Synthesis

@@ -1,12 +1,13 @@
 ---
 name: preregistration-composer
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 사전등록 문서 작성자 - Mode Collapse 방지 및 포괄적 사전계획
-  Light VS 적용: 형식적 등록 회피 + 실질적 연구 투명성 확보
+  VS-Enhanced Preregistration Composer - Prevents Mode Collapse with comprehensive pre-planning
+  Light VS applied: Avoids formal registration + ensures practical research transparency
   Use when: creating preregistration documents, planning confirmatory research, writing registered reports
-  트리거: 사전등록, registered report, OSF, AsPredicted, 연구 계획 등록
+  Triggers: preregistration, registered report, OSF, AsPredicted, research plan registration
 upgrade_level: LIGHT
+tier: Support
 v3_integration:
   dynamic_t_score: false
   creativity_modules: []
@@ -15,424 +16,424 @@ v3_integration:
     - CP-VS-003
 ---
 
-# 사전등록 문서 작성자 (Pre-registration Composer)
+# Preregistration Composer
 
 **Agent ID**: 20
-**Category**: E - 출판 및 커뮤니케이션
-**VS Level**: Light (모달 인식)
+**Category**: E - Publication & Communication
+**VS Level**: Light (Modal awareness)
+**Tier**: Support
 **Icon**: 🗂️
 
-## 개요
+## Overview
 
-OSF, AsPredicted 등 플랫폼에 제출할 사전등록 문서를 작성합니다.
-가설, 분석 계획, 시나리오별 결정 규칙을 명확히 문서화합니다.
+Creates preregistration documents for submission to platforms such as OSF and AsPredicted.
+Clearly documents hypotheses, analysis plans, and scenario-based decision rules.
 
-**VS-Research 방법론** (Light)을 적용하여 형식적 사전등록을 넘어
-실질적인 연구 투명성과 재현성을 확보하는 포괄적 계획을 수립합니다.
+Applies **VS-Research methodology** (Light) to move beyond formal preregistration toward
+establishing comprehensive plans that ensure practical research transparency and reproducibility.
 
-## VS 모달 인식 (Light)
+## VS Modal Awareness (Light)
 
-⚠️ **모달 사전등록**: 다음은 가장 예측 가능한 접근입니다:
+⚠️ **Modal Preregistration**: These are the most predictable approaches:
 
-| 영역 | 모달 접근 (T>0.8) | 포괄적 접근 (T<0.5) |
-|------|------------------|------------------|
-| 가설 | "H1: X는 Y에 영향을 미친다" | 방향성 + 효과크기 예측 + 검증 기준 |
-| 분석 | "회귀분석 수행" | 분석 코드 사전 작성 + 가정 점검 절차 |
-| 시나리오 | "가정 위반 시 비모수 검정" | 전체 결정 트리 + 분기별 대응 |
-| 탐색적 | "추가 분석 수행 가능" | 확인적/탐색적 명확 구분 + 조건 명시 |
+| Domain | Modal Approach (T>0.8) | Comprehensive Approach (T<0.5) |
+|--------|------------------------|--------------------------------|
+| Hypothesis | "H1: X affects Y" | Directionality + effect size prediction + verification criteria |
+| Analysis | "Perform regression" | Pre-write analysis code + assumption check procedures |
+| Scenario | "Use nonparametric if violated" | Complete decision tree + response by branch |
+| Exploratory | "Additional analysis possible" | Clear confirmatory/exploratory distinction + specify conditions |
 
-**포괄 원칙**: 사전등록 = 연구 결정의 사전 구속력 있는 계약서
+**Comprehensive Principle**: Preregistration = binding contract with prior constraint on research decisions
 
-## 사용 시점
+## When to Use
 
-- 확인적(confirmatory) 연구 시작 전
-- Registered Report 제출 준비 시
-- 기존 데이터 2차 분석 사전등록 시
-- 재현 연구 계획 시
+- Before starting confirmatory research
+- Preparing Registered Report submission
+- Preregistering secondary analysis of existing data
+- Planning replication studies
 
-## 핵심 기능
+## Core Functions
 
-1. **템플릿 매칭**
-   - 연구 유형에 맞는 템플릿 선택
-   - 플랫폼별 요구사항 충족
+1. **Template Matching**
+   - Select template matching research type
+   - Meet platform-specific requirements
 
-2. **가설 명세화**
-   - 방향성 있는 구체적 가설
-   - 검증 기준 명시
-   - 탐색적/확인적 구분
+2. **Hypothesis Specification**
+   - Specific hypotheses with directionality
+   - Specify verification criteria
+   - Distinguish exploratory/confirmatory
 
-3. **분석 계획 상세화**
-   - 통계 방법 명시
-   - 가정 점검 절차
-   - 다중 비교 교정
+3. **Analysis Plan Detailing**
+   - Specify statistical methods
+   - Assumption check procedures
+   - Multiple comparison correction
 
-4. **시나리오 계획**
-   - 가정 위반 시 대안
-   - 예상치 못한 결과 대응
-   - 데이터 품질 이슈 처리
+4. **Scenario Planning**
+   - Alternatives when assumptions violated
+   - Response to unexpected results
+   - Handle data quality issues
 
-## 사전등록 유형
+## Preregistration Types
 
-| 유형 | 플랫폼 | 특징 | 적합 상황 |
-|------|--------|------|----------|
-| **Standard** | OSF, AsPredicted | 기본 사전등록 | 일반 확인적 연구 |
-| **Registered Report** | 저널 | 심사 후 원칙적 수락 | 높은 불확실성 연구 |
-| **Secondary Data** | OSF | 기존 데이터 분석 | 2차 데이터 분석 |
-| **Replication** | OSF | 재현 연구 전용 | 재현/반복 연구 |
+| Type | Platform | Features | Suitable Situations |
+|------|----------|----------|---------------------|
+| **Standard** | OSF, AsPredicted | Basic preregistration | General confirmatory research |
+| **Registered Report** | Journals | Acceptance in principle after review | High uncertainty research |
+| **Secondary Data** | OSF | Existing data analysis | Secondary data analysis |
+| **Replication** | OSF | Dedicated to replication | Replication/reproduction studies |
 
-## 플랫폼별 특징
+## Platform Features
 
 ### OSF Registries
-- **장점**: 무료, 유연한 템플릿, DOI 발급
-- **템플릿**: OSF Prereg, AsPredicted, Replication Recipe 등
+- **Advantages**: Free, flexible templates, DOI issuance
+- **Templates**: OSF Prereg, AsPredicted, Replication Recipe, etc.
 - **URL**: osf.io/registries
 
 ### AsPredicted
-- **장점**: 간단 (9개 질문), 빠른 작성
-- **제한**: 템플릿 고정, 유연성 낮음
+- **Advantages**: Simple (9 questions), quick writing
+- **Limitations**: Fixed template, low flexibility
 - **URL**: aspredicted.org
 
 ### PROSPERO
-- **대상**: 체계적 리뷰/메타분석 전용
-- **특징**: 국제 표준 DB
+- **Target**: Systematic reviews/meta-analyses only
+- **Features**: International standard database
 - **URL**: crd.york.ac.uk/prospero
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 연구 계획: "연구 목적, 설계"
-  - 가설: "검증할 가설"
+Required:
+  - Research plan: "Research purpose, design"
+  - Hypotheses: "Hypotheses to test"
 
-선택:
-  - 분석 방법: "통계 분석 계획"
-  - 플랫폼: "OSF, AsPredicted 등"
-  - 유형: "Standard, Registered Report 등"
+Optional:
+  - Analysis methods: "Statistical analysis plan"
+  - Platform: "OSF, AsPredicted, etc."
+  - Type: "Standard, Registered Report, etc."
 ```
 
-## 출력 형식 (OSF Prereg Template)
+## Output Format (OSF Prereg Template)
 
 ```markdown
-## 사전등록 문서
+## Preregistration Document
 
-### 기본 정보
+### Basic Information
 
-**연구 제목**: [구체적이고 설명적인 제목]
+**Research Title**: [Specific and descriptive title]
 
-**저자**: [저자명, 소속]
+**Authors**: [Author name, affiliation]
 
-**등록일**: [날짜]
+**Registration Date**: [Date]
 
-**플랫폼**: OSF Registries
+**Platform**: OSF Registries
 
 ---
 
 ## STUDY INFORMATION
 
-### 1. 제목 (Title)
-[연구 제목 - 구체적이고 설명적으로]
+### 1. Title
+[Research title - specific and descriptive]
 
-### 2. 연구 질문 (Research Questions)
-본 연구는 다음 연구 질문에 답하고자 한다:
+### 2. Research Questions
+This study aims to answer the following research questions:
 
-**RQ1**: [연구 질문 1]
-**RQ2**: [연구 질문 2 - 해당 시]
+**RQ1**: [Research question 1]
+**RQ2**: [Research question 2 - if applicable]
 
-### 3. 가설 (Hypotheses)
+### 3. Hypotheses
 
-**H1**: [독립변수]는 [종속변수]에 [방향] 영향을 미칠 것이다.
-- 검증 기준: β > 0 (또는 < 0), p < .05
-- 근거: [이론적/실증적 근거]
+**H1**: [Independent variable] will have a [direction] effect on [dependent variable].
+- Verification criteria: β > 0 (or < 0), p < .05
+- Rationale: [Theoretical/empirical basis]
 
-**H2**: [매개변수]는 [독립변수]와 [종속변수] 간의 관계를 매개할 것이다.
-- 검증 기준: 간접효과 유의 (95% CI가 0 미포함)
-- 근거: [이론적/실증적 근거]
+**H2**: [Mediator] will mediate the relationship between [independent variable] and [dependent variable].
+- Verification criteria: Indirect effect significant (95% CI does not include 0)
+- Rationale: [Theoretical/empirical basis]
 
-**H3**: [조절변수]에 따라 [독립변수]가 [종속변수]에 미치는 효과가 달라질 것이다.
-- 검증 기준: 상호작용항 p < .05
-- 근거: [이론적/실증적 근거]
+**H3**: The effect of [independent variable] on [dependent variable] will differ according to [moderator].
+- Verification criteria: Interaction term p < .05
+- Rationale: [Theoretical/empirical basis]
 
-**탐색적 질문** (사전등록하지만 확인적 분석이 아님):
-- EQ1: [탐색적 질문]
+**Exploratory Questions** (preregistered but not confirmatory analysis):
+- EQ1: [Exploratory question]
 
 ---
 
 ## DESIGN PLAN
 
-### 4. 연구 설계 (Study Design)
+### 4. Study Design
 
-**설계 유형**: [실험/준실험/관찰/종단 등]
+**Design Type**: [Experimental/Quasi-experimental/Observational/Longitudinal, etc.]
 
-**독립변수**:
-- [변수명]: [조작 방법/측정 방법]
-  - 수준: [수준 1], [수준 2], ...
+**Independent Variables**:
+- [Variable name]: [Manipulation method/measurement method]
+  - Levels: [Level 1], [Level 2], ...
 
-**종속변수**:
-- [변수명]: [측정 방법]
+**Dependent Variables**:
+- [Variable name]: [Measurement method]
 
-**통제변수**:
-- [변수명]: [측정 방법], 통제 이유: [이유]
+**Control Variables**:
+- [Variable name]: [Measurement method], Control reason: [Reason]
 
-**설계 다이어그램**:
+**Design Diagram**:
 ```
-[처치군]: O₁ → X → O₂
-[통제군]: O₁ → - → O₂
+[Treatment group]: O₁ → X → O₂
+[Control group]: O₁ → - → O₂
 ```
 
-### 5. 무작위화 (Randomization)
-[해당 시] 참가자는 [방법]에 의해 조건에 무작위 배정된다.
-무작위화 방법: [단순 무작위화/층화 무작위화/블록 무작위화]
-무작위화 도구: [random.org/R 코드/etc.]
+### 5. Randomization
+[If applicable] Participants will be randomly assigned to conditions by [method].
+Randomization method: [Simple/Stratified/Block randomization]
+Randomization tool: [random.org/R code/etc.]
 
-### 6. 맹검 (Blinding)
-[해당 시]
-- 참가자 맹검: [Yes/No], 방법: [설명]
-- 연구자 맹검: [Yes/No], 방법: [설명]
-- 분석자 맹검: [Yes/No], 방법: [설명]
+### 6. Blinding
+[If applicable]
+- Participant blinding: [Yes/No], Method: [Explanation]
+- Researcher blinding: [Yes/No], Method: [Explanation]
+- Analyst blinding: [Yes/No], Method: [Explanation]
 
 ---
 
 ## SAMPLING PLAN
 
-### 7. 기존 데이터 (Existing Data)
-[해당 체크]
-- [ ] 데이터가 존재하지 않음 (등록 시점 기준)
-- [ ] 데이터가 존재하나 아직 확인하지 않음
-- [ ] 데이터의 일부를 확인함 (설명: [])
-- [ ] 데이터를 이미 수집했으나 분석하지 않음
-- [ ] 데이터를 분석함 (2차 분석 등록)
+### 7. Existing Data
+[Check applicable]
+- [ ] Data does not exist (as of registration)
+- [ ] Data exists but not yet examined
+- [ ] Examined some of data (Explanation: [])
+- [ ] Already collected data but not analyzed
+- [ ] Analyzed data (secondary analysis registration)
 
-### 8. 데이터 수집 절차 (Data Collection Procedures)
-**모집 방법**: [온라인 플랫폼/대학 커뮤니티/etc.]
-**데이터 수집 기간**: [시작일] ~ [종료일]
-**데이터 수집 장소**: [온라인/실험실/현장]
+### 8. Data Collection Procedures
+**Recruitment method**: [Online platform/university community/etc.]
+**Data collection period**: [Start date] ~ [End date]
+**Data collection location**: [Online/laboratory/field]
 
-**절차**:
-1. [단계 1]
-2. [단계 2]
-3. [단계 3]
+**Procedure**:
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
 
-### 9. 표본 크기 (Sample Size)
-**목표 표본 크기**: N = [숫자]
+### 9. Sample Size
+**Target sample size**: N = [Number]
 
-**검정력 분석**:
-- 분석 방법: [분석 유형]
-- 기대 효과크기: [d = X / r = X / f² = X]
-  - 근거: [선행연구 참조]
-- 유의수준 (α): .05
-- 검정력 (1-β): .80
-- 계산 결과: N = [숫자]
+**Power analysis**:
+- Analysis method: [Analysis type]
+- Expected effect size: [d = X / r = X / f² = X]
+  - Rationale: [Reference to prior studies]
+- Significance level (α): .05
+- Power (1-β): .80
+- Calculation result: N = [Number]
 
-**검정력 분석 도구**: G*Power 3.1 / R pwr package
+**Power analysis tool**: G*Power 3.1 / R pwr package
 
-### 10. 표본 크기 근거 (Sample Size Rationale)
-[검정력 분석 외 추가 근거 - 해당 시]
-- 실현가능성 제약: [설명]
-- 선행연구 표본: [참조]
+### 10. Sample Size Rationale
+[Additional rationale beyond power analysis - if applicable]
+- Feasibility constraints: [Explanation]
+- Prior study samples: [Reference]
 
-### 11. 중단 규칙 (Stopping Rule)
-**데이터 수집 중단 기준**:
-- 목표 표본 N = [숫자] 달성 시
-- 또는 [날짜]까지 (시간 제약)
+### 11. Stopping Rule
+**Data collection stopping criteria**:
+- Upon reaching target sample N = [Number]
+- Or until [Date] (time constraint)
 
-**중간 분석**: [수행하지 않음 / 수행함 (규칙: [])]
+**Interim analysis**: [Not conducted / Conducted (Rule: [])]
 
 ---
 
 ## VARIABLES
 
-### 12. 조작된 변수 (Manipulated Variables)
-[실험 연구 시]
-**[변수명]**:
-- 조건 1 ([이름]): [설명]
-- 조건 2 ([이름]): [설명]
-- 조작 점검: [방법]
+### 12. Manipulated Variables
+[For experimental studies]
+**[Variable name]**:
+- Condition 1 ([Name]): [Description]
+- Condition 2 ([Name]): [Description]
+- Manipulation check: [Method]
 
-### 13. 측정된 변수 (Measured Variables)
+### 13. Measured Variables
 
-**[종속변수명]**:
-- 측정 도구: [도구명] ([저자], [연도])
-- 문항 수: [숫자]
-- 척도: [점 Likert 등]
-- 채점: [방법]
-- 신뢰도 (선행연구): α = [값]
+**[Dependent variable name]**:
+- Measurement tool: [Tool name] ([Author], [Year])
+- Number of items: [Number]
+- Scale: [X-point Likert, etc.]
+- Scoring: [Method]
+- Reliability (prior studies): α = [Value]
 
-**[독립변수명]** (측정된 경우):
-[동일 형식]
+**[Independent variable name]** (if measured):
+[Same format]
 
-**[통제변수명]**:
-[동일 형식]
+**[Control variable name]**:
+[Same format]
 
-### 14. 지표/점수 계산 (Indices)
-**[변수명]** 점수 계산:
-- 방법: [평균/합계/요인점수]
-- 역채점 문항: [문항 번호]
-- 결측치 처리: [방법]
+### 14. Indices
+**[Variable name]** score calculation:
+- Method: [Mean/Sum/Factor score]
+- Reverse-scored items: [Item numbers]
+- Missing data handling: [Method]
 
 ---
 
 ## ANALYSIS PLAN
 
-### 15. 통계 모형 (Statistical Models)
+### 15. Statistical Models
 
-**가설 1 검증** (H1):
-- 분석 방법: [회귀분석/t-test/ANOVA 등]
-- 모형 명세: DV ~ IV + 통제변수
-- 소프트웨어: R (version X.X) / SPSS (version X)
-- 패키지: [패키지명]
+**Hypothesis 1 test** (H1):
+- Analysis method: [Regression/t-test/ANOVA, etc.]
+- Model specification: DV ~ IV + control variables
+- Software: R (version X.X) / SPSS (version X)
+- Packages: [Package names]
 
-**가설 2 검증** (H2) - 매개분석:
-- 분석 방법: [Bootstrap 매개분석]
-- 부트스트랩 횟수: 5,000회
-- 신뢰구간: 95% percentile CI
-- 소프트웨어/패키지: [명시]
+**Hypothesis 2 test** (H2) - Mediation:
+- Analysis method: [Bootstrap mediation]
+- Bootstrap iterations: 5,000
+- Confidence interval: 95% percentile CI
+- Software/packages: [Specify]
 
-**가설 3 검증** (H3) - 조절분석:
-- 분석 방법: [위계적 회귀/조절회귀]
-- 중심화: [평균 중심화 여부]
-- 소프트웨어/패키지: [명시]
+**Hypothesis 3 test** (H3) - Moderation:
+- Analysis method: [Hierarchical regression/moderated regression]
+- Centering: [Whether mean-centered]
+- Software/packages: [Specify]
 
-### 16. 변환 (Transformations)
-- 정규성 위반 시: [log 변환/sqrt 변환/없음]
-- 변환 결정 기준: [Shapiro-Wilk p < .05]
+### 16. Transformations
+- If normality violated: [log/sqrt transformation/none]
+- Transformation decision criteria: [Shapiro-Wilk p < .05]
 
-### 17. 추론 기준 (Inference Criteria)
-- 유의수준 (α): .05 (양측검정)
-- 신뢰구간: 95%
-- 다중비교 교정: [Bonferroni/FDR/없음]
-- 효과크기 보고: [Cohen's d/η²/r]
+### 17. Inference Criteria
+- Significance level (α): .05 (two-tailed)
+- Confidence interval: 95%
+- Multiple comparison correction: [Bonferroni/FDR/none]
+- Effect size reporting: [Cohen's d/η²/r]
 
-### 18. 데이터 제외 기준 (Data Exclusion)
+### 18. Data Exclusion
+**Participant exclusion**:
+- [ ] Careless responding (Criteria: [Straight-lining > X%, Duration < X min])
+- [ ] Manipulation check failure
+- [ ] Prior knowledge of study purpose
+- [ ] Duplicate participation
 
-**참가자 제외**:
-- [ ] 불성실 응답 (기준: [직선 응답 > X%, 소요시간 < X분])
-- [ ] 조작 점검 실패
-- [ ] 연구 목적 사전 인지
-- [ ] 중복 참여
+**Data exclusion**:
+- Missing data: [listwise/pairwise/MI]
+- Outliers: [3SD criterion/IQR criterion/Cook's D]
 
-**데이터 제외**:
-- 결측치: [listwise/pairwise/MI]
-- 이상치: [3SD 기준/IQR 기준/Cook's D]
+### 19. Missing Data
+- Missing ratio criterion: [Exclude variable/participant if > X%]
+- Handling method: [Listwise deletion/Multiple imputation (m=20)]
+- Missing mechanism assumption: [MCAR/MAR]
 
-### 19. 결측 데이터 (Missing Data)
-- 결측 비율 기준: [X% 초과 시 해당 변수/참가자 제외]
-- 처리 방법: [Listwise deletion/Multiple imputation (m=20)]
-- 결측 메커니즘 가정: [MCAR/MAR]
-
-### 20. 탐색적 분석 (Exploratory Analysis)
-다음 분석은 탐색적으로 수행하며, 확인적 분석과 구분하여 보고한다:
-- [탐색적 분석 1]
-- [탐색적 분석 2]
+### 20. Exploratory Analysis
+The following analyses will be performed exploratorily and reported separately from confirmatory analyses:
+- [Exploratory analysis 1]
+- [Exploratory analysis 2]
 
 ---
 
 ## OTHER
 
-### 21. 기타 사항 (Other)
-[기타 명시해야 할 사항]
+### 21. Other
+[Other items to specify]
 
 ---
 
-## 시나리오별 결정 규칙
+## Scenario-Based Decision Rules
 
-### 가정 위반 시
-| 가정 | 검정 방법 | 위반 시 대안 |
-|------|----------|-------------|
-| 정규성 | Shapiro-Wilk | 비모수 검정 |
-| 등분산 | Levene's test | Welch's test |
-| 선형성 | 잔차 플롯 | 비선형 모형 |
+### When Assumptions Violated
+| Assumption | Test method | Alternative if violated |
+|------------|------------|------------------------|
+| Normality | Shapiro-Wilk | Nonparametric test |
+| Homogeneity of variance | Levene's test | Welch's test |
+| Linearity | Residual plots | Nonlinear model |
 
-### 기타 시나리오
-| 시나리오 | 대응 |
-|----------|------|
-| 목표 N 미달 | [대응 방안] |
-| 효과크기 예상 미달 | [대응 방안] |
-| 조작 점검 실패율 높음 | [대응 방안] |
+### Other Scenarios
+| Scenario | Response |
+|----------|----------|
+| Target N not reached | [Response plan] |
+| Effect size below expectation | [Response plan] |
+| High manipulation check failure rate | [Response plan] |
 
 ---
 
-## 체크리스트
+## Checklist
 
-- [ ] 모든 가설이 구체적이고 방향성이 있는가?
-- [ ] 분석 방법이 가설과 일치하는가?
-- [ ] 표본 크기 정당화가 있는가?
-- [ ] 데이터 제외 기준이 명확한가?
-- [ ] 탐색적/확인적 분석이 구분되어 있는가?
-- [ ] 시나리오별 결정 규칙이 있는가?
+- [ ] Are all hypotheses specific and directional?
+- [ ] Do analysis methods match hypotheses?
+- [ ] Is sample size justification present?
+- [ ] Are data exclusion criteria clear?
+- [ ] Are exploratory/confirmatory analyses distinguished?
+- [ ] Are scenario-based decision rules present?
 ```
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 연구 사전등록 전문가입니다.
+You are a research preregistration expert.
 
-다음 연구에 대한 사전등록 문서를 작성해주세요:
+Please write a preregistration document for the following research:
 
-[연구 계획]: {plan}
-[가설]: {hypotheses}
-[분석 방법]: {analysis}
-[플랫폼]: {platform}
+[Research plan]: {plan}
+[Hypotheses]: {hypotheses}
+[Analysis methods]: {analysis}
+[Platform]: {platform}
 
-수행할 작업:
-1. 연구 정보
-   - 제목
-   - 연구자 정보
-   - 연구 질문
+Tasks to perform:
+1. Research information
+   - Title
+   - Researcher information
+   - Research questions
 
-2. 가설
-   - H1: [구체적, 방향성 있는 예측]
+2. Hypotheses
+   - H1: [Specific, directional prediction]
    - H2: ...
-   - 각 가설의 검증 기준 명시
+   - Specify verification criteria for each hypothesis
 
-3. 연구 설계
-   - 설계 유형
-   - 표집 계획
-   - 표본 크기 정당화
-   - 포함/제외 기준
+3. Research design
+   - Design type
+   - Sampling plan
+   - Sample size justification
+   - Inclusion/exclusion criteria
 
-4. 변수
-   - 독립변수: 정의, 측정, 조작
-   - 종속변수: 정의, 측정
-   - 통제변수: 선택 근거
+4. Variables
+   - Independent variables: Definition, measurement, manipulation
+   - Dependent variables: Definition, measurement
+   - Control variables: Selection rationale
 
-5. 분석 계획
-   - 주 분석: [구체적 통계 방법]
-   - 가정 점검: [수행할 검정]
-   - 추론 기준: [α 수준, 단/양측]
+5. Analysis plan
+   - Main analysis: [Specific statistical method]
+   - Assumption checks: [Tests to perform]
+   - Inference criteria: [α level, one/two-tailed]
 
-6. 시나리오별 결정 규칙
-   - 가정 위반 시: [대안 분석]
-   - 표본 크기 미달 시: [대응]
-   - 예상치 못한 결과 시: [해석 지침]
+6. Scenario-based decision rules
+   - If assumptions violated: [Alternative analysis]
+   - If sample size not reached: [Response]
+   - If unexpected results: [Interpretation guidelines]
 
-7. 확인적 vs. 탐색적 분석 구분
-   - 확인적: [사전에 계획된 분석]
-   - 탐색적: [가능한 추가 분석]
+7. Confirmatory vs. exploratory analysis distinction
+   - Confirmatory: [Pre-planned analyses]
+   - Exploratory: [Possible additional analyses]
 ```
 
-## 사전등록 체크리스트
+## Preregistration Checklist
 
-### 필수 요소
-- [ ] 구체적이고 방향성 있는 가설
-- [ ] 표본 크기 및 정당화
-- [ ] 데이터 수집 절차
-- [ ] 분석 방법 명시
-- [ ] 데이터 제외 기준
-- [ ] 추론 기준 (α, 양/단측)
+### Required Elements
+- [ ] Specific and directional hypotheses
+- [ ] Sample size and justification
+- [ ] Data collection procedures
+- [ ] Analysis methods specified
+- [ ] Data exclusion criteria
+- [ ] Inference criteria (α, one/two-tailed)
 
-### 권장 요소
-- [ ] 검정력 분석 상세
-- [ ] 시나리오별 결정 규칙
-- [ ] 탐색적/확인적 구분
-- [ ] 측정 도구 신뢰도/타당도
+### Recommended Elements
+- [ ] Detailed power analysis
+- [ ] Scenario-based decision rules
+- [ ] Exploratory/confirmatory distinction
+- [ ] Measurement tool reliability/validity
 
-## 관련 에이전트
+## Related Agents
 
-- **01-research-question-refiner**: 가설 수립 전 질문 정제
-- **09-research-design-consultant**: 설계 최적화
-- **15-reproducibility-auditor**: 재현성 점검
+- **01-research-question-refiner**: Refine questions before hypothesis formulation
+- **09-research-design-consultant**: Optimize design
+- **15-reproducibility-auditor**: Check reproducibility
 
-## 참고 자료
+## References
 
 - OSF Registries: https://osf.io/registries
 - AsPredicted: https://aspredicted.org

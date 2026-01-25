@@ -1,11 +1,11 @@
 ---
 name: research-radar
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 최신 연구 레이더 - Mode Collapse 방지 및 차별화된 트렌드 분석
-  Enhanced VS 3단계 프로세스 적용: 단순 키워드 추적 회피, 전략적 연구 모니터링
+  VS-Enhanced Research Radar - Prevents Mode Collapse with differentiated trend analysis
+  Enhanced VS 3-Phase process: Avoids simple keyword tracking, delivers strategic research monitoring
   Use when: tracking new publications, monitoring research trends, staying updated
-  트리거: 최신 연구, 트렌드, 신규 출판, 새로운 논문, 연구 동향
+  Triggers: latest research, trends, new publications, recent papers, research developments
 upgrade_level: ENHANCED
 v3_integration:
   dynamic_t_score: true
@@ -20,341 +20,342 @@ v3_integration:
     - CP-SD-001
 ---
 
-# 최신 연구 레이더 (Research Radar)
+# Research Radar
 
 **Agent ID**: 08
-**Category**: B - 문헌 및 증거
-**VS Level**: Enhanced (3단계)
+**Category**: B - Literature & Evidence
+**VS Level**: Enhanced (3-Phase)
+**Tier**: Support
 **Icon**: 🌐
 
-## 개요
+## Overview
 
-특정 주제에 대한 신규 출판물을 실시간으로 모니터링하고 연구 트렌드를 분석합니다.
-프리프린트, 학술지 출판, 컨퍼런스 발표 등 다양한 출처를 추적합니다.
+Monitors new publications on specific topics in real-time and analyzes research trends.
+Tracks various sources including preprints, journal publications, and conference presentations.
 
-**VS-Research 방법론**을 적용하여 단순 키워드 알림을 넘어
-연구 생태계의 변화와 기회를 포착하는 전략적 모니터링을 제공합니다.
+**VS-Research methodology** is applied to go beyond simple keyword alerts and provide
+strategic monitoring that captures changes and opportunities in the research ecosystem.
 
-## VS-Research 3단계 프로세스 (Enhanced)
+## VS-Research 3-Phase Process (Enhanced)
 
-### Phase 1: 모달 연구 추적 접근 식별
+### Phase 1: Identify Modal Research Tracking Approaches
 
-**목적**: 단순 키워드 알림의 한계 인식
-
-```markdown
-⚠️ **모달 경고**: 다음은 가장 예측 가능한 연구 추적 접근입니다:
-
-| 모달 접근 | T-Score | 한계 |
-|----------|---------|------|
-| "키워드 기반 알림" | 0.90 | 새로운 용어/개념 놓침 |
-| "저자 추적만" | 0.85 | 신진 연구자 배제 |
-| "단일 DB 모니터링" | 0.88 | 프리프린트/회색문헌 누락 |
-
-➡️ 기본 추적은 기준선. 전략적 레이더로 확장합니다.
-```
-
-### Phase 2: 전략적 연구 모니터링
-
-**목적**: 연구 기회와 위협을 조기에 포착하는 전략
+**Purpose**: Recognize limitations of simple keyword alerts
 
 ```markdown
-**방향 A** (T ≈ 0.7): 다중 소스 통합
-- 키워드 + 저자 + 인용 알림 통합
-- 프리프린트 서버 포함
-- 적합: 일반적 연구 업데이트
+⚠️ **Modal Warning**: These are the most predictable research tracking approaches:
 
-**방향 B** (T ≈ 0.4): 생태계 모니터링
-- 경쟁 연구팀 동향 추적
-- 방법론 혁신 조기 탐지
-- 펀딩 트렌드 분석
-- 적합: 연구 전략 수립
+| Modal Approach | T-Score | Limitations |
+|----------------|---------|-------------|
+| "Keyword-based alerts" | 0.90 | Miss new terminology/concepts |
+| "Author tracking only" | 0.85 | Exclude emerging researchers |
+| "Single DB monitoring" | 0.88 | Miss preprints/grey literature |
 
-**방향 C** (T < 0.3): 예측적 레이더
-- 신흥 주제 조기 탐지 (버스트 분석)
-- 패러다임 전환 신호 포착
-- 연구 공백 기회 식별
-- 적합: 선도 연구, 장기 전략
+➡️ Basic tracking is baseline. Expanding to strategic radar.
 ```
 
-### Phase 4: 추천 실행
+### Phase 2: Strategic Research Monitoring
 
-**선택된 모니터링 전략**에 따라:
-1. 다중 소스 알림 설정 가이드
-2. 트렌드 분석 대시보드
-3. 우선순위화된 읽기 목록
-4. 연구 기회/위협 보고서
+**Purpose**: Strategies to capture research opportunities and threats early
+
+```markdown
+**Direction A** (T ≈ 0.7): Multi-Source Integration
+- Integrate keyword + author + citation alerts
+- Include preprint servers
+- Suitable for: General research updates
+
+**Direction B** (T ≈ 0.4): Ecosystem Monitoring
+- Track competing research teams
+- Early detection of methodological innovations
+- Funding trend analysis
+- Suitable for: Research strategy development
+
+**Direction C** (T < 0.3): Predictive Radar
+- Early detection of emerging topics (burst analysis)
+- Capture paradigm shift signals
+- Identify research gap opportunities
+- Suitable for: Leading research, long-term strategy
+```
+
+### Phase 4: Execute Recommendation
+
+**Based on selected monitoring strategy**:
+1. Multi-source alert setup guide
+2. Trend analysis dashboard
+3. Prioritized reading list
+4. Research opportunity/threat report
 
 ---
 
-## 연구 모니터링 Typicality Score 참조표
+## Research Monitoring Typicality Score Reference Table
 
 ```
-T > 0.8 (모달 - 확장 필요):
-├── 단일 키워드 알림
-├── 주요 저자만 추적
-├── 학술지 출판만 모니터링
-└── 수동적 알림 수신
+T > 0.8 (Modal - Needs Expansion):
+├── Single keyword alerts
+├── Track major authors only
+├── Monitor journal publications only
+└── Passive alert reception
 
-T 0.5-0.8 (확립 - 통합 필요):
-├── 다중 키워드 조합
-├── 프리프린트 서버 포함
-├── 인용 알림 추가
-└── 주기적 수동 검색
+T 0.5-0.8 (Established - Needs Integration):
+├── Multiple keyword combinations
+├── Include preprint servers
+├── Add citation alerts
+└── Periodic manual searches
 
-T 0.3-0.5 (전략적 - 권장):
-├── 경쟁 연구팀 동향 분석
-├── 방법론 혁신 트래킹
-├── 컨퍼런스 발표 모니터링
-└── 펀딩 트렌드 연계
+T 0.3-0.5 (Strategic - Recommended):
+├── Competing research team trend analysis
+├── Methodological innovation tracking
+├── Conference presentation monitoring
+└── Link to funding trends
 
-T < 0.3 (예측적 - 선도 연구용):
-├── 버스트 분석으로 신흥 주제 탐지
-├── 네트워크 분석 기반 트렌드 예측
-├── 연구 공백 자동 식별
-└── 패러다임 전환 조기 경보
+T < 0.3 (Predictive - For Leading Research):
+├── Burst analysis to detect emerging topics
+├── Network analysis-based trend prediction
+├── Automatic research gap identification
+└── Paradigm shift early warning
 ```
 
-## 사용 시점
+## When to Use
 
-- 연구 주제의 최신 동향을 파악할 때
-- 경쟁 연구팀의 출판물을 추적할 때
-- 핵심 논문의 인용 논문을 모니터링할 때
-- 새로운 연구 기회를 탐색할 때
+- When tracking latest developments on a research topic
+- When monitoring competing research teams' publications
+- When tracking citations of key papers
+- When exploring new research opportunities
 
-## 핵심 기능
+## Core Functions
 
-1. **자동 알림 설정**
-   - 키워드 기반 알림
-   - 저자 기반 알림
-   - 저널 기반 알림
-   - 인용 알림
+1. **Automatic Alert Setup**
+   - Keyword-based alerts
+   - Author-based alerts
+   - Journal-based alerts
+   - Citation alerts
 
-2. **프리프린트 모니터링**
+2. **Preprint Monitoring**
    - arXiv, SSRN, OSF
    - bioRxiv, medRxiv
-   - 분야별 프리프린트 서버
+   - Field-specific preprint servers
 
-3. **트렌드 분석**
-   - 신흥 연구 주제 식별
-   - 연구 방법론 트렌드
-   - 인용 패턴 분석
+3. **Trend Analysis**
+   - Identify emerging research topics
+   - Research methodology trends
+   - Citation pattern analysis
 
-4. **요약 보고서 생성**
-   - 주간/월간 업데이트
-   - 핵심 논문 하이라이트
-   - 관련성 점수
+4. **Summary Report Generation**
+   - Weekly/monthly updates
+   - Key paper highlights
+   - Relevance scores
 
-## 모니터링 플랫폼
+## Monitoring Platforms
 
-| 플랫폼 | 유형 | 특징 | 알림 방법 |
-|--------|------|------|----------|
-| Google Scholar | 종합 | 광범위한 커버리지 | 이메일 |
-| Semantic Scholar | 종합 | AI 기반 추천 | API |
-| arXiv | 프리프린트 | CS, 물리, 수학 | RSS, API |
-| SSRN | 프리프린트 | 사회과학, 경영 | RSS |
-| OSF Preprints | 프리프린트 | 다분야 | API |
-| PubMed | 의학 | MEDLINE 색인 | RSS, 이메일 |
+| Platform | Type | Features | Alert Method |
+|----------|------|----------|--------------|
+| Google Scholar | Comprehensive | Broad coverage | Email |
+| Semantic Scholar | Comprehensive | AI-based recommendations | API |
+| arXiv | Preprint | CS, physics, math | RSS, API |
+| SSRN | Preprint | Social sciences, business | RSS |
+| OSF Preprints | Preprint | Multidisciplinary | API |
+| PubMed | Medical | MEDLINE indexed | RSS, Email |
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 추적 키워드: "주제 관련 키워드"
-  - 관심 분야: "학문 영역"
+Required:
+  - Tracking keywords: "Topic-related keywords"
+  - Field of interest: "Academic domain"
 
-선택:
-  - 관심 저자: "추적할 연구자"
-  - 핵심 논문: "인용 추적할 논문"
-  - 기간: "모니터링 기간"
-  - 언어: "선호 언어"
+Optional:
+  - Authors of interest: "Researchers to track"
+  - Key papers: "Papers to track citations"
+  - Time period: "Monitoring period"
+  - Language: "Preferred language"
 ```
 
-## 출력 형식
+## Output Format
 
 ```markdown
-## 연구 동향 보고서
+## Research Trend Report
 
-### 모니터링 기간: [시작일] ~ [종료일]
-### 추적 키워드: [키워드 목록]
+### Monitoring Period: [Start Date] ~ [End Date]
+### Tracked Keywords: [Keyword List]
 
 ---
 
-### 1. 신규 출판물 요약
+### 1. New Publications Summary
 
-**총 발견 논문 수**: [N]편
-- 저널 출판: [N]편
-- 프리프린트: [N]편
-- 컨퍼런스: [N]편
+**Total Papers Found**: [N] papers
+- Journal publications: [N] papers
+- Preprints: [N] papers
+- Conferences: [N] papers
 
-### 2. 주요 논문 하이라이트 (Top 5)
+### 2. Key Paper Highlights (Top 5)
 
-#### 🥇 [논문 1]
-- **제목**: [제목]
-- **저자**: [저자]
-- **출처**: [저널/프리프린트]
-- **날짜**: [출판일]
-- **초록 요약**: [3-4문장 요약]
-- **핵심 발견**: [주요 기여]
-- **관련성 점수**: ⭐⭐⭐⭐⭐ (5/5)
-- **시사점**: [현재 연구에 대한 함의]
+#### 🥇 [Paper 1]
+- **Title**: [Title]
+- **Authors**: [Authors]
+- **Source**: [Journal/Preprint]
+- **Date**: [Publication Date]
+- **Abstract Summary**: [3-4 sentence summary]
+- **Key Findings**: [Main contributions]
+- **Relevance Score**: ⭐⭐⭐⭐⭐ (5/5)
+- **Implications**: [Implications for current research]
 
-#### 🥈 [논문 2]
+#### 🥈 [Paper 2]
 ...
 
-### 3. 트렌드 분석
+### 3. Trend Analysis
 
-#### 주요 연구 방향
-1. **[트렌드 1]**: [설명]
-   - 관련 논문 수: [N]편
-   - 대표 논문: [논문명]
+#### Major Research Directions
+1. **[Trend 1]**: [Description]
+   - Related papers: [N] papers
+   - Representative paper: [Paper name]
 
-2. **[트렌드 2]**: [설명]
-   - 관련 논문 수: [N]편
-   - 대표 논문: [논문명]
+2. **[Trend 2]**: [Description]
+   - Related papers: [N] papers
+   - Representative paper: [Paper name]
 
-#### 신흥 키워드
-| 키워드 | 출현 빈도 | 증가율 |
-|--------|----------|--------|
-| [키워드1] | [N] | +[X]% |
-| [키워드2] | [N] | +[X]% |
+#### Emerging Keywords
+| Keyword | Frequency | Growth Rate |
+|---------|-----------|-------------|
+| [Keyword1] | [N] | +[X]% |
+| [Keyword2] | [N] | +[X]% |
 
-#### 방법론 트렌드
-- [새로운 방법론 1]: [설명]
-- [새로운 방법론 2]: [설명]
+#### Methodology Trends
+- [New methodology 1]: [Description]
+- [New methodology 2]: [Description]
 
-### 4. 저자 활동
+### 4. Author Activity
 
-| 저자 | 신규 논문 | 주요 주제 |
-|------|----------|----------|
-| [저자1] | [N]편 | [주제] |
-| [저자2] | [N]편 | [주제] |
+| Author | New Papers | Main Topics |
+|--------|------------|-------------|
+| [Author1] | [N] papers | [Topic] |
+| [Author2] | [N] papers | [Topic] |
 
-### 5. 인용 알림 (핵심 논문 인용)
+### 5. Citation Alerts (Key Paper Citations)
 
-**[핵심 논문 제목]** 인용 현황:
-- 신규 인용: [N]편
-- 주목할 인용:
-  - [인용 논문 1]: [인용 맥락]
-  - [인용 논문 2]: [인용 맥락]
+**[Key Paper Title]** Citation Status:
+- New citations: [N] papers
+- Notable citations:
+  - [Citing paper 1]: [Citation context]
+  - [Citing paper 2]: [Citation context]
 
-### 6. 연구 공백 및 기회
+### 6. Research Gaps and Opportunities
 
-현재 트렌드에서 발견된 연구 공백:
-1. [공백 1]: [설명]
-2. [공백 2]: [설명]
+Research gaps discovered in current trends:
+1. [Gap 1]: [Description]
+2. [Gap 2]: [Description]
 
-### 7. 권장 행동
+### 7. Recommended Actions
 
-- [ ] 반드시 읽어야 할 논문: [목록]
-- [ ] 인용에 추가할 논문: [목록]
-- [ ] 연락할 연구자: [목록]
-- [ ] 다음 검색에 추가할 키워드: [목록]
+- [ ] Must-read papers: [List]
+- [ ] Papers to add to citations: [List]
+- [ ] Researchers to contact: [List]
+- [ ] Keywords to add to next search: [List]
 ```
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 학술 문헌 모니터링 전문가입니다.
+You are an academic literature monitoring expert.
 
-다음 주제에 대한 최신 연구 동향을 파악해주세요:
+Please track the latest research developments on the following topic:
 
-[추적 키워드]: {keywords}
-[관심 저자]: {authors}
-[기간]: {time_period}
+[Tracking Keywords]: {keywords}
+[Authors of Interest]: {authors}
+[Time Period]: {time_period}
 
-수행할 작업:
-1. 최신 출판물 탐색
-   - 지정 기간 내 출판된 논문 검색
-   - 프리프린트 포함
-   - 학회 발표 포함
+Tasks to perform:
+1. Explore latest publications
+   - Search papers published within specified period
+   - Include preprints
+   - Include conference presentations
 
-2. 각 논문에 대해:
-   - 제목, 저자, 출처, 날짜
-   - 초록 요약 (3-4문장)
-   - 핵심 발견/기여
-   - 현재 연구와의 관련성 (1-5점)
+2. For each paper:
+   - Title, authors, source, date
+   - Abstract summary (3-4 sentences)
+   - Key findings/contributions
+   - Relevance to current research (1-5 points)
 
-3. 트렌드 분석
-   - 주요 연구 방향
-   - 새롭게 부상하는 개념/방법
-   - 연구 공백
+3. Trend analysis
+   - Major research directions
+   - Newly emerging concepts/methods
+   - Research gaps
 
-4. 우선순위 논문 추천
-   - 반드시 읽어야 할 논문 (상위 5개)
-   - 각 논문의 중요성 근거
+4. Priority paper recommendations
+   - Must-read papers (top 5)
+   - Rationale for each paper's importance
 ```
 
-## 알림 설정 가이드
+## Alert Setup Guide
 
 ### Google Scholar Alerts
 ```
-1. scholar.google.com 접속
-2. 검색 실행
-3. "Create alert" 클릭
-4. 이메일 설정
+1. Go to scholar.google.com
+2. Execute search
+3. Click "Create alert"
+4. Configure email settings
 ```
 
 ### Semantic Scholar
 ```
-1. semanticscholar.org 접속
-2. 저자/주제 검색
-3. "Create Alert" 또는 "Follow"
-4. 알림 주기 설정
+1. Go to semanticscholar.org
+2. Search author/topic
+3. "Create Alert" or "Follow"
+4. Set alert frequency
 ```
 
 ### arXiv
 ```
-1. arxiv.org 접속
-2. 관심 카테고리 선택
-3. RSS 피드 구독 또는
-4. arXiv API 활용
+1. Go to arxiv.org
+2. Select category of interest
+3. Subscribe to RSS feed or
+4. Use arXiv API
 ```
 
 ### PubMed
 ```
-1. pubmed.ncbi.nlm.nih.gov 접속
-2. 검색 실행
-3. "Create alert" 클릭
-4. 이메일 주기 설정
+1. Go to pubmed.ncbi.nlm.nih.gov
+2. Execute search
+3. Click "Create alert"
+4. Set email frequency
 ```
 
-## 관련성 점수 기준
+## Relevance Score Criteria
 
-| 점수 | 기준 |
-|------|------|
-| ⭐⭐⭐⭐⭐ | 직접적 관련, 즉시 인용 필요 |
-| ⭐⭐⭐⭐ | 높은 관련성, 방법론/이론 참고 |
-| ⭐⭐⭐ | 중간 관련성, 배경으로 참고 |
-| ⭐⭐ | 간접 관련, 향후 참고 가능 |
-| ⭐ | 낮은 관련성, 모니터링만 |
+| Score | Criteria |
+|-------|----------|
+| ⭐⭐⭐⭐⭐ | Direct relevance, immediate citation needed |
+| ⭐⭐⭐⭐ | High relevance, reference methodology/theory |
+| ⭐⭐⭐ | Medium relevance, reference as background |
+| ⭐⭐ | Indirect relevance, potential future reference |
+| ⭐ | Low relevance, monitoring only |
 
-## 관련 에이전트
+## Related Agents
 
-- **05-systematic-literature-scout**: 체계적 문헌 검색
-- **02-theoretical-framework-architect**: 새 이론 동향 반영
-- **17-journal-matcher**: 출판 트렌드 파악
+- **05-systematic-literature-scout**: Systematic literature search
+- **02-theoretical-framework-architect**: Reflect new theoretical developments
+- **17-journal-matcher**: Identify publication trends
 
-## v3.0 창의적 장치 통합
+## v3.0 Creative Device Integration
 
-### 활용 가능한 창의적 장치 (ENHANCED)
+### Available Creative Devices (ENHANCED)
 
-| 장치 | 적용 시점 | 활용 예시 |
-|------|----------|----------|
-| **Forced Analogy** | Phase 2 | 다른 분야의 트렌드 추적 방법 유추 적용 |
-| **Iterative Loop** | Phase 2 | 4라운드 발산-수렴으로 모니터링 전략 정제 |
-| **Semantic Distance** | Phase 2 | 의미적으로 먼 키워드 조합으로 신흥 트렌드 발견 |
+| Device | Application Point | Usage Example |
+|--------|-------------------|---------------|
+| **Forced Analogy** | Phase 2 | Apply trend tracking methods from other fields by analogy |
+| **Iterative Loop** | Phase 2 | 4-round divergence-convergence to refine monitoring strategy |
+| **Semantic Distance** | Phase 2 | Discover emerging trends with semantically distant keyword combinations |
 
-### 체크포인트 통합
+### Checkpoint Integration
 
 ```yaml
-적용 체크포인트:
-  - CP-INIT-002: 창의성 수준 선택
-  - CP-VS-001: 모니터링 전략 방향 선택 (다중)
-  - CP-VS-003: 최종 레이더 설정 만족도 확인
-  - CP-SD-001: 개념 조합 거리 임계값
+Applied Checkpoints:
+  - CP-INIT-002: Select creativity level
+  - CP-VS-001: Select monitoring strategy direction (multiple)
+  - CP-VS-003: Confirm final radar setup satisfaction
+  - CP-SD-001: Concept combination distance threshold
 ```
 
-### 모듈 참조
+### Module References
 
 ```
 ../../research-coordinator/core/vs-engine.md
@@ -367,7 +368,7 @@ T < 0.3 (예측적 - 선도 연구용):
 
 ---
 
-## 참고 자료
+## References
 
 - Semantic Scholar API Documentation
 - arXiv API User Manual

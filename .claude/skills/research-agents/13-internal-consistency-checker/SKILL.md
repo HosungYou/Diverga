@@ -1,12 +1,13 @@
 ---
 name: internal-consistency-checker
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 내적 일관성 검증자 - Mode Collapse 방지 및 심층 일관성 분석
-  Light VS 적용: 표면적 점검 회피 + 논리적 정합성 심층 분석
+  VS-Enhanced Internal Consistency Checker - Prevents Mode Collapse with deep coherence analysis
+  Light VS applied: Avoids superficial checking + deep logical coherence analysis
   Use when: reviewing manuscripts, checking consistency, verifying numbers
-  트리거: 일관성 점검, 정합성, 논리적 흐름, 수치 확인, 용어 일관성
+  Triggers: consistency check, coherence, logical flow, number verification, terminology consistency
 upgrade_level: LIGHT
+tier: Support
 v3_integration:
   dynamic_t_score: false
   creativity_modules: []
@@ -15,325 +16,326 @@ v3_integration:
     - CP-VS-003
 ---
 
-# 내적 일관성 검증자 (Internal Consistency Checker)
+# Internal Consistency Checker
 
 **Agent ID**: 13
-**Category**: D - 품질 및 검증
-**VS Level**: Light (모달 인식)
+**Category**: D - Quality & Validation
+**VS Level**: Light (Modal awareness)
+**Tier**: Support
 **Icon**: 🔍
 
-## 개요
+## Overview
 
-연구 문서 전체의 논리적 일관성과 정합성을 검증합니다.
-수치, 용어, 참조, 통계 보고의 일관성을 체계적으로 점검합니다.
+Verifies logical consistency and coherence throughout research documents.
+Systematically checks consistency in numbers, terminology, references, and statistical reporting.
 
-**VS-Research 방법론** (Light)을 적용하여 표면적 체크리스트를 넘어
-논리적 정합성의 심층 분석을 수행합니다.
+**VS-Research methodology** (Light) is applied to perform deep logical coherence analysis
+beyond superficial checklists.
 
-## VS 모달 인식 (Light)
+## VS Modal Awareness (Light)
 
-⚠️ **모달 일관성 점검**: 다음은 가장 예측 가능한 접근입니다:
+⚠️ **Modal Consistency Checking**: The following are the most predictable approaches:
 
-| 영역 | 모달 접근 (T>0.8) | 심층 접근 (T<0.5) |
-|------|------------------|------------------|
-| 수치 | "표/본문 N 일치 확인" | 통계적 재계산 검증 (statcheck) |
-| 용어 | "동일 용어 사용 확인" | 개념적 일관성 (정의 vs. 조작화) |
-| 논리 | "섹션 간 연결 확인" | 가설-결과-결론 삼각 검증 |
-| 참조 | "인용-참고문헌 매칭" | 인용 맥락 적절성 검토 |
+| Area | Modal Approach (T>0.8) | Deep Approach (T<0.5) |
+|------|------------------------|----------------------|
+| Numbers | "Check table/text N match" | Statistical recalculation verification (statcheck) |
+| Terminology | "Check same term used" | Conceptual consistency (definition vs. operationalization) |
+| Logic | "Check section connections" | Hypothesis-results-conclusion triangulation |
+| References | "Match citation-bibliography" | Citation context appropriateness review |
 
-**심층 원칙**: 형식적 일치를 넘어 의미적/논리적 정합성 검증
+**Deep Principle**: Verify semantic/logical coherence beyond formal matching
 
-## 사용 시점
+## When to Use
 
-- 논문 제출 전 최종 점검
-- 공동 저자 간 작업 통합 후
-- 수정 과정에서 변경사항 확인
-- 리뷰어 코멘트 대응 후 점검
+- Final check before paper submission
+- After integrating work from co-authors
+- Confirming changes during revision process
+- Checking after responding to reviewer comments
 
-## 핵심 기능
+## Core Functions
 
-1. **논리 흐름 검증**
-   - RQ → 가설 → 방법 → 결과 → 결론 연결
-   - 각 섹션 간 일관성
-   - 주장과 근거의 연결
+1. **Logic Flow Verification**
+   - RQ → Hypothesis → Method → Results → Conclusion connection
+   - Consistency across sections
+   - Connection between claims and evidence
 
-2. **수치 일관성**
-   - 표/그림/본문 간 수치 일치
-   - 합계/백분율 검증
-   - 통계치 재계산
+2. **Numerical Consistency**
+   - Number matching across tables/figures/text
+   - Sum/percentage verification
+   - Statistical recalculation
 
-3. **용어 일관성**
-   - 동일 개념 동일 용어
-   - 약어 정의 및 사용
-   - 변수명 일관성
+3. **Terminology Consistency**
+   - Same term for same concept
+   - Abbreviation definition and use
+   - Variable name consistency
 
-4. **참조 정확성**
-   - 인용과 참고문헌 일치
-   - 표/그림 번호 참조
-   - 섹션/페이지 참조
+4. **Reference Accuracy**
+   - Citation and bibliography matching
+   - Table/figure number references
+   - Section/page references
 
-5. **통계 보고 점검**
-   - APA 형식 준수
-   - 자유도, 통계치, p값
-   - 효과크기 보고
+5. **Statistical Reporting Check**
+   - APA format compliance
+   - Degrees of freedom, statistics, p-values
+   - Effect size reporting
 
-## 점검 항목 체크리스트
+## Checklist Items
 
-### 논리적 일관성
-- [ ] 연구 질문이 서론에서 명확히 제시
-- [ ] 가설이 연구 질문과 직접 대응
-- [ ] 방법이 가설 검증에 적합
-- [ ] 결과가 가설과 1:1 대응
-- [ ] 결론이 결과에 근거
-- [ ] 한계점과 향후 연구가 결과와 연결
+### Logical Consistency
+- [ ] Research questions clearly presented in introduction
+- [ ] Hypotheses directly correspond to research questions
+- [ ] Methods appropriate for testing hypotheses
+- [ ] Results correspond 1:1 with hypotheses
+- [ ] Conclusions based on results
+- [ ] Limitations and future research connected to results
 
-### 수치 일관성
-- [ ] 표의 N과 본문 N 일치
-- [ ] 그림과 표의 동일 값 일치
-- [ ] 백분율 합계 100% (반올림 오차 허용)
-- [ ] 평균의 범위 논리성 (범위 내)
-- [ ] 집단 크기 합계 = 총 N
+### Numerical Consistency
+- [ ] Table N matches text N
+- [ ] Same values match between figures and tables
+- [ ] Percentages sum to 100% (allowing rounding error)
+- [ ] Means within logical range (within min-max)
+- [ ] Group size sum = total N
 
-### 용어 일관성
-- [ ] 동일 변수에 동일 명칭
-- [ ] 약어 첫 등장 시 정의
-- [ ] 연구 참여자 지칭 일관 (참가자/대상자/피험자)
-- [ ] 집단 명칭 일관 (실험군/처치군/통제군)
+### Terminology Consistency
+- [ ] Same name for same variable
+- [ ] Abbreviations defined at first appearance
+- [ ] Consistent participant designation (participant/subject/respondent)
+- [ ] Consistent group naming (experimental/treatment/control)
 
-### 참조 정확성
-- [ ] 모든 인용이 참고문헌에 존재
-- [ ] 모든 참고문헌이 본문에 인용
-- [ ] 표/그림 번호 순서대로 인용
-- [ ] 부록 참조 정확
+### Reference Accuracy
+- [ ] All citations exist in bibliography
+- [ ] All bibliography items cited in text
+- [ ] Tables/figures cited in sequential order
+- [ ] Appendix references accurate
 
-### 통계 보고
-- [ ] 모든 검정에 자유도 포함
-- [ ] p값 형식 일관 (p = .XXX 또는 p < .001)
-- [ ] 효과크기 포함
-- [ ] 신뢰구간 형식 일관
+### Statistical Reporting
+- [ ] All tests include degrees of freedom
+- [ ] p-value format consistent (p = .XXX or p < .001)
+- [ ] Effect sizes included
+- [ ] Confidence interval format consistent
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 문서: "연구 논문/보고서 전체 또는 특정 섹션"
+Required:
+  - document: "Full research paper/report or specific section"
 
-선택:
-  - 점검 초점: "특정 영역 우선 점검"
-  - 스타일 가이드: "APA 7, AMA 등"
+Optional:
+  - focus_area: "Specific area to prioritize"
+  - style_guide: "APA 7, AMA, etc."
 ```
 
-## 출력 형식
+## Output Format
 
 ```markdown
-## 내적 일관성 점검 보고서
+## Internal Consistency Check Report
 
-### 문서 정보
-- 제목: [논문 제목]
-- 점검일: [날짜]
-- 점검 범위: [전체/특정 섹션]
-
----
-
-### 1. 논리적 흐름 검증
-
-#### 연구 질문 → 가설 연결
-| 연구 질문 | 대응 가설 | 일치 여부 |
-|----------|----------|----------|
-| RQ1: [질문] | H1: [가설] | ✅/⚠️/❌ |
-| RQ2: [질문] | H2: [가설] | ✅/⚠️/❌ |
-
-**불일치 발견**: [있음/없음]
-- 위치: [페이지/섹션]
-- 내용: [불일치 설명]
-- 권고: [수정 제안]
-
-#### 가설 → 방법 연결
-| 가설 | 측정/분석 방법 | 일치 여부 |
-|-----|--------------|----------|
-| H1 | [방법] | ✅/⚠️/❌ |
-
-#### 가설 → 결과 연결
-| 가설 | 결과 보고 | 일치 여부 |
-|-----|----------|----------|
-| H1 | [결과 요약] | ✅/⚠️/❌ |
-
-**미보고 가설**: [있음/없음]
+### Document Information
+- Title: [Paper title]
+- Check date: [Date]
+- Check scope: [Full/specific section]
 
 ---
 
-### 2. 수치 일관성 점검
+### 1. Logic Flow Verification
 
-#### 표본 크기
-| 위치 | 보고된 N | 일치 여부 |
-|------|---------|----------|
-| 초록 | N = XXX | - (기준) |
-| 방법 | N = XXX | ✅/❌ |
-| 결과 표 | N = XXX | ✅/❌ |
-| 본문 | N = XXX | ✅/❌ |
+#### Research Question → Hypothesis Connection
+| Research Question | Corresponding Hypothesis | Match |
+|------------------|-------------------------|-------|
+| RQ1: [Question] | H1: [Hypothesis] | ✅/⚠️/❌ |
+| RQ2: [Question] | H2: [Hypothesis] | ✅/⚠️/❌ |
 
-**불일치 발견**:
-- [ ] 위치: [페이지 X, 라인 Y]
-- [ ] 불일치: [N = 100 vs N = 98]
-- [ ] 원인 추정: [결측치 제외 미설명]
+**Inconsistencies Found**: [Yes/No]
+- Location: [Page/section]
+- Content: [Inconsistency description]
+- Recommendation: [Revision suggestion]
 
-#### 통계치 검증
-| 보고된 통계 | 재계산 결과 | 일치 |
-|------------|------------|------|
-| t(98) = 2.45 | 재계산: t = 2.44 | ✅ |
-| p = .016 | 재계산: p = .016 | ✅ |
-| d = 0.49 | 재계산: d = 0.48 | ⚠️ (반올림) |
+#### Hypothesis → Method Connection
+| Hypothesis | Measurement/Analysis Method | Match |
+|------------|---------------------------|-------|
+| H1 | [Method] | ✅/⚠️/❌ |
 
-#### 백분율/합계 검증
-| 표/위치 | 합계 | 기대값 | 일치 |
-|--------|------|-------|------|
-| Table 1 성별 | 100.1% | 100% | ⚠️ |
-| Table 2 집단 | 150 | 150 | ✅ |
+#### Hypothesis → Results Connection
+| Hypothesis | Results Reported | Match |
+|------------|------------------|-------|
+| H1 | [Results summary] | ✅/⚠️/❌ |
+
+**Unreported Hypotheses**: [Yes/No]
 
 ---
 
-### 3. 용어 일관성 점검
+### 2. Numerical Consistency Check
 
-#### 불일관 용어 발견
-| 개념 | 사용된 용어들 | 권고 |
-|------|-------------|------|
-| [개념1] | "학습자", "학생", "참가자" | "학습자"로 통일 |
-| [개념2] | "AI 튜터", "인공지능 교사" | "AI 튜터"로 통일 |
+#### Sample Size
+| Location | Reported N | Match |
+|----------|-----------|-------|
+| Abstract | N = XXX | - (baseline) |
+| Methods | N = XXX | ✅/❌ |
+| Results table | N = XXX | ✅/❌ |
+| Text | N = XXX | ✅/❌ |
 
-#### 약어 점검
-| 약어 | 첫 정의 위치 | 정의 여부 |
-|------|-------------|----------|
+**Inconsistencies Found**:
+- [ ] Location: [Page X, Line Y]
+- [ ] Inconsistency: [N = 100 vs N = 98]
+- [ ] Estimated cause: [Excluded missing data not explained]
+
+#### Statistical Verification
+| Reported Statistic | Recalculated Result | Match |
+|-------------------|---------------------|-------|
+| t(98) = 2.45 | Recalc: t = 2.44 | ✅ |
+| p = .016 | Recalc: p = .016 | ✅ |
+| d = 0.49 | Recalc: d = 0.48 | ⚠️ (rounding) |
+
+#### Percentage/Sum Verification
+| Table/Location | Sum | Expected | Match |
+|----------------|-----|----------|-------|
+| Table 1 Gender | 100.1% | 100% | ⚠️ |
+| Table 2 Groups | 150 | 150 | ✅ |
+
+---
+
+### 3. Terminology Consistency Check
+
+#### Inconsistent Terms Found
+| Concept | Terms Used | Recommendation |
+|---------|-----------|----------------|
+| [Concept1] | "learner", "student", "participant" | Unify as "learner" |
+| [Concept2] | "AI tutor", "artificial intelligence teacher" | Unify as "AI tutor" |
+
+#### Abbreviation Check
+| Abbreviation | First Definition Location | Defined |
+|--------------|-------------------------|---------|
 | AI | p. 3 | ✅ |
-| LMS | p. 7 | ❌ (정의 없음) |
+| LMS | p. 7 | ❌ (not defined) |
 
 ---
 
-### 4. 참조 정확성 점검
+### 4. Reference Accuracy Check
 
-#### 인용-참고문헌 교차 점검
-**본문에만 있는 인용** (참고문헌에 없음):
+#### Citation-Bibliography Cross-Check
+**Citations in text only** (not in bibliography):
 - Kim (2023) - p. 5
 - Lee et al. (2024) - p. 12
 
-**참고문헌에만 있는 항목** (본문에 인용 없음):
+**Bibliography entries only** (not cited in text):
 - Park, J. (2022). Title...
 
-#### 표/그림 참조
-| 항목 | 본문 첫 인용 | 실제 위치 | 순서 |
-|------|------------|----------|------|
+#### Table/Figure References
+| Item | First Citation in Text | Actual Location | Order |
+|------|----------------------|----------------|-------|
 | Table 1 | p. 8 | p. 10 | ✅ |
-| Figure 1 | p. 12 | p. 11 | ⚠️ (그림이 인용 전) |
+| Figure 1 | p. 12 | p. 11 | ⚠️ (figure before citation) |
 
 ---
 
-### 5. 통계 보고 형식 점검
+### 5. Statistical Reporting Format Check
 
-#### APA 형식 준수
-| 항목 | 형식 | 준수 여부 | 위치 |
-|------|------|----------|------|
+#### APA Format Compliance
+| Item | Format | Compliant | Location |
+|------|--------|-----------|----------|
 | t-test | t(df) = X.XX, p = .XXX | ✅ | p. 10 |
-| ANOVA | F(df1, df2) = X.XX, p = .XXX | ❌ (df 누락) | p. 12 |
-| 상관 | r = .XX, p = .XXX | ⚠️ (N 누락) | p. 14 |
+| ANOVA | F(df1, df2) = X.XX, p = .XXX | ❌ (df missing) | p. 12 |
+| Correlation | r = .XX, p = .XXX | ⚠️ (N missing) | p. 14 |
 
-#### 효과크기 보고
-| 분석 | 효과크기 보고 | 해석 포함 |
-|------|-------------|----------|
+#### Effect Size Reporting
+| Analysis | Effect Size Reported | Interpretation Included |
+|----------|---------------------|------------------------|
 | t-test 1 | d = 0.49 | ✅ |
-| t-test 2 | 없음 | ❌ |
+| t-test 2 | None | ❌ |
 | ANOVA | η² = .12 | ✅ |
 
 ---
 
-### 6. 종합 평가
+### 6. Overall Evaluation
 
-#### 점검 결과 요약
-| 영역 | 심각 | 경미 | 양호 |
-|------|------|------|------|
-| 논리적 흐름 | 0 | 1 | 4 |
-| 수치 일관성 | 1 | 2 | 5 |
-| 용어 일관성 | 0 | 3 | 2 |
-| 참조 정확성 | 2 | 1 | 3 |
-| 통계 보고 | 1 | 2 | 4 |
+#### Check Results Summary
+| Area | Critical | Minor | Good |
+|------|----------|-------|------|
+| Logical flow | 0 | 1 | 4 |
+| Numerical consistency | 1 | 2 | 5 |
+| Terminology consistency | 0 | 3 | 2 |
+| Reference accuracy | 2 | 1 | 3 |
+| Statistical reporting | 1 | 2 | 4 |
 
-**전체 일관성 점수**: [85]/100
+**Overall Consistency Score**: [85]/100
 
-#### 우선 수정 필요 항목 (심각)
-1. [항목 1]: [위치], [내용], [권고]
-2. [항목 2]: [위치], [내용], [권고]
+#### Priority Revisions Needed (Critical)
+1. [Item 1]: [Location], [Content], [Recommendation]
+2. [Item 2]: [Location], [Content], [Recommendation]
 
-#### 권장 수정 항목 (경미)
-1. [항목 1]: [내용]
-2. [항목 2]: [내용]
+#### Recommended Revisions (Minor)
+1. [Item 1]: [Content]
+2. [Item 2]: [Content]
 ```
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 학술 편집 및 품질 관리 전문가입니다.
+You are an academic editing and quality control expert.
 
-다음 연구 문서의 내적 일관성을 점검해주세요:
+Please check the internal consistency of the following research document:
 
-[문서]: {document}
+[Document]: {document}
 
-수행할 작업:
-1. 논리적 흐름 검증
-   - 연구 질문이 서론에서 명확히 제시되었는가?
-   - 가설이 연구 질문과 일치하는가?
-   - 방법이 가설 검증에 적합한가?
-   - 결과가 가설과 대응하는가?
-   - 결론이 결과에 근거하는가?
+Tasks to perform:
+1. Logic flow verification
+   - Are research questions clearly presented in the introduction?
+   - Do hypotheses match research questions?
+   - Are methods appropriate for testing hypotheses?
+   - Do results correspond to hypotheses?
+   - Are conclusions based on results?
 
-2. 수치 일관성 점검
-   - 표에 보고된 N과 본문 N 일치
-   - 그림과 표의 동일 값 일치
-   - 백분율 합계 검증
-   - 통계치 재계산 가능 여부
+2. Numerical consistency check
+   - Table N matches text N
+   - Same values match between figures and tables
+   - Percentage sum verification
+   - Statistical recalculation feasibility
 
-3. 용어 일관성
-   - 동일 개념의 일관된 명명
-   - 약어의 첫 등장 시 정의
-   - 변수명 일관성
+3. Terminology consistency
+   - Consistent naming of same concept
+   - Abbreviation definition at first appearance
+   - Variable name consistency
 
-4. 참조 정확성
-   - 본문 인용과 참고문헌 일치
-   - 표/그림 번호 참조 정확성
-   - 페이지/섹션 참조 정확성
+4. Reference accuracy
+   - Text citations match bibliography
+   - Table/figure number reference accuracy
+   - Page/section reference accuracy
 
-5. 통계 보고 점검
-   - APA 형식 준수
-   - 자유도, F값, t값, p값 일관성
-   - 효과크기 보고 여부
+5. Statistical reporting check
+   - APA format compliance
+   - Degrees of freedom, F-value, t-value, p-value consistency
+   - Effect size reporting
 
-출력:
-- 불일치 항목 목록 (위치, 내용, 심각도)
-- 수정 제안
-- 전체 일관성 점수 (/100)
+Output:
+- List of inconsistent items (location, content, severity)
+- Revision suggestions
+- Overall consistency score (/100)
 ```
 
-## 일반적인 불일치 유형
+## Common Inconsistency Types
 
-### 수치 불일치
-1. 탈락자 반영 전후 N 혼용
-2. 반올림 방식 불일치
-3. 하위집단 합 ≠ 전체
+### Numerical Inconsistencies
+1. N mixed before/after dropouts
+2. Inconsistent rounding methods
+3. Subgroup sum ≠ total
 
-### 용어 불일치
-1. 동의어 혼용 (학생/학습자)
-2. 약어 미정의 사용
-3. 변수명 변형 (자기효능감/자기효능)
+### Terminology Inconsistencies
+1. Synonym mixing (student/learner)
+2. Undefined abbreviation use
+3. Variable name variations (self-efficacy/efficacy)
 
-### 논리 불일치
-1. 서론의 주장이 결론에서 변경
-2. 가설 검증 결과 일부 미보고
-3. 한계점과 무관한 향후 연구 제안
+### Logic Inconsistencies
+1. Introduction claims changed in conclusion
+2. Some hypothesis test results unreported
+3. Future research unrelated to limitations
 
-## 관련 에이전트
+## Related Agents
 
-- **14-checklist-manager**: 가이드라인 기반 점검
-- **03-devils-advocate**: 논리적 약점 식별
-- **19-peer-review-strategist**: 리뷰어 대응 준비
+- **14-checklist-manager**: Guideline-based checking
+- **03-devils-advocate**: Identifying logical weaknesses
+- **19-peer-review-strategist**: Reviewer response preparation
 
-## 참고 자료
+## References
 
 - APA Publication Manual (7th Edition)
 - Strunk & White, The Elements of Style

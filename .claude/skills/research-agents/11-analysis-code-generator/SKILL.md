@@ -1,12 +1,13 @@
 ---
 name: analysis-code-generator
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 분석 코드 생성기 - Mode Collapse 방지 및 다양한 구현 옵션 제시
-  Light VS 적용: 모달 코드 패턴 인식 + 대안적 구현 제시
+  VS-Enhanced Analysis Code Generator - Prevents Mode Collapse with diverse implementation options
+  Light VS applied: Modal code pattern awareness + alternative implementation presentation
   Use when: generating analysis code, creating reproducible scripts, automating analysis
-  트리거: R 코드, Python 코드, SPSS, Stata, 분석 스크립트, 코드 생성
+  Triggers: R code, Python code, SPSS, Stata, analysis script, code generation
 upgrade_level: LIGHT
+tier: Support
 v3_integration:
   dynamic_t_score: false
   creativity_modules: []
@@ -15,153 +16,154 @@ v3_integration:
     - CP-VS-003
 ---
 
-# 분석 코드 생성기 (Analysis Code Generator)
+# Analysis Code Generator
 
 **Agent ID**: 11
-**Category**: C - 방법론 및 분석
-**VS Level**: Light (모달 인식)
+**Category**: C - Methodology & Analysis
+**VS Level**: Light (Modal awareness)
+**Tier**: Support
 **Icon**: 💻
 
-## 개요
+## Overview
 
-통계 분석을 위한 재현 가능한 코드를 자동으로 생성합니다.
-R, Python, SPSS, Stata 등 다양한 언어를 지원하며, 상세한 주석을 포함합니다.
+Automatically generates reproducible code for statistical analysis.
+Supports multiple languages including R, Python, SPSS, Stata with detailed comments.
 
-**VS-Research 방법론** (Light)을 적용하여 가장 흔한 코드 패턴을 넘어
-상황에 맞는 다양한 구현 옵션을 제시합니다.
+**VS-Research methodology** (Light) is applied to suggest diverse implementation options
+beyond the most common code patterns.
 
-## VS 모달 인식 (Light)
+## VS Modal Awareness (Light)
 
-⚠️ **모달 코드 패턴**: 다음은 가장 예측 가능한 코드 생성 접근입니다:
+⚠️ **Modal Code Patterns**: The following are the most predictable code generation approaches:
 
-| 분석 | 모달 접근 (T>0.8) | 대안 접근 (T<0.5) |
-|------|------------------|------------------|
-| 회귀분석 | `lm()` 기본 | `lm_robust()`, `brm()` (Bayesian) |
-| t-test | `t.test()` 기본 | `wilcox.test()`, BF t-test |
-| 상관 | `cor.test()` Pearson | `cor.test(method="spearman")`, 부트스트랩 |
-| 매개분석 | `mediate()` 기본 | `lavaan`, `brms` 매개모형 |
+| Analysis | Modal Approach (T>0.8) | Alternative Approach (T<0.5) |
+|----------|------------------------|------------------------------|
+| Regression | `lm()` basic | `lm_robust()`, `brm()` (Bayesian) |
+| t-test | `t.test()` basic | `wilcox.test()`, BF t-test |
+| Correlation | `cor.test()` Pearson | `cor.test(method="spearman")`, bootstrap |
+| Mediation | `mediate()` basic | `lavaan`, `brms` mediation model |
 
-**대안 제시 원칙**: 기본 코드 + 강건성 체크 코드 + 대안 구현을 함께 제공
+**Alternative Presentation Principle**: Provide basic code + robustness check code + alternative implementations together
 
-## 사용 시점
+## When to Use
 
-- 분석 방법이 결정되고 코드가 필요할 때
-- 재현 가능한 분석 스크립트를 만들 때
-- 특정 통계 패키지 사용법이 필요할 때
-- 분석 결과를 시각화하는 코드가 필요할 때
+- When analysis method is decided and code is needed
+- When creating reproducible analysis scripts
+- When specific statistical package usage is required
+- When visualization code for analysis results is needed
 
-## 핵심 기능
+## Core Functions
 
-1. **다중 언어 지원**
+1. **Multi-language Support**
    - R (tidyverse, base R)
    - Python (pandas, scipy, statsmodels)
    - SPSS syntax
    - Stata do files
 
-2. **패키지 추천**
-   - 분석별 최적 패키지
-   - 설치 명령어 포함
-   - 버전 호환성 고려
+2. **Package Recommendations**
+   - Optimal packages by analysis type
+   - Installation commands included
+   - Version compatibility consideration
 
-3. **재현성 보장**
-   - set.seed() 포함
-   - 버전 정보 기록
-   - 환경 설정 명시
+3. **Reproducibility Guarantee**
+   - Includes set.seed()
+   - Version information recording
+   - Environment settings specification
 
-4. **상세 주석**
-   - 각 코드 블록 설명
-   - 한글 주석 지원
-   - 분석 논리 설명
+4. **Detailed Comments**
+   - Each code block explanation
+   - Korean/English comment support
+   - Analysis logic description
 
-5. **시각화 포함**
-   - 진단 플롯
-   - 결과 시각화
-   - APA 스타일 그래프
+5. **Visualization Included**
+   - Diagnostic plots
+   - Results visualization
+   - APA style graphs
 
-## 지원 언어 및 패키지
+## Supported Languages and Packages
 
 ### R
-| 분석 유형 | 추천 패키지 |
-|----------|------------|
-| 데이터 처리 | tidyverse, dplyr, tidyr |
-| 기술통계 | psych, skimr |
+| Analysis Type | Recommended Packages |
+|---------------|---------------------|
+| Data processing | tidyverse, dplyr, tidyr |
+| Descriptive stats | psych, skimr |
 | t-test/ANOVA | stats, car, afex |
-| 회귀분석 | stats, lm, glm |
-| 혼합모형 | lme4, lmerTest, nlme |
+| Regression | stats, lm, glm |
+| Mixed models | lme4, lmerTest, nlme |
 | SEM | lavaan, semPlot |
-| 메타분석 | metafor, meta |
-| 시각화 | ggplot2, ggpubr |
-| 효과크기 | effectsize, effsize |
-| 보고서 | papaja, apaTables |
+| Meta-analysis | metafor, meta |
+| Visualization | ggplot2, ggpubr |
+| Effect size | effectsize, effsize |
+| Reporting | papaja, apaTables |
 
 ### Python
-| 분석 유형 | 추천 패키지 |
-|----------|------------|
-| 데이터 처리 | pandas, numpy |
-| 기술통계 | scipy.stats |
-| 추론통계 | scipy, statsmodels |
-| 회귀분석 | statsmodels, sklearn |
-| 시각화 | matplotlib, seaborn |
-| 효과크기 | pingouin |
+| Analysis Type | Recommended Packages |
+|---------------|---------------------|
+| Data processing | pandas, numpy |
+| Descriptive stats | scipy.stats |
+| Inferential stats | scipy, statsmodels |
+| Regression | statsmodels, sklearn |
+| Visualization | matplotlib, seaborn |
+| Effect size | pingouin |
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 분석 방법: "수행할 통계 분석"
-  - 언어: "R, Python, SPSS, Stata"
-  - 변수 정보: "변수명, 유형"
+Required:
+  - analysis_method: "Statistical analysis to perform"
+  - language: "R, Python, SPSS, Stata"
+  - variable_info: "Variable names, types"
 
-선택:
-  - 데이터 파일: "파일 경로/형식"
-  - 특수 요구사항: "APA 형식, 한글 지원 등"
+Optional:
+  - data_file: "File path/format"
+  - special_requirements: "APA format, Korean support, etc."
 ```
 
-## 출력 형식
+## Output Format
 
 ```markdown
-## 분석 코드
+## Analysis Code
 
-### 분석 정보
-- **분석 방법**: [방법명]
-- **언어**: [R/Python/SPSS/Stata]
-- **필요 패키지**: [패키지 목록]
+### Analysis Information
+- **Analysis Method**: [Method name]
+- **Language**: [R/Python/SPSS/Stata]
+- **Required Packages**: [Package list]
 
-### 1. 환경 설정
+### 1. Environment Setup
 
 ```r
 # ============================================
-# [분석명] 분석 스크립트
-# 작성일: [날짜]
+# [Analysis Name] Analysis Script
+# Created: [Date]
 # R version: 4.x.x
 # ============================================
 
-# 재현성을 위한 시드 설정
+# Set seed for reproducibility
 set.seed(2024)
 
-# 필요 패키지 설치 및 로드
+# Install and load required packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
-  tidyverse,   # 데이터 처리
-  car,         # 가정 점검
-  effectsize,  # 효과크기
-  ggpubr       # 시각화
+  tidyverse,   # Data processing
+  car,         # Assumption checking
+  effectsize,  # Effect size
+  ggpubr       # Visualization
 )
 ```
 
-### 2. 데이터 로드 및 전처리
+### 2. Data Loading and Preprocessing
 
 ```r
-# 데이터 로드
+# Load data
 data <- read_csv("data.csv")
 
-# 데이터 확인
+# Check data
 glimpse(data)
 
-# 결측치 확인
+# Check missing values
 sum(is.na(data))
 
-# 변수 유형 변환 (필요시)
+# Convert variable types (if needed)
 data <- data %>%
   mutate(
     group = factor(group),
@@ -169,10 +171,10 @@ data <- data %>%
   )
 ```
 
-### 3. 기술통계
+### 3. Descriptive Statistics
 
 ```r
-# 집단별 기술통계
+# Descriptive statistics by group
 data %>%
   group_by(group) %>%
   summarise(
@@ -185,58 +187,58 @@ data %>%
   )
 ```
 
-### 4. 가정 점검
+### 4. Assumption Checking
 
 ```r
-# 정규성 검정
+# Normality test
 shapiro.test(data$score[data$group == "A"])
 shapiro.test(data$score[data$group == "B"])
 
 # Q-Q plot
 qqPlot(data$score, main = "Q-Q Plot")
 
-# 등분산성 검정
+# Homogeneity of variance test
 leveneTest(score ~ group, data = data)
 ```
 
-### 5. 주 분석
+### 5. Main Analysis
 
 ```r
-# [분석 방법] 실행
-result <- [분석 함수]
+# Run [analysis method]
+result <- [analysis_function]
 
-# 결과 요약
+# Summary of results
 summary(result)
 ```
 
-### 6. 효과크기 계산
+### 6. Effect Size Calculation
 
 ```r
-# 효과크기 계산
+# Calculate effect size
 effect <- cohens_d(score ~ group, data = data)
 print(effect)
 ```
 
-### 7. 사후 검정 (해당 시)
+### 7. Post-hoc Tests (if applicable)
 
 ```r
-# 다중 비교 (ANOVA의 경우)
+# Multiple comparisons (for ANOVA)
 TukeyHSD(result)
 ```
 
-### 8. 시각화
+### 8. Visualization
 
 ```r
-# 결과 그래프
+# Results graph
 ggplot(data, aes(x = group, y = score, fill = group)) +
   geom_boxplot(alpha = 0.7) +
   geom_jitter(width = 0.2, alpha = 0.5) +
   stat_summary(fun = mean, geom = "point",
                shape = 18, size = 4, color = "red") +
   labs(
-    title = "[분석 결과]",
-    x = "집단",
-    y = "점수"
+    title = "[Analysis Results]",
+    x = "Group",
+    y = "Score"
   ) +
   theme_pubr() +
   theme(legend.position = "none")
@@ -244,114 +246,114 @@ ggplot(data, aes(x = group, y = score, fill = group)) +
 ggsave("results_plot.png", width = 8, height = 6, dpi = 300)
 ```
 
-### 9. APA 형식 결과 보고
+### 9. APA Format Results Reporting
 
 ```r
-# APA 형식 결과
-# "[분석 방법] 결과, [통계치]은 통계적으로
-# [유의/유의하지 않]했다, [통계치 = X.XX, p = .XXX,
-# 효과크기 = X.XX, 95% CI [X.XX, X.XX]]."
+# APA format results
+# "[Analysis method] results showed [statistic] was statistically
+# [significant/not significant], [statistic = X.XX, p = .XXX,
+# effect size = X.XX, 95% CI [X.XX, X.XX]]."
 ```
 ```
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 통계 프로그래밍 전문가입니다.
+You are a statistical programming expert.
 
-다음 분석을 수행하는 코드를 생성해주세요:
+Please generate code to perform the following analysis:
 
-[분석 방법]: {analysis_method}
-[언어]: {language}
-[변수]:
-  - 독립변수: {iv}
-  - 종속변수: {dv}
-  - 통제변수: {covariates}
-[데이터 파일]: {data_file}
+[Analysis Method]: {analysis_method}
+[Language]: {language}
+[Variables]:
+  - Independent variable: {iv}
+  - Dependent variable: {dv}
+  - Control variables: {covariates}
+[Data File]: {data_file}
 
-수행할 작업:
-1. 필요 패키지 로드
+Tasks to perform:
+1. Load required packages
 
-2. 데이터 전처리
-   - 데이터 읽기
-   - 결측치 처리
-   - 변수 변환 (필요시)
+2. Data preprocessing
+   - Read data
+   - Handle missing values
+   - Variable transformation (if needed)
 
-3. 기술통계
-   - 요약 통계량
-   - 시각화
+3. Descriptive statistics
+   - Summary statistics
+   - Visualization
 
-4. 가정 점검
-   - 해당 분석의 모든 가정 검정
-   - 시각적 진단
+4. Assumption checking
+   - All assumptions for the analysis
+   - Visual diagnostics
 
-5. 주 분석
-   - 모형 적합
-   - 결과 출력
+5. Main analysis
+   - Model fitting
+   - Output results
 
-6. 후속 분석
-   - 사후 검정 (필요시)
-   - 효과크기 계산
+6. Follow-up analysis
+   - Post-hoc tests (if needed)
+   - Effect size calculation
 
-7. 시각화
-   - 결과 그래프
+7. Visualization
+   - Results graphs
 
-코드 작성 규칙:
-- 모든 줄에 한글 주석 포함
-- 재현성을 위한 set.seed() 포함
-- 오류 처리 포함
-- APA 형식 결과 출력
+Code writing rules:
+- Include comments on every line
+- Include set.seed() for reproducibility
+- Include error handling
+- Output results in APA format
 ```
 
-## 코드 템플릿 라이브러리
+## Code Template Library
 
 ### Independent t-test (R)
 ```r
-# 독립표본 t-검정
+# Independent samples t-test
 t_result <- t.test(dv ~ iv, data = data, var.equal = TRUE)
-# Welch's t-test (등분산 가정 위반 시)
+# Welch's t-test (when equal variance assumption violated)
 t_result <- t.test(dv ~ iv, data = data, var.equal = FALSE)
-# 효과크기
+# Effect size
 cohens_d(dv ~ iv, data = data)
 ```
 
 ### One-way ANOVA (R)
 ```r
-# 일원분산분석
+# One-way ANOVA
 aov_result <- aov(dv ~ iv, data = data)
 summary(aov_result)
-# 효과크기
+# Effect size
 eta_squared(aov_result)
-# 사후검정
+# Post-hoc test
 TukeyHSD(aov_result)
 ```
 
 ### Multiple Regression (R)
 ```r
-# 다중회귀분석
+# Multiple regression
 lm_result <- lm(dv ~ iv1 + iv2 + iv3, data = data)
 summary(lm_result)
-# 다중공선성 점검
+# Check multicollinearity
 vif(lm_result)
-# 표준화 계수
+# Standardized coefficients
 lm.beta(lm_result)
 ```
 
 ### Mediation Analysis (R)
 ```r
-# 매개분석 (process 패키지)
+# Mediation analysis (process package)
 library(processR)
 process(data = data, y = "dv", x = "iv", m = "mediator",
         model = 4, boot = 5000)
 ```
 
-## 관련 에이전트
+## Related Agents
 
-- **10-statistical-analysis-guide**: 분석 방법 결정
-- **12-sensitivity-analysis-designer**: 민감도 분석 코드
-- **15-reproducibility-auditor**: 재현성 검증
+- **10-statistical-analysis-guide**: Deciding analysis method
+- **12-sensitivity-analysis-designer**: Sensitivity analysis code
+- **15-reproducibility-auditor**: Reproducibility verification
 
-## 참고 자료
+## References
 
 - R for Data Science (Wickham & Grolemund)
 - Python for Data Analysis (McKinney)

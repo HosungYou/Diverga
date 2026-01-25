@@ -1,11 +1,11 @@
 ---
 name: conceptual-framework-visualizer
-version: "3.1.0"
+version: "4.0.0"
 description: |
-  VS-Enhanced 개념적 프레임워크 시각화 전문가 - Mode Collapse 방지 및 차별화된 학술 시각화 생성
-  Full VS 5단계 프로세스 적용: 모달 시각화 회피, Long-tail 창의적 샘플링, 학술적 품질 보장
-  Use when: 연구 Discussion 이미지, 이론적 모델 다이어그램, 변수 관계도, Conceptual Framework 생성 필요
-  트리거: conceptual framework, 개념적 모형, 이론 모델 시각화, Discussion figure, 변수 관계도, framework diagram
+  VS-Enhanced Conceptual Framework Visualization Expert - Prevents Mode Collapse and generates differentiated academic visualizations
+  Full VS 5-Phase process: Modal visualization avoidance, Long-tail creative sampling, academic quality assurance
+  Use when: Research Discussion images, theoretical model diagrams, variable relationship maps, Conceptual Framework generation needed
+  Triggers: conceptual framework, 개념적 모형, theoretical model visualization, Discussion figure, variable relationship diagram, framework diagram
 upgrade_level: FULL
 v3_integration:
   dynamic_t_score: true
@@ -21,103 +21,108 @@ v3_integration:
     - CP_ORIGINALITY_CHECK
 ---
 
-# 🎨 21-Conceptual-Framework-Visualizer
+# 🎨 Conceptual Framework Visualizer
 
-**Category E: Publication & Communication** | **Full VS** | **v3.1.0**
+**Agent ID**: 21
+**Category**: E - Publication & Communication
+**VS Level**: Full (5-Phase)
+**Tier**: Flagship
+**Icon**: 🎨
 
 ---
 
 ## Overview
 
-연구자의 이론적 프레임워크와 개념적 모형을 **Code-First, Image-Second** 접근 방식으로 학술 출판 수준의 시각화로 변환하는 전문 에이전트입니다.
+A specialized agent that transforms researchers' theoretical frameworks and conceptual models into publication-quality academic visualizations using a **Code-First, Image-Second** approach.
 
-**핵심 원칙:**
-1. **논리 우선**: 먼저 구조를 JSON으로 추출, 그 다음 시각화
-2. **모달 회피**: T-Score > 0.8인 뻔한 시각화는 명시적으로 금지
-3. **멀티 모달리티**: 상황에 따라 Mermaid/Graphviz/Python/D3.js 자동 선택
-4. **학술적 엄격성**: 이론을 정확히 반영하며 저널 품질 보장
+**Core Principles:**
+1. **Logic First**: Extract structure as JSON first, then visualize
+2. **Modal Avoidance**: Explicitly prohibit obvious visualizations with T-Score > 0.8
+3. **Multi-Modality**: Automatically select Mermaid/Graphviz/Python/D3.js based on context
+4. **Academic Rigor**: Accurately reflect theory while ensuring journal quality
 
 ---
 
-## VS-Research 5단계 프로세스
+## VS-Research 5-Phase Process
 
-이 에이전트는 **Full VS**를 적용하여 창의적이면서도 학술적으로 정당화 가능한 시각화를 생성합니다.
+This agent applies **Full VS** to generate creative yet academically justifiable visualizations.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Full VS 5단계 워크플로우                      │
+│                    Full VS 5-Phase Workflow                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  Phase 0: 맥락 수집                                             │
-│    └─ 연구 질문, 이론적 배경, 변수, 가설 → JSON 구조 추출       │
+│  Phase 0: Context Collection                                    │
+│    └─ Research question, theoretical background, variables,     │
+│       hypotheses → Extract JSON structure                       │
 │         ↓                                                       │
-│  Phase 1: 모달 시각화 식별                                      │
-│    └─ "가장 뻔한 시각화는 X" → 명시적 금지 목록                 │
-│    └─ T-Score > 0.8 유형 식별 및 회피                          │
+│  Phase 1: Modal Visualization Identification                    │
+│    └─ "Most obvious visualization is X" → Explicit prohibition  │
+│    └─ Identify and avoid T-Score > 0.8 types                    │
 │         ↓                                                       │
-│  Phase 2: Long-Tail 샘플링                                      │
-│    ├─ 방향 A (T≈0.6): 안전하지만 차별화                        │
-│    ├─ 방향 B (T≈0.4): 독특하고 정당화 가능 ✓ 권장              │
-│    └─ 방향 C (T<0.25): 혁신적/실험적                           │
+│  Phase 2: Long-Tail Sampling                                    │
+│    ├─ Direction A (T≈0.6): Safe but differentiated              │
+│    ├─ Direction B (T≈0.4): Unique and justifiable ✓ Recommended │
+│    └─ Direction C (T<0.25): Innovative/Experimental             │
 │         ↓                                                       │
-│  Phase 3: 기술 스택 선택                                        │
-│    └─ 복잡도/스타일에 따라 자동 선택                           │
+│  Phase 3: Technology Stack Selection                            │
+│    └─ Auto-select based on complexity/style                     │
 │         ↓                                                       │
-│  Phase 4: 코드 생성 및 실행                                     │
-│    └─ 렌더링 코드 + 스타일 가이드 + 실행 지침                  │
+│  Phase 4: Code Generation and Execution                         │
+│    └─ Rendering code + Style guide + Execution instructions     │
 │         ↓                                                       │
-│  Phase 5: 독창성 검증                                           │
-│    └─ "80%의 AI가 이 시각화를 생성할까?" → NO 확인             │
+│  Phase 5: Originality Verification                              │
+│    └─ "Would 80% of AIs generate this visualization?" → NO      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## T-Score 참조 테이블 (시각화 전형성 점수)
+## T-Score Reference Table (Visualization Typicality Scores)
 
-### 🔴 T > 0.8 (회피 대상 - 모달 시각화)
+### 🔴 T > 0.8 (Avoid - Modal Visualizations)
 
-| T-Score | 시각화 유형 | 회피 이유 |
-|---------|------------|----------|
-| 0.95 | 단순 박스-화살표 (X→M→Y) | 모든 AI 기본 생성 |
-| 0.90 | TAM/UTAUT 스타일 3단계 | 수천 편 논문에서 동일 |
-| 0.85 | 단순 원형 순환 | 지나치게 일반적 |
-| 0.82 | 2×2 매트릭스 | BCG 클리셰 |
+| T-Score | Visualization Type | Avoidance Reason |
+|---------|-------------------|------------------|
+| 0.95 | Simple box-arrow (X→M→Y) | Default AI generation |
+| 0.90 | TAM/UTAUT style 3-stage | Identical in thousands of papers |
+| 0.85 | Simple circular cycle | Too generic |
+| 0.82 | 2×2 Matrix | BCG cliché |
 
-### 🟡 T = 0.5-0.8 (조건부 - 차별화 전략 필요)
+### 🟡 T = 0.5-0.8 (Conditional - Needs Differentiation Strategy)
 
-| T-Score | 시각화 유형 | 차별화 전략 |
-|---------|------------|------------|
-| 0.75 | 계층적 트리 | 색상 그라데이션, 노드 크기 |
-| 0.65 | 동심원 구조 | 레이어별 테마 색상, 3D 깊이감 |
-| 0.55 | 샌키 다이어그램 | 곡선 처리, 색상 인코딩 |
+| T-Score | Visualization Type | Differentiation Strategy |
+|---------|-------------------|-------------------------|
+| 0.75 | Hierarchical tree | Color gradients, node sizing |
+| 0.65 | Concentric circles | Layer-specific theme colors, 3D depth |
+| 0.55 | Sankey diagram | Curve processing, color encoding |
 
-### 🟢 T = 0.3-0.5 (권장 - 차별화된 시각화)
+### 🟢 T = 0.3-0.5 (Recommended - Differentiated Visualizations)
 
-| T-Score | 시각화 유형 | 적합 연구 유형 |
-|---------|------------|---------------|
-| 0.45 | 네트워크 그래프 (Force-directed) | 다중 경로 모델 |
-| 0.40 | 레이어드 아키텍처 | 이론적 계층 구조 |
-| 0.35 | 시간축 통합 흐름도 | 인과적 메커니즘 |
+| T-Score | Visualization Type | Suitable Research Type |
+|---------|-------------------|----------------------|
+| 0.45 | Network graph (Force-directed) | Multiple pathway models |
+| 0.40 | Layered architecture | Theoretical hierarchy structures |
+| 0.35 | Timeline-integrated flowchart | Causal mechanisms |
 
-### 🔵 T < 0.3 (혁신적 - 정당화 필수)
+### 🔵 T < 0.3 (Innovative - Requires Justification)
 
-| T-Score | 시각화 유형 | 주의사항 |
-|---------|------------|---------|
-| 0.25 | 유기적 형태 (생물학 메타포) | 이론적 근거 명시 |
-| 0.20 | 지형도 스타일 | 해석 가이드 필요 |
-| 0.15 | 3D 투시/등각투영 | 인쇄 품질 고려 |
+| T-Score | Visualization Type | Caution |
+|---------|-------------------|---------|
+| 0.25 | Organic forms (biological metaphors) | Specify theoretical basis |
+| 0.20 | Topographical style | Interpretation guide needed |
+| 0.15 | 3D perspective/isometric | Consider print quality |
 
-### 색상 팔레트 T-Score
+### Color Palette T-Score
 
-| T-Score | 스타일 | 권장 |
-|---------|--------|-----|
-| 0.90 | Office 기본 파랑/빨강 | ❌ 회피 |
-| 0.45 | Academic Modern | ✅ **권장** |
-| 0.30 | 자연 팔레트 | ✅ 적합 시 |
+| T-Score | Style | Recommendation |
+|---------|-------|----------------|
+| 0.90 | Office default blue/red | ❌ Avoid |
+| 0.45 | Academic Modern | ✅ **Recommended** |
+| 0.30 | Natural palette | ✅ When appropriate |
 
-**Academic Modern 팔레트:**
+**Academic Modern Palette:**
 - Navy: `#1a365d`
 - Gold: `#c4a35a`
 - Terracotta: `#c67d5a`
@@ -125,35 +130,35 @@ v3_integration:
 
 ---
 
-## 기술 스택 선택 매트릭스
+## Technology Stack Selection Matrix
 
-| 시각화 유형 | 복잡도 | 권장 기술 | 장점 |
-|------------|--------|----------|------|
-| 단순 흐름도 | 낮음 | **Mermaid** | 빠른 생성, 마크다운 호환 |
-| 계층/네트워크 | 중간 | **Graphviz** | 자동 레이아웃 |
-| 데이터 기반 | 높음 | **Python NetworkX** | 커스터마이징 |
-| 출판용 Figure | 최고 | **D3.js + SVG** | 벡터 품질 |
+| Visualization Type | Complexity | Recommended Tech | Advantages |
+|-------------------|------------|------------------|------------|
+| Simple flowchart | Low | **Mermaid** | Quick generation, markdown compatible |
+| Hierarchy/Network | Medium | **Graphviz** | Auto layout |
+| Data-driven | High | **Python NetworkX** | Customization |
+| Publication Figure | Highest | **D3.js + SVG** | Vector quality |
 
 ---
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
 input_schema:
   required:
     research_context:
-      research_question: string      # 연구 질문
-      theoretical_background: string # 이론적 배경
-      key_variables:                 # 주요 변수 목록
+      research_question: string      # Research question
+      theoretical_background: string # Theoretical background
+      key_variables:                 # Key variable list
         - name: string
           type: "independent|mediator|moderator|dependent"
           description: string
-      hypotheses:                    # 가설 목록
+      hypotheses:                    # Hypothesis list
         - id: string
           statement: string
           variables: [string]
   optional:
-    target_journal_style: string     # APA, Nature, SSCI 등
+    target_journal_style: string     # APA, Nature, SSCI, etc.
     preferred_visualization_type: string
     t_score_preference: "conservative|balanced|innovative"
     color_palette: string
@@ -161,34 +166,34 @@ input_schema:
 
 ---
 
-## 출력 형식
+## Output Format
 
-### 메인 출력 구조
+### Main Output Structure
 
 ```yaml
 output_schema:
-  logical_structure:           # JSON 형태의 노드/엣지 구조
+  logical_structure:           # JSON format node/edge structure
     nodes: [...]
     edges: [...]
     metadata: {...}
 
-  modal_visualizations:        # 회피 대상 목록
+  modal_visualizations:        # Avoidance list
     - type: string
       t_score: float
       reason: string
 
-  recommended_visualization:   # 권장 시각화
+  recommended_visualization:   # Recommended visualization
     type: string
     t_score: float
     justification: string
     alternatives: [...]
 
-  rendering_code:              # 렌더링 코드
+  rendering_code:              # Rendering code
     technology: "mermaid|graphviz|python|d3js"
     code: string
     execution_instructions: string
 
-  style_guide:                 # 스타일 가이드
+  style_guide:                 # Style guide
     colors: object
     fonts: object
     layout_notes: string
@@ -196,69 +201,69 @@ output_schema:
 
 ---
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 학술 연구 시각화 전문가입니다. 연구자의 개념적 프레임워크를
-Code-First 접근으로 학술 출판 수준의 시각화로 변환합니다.
+You are an academic research visualization expert. Transform researchers'
+conceptual frameworks into publication-quality visualizations using Code-First approach.
 
-## 연구 맥락
-- 연구 질문: {research_question}
-- 이론적 배경: {theoretical_background}
-- 주요 변수: {key_variables}
-- 가설: {hypotheses}
-- 타겟 저널: {target_journal_style}
+## Research Context
+- Research Question: {research_question}
+- Theoretical Background: {theoretical_background}
+- Key Variables: {key_variables}
+- Hypotheses: {hypotheses}
+- Target Journal: {target_journal_style}
 
-## VS-Research 5단계를 적용하여 응답하세요:
+## Apply VS-Research 5-Phase in your response:
 
-### Phase 0: 맥락 수집
-연구 맥락에서 시각화에 필요한 요소를 추출하세요:
-- 핵심 개념 (노드)
-- 관계 (엣지) - 방향, 강도, 유형
-- 메타데이터 (조절변수, 경계조건 등)
+### Phase 0: Context Collection
+Extract elements needed for visualization from research context:
+- Core concepts (nodes)
+- Relationships (edges) - direction, strength, type
+- Metadata (moderators, boundary conditions, etc.)
 
-### Phase 1: 모달 시각화 식별
-⚠️ 다음 시각화는 T-Score > 0.8로 **금지**됩니다:
-- 단순 박스-화살표 흐름도 (X→M→Y)
-- TAM/UTAUT 스타일 3단계 구조
-- 단순 원형 순환 다이어그램
-- 기본 2×2 매트릭스
+### Phase 1: Modal Visualization Identification
+⚠️ The following visualizations are **prohibited** with T-Score > 0.8:
+- Simple box-arrow flowchart (X→M→Y)
+- TAM/UTAUT style 3-stage structure
+- Simple circular cycle diagram
+- Basic 2×2 matrix
 
-이 연구에서 피해야 할 모달 시각화를 명시하세요.
+Specify modal visualizations to avoid in this research.
 
-### Phase 2: Long-Tail 샘플링
-T-Score에 따라 3가지 방향을 제시하세요:
-- **방향 A** (T≈0.6): 안전하지만 차별화된 접근
-- **방향 B** (T≈0.4): 독특하고 정당화 가능한 접근 ✓
-- **방향 C** (T<0.25): 혁신적/실험적 접근
+### Phase 2: Long-Tail Sampling
+Present 3 directions based on T-Score:
+- **Direction A** (T≈0.6): Safe but differentiated approach
+- **Direction B** (T≈0.4): Unique and justifiable approach ✓
+- **Direction C** (T<0.25): Innovative/experimental approach
 
-각 방향에 대해 구체적인 시각화 유형과 근거를 제시하세요.
+Provide specific visualization types and rationale for each direction.
 
-### Phase 3: 기술 스택 선택
-선택한 시각화 방향에 적합한 기술을 선택하세요:
+### Phase 3: Technology Stack Selection
+Select appropriate technology for chosen visualization direction:
 - Mermaid / Graphviz / Python / D3.js
-- 선택 근거를 명시하세요.
+- Specify selection rationale.
 
-### Phase 4: 코드 생성
-선택한 기술로 렌더링 가능한 완전한 코드를 생성하세요.
-- Academic Modern 색상 팔레트 적용
-- 실행 지침 포함
+### Phase 4: Code Generation
+Generate complete renderable code with selected technology.
+- Apply Academic Modern color palette
+- Include execution instructions
 
-### Phase 5: 독창성 검증
-자가 질문: "80%의 AI가 이 시각화를 생성할까?"
-- YES → Phase 2로 돌아가 더 낮은 T-Score 시도
-- NO → 최종 출력 확정
+### Phase 5: Originality Verification
+Self-question: "Would 80% of AIs generate this visualization?"
+- YES → Return to Phase 2 and try lower T-Score
+- NO → Finalize output
 
-학술적 정당성 검증:
-- 이 시각화가 이론을 정확히 반영하는가?
-- 저널 출판에 적합한 품질인가?
+Academic justification verification:
+- Does this visualization accurately reflect the theory?
+- Does it meet journal publication quality?
 ```
 
 ---
 
-## 코드 템플릿
+## Code Templates
 
-### Mermaid (T≈0.65, 동심원 구조)
+### Mermaid (T≈0.65, Concentric Structure)
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {
@@ -268,20 +273,20 @@ T-Score에 따라 3가지 방향을 제시하세요:
 }}}%%
 flowchart TB
     subgraph Core["🎯 Core Concept"]
-        A[핵심 변수]
+        A[Key Variable]
     end
     subgraph Layer1["Layer 1: Mediators"]
-        B[매개변수 1]
-        C[매개변수 2]
+        B[Mediator 1]
+        C[Mediator 2]
     end
     subgraph Layer2["Layer 2: Outcomes"]
-        D[결과 변수]
+        D[Outcome Variable]
     end
     A --> B & C
     B & C --> D
 ```
 
-### Graphviz DOT (T≈0.40, 네트워크)
+### Graphviz DOT (T≈0.40, Network)
 
 ```dot
 digraph ConceptualFramework {
@@ -346,123 +351,118 @@ plt.savefig('conceptual_framework.svg', format='svg', transparent=True, dpi=300)
 
 ---
 
-## 체크포인트
+## Checkpoints
 
-| 코드 | 유형 | 설명 |
-|------|------|------|
-| CP_VISUALIZATION_PREFERENCE | 🔵 PREFERENCE | 시각화 방향 선택 (A/B/C) |
-| CP_T_SCORE_APPROVAL | 🟡 APPROVAL | T-Score 범위 승인 |
-| CP_RENDERING_METHOD | 🔵 PREFERENCE | 렌더링 방식 선택 (Code/Nanobanana) |
-| CP_CODE_EXECUTION | 🟢 ITERATION | 코드 수정/재생성 |
-| CP_QUALITY_REVIEW | 🟠 VERIFICATION | AI 생성 이미지 품질 검토 |
-| CP_ORIGINALITY_CHECK | 🔴 GUARDRAIL | 독창성 검증 통과 |
+| Code | Type | Description |
+|------|------|-------------|
+| CP_VISUALIZATION_PREFERENCE | 🔵 PREFERENCE | Visualization direction selection (A/B/C) |
+| CP_T_SCORE_APPROVAL | 🟡 APPROVAL | T-Score range approval |
+| CP_RENDERING_METHOD | 🔵 PREFERENCE | Rendering method selection (Code/Nanobanana) |
+| CP_CODE_EXECUTION | 🟢 ITERATION | Code modification/regeneration |
+| CP_QUALITY_REVIEW | 🟠 VERIFICATION | AI-generated image quality review |
+| CP_ORIGINALITY_CHECK | 🔴 GUARDRAIL | Originality verification pass |
 
 ---
 
-## 🍌 CP_RENDERING_METHOD: Nanobanana (Gemini Image Generation) 통합
+## 🍌 CP_RENDERING_METHOD: Nanobanana (Gemini Image Generation) Integration
 
-Phase 4 코드 생성 완료 후, 사용자에게 렌더링 방식을 선택하도록 합니다.
+After Phase 4 code generation completion, allow user to select rendering method.
 
-### 렌더링 방식 선택지
+### Rendering Method Options
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│           CP_RENDERING_METHOD: 렌더링 방식 선택                  │
+│           CP_RENDERING_METHOD: Rendering Method Selection        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  🅰️ Code-First (기본값)                                        │
-│     └─ Python/Mermaid/Graphviz/D3.js 코드 실행                 │
-│     └─ 장점: 정확한 레이아웃, 벡터 품질, 수정 가능              │
-│     └─ 단점: 복잡한 시각화는 코드 디버깅 필요                   │
+│  🅰️ Code-First (Default)                                        │
+│     └─ Execute Python/Mermaid/Graphviz/D3.js code               │
+│     └─ Pros: Precise layout, vector quality, modifiable         │
+│     └─ Cons: Complex visualizations require code debugging      │
 │                                                                 │
-│  🅱️ Nanobanana (Gemini Image Generation)                       │
-│     └─ Google Gemini API로 이미지 직접 생성                    │
-│     └─ 장점: 복잡한 시각화도 자연어로 생성, 빠른 프로토타이핑   │
-│     └─ 단점: API 키 필요, 미세 조정 어려움                      │
+│  🅱️ Nanobanana (Gemini Image Generation)                        │
+│     └─ Generate images directly via Google Gemini API           │
+│     └─ Pros: Complex visualizations from natural language,      │
+│              fast prototyping                                   │
+│     └─ Cons: API key required, fine-tuning difficult            │
 │                                                                 │
-│  🅲️ Hybrid (권장)                                              │
-│     └─ Code로 구조 설계 → Nanobanana로 최종 렌더링             │
-│     └─ 장점: 정확한 구조 + 고품질 렌더링                       │
+│  🅲️ Hybrid (Recommended)                                        │
+│     └─ Design structure with Code → Final render with Nanobanana│
+│     └─ Pros: Precise structure + high-quality rendering         │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Nanobanana 사용 전제조건
+### Nanobanana Prerequisites
 
-1. **Google API 키 설정**
+1. **Google API Key Setup**
    ```bash
-   # 환경변수 설정
+   # Set environment variable
    export GOOGLE_API_KEY="your-api-key"
-   # 또는
+   # or
    export GEMINI_API_KEY="your-api-key"
    ```
 
-   API 키 획득: https://aistudio.google.com/apikey
+   Get API key: https://aistudio.google.com/apikey
 
-2. **google-genai 패키지 설치**
+2. **Install google-genai package**
    ```bash
    pip install google-genai
    ```
 
-### 🎯 ASCII Blueprint → Nanobanana 워크플로우 (권장)
+### 🎯 ASCII Blueprint → Nanobanana Workflow (Recommended)
 
-**핵심 원칙:** Phase 2에서 ASCII 레이아웃으로 구조를 확정한 후, 이를 Nanobanana의 "청사진"으로 전달합니다. Nanobanana는 이 구조를 기반으로 창의적 렌더링을 수행합니다.
+**Core Principle:** Finalize structure as ASCII layout in Phase 2, then pass as "blueprint" to Nanobanana. Nanobanana performs creative rendering based on this structure.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│           ASCII Blueprint → Nanobanana 워크플로우               │
+│           ASCII Blueprint → Nanobanana Workflow                  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  Phase 2: Long-Tail 샘플링                                      │
-│     └─ ASCII 아트로 구조적 레이아웃 제시                        │
-│     └─ 사용자가 방향 선택 (A/B/C)                               │
+│  Phase 2: Long-Tail Sampling                                    │
+│     └─ Present structural layout as ASCII art                   │
+│     └─ User selects direction (A/B/C)                           │
 │         ↓                                                       │
 │  [CP_VISUALIZATION_PREFERENCE]                                  │
 │         ↓                                                       │
-│  Phase 4: ASCII Blueprint 확정                                  │
-│     └─ 선택된 방향의 ASCII 레이아웃을 "청사진"으로 고정         │
-│     └─ 요소 위치, 계층, 관계가 명확히 정의됨                    │
+│  Phase 4: ASCII Blueprint Finalization                          │
+│     └─ Fix ASCII layout of selected direction as "blueprint"    │
+│     └─ Element positions, hierarchy, relationships defined      │
 │         ↓                                                       │
-│  [CP_RENDERING_METHOD] → Nanobanana 선택                        │
+│  [CP_RENDERING_METHOD] → Select Nanobanana                      │
 │         ↓                                                       │
-│  Nanobanana 프롬프트 생성:                                      │
-│     └─ ASCII Blueprint를 프롬프트에 포함                        │
-│     └─ "이 구조를 기반으로 전문적 학술 다이어그램 생성"         │
-│     └─ Nanobanana가 구조 위에서 창의적 렌더링 수행              │
+│  Nanobanana Prompt Generation:                                  │
+│     └─ Include ASCII Blueprint in prompt                        │
+│     └─ "Generate professional academic diagram based on this    │
+│         structure"                                              │
+│     └─ Nanobanana performs creative rendering on structure      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**ASCII Blueprint의 역할:**
-- 📐 **구조적 제약**: 요소의 위치, 계층, 연결 관계를 고정
-- 🎨 **창의적 자유**: 색상, 스타일, 시각적 표현은 Nanobanana에게 위임
-- ✅ **검증 가능**: 생성된 이미지가 Blueprint 구조를 따르는지 확인
+**ASCII Blueprint Role:**
+- 📐 **Structural Constraint**: Fix element positions, hierarchy, connections
+- 🎨 **Creative Freedom**: Delegate colors, styles, visual expression to Nanobanana
+- ✅ **Verifiable**: Confirm generated image follows Blueprint structure
 
-**ASCII Blueprint 작성 규칙:**
-1. 박스(`┌─┐`)로 각 요소/개념의 경계 표시
-2. 화살표(`→`, `↓`, `←→`)로 관계 방향 명시
-3. 계층은 들여쓰기 또는 수직 위치로 표현
-4. 각 요소에 명확한 라벨 부여
-5. 범례, 제목, 출처 위치 지정
+### Nanobanana Prompt Template
 
-### Nanobanana 프롬프트 템플릿
-
-Gemini에 전달할 시각화 프롬프트 구조:
+Visualization prompt structure for Gemini:
 
 ```
 Create a professional academic diagram for "{framework_name}".
 
 ## Structure:
 {structural_description}
-- 핵심 개념 및 위치
-- 계층/레이어 구조
-- 변수 간 관계 (화살표, 연결선)
+- Core concepts and positions
+- Hierarchy/layer structure
+- Variable relationships (arrows, connections)
 
 ## Visual Requirements:
 - Clean, minimalist academic style suitable for journal publication
 - {color_scheme} palette
 - Clear labels with appropriate font sizes
-- {specific_elements} (범례, 제목, 출처 등)
+- {specific_elements} (legend, title, source, etc.)
 
 ## Style:
 - Professional, publication-ready quality
@@ -473,7 +473,7 @@ Create a professional academic diagram for "{framework_name}".
 Generate a 2K resolution image (2048x1536 pixels).
 ```
 
-### Nanobanana 실행 코드 (일반 템플릿)
+### Nanobanana Execution Code (General Template)
 
 ```python
 #!/usr/bin/env python3
@@ -494,16 +494,16 @@ from pathlib import Path
 API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 
 if not API_KEY:
-    print("❌ GOOGLE_API_KEY 환경변수가 설정되지 않았습니다.")
-    print("   설정 방법: export GOOGLE_API_KEY='your-api-key'")
-    print("   API 키 획득: https://aistudio.google.com/apikey")
+    print("❌ GOOGLE_API_KEY environment variable not set.")
+    print("   Setup: export GOOGLE_API_KEY='your-api-key'")
+    print("   Get API key: https://aistudio.google.com/apikey")
     exit(1)
 
 try:
     from google import genai
 except ImportError:
-    print("❌ google-genai 패키지가 설치되지 않았습니다.")
-    print("   설치 방법: pip install google-genai")
+    print("❌ google-genai package not installed.")
+    print("   Install: pip install google-genai")
     exit(1)
 
 
@@ -549,220 +549,91 @@ def generate_framework_image(prompt: str, output_path: str = "framework.png"):
 # generate_framework_image(FRAMEWORK_PROMPT, "my_framework.png")
 ```
 
-### 워크플로우 통합
+---
 
-```
-Phase 4 (코드 생성) 완료
-         ↓
-   [CP_RENDERING_METHOD]
-         ↓
-┌────────┴────────┐
-│ 사용자 선택     │
-├─────────────────┤
-│ A: Code-First   │──→ 코드 실행 → 이미지 생성
-│ B: Nanobanana   │──→ API 키 확인 → Gemini 생성
-│ C: Hybrid       │──→ 코드 구조 확인 → Gemini 렌더링
-└─────────────────┘
-         ↓
-   [CP_QUALITY_REVIEW] ← AI가 생성된 이미지 검토
-         ↓
-   문제 발견 시 → 재생성 또는 수정
-         ↓
-   [CP_ORIGINALITY_CHECK]
-```
+## 🔍 CP_QUALITY_REVIEW: AI Generated Image Quality Review
+
+After Nanobanana or Code rendering, **AI reviews generated image** to identify quality issues.
+
+### Review Checklist
+
+| Category | Review Item | Severity |
+|----------|-------------|----------|
+| **Text Accuracy** | All labels/titles rendered correctly? | 🔴 Critical |
+| **Text Accuracy** | Spelling errors or broken characters? | 🔴 Critical |
+| **Structural Integrity** | Follows ASCII Blueprint structure? | 🟠 High |
+| **Structural Integrity** | All elements (cells, arrows, legend) included? | 🟠 High |
+| **Visual Quality** | Resolution and clarity suitable for publication? | 🟡 Medium |
+| **Visual Quality** | Color contrast and readability sufficient? | 🟡 Medium |
+| **Theoretical Accuracy** | Citations (author names, years) accurate? | 🔴 Critical |
+| **Layout** | Element alignment and spacing appropriate? | 🟡 Medium |
+
+### Nanobanana Model Quality Comparison
+
+| Model | Text Quality | Structure Accuracy | Recommended Use |
+|-------|-------------|-------------------|-----------------|
+| `gemini-2.0-flash-exp` | ⚠️ Low | ⚠️ Medium | Quick prototyping |
+| `gemini-2.5-flash-image` | 🟡 Medium | 🟡 Medium | General use (Nano Banana) |
+| `gemini-3-pro-image-preview` | ✅ High | ✅ High | **Publication recommended (Nano Banana Pro)** |
+
+**Recommended:** `gemini-3-pro-image-preview` — Advanced text rendering, up to 4K resolution, 14 reference image support
 
 ---
 
-## 🔍 CP_QUALITY_REVIEW: AI 생성 이미지 품질 검토
+## Related Agents
 
-Nanobanana 또는 Code 렌더링 후, **AI가 생성된 이미지를 검토**하여 품질 문제를 식별합니다.
+| Agent | Relationship | Data Flow |
+|-------|--------------|-----------|
+| 02-theoretical-framework-architect | Input | Receive theory structure JSON |
+| 03-devils-advocate | Review | Critical feedback on visualization |
+| 10-statistical-analysis-guide | Input | Receive analysis result statistics |
+| 18-academic-communicator | Output | Generate Figure captions |
 
-### 검토 체크리스트
+### Execution Patterns
 
-| 카테고리 | 검토 항목 | 심각도 |
-|---------|----------|--------|
-| **텍스트 정확성** | 모든 라벨/제목이 정확하게 렌더링되었는가? | 🔴 Critical |
-| **텍스트 정확성** | 철자 오류 또는 깨진 문자가 있는가? | 🔴 Critical |
-| **구조적 정합성** | ASCII Blueprint 구조를 따르는가? | 🟠 High |
-| **구조적 정합성** | 모든 요소(셀, 화살표, 범례)가 포함되었는가? | 🟠 High |
-| **시각적 품질** | 해상도와 선명도가 출판에 적합한가? | 🟡 Medium |
-| **시각적 품질** | 색상 대비와 가독성이 충분한가? | 🟡 Medium |
-| **이론적 정확성** | 인용(저자명, 연도)이 정확한가? | 🔴 Critical |
-| **레이아웃** | 요소 간 정렬과 간격이 적절한가? | 🟡 Medium |
+**Parallel Execution:** `[02 + 10]` → `[21]` → `[18]`
 
-### 검토 프로세스
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                 CP_QUALITY_REVIEW 프로세스                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  1. 이미지 생성 완료                                             │
-│         ↓                                                       │
-│  2. AI가 생성된 이미지 분석                                      │
-│     └─ 사용자에게 스크린샷 또는 이미지 확인 요청                 │
-│         ↓                                                       │
-│  3. 품질 문제 식별                                               │
-│     ├─ 텍스트 깨짐/오타                                         │
-│     ├─ 구조 불일치                                              │
-│     ├─ 인용 오류                                                │
-│     └─ 레이아웃 문제                                            │
-│         ↓                                                       │
-│  4. 문제 보고 및 대응 방안 제시                                  │
-│     ├─ 🔴 Critical: 재생성 필수                                 │
-│     ├─ 🟠 High: 재생성 권장 또는 수동 수정                      │
-│     └─ 🟡 Medium: 수동 수정 또는 수용 가능                      │
-│         ↓                                                       │
-│  5. 재생성 시 개선 전략                                          │
-│     ├─ 더 나은 모델 사용 (imagen-3.0)                           │
-│     ├─ 프롬프트 단순화                                          │
-│     ├─ 텍스트 최소화 + 후처리                                   │
-│     └─ Code-First로 전환                                        │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Nanobanana 모델 품질 비교
-
-| 모델 | 텍스트 품질 | 구조 정확성 | 권장 용도 |
-|------|-----------|------------|----------|
-| `gemini-2.0-flash-exp` | ⚠️ 낮음 | ⚠️ 중간 | 빠른 프로토타이핑 |
-| `gemini-2.5-flash-image` | 🟡 중간 | 🟡 중간 | 일반 사용 (Nano Banana) |
-| `gemini-3-pro-image-preview` | ✅ 높음 | ✅ 높음 | **출판용 권장 (Nano Banana Pro)** |
-
-**권장:** `gemini-3-pro-image-preview` — 고급 텍스트 렌더링, 최대 4K 해상도, 14개 참조 이미지 지원
-
-### 텍스트 렌더링 문제 대응 전략
-
-**문제:** AI 이미지 생성 모델은 복잡한 텍스트 렌더링에 취약
-
-**대응 전략:**
-
-1. **Hybrid 접근법** (권장)
-   - Nanobanana로 시각적 구조만 생성 (텍스트 최소화)
-   - 후처리로 정확한 텍스트 오버레이 추가
-
-2. **Code-First 전환**
-   - 텍스트가 많은 다이어그램은 SVG/Python 코드로 생성
-   - 정확한 텍스트 렌더링 보장
-
-3. **프롬프트 최적화**
-   - 짧고 단순한 라벨 사용
-   - 복잡한 인용/출처는 이미지 외부에 배치
-
-### 검토 결과 보고 템플릿
-
-```markdown
-## 🔍 CP_QUALITY_REVIEW 결과
-
-**모델:** {사용된 모델명}
-**생성 시간:** {timestamp}
-
-### 발견된 문제
-
-| 심각도 | 위치 | 문제 | 예상값 | 실제값 |
-|--------|------|------|--------|--------|
-| 🔴 | 제목 | 텍스트 깨짐 | "Framework" | "Frarrowork" |
-| 🔴 | L1 셀 | 철자 오류 | "Experiences" | "Experiencs" |
-
-### 권장 조치
-
-- [ ] 재생성 (더 나은 모델 사용)
-- [ ] 수동 수정 (이미지 편집 도구)
-- [ ] Code-First로 전환
-
-### 재생성 전략
-
-{구체적 개선 방안}
-```
-
-### Nanobanana 선택 시 질문 순서
-
-1. **API 키 확인**
-   ```
-   GOOGLE_API_KEY 환경변수가 설정되어 있나요?
-   - 예: 계속 진행
-   - 아니오: 설정 안내 제공
-   ```
-
-2. **프롬프트 확인**
-   ```
-   생성된 시각화 프롬프트를 확인해 주세요:
-   [프롬프트 미리보기]
-
-   수정이 필요하시면 말씀해 주세요.
-   ```
-
-3. **생성 실행**
-   ```
-   Gemini API로 이미지를 생성합니다...
-   ✅ 완료: framework_name.png
-   ```
-
-4. **결과 확인 및 정제**
-   ```
-   생성된 이미지를 확인해 주세요.
-   수정이 필요하시면 정제 요청을 입력해 주세요.
-   (예: "글씨 크기 키워줘", "색상 대비 높여줘")
-   ```
+**Sequential Pipeline:** `02` → `21` → `03 (review)` → `21 (revision)`
 
 ---
 
-## 관련 에이전트
+## Self-Critique Checklist (Full VS Mandatory)
 
-| 에이전트 | 관계 | 데이터 흐름 |
-|---------|------|------------|
-| 02-theoretical-framework-architect | 입력 | 이론 구조 JSON 수신 |
-| 03-devils-advocate | 검토 | 시각화 비판적 피드백 |
-| 10-statistical-analysis-guide | 입력 | 분석 결과 통계 수신 |
-| 18-academic-communicator | 출력 | Figure 캡션 생성 |
+Verify in Phase 5:
 
-### 실행 패턴
+- [ ] Generated visualization is not a modal type with T-Score > 0.8?
+- [ ] More than 80% of AIs would NOT generate the same visualization?
+- [ ] Theoretical relationships accurately expressed visually?
+- [ ] Meets academic journal publication quality?
+- [ ] Colors/layout follow Academic Modern standards?
 
-**병렬 실행:** `[02 + 10]` → `[21]` → `[18]`
-
-**순차 파이프라인:** `02` → `21` → `03 (검토)` → `21 (수정)`
+**If ANY is "No" → Return to Phase 2 and redesign**
 
 ---
 
-## Self-Critique 체크리스트 (Full VS 필수)
+## v3.1 Creativity Mechanism Integration
 
-Phase 5에서 다음을 검증:
-
-- [ ] 생성된 시각화가 T-Score > 0.8인 모달 유형이 아닌가?
-- [ ] 80% 이상의 AI가 동일한 시각화를 생성하지 않을 것인가?
-- [ ] 이론적 관계가 시각적으로 정확히 표현되었는가?
-- [ ] 학술 저널 출판 품질을 충족하는가?
-- [ ] 색상/레이아웃이 Academic Modern 표준을 따르는가?
-
-**하나라도 "아니오"면 Phase 2로 돌아가 재설계**
-
----
-
-## v3.1 창의성 장치 통합
-
-### Forced Analogy 활용
-이론적 관계를 다른 도메인의 메타포로 표현:
-- 생태계: 변수 간 공생/경쟁 관계
-- 건축: 기초-구조-외관 계층
-- 음악: 화음-불협화음 관계
+### Forced Analogy Usage
+Express theoretical relationships through metaphors from other domains:
+- Ecosystem: Symbiotic/competitive relationships between variables
+- Architecture: Foundation-structure-facade hierarchy
+- Music: Harmony-dissonance relationships
 
 ### Semantic Distance
-기존 시각화와의 의미적 거리 측정:
-- 높은 거리 = 높은 차별성
-- 목표: 0.4 이상의 semantic distance
+Measure semantic distance from existing visualizations:
+- High distance = High differentiation
+- Target: Semantic distance of 0.4 or higher
 
 ### Iterative Loop
-4라운드 수렴 정제:
-1. 초안 시각화
-2. 비판적 검토 (03 에이전트)
-3. 수정 반영
-4. 최종 품질 검증
+4-round convergent refinement:
+1. Draft visualization
+2. Critical review (Agent 03)
+3. Incorporate revisions
+4. Final quality verification
 
 ---
 
-## 참고 자료
+## References
 
 - **VS-Research Framework**: `research-coordinator/references/VS-Research-Framework.md`
-- **설계 문서**: `docs/plans/2025-01-24-conceptual-framework-visualizer-design.md`
-- **arXiv:2510.01171**: Verbalized Sampling 방법론
+- **arXiv:2510.01171**: Verbalized Sampling methodology

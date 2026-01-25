@@ -1,11 +1,11 @@
 ---
 name: effect-size-extractor
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 효과크기 추출기 - Mode Collapse 방지 및 최적 효과크기 전략 제시
-  Enhanced VS 3단계 프로세스 적용: 단순 변환 회피, 맥락 적합 효과크기 선택
+  VS-Enhanced Effect Size Extractor - Prevents Mode Collapse with optimal effect size strategy
+  Enhanced VS 3-Phase process: Avoids simple conversions, delivers context-appropriate effect size selection
   Use when: extracting effect sizes, converting statistics, preparing meta-analysis data
-  트리거: 효과크기, Cohen's d, Hedges' g, 상관계수, 변환, 메타분석 데이터
+  Triggers: effect size, Cohen's d, Hedges' g, correlation, conversion, meta-analysis data
 upgrade_level: ENHANCED
 v3_integration:
   dynamic_t_score: true
@@ -20,166 +20,167 @@ v3_integration:
     - CP-IL-001
 ---
 
-# 효과크기 추출기 (Effect Size Extractor)
+# Effect Size Extractor
 
 **Agent ID**: 07
-**Category**: B - 문헌 및 증거
-**VS Level**: Enhanced (3단계)
+**Category**: B - Literature & Evidence
+**VS Level**: Enhanced (3-Phase)
+**Tier**: Support
 **Icon**: 📊
 
-## 개요
+## Overview
 
-연구 논문에서 다양한 형태의 통계치를 표준화된 효과크기로 변환합니다.
-메타분석에 필요한 효과크기와 분산/표준오차를 정확하게 계산합니다.
+Converts various forms of statistics from research papers into standardized effect sizes.
+Accurately calculates effect sizes and variances/standard errors needed for meta-analysis.
 
-**VS-Research 방법론**을 적용하여 단순 공식 적용을 넘어
-연구 설계와 메타분석 목적에 최적화된 효과크기 전략을 제공합니다.
+**VS-Research methodology** is applied to go beyond simple formula application and provide
+effect size strategies optimized for research design and meta-analysis purposes.
 
-## VS-Research 3단계 프로세스 (Enhanced)
+## VS-Research 3-Phase Process (Enhanced)
 
-### Phase 1: 모달 효과크기 접근 식별
+### Phase 1: Identify Modal Effect Size Approaches
 
-**목적**: 단순 공식 적용의 한계 인식
-
-```markdown
-⚠️ **모달 경고**: 다음은 가장 예측 가능한 효과크기 추출 접근입니다:
-
-| 모달 접근 | T-Score | 한계 |
-|----------|---------|------|
-| "t → d 공식 적용" | 0.90 | 설계 특수성 무시 |
-| "Cohen's d로 통일" | 0.88 | 최적 스케일 아닐 수 있음 |
-| "누락 시 p → t 역산" | 0.85 | 정보 손실, 불확실성 증가 |
-
-➡️ 공식 적용은 기준선. 최적 효과크기 전략을 탐색합니다.
-```
-
-### Phase 2: 맥락 최적 효과크기 전략
-
-**목적**: 연구 설계와 메타분석 목적에 맞는 효과크기 전략
+**Purpose**: Recognize limitations of simple formula application
 
 ```markdown
-**방향 A** (T ≈ 0.7): 표준 변환 + 설계 보정
-- 표준 공식 + Hedges' g 교정
-- 대응/반복측정 설계 보정
-- 적합: 일반적 메타분석
+⚠️ **Modal Warning**: These are the most predictable effect size extraction approaches:
 
-**방향 B** (T ≈ 0.4): 목적 특화 스케일
-- 메타분석 유형별 최적 스케일 선택
-- 군집/다수준 설계 고려
-- 의존성 처리 전략
-- 적합: 복잡한 설계, 교육/심리 연구
+| Modal Approach | T-Score | Limitations |
+|----------------|---------|-------------|
+| "Apply t → d formula" | 0.90 | Ignores design specificity |
+| "Standardize to Cohen's d" | 0.88 | May not be optimal scale |
+| "Reverse calculate p → t when missing" | 0.85 | Information loss, increased uncertainty |
 
-**방향 C** (T < 0.3): 정보 최대화 전략
-- 불완전 보고에서 다중 추정 방법
-- 베이지안 효과크기 추정
-- 불확실성 전파 분석
-- 적합: 방법론 연구, 정밀 메타분석
+➡️ Formula application is baseline. Exploring optimal effect size strategy.
 ```
 
-### Phase 4: 추천 실행
+### Phase 2: Context-Optimal Effect Size Strategy
 
-**선택된 효과크기 전략**에 따라:
-1. 최적 스케일 선택 근거
-2. 변환 공식 및 계산 과정
-3. 분산/SE 계산
-4. 메타분석 데이터 형식
+**Purpose**: Effect size strategy matched to research design and meta-analysis purpose
+
+```markdown
+**Direction A** (T ≈ 0.7): Standard Conversion + Design Correction
+- Standard formulas + Hedges' g correction
+- Matched/repeated measures design correction
+- Suitable for: General meta-analyses
+
+**Direction B** (T ≈ 0.4): Purpose-Specific Scales
+- Select optimal scale by meta-analysis type
+- Consider clustered/multilevel designs
+- Dependency handling strategies
+- Suitable for: Complex designs, education/psychology research
+
+**Direction C** (T < 0.3): Information Maximization Strategy
+- Multiple estimation methods from incomplete reporting
+- Bayesian effect size estimation
+- Uncertainty propagation analysis
+- Suitable for: Methodological research, precision meta-analysis
+```
+
+### Phase 4: Execute Recommendation
+
+**Based on selected effect size strategy**:
+1. Rationale for optimal scale selection
+2. Conversion formulas and calculation process
+3. Variance/SE calculations
+4. Meta-analysis data format
 
 ---
 
-## 효과크기 추출 Typicality Score 참조표
+## Effect Size Extraction Typicality Score Reference Table
 
 ```
-T > 0.8 (모달 - 보완 필요):
-├── 통계치 → 표준 공식 자동 적용
-├── Cohen's d로 일률적 변환
-├── 누락 정보 단순 추정
-└── 설계 특수성 무시
+T > 0.8 (Modal - Needs Enhancement):
+├── Statistics → automatic standard formula application
+├── Uniform conversion to Cohen's d
+├── Simple estimation of missing information
+└── Ignore design specificity
 
-T 0.5-0.8 (확립 - 정교화 필요):
-├── Hedges' g 소표본 교정
-├── 대응/반복측정 보정
-├── 신뢰구간에서 SE 역산
-└── 분야별 해석 기준 적용
+T 0.5-0.8 (Established - Needs Refinement):
+├── Hedges' g small sample correction
+├── Matched/repeated measures correction
+├── Reverse calculate SE from confidence intervals
+└── Apply field-specific interpretation criteria
 
-T 0.3-0.5 (심층 - 권장):
-├── 메타분석 유형별 최적 스케일
-├── 군집 설계 효과 교정
-├── 다중 결과 의존성 처리
-└── 변환 불확실성 정량화
+T 0.3-0.5 (Deep - Recommended):
+├── Optimal scale by meta-analysis type
+├── Clustered design effect correction
+├── Multiple outcome dependency handling
+└── Quantify conversion uncertainty
 
-T < 0.3 (혁신 - 선도 연구용):
-├── 베이지안 효과크기 추정
-├── 불완전 보고 다중 대체
-├── 효과크기 함수로서 모델링
-└── 측정 오차 통합
+T < 0.3 (Innovation - For Leading Research):
+├── Bayesian effect size estimation
+├── Multiple imputation for incomplete reporting
+├── Model effect size as function
+└── Integrate measurement error
 ```
 
-## 사용 시점
+## When to Use
 
-- 메타분석을 위한 데이터 추출 시
-- 연구 간 효과 비교가 필요할 때
-- 다양한 통계치를 표준화해야 할 때
-- 효과크기 해석이 필요할 때
+- When extracting data for meta-analysis
+- When cross-study effect comparison is needed
+- When standardizing various statistics is required
+- When effect size interpretation is needed
 
-## 핵심 기능
+## Core Functions
 
-1. **다양한 입력 처리**
-   - 평균과 표준편차
-   - t-value, F-value
-   - 상관계수 (r)
-   - 카이제곱, 오즈비
-   - p-value와 표본크기
+1. **Process Various Inputs**
+   - Means and standard deviations
+   - t-values, F-values
+   - Correlation coefficients (r)
+   - Chi-square, odds ratios
+   - p-values and sample sizes
 
-2. **효과크기 변환**
+2. **Effect Size Conversions**
    - Cohen's d ↔ Hedges' g
    - d ↔ r
    - OR ↔ d
-   - 다양한 상호 변환
+   - Various mutual conversions
 
-3. **분산/표준오차 계산**
-   - 메타분석 가중치용
-   - 신뢰구간 계산
+3. **Variance/Standard Error Calculation**
+   - For meta-analysis weighting
+   - Confidence interval calculation
 
-4. **의존성 처리**
-   - 반복측정 설계
-   - 군집 설계
-   - 다중 결과변수
+4. **Dependency Handling**
+   - Repeated measures designs
+   - Clustered designs
+   - Multiple outcome variables
 
-## 변환 공식 라이브러리
+## Conversion Formula Library
 
-### 기본 효과크기 계산
+### Basic Effect Size Calculations
 
-**Cohen's d (독립 집단)**
+**Cohen's d (Independent Groups)**
 ```
 d = (M₁ - M₂) / SD_pooled
 
 SD_pooled = √[((n₁-1)SD₁² + (n₂-1)SD₂²) / (n₁ + n₂ - 2)]
 ```
 
-**Hedges' g (소표본 교정)**
+**Hedges' g (Small Sample Correction)**
 ```
 g = d × J
 
 J = 1 - 3/(4(n₁ + n₂) - 9)
 ```
 
-**Cohen's d (대응 집단)**
+**Cohen's d (Matched Groups)**
 ```
 d = M_diff / SD_diff
 
-또는
+or
 
 d = (M_pre - M_post) / SD_pooled × √(2(1-r))
 ```
 
-### 변환 공식
+### Conversion Formulas
 
 **t → d**
 ```
 d = t × √(1/n₁ + 1/n₂)
 ```
 
-**F → d (2집단)**
+**F → d (2 groups)**
 ```
 d = √(F × (n₁ + n₂) / (n₁ × n₂))
 ```
@@ -209,84 +210,84 @@ d = 2 × √(η² / (1 - η²))
 z = 0.5 × ln[(1 + r) / (1 - r)]
 ```
 
-### 분산 계산
+### Variance Calculations
 
-**d의 분산**
+**Variance of d**
 ```
 V_d = (n₁ + n₂)/(n₁ × n₂) + d²/(2(n₁ + n₂))
 ```
 
-**r의 분산**
+**Variance of r**
 ```
 V_r = (1 - r²)² / (n - 1)
 ```
 
-**Fisher's z의 분산**
+**Variance of Fisher's z**
 ```
 V_z = 1 / (n - 3)
 ```
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 원 통계치: "보고된 통계 값"
-  - 표본 크기: "각 집단 또는 전체 N"
+Required:
+  - Original statistic: "Reported statistical value"
+  - Sample size: "Each group or total N"
 
-선택:
-  - 목표 효과크기: "d, r, OR 중 선택"
-  - 연구 설계: "독립/대응/반복측정"
-  - 사전-사후 상관: "대응 설계 시"
+Optional:
+  - Target effect size: "Choose from d, r, OR"
+  - Research design: "Independent/matched/repeated measures"
+  - Pre-post correlation: "For matched designs"
 ```
 
-## 출력 형식
+## Output Format
 
 ```markdown
-## 효과크기 변환 보고서
+## Effect Size Conversion Report
 
-### 1. 입력 정보
+### 1. Input Information
 
-| 항목 | 값 |
-|------|-----|
-| 원 통계치 | [값] |
-| 통계치 유형 | [t/F/r/χ²/M&SD 등] |
-| n₁ | [값] |
-| n₂ | [값] |
-| 설계 유형 | [독립/대응] |
+| Item | Value |
+|------|-------|
+| Original statistic | [value] |
+| Statistic type | [t/F/r/χ²/M&SD, etc.] |
+| n₁ | [value] |
+| n₂ | [value] |
+| Design type | [Independent/Matched] |
 
-### 2. 변환 과정
+### 2. Conversion Process
 
-**적용 공식:**
+**Applied Formula:**
 ```
-[공식 명시]
+[Specify formula]
 ```
 
-**계산 과정:**
+**Calculation Steps:**
 ```
-Step 1: [중간 계산]
-Step 2: [중간 계산]
+Step 1: [Intermediate calculation]
+Step 2: [Intermediate calculation]
 ...
-최종: [결과]
+Final: [Result]
 ```
 
-### 3. 결과
+### 3. Results
 
-| 효과크기 | 값 | SE | 95% CI |
-|----------|-----|-----|--------|
-| Cohen's d | [값] | [SE] | [lower, upper] |
-| Hedges' g | [값] | [SE] | [lower, upper] |
-| r | [값] | [SE] | [lower, upper] |
+| Effect Size | Value | SE | 95% CI |
+|-------------|-------|-----|--------|
+| Cohen's d | [value] | [SE] | [lower, upper] |
+| Hedges' g | [value] | [SE] | [lower, upper] |
+| r | [value] | [SE] | [lower, upper] |
 
-### 4. 해석
+### 4. Interpretation
 
-**Cohen (1988) 기준:**
+**Cohen (1988) Criteria:**
 - Small: d = 0.2, r = .10
 - Medium: d = 0.5, r = .30
 - Large: d = 0.8, r = .50
 
-**본 연구 효과크기**: [Small/Medium/Large] 수준
+**Current Study Effect Size**: [Small/Medium/Large] level
 
-### 5. 메타분석 입력 데이터
+### 5. Meta-Analysis Input Data
 
 ```csv
 study_id, yi, vi, ni
@@ -294,105 +295,105 @@ study_id, yi, vi, ni
 ```
 ```
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 메타분석 효과크기 계산 전문가입니다.
+You are a meta-analysis effect size calculation expert.
 
-다음 통계치를 표준화된 효과크기로 변환해주세요:
+Please convert the following statistics to standardized effect sizes:
 
-[원 통계치]: {original_statistic}
-[표본 크기]: {sample_size}
-[목표 효과크기]: {target_es} (d, r, OR 중 선택)
+[Original Statistic]: {original_statistic}
+[Sample Size]: {sample_size}
+[Target Effect Size]: {target_es} (choose from d, r, OR)
 
-수행할 작업:
-1. 원 통계치 유형 식별
+Tasks to perform:
+1. Identify original statistic type
    - Cohen's d / Hedges' g
    - Pearson r
    - t-value
-   - F-value (df1, df2 포함)
+   - F-value (include df1, df2)
    - χ² (chi-square)
    - η² / η²_partial
    - Odds Ratio / Risk Ratio
-   - 평균과 표준편차
+   - Means and standard deviations
 
-2. 변환 수행
-   - 적용할 공식 명시
-   - 계산 과정 상세 기술
-   - 중간 값 모두 표시
+2. Perform conversion
+   - Specify formula to apply
+   - Detail calculation process
+   - Show all intermediate values
 
-3. 분산/표준오차 계산
-   - 효과크기의 표본 분산 공식
-   - 메타분석 가중치 계산용
+3. Calculate variance/standard error
+   - Sample variance formula for effect size
+   - For meta-analysis weighting
 
-4. 95% 신뢰구간 계산
+4. Calculate 95% confidence interval
 
-5. 결과 요약
-   | 원 통계치 | 변환된 ES | SE | 95% CI |
+5. Summarize results
+   | Original Statistic | Converted ES | SE | 95% CI |
 ```
 
-## 효과크기 해석 기준
+## Effect Size Interpretation Criteria
 
-### Cohen (1988) 일반 기준
-| 효과크기 | Small | Medium | Large |
-|----------|-------|--------|-------|
+### Cohen (1988) General Criteria
+| Effect Size | Small | Medium | Large |
+|-------------|-------|--------|-------|
 | d | 0.2 | 0.5 | 0.8 |
 | r | .10 | .30 | .50 |
 | η² | .01 | .06 | .14 |
 | OR | 1.5 | 2.5 | 4.0 |
 
-### 분야별 기준 (교육/심리학)
-| 중재 유형 | 평균 d | 기준 조정 |
-|----------|--------|----------|
-| 교육적 중재 | 0.40 | Small: 0.15, Med: 0.40, Large: 0.65 |
-| 심리치료 | 0.50 | 일반 기준 적용 |
-| 약물 치료 | 0.30 | Small: 0.10, Med: 0.30, Large: 0.50 |
+### Field-Specific Criteria (Education/Psychology)
+| Intervention Type | Average d | Adjusted Criteria |
+|-------------------|-----------|-------------------|
+| Educational interventions | 0.40 | Small: 0.15, Med: 0.40, Large: 0.65 |
+| Psychotherapy | 0.50 | Use general criteria |
+| Pharmacological treatment | 0.30 | Small: 0.10, Med: 0.30, Large: 0.50 |
 
-## 특수 상황 처리
+## Special Situation Handling
 
-### 다중 처치군 (3+ groups)
-- 쌍별 비교 vs. 통합 비교
-- 분산 풀링 방법
+### Multiple Treatment Groups (3+ groups)
+- Pairwise vs. pooled comparisons
+- Variance pooling methods
 
-### 반복 측정
-- 사전-사후 상관 필요
-- 의존성 교정
+### Repeated Measures
+- Pre-post correlation needed
+- Dependency correction
 
-### 군집 설계
-- 설계 효과 (Design Effect) 적용
-- ICC 기반 교정
+### Clustered Designs
+- Apply Design Effect
+- ICC-based correction
 
-### 누락 정보 추정
-- p-value에서 t 역산
-- CI에서 SE 역산
+### Missing Information Estimation
+- Reverse calculate t from p-value
+- Reverse calculate SE from CI
 
-## 관련 에이전트
+## Related Agents
 
-- **05-systematic-literature-scout**: 연구 검색 및 수집
-- **06-evidence-quality-appraiser**: 품질 평가
-- **10-statistical-analysis-guide**: 메타분석 방법 안내
+- **05-systematic-literature-scout**: Research search and collection
+- **06-evidence-quality-appraiser**: Quality assessment
+- **10-statistical-analysis-guide**: Meta-analysis method guidance
 
-## v3.0 창의적 장치 통합
+## v3.0 Creative Device Integration
 
-### 활용 가능한 창의적 장치 (ENHANCED)
+### Available Creative Devices (ENHANCED)
 
-| 장치 | 적용 시점 | 활용 예시 |
-|------|----------|----------|
-| **Forced Analogy** | Phase 2 | 다른 분야의 효과크기 스케일 유추 적용 |
-| **Iterative Loop** | Phase 2 | 4라운드 발산-수렴으로 최적 변환 전략 정제 |
-| **Semantic Distance** | Phase 2 | 새로운 효과크기 해석 기준 발견 |
+| Device | Application Point | Usage Example |
+|--------|-------------------|---------------|
+| **Forced Analogy** | Phase 2 | Apply effect size scales from other fields by analogy |
+| **Iterative Loop** | Phase 2 | 4-round divergence-convergence to refine optimal conversion strategy |
+| **Semantic Distance** | Phase 2 | Discover new effect size interpretation criteria |
 
-### 체크포인트 통합
+### Checkpoint Integration
 
 ```yaml
-적용 체크포인트:
-  - CP-INIT-002: 창의성 수준 선택
-  - CP-VS-001: 효과크기 전략 방향 선택 (다중)
-  - CP-VS-003: 최종 효과크기 전략 만족도 확인
-  - CP-IL-001: 반복 라운드 수 설정
+Applied Checkpoints:
+  - CP-INIT-002: Select creativity level
+  - CP-VS-001: Select effect size strategy direction (multiple)
+  - CP-VS-003: Confirm final effect size strategy satisfaction
+  - CP-IL-001: Set iteration round count
 ```
 
-### 모듈 참조
+### Module References
 
 ```
 ../../research-coordinator/core/vs-engine.md
@@ -405,7 +406,7 @@ study_id, yi, vi, ni
 
 ---
 
-## 참고 자료
+## References
 
 - Borenstein et al. (2009). Introduction to Meta-Analysis
 - Cooper et al. (2019). Handbook of Research Synthesis

@@ -1,12 +1,13 @@
 ---
 name: checklist-manager
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 체크리스트 관리자 - Mode Collapse 방지 및 맥락 적응형 점검
-  Light VS 적용: 기계적 체크 회피 + 연구 특화 가이드라인 적용
+  VS-Enhanced Checklist Manager - Prevents Mode Collapse with context-adaptive checking
+  Light VS applied: Avoids mechanical checking + research-specific guideline application
   Use when: checking reporting guidelines, preparing submissions, ensuring compliance
-  트리거: 체크리스트, PRISMA, CONSORT, STROBE, COREQ, 보고 가이드라인
+  Triggers: checklist, PRISMA, CONSORT, STROBE, COREQ, reporting guidelines
 upgrade_level: LIGHT
+tier: Support
 v3_integration:
   dynamic_t_score: false
   creativity_modules: []
@@ -15,297 +16,298 @@ v3_integration:
     - CP-VS-003
 ---
 
-# 체크리스트 관리자 (Checklist Manager)
+# Checklist Manager
 
 **Agent ID**: 14
-**Category**: D - 품질 및 검증
-**VS Level**: Light (모달 인식)
+**Category**: D - Quality & Validation
+**VS Level**: Light (Modal awareness)
+**Tier**: Support
 **Icon**: 📋
 
-## 개요
+## Overview
 
-연구 유형별 보고 가이드라인(PRISMA, CONSORT, STROBE 등) 준수 여부를 체계적으로 점검합니다.
-누락된 항목을 식별하고 구체적인 보완 가이드를 제공합니다.
+Systematically checks compliance with reporting guidelines (PRISMA, CONSORT, STROBE, etc.) by research type.
+Identifies missing items and provides specific supplementation guidance.
 
-**VS-Research 방법론** (Light)을 적용하여 기계적 체크리스트 적용을 넘어
-연구 맥락에 맞는 가이드라인 해석과 적용을 제공합니다.
+**VS-Research methodology** (Light) is applied to provide contextualized guideline interpretation
+and application beyond mechanical checklist application.
 
-## VS 모달 인식 (Light)
+## VS Modal Awareness (Light)
 
-⚠️ **모달 체크리스트 접근**: 다음은 가장 예측 가능한 접근입니다:
+⚠️ **Modal Checklist Approaches**: The following are the most predictable approaches:
 
-| 영역 | 모달 접근 (T>0.8) | 맥락화 접근 (T<0.5) |
-|------|------------------|------------------|
-| 가이드라인 선택 | "연구 유형 → 표준 체크리스트" | 다중 가이드라인 통합 (PRISMA+COSMIN) |
-| 항목 점검 | "Yes/No 이진 체크" | 충족 수준 + 보완 우선순위 |
-| 누락 대응 | "누락 항목 나열" | 맥락별 필수/권장 구분 |
-| 보고 | "체크리스트 완성" | 항목별 개선 구체화 |
+| Area | Modal Approach (T>0.8) | Contextualized Approach (T<0.5) |
+|------|------------------------|----------------------------------|
+| Guideline selection | "Study type → Standard checklist" | Multi-guideline integration (PRISMA+COSMIN) |
+| Item checking | "Yes/No binary check" | Fulfillment level + supplementation priority |
+| Missing items | "List missing items" | Context-specific essential/recommended distinction |
+| Reporting | "Complete checklist" | Item-specific improvement specification |
 
-**맥락화 원칙**: 가이드라인의 정신을 반영한 유연한 적용
+**Contextualization Principle**: Flexible application reflecting the spirit of guidelines
 
-## 사용 시점
+## When to Use
 
-- 논문 투고 전 가이드라인 점검
-- 체계적 리뷰/메타분석 보고서 작성
-- RCT 또는 관찰연구 보고
-- 저널의 요구사항 충족 확인
+- Checking guidelines before paper submission
+- Writing systematic review/meta-analysis reports
+- Reporting RCT or observational studies
+- Confirming journal requirements
 
-## 핵심 기능
+## Core Functions
 
-1. **가이드라인 매칭**
-   - 연구 유형에 적합한 체크리스트 선택
-   - 최신 버전 적용
+1. **Guideline Matching**
+   - Select appropriate checklist for study type
+   - Apply latest version
 
-2. **항목별 점검**
-   - 각 항목 충족 여부 평가
-   - 해당 위치(페이지/섹션) 기록
+2. **Item-by-Item Checking**
+   - Evaluate each item fulfillment
+   - Record location (page/section)
 
-3. **누락 식별**
-   - 미충족 항목 목록화
-   - 심각도 평가
+3. **Missing Item Identification**
+   - List unfulfilled items
+   - Assess severity
 
-4. **개선 제안**
-   - 구체적 보완 가이드
-   - 예시 문구 제공
+4. **Improvement Suggestions**
+   - Specific supplementation guidance
+   - Provide example phrases
 
-## 체크리스트 라이브러리
+## Checklist Library
 
-| 연구 유형 | 체크리스트 | 항목 수 |
-|----------|-----------|---------|
-| 체계적 리뷰/메타분석 | PRISMA 2020 | 27 |
+| Study Type | Checklist | Item Count |
+|------------|-----------|------------|
+| Systematic review/Meta-analysis | PRISMA 2020 | 27 |
 | RCT | CONSORT 2010 | 25 |
-| 관찰연구 (코호트/사례-대조/횡단) | STROBE | 22 |
-| 질적연구 | COREQ / SRQR | 32 / 21 |
-| 혼합방법 | GRAMMS | 6 |
-| 설문도구 개발 | COSMIN | 다수 |
-| 진단정확도 | STARD | 30 |
-| 예후연구 | TRIPOD | 22 |
-| 동물연구 | ARRIVE | 20 |
-| 사례보고 | CARE | 13 |
+| Observational (cohort/case-control/cross-sectional) | STROBE | 22 |
+| Qualitative research | COREQ / SRQR | 32 / 21 |
+| Mixed methods | GRAMMS | 6 |
+| Survey instrument development | COSMIN | Multiple |
+| Diagnostic accuracy | STARD | 30 |
+| Prognostic research | TRIPOD | 22 |
+| Animal studies | ARRIVE | 20 |
+| Case reports | CARE | 13 |
 
-## PRISMA 2020 체크리스트 (체계적 리뷰용)
+## PRISMA 2020 Checklist (for Systematic Reviews)
 
-### 제목
-- [ ] 1. 체계적 리뷰/메타분석임을 제목에 명시
+### Title
+- [ ] 1. Identify as systematic review/meta-analysis in title
 
-### 초록
-- [ ] 2. 구조화된 초록 (배경, 목적, 방법, 결과, 결론)
+### Abstract
+- [ ] 2. Structured abstract (background, objectives, methods, results, conclusions)
 
-### 서론
-- [ ] 3. 연구의 근거 (Rationale)
-- [ ] 4. 목적 (Objectives) - PICO 포함
+### Introduction
+- [ ] 3. Rationale for the review
+- [ ] 4. Objectives - including PICO
 
-### 방법
-- [ ] 5. 프로토콜 등록 정보
-- [ ] 6. 적격 기준 (Eligibility criteria)
-- [ ] 7. 정보원 (Information sources)
-- [ ] 8. 검색 전략 (Search strategy)
-- [ ] 9. 선택 과정 (Selection process)
-- [ ] 10. 데이터 수집 과정
-- [ ] 11. 데이터 항목 (Data items)
-- [ ] 12. 연구의 비뚤림 위험 평가
-- [ ] 13. 효과 측정 (Effect measures)
-- [ ] 14. 합성 방법 (Synthesis methods)
-- [ ] 15. 보고 편향 평가
-- [ ] 16. 확실성 평가 (GRADE 등)
+### Methods
+- [ ] 5. Protocol registration information
+- [ ] 6. Eligibility criteria
+- [ ] 7. Information sources
+- [ ] 8. Search strategy
+- [ ] 9. Selection process
+- [ ] 10. Data collection process
+- [ ] 11. Data items
+- [ ] 12. Risk of bias assessment
+- [ ] 13. Effect measures
+- [ ] 14. Synthesis methods
+- [ ] 15. Reporting bias assessment
+- [ ] 16. Certainty assessment (GRADE, etc.)
 
-### 결과
-- [ ] 17. 연구 선택 (PRISMA 흐름도)
-- [ ] 18. 연구 특성
-- [ ] 19. 비뚤림 위험 결과
-- [ ] 20. 개별 연구 결과
-- [ ] 21. 합성 결과
-- [ ] 22. 보고 편향 결과
-- [ ] 23. 확실성 결과
+### Results
+- [ ] 17. Study selection (PRISMA flow diagram)
+- [ ] 18. Study characteristics
+- [ ] 19. Risk of bias results
+- [ ] 20. Individual study results
+- [ ] 21. Synthesis results
+- [ ] 22. Reporting bias results
+- [ ] 23. Certainty results
 
-### 논의
-- [ ] 24. 논의 (주요 발견, 한계, 해석)
+### Discussion
+- [ ] 24. Discussion (key findings, limitations, interpretation)
 
-### 기타
-- [ ] 25. 등록 및 프로토콜
-- [ ] 26. 지원 (Funding)
-- [ ] 27. 이해충돌
+### Other
+- [ ] 25. Registration and protocol
+- [ ] 26. Support (Funding)
+- [ ] 27. Conflicts of interest
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 연구 유형: "체계적 리뷰, RCT, 코호트 등"
-  - 원고/프로토콜: "점검할 문서"
+Required:
+  - study_type: "Systematic review, RCT, cohort, etc."
+  - manuscript_or_protocol: "Document to check"
 
-선택:
-  - 적용 가이드라인: "특정 체크리스트 지정"
-  - 점검 수준: "기본/상세"
+Optional:
+  - guideline: "Specify particular checklist"
+  - check_level: "Basic/detailed"
 ```
 
-## 출력 형식
+## Output Format
 
 ```markdown
-## 보고 가이드라인 준수 점검 보고서
+## Reporting Guideline Compliance Check Report
 
-### 문서 정보
-- 연구 유형: [유형]
-- 적용 가이드라인: [PRISMA 2020 / CONSORT / STROBE 등]
-- 점검일: [날짜]
-
----
-
-### 점검 결과 요약
-
-| 섹션 | 총 항목 | 충족 | 부분 충족 | 미충족 | N/A |
-|------|--------|------|----------|--------|-----|
-| 제목/초록 | X | X | X | X | X |
-| 서론 | X | X | X | X | X |
-| 방법 | X | X | X | X | X |
-| 결과 | X | X | X | X | X |
-| 논의/기타 | X | X | X | X | X |
-| **전체** | **X** | **X** | **X** | **X** | **X** |
-
-**전체 준수율**: [X]%
+### Document Information
+- Study Type: [Type]
+- Applied Guideline: [PRISMA 2020 / CONSORT / STROBE, etc.]
+- Check Date: [Date]
 
 ---
 
-### 상세 점검 결과
+### Check Results Summary
 
-#### 섹션 1: 제목
+| Section | Total Items | Fulfilled | Partially Fulfilled | Not Fulfilled | N/A |
+|---------|------------|-----------|-------------------|---------------|-----|
+| Title/Abstract | X | X | X | X | X |
+| Introduction | X | X | X | X | X |
+| Methods | X | X | X | X | X |
+| Results | X | X | X | X | X |
+| Discussion/Other | X | X | X | X | X |
+| **Total** | **X** | **X** | **X** | **X** | **X** |
 
-| # | 항목 | 충족 | 위치 | 비고 |
-|---|------|------|------|------|
-| 1 | 체계적 리뷰임을 제목에 명시 | ✅ | 제목 | - |
-
-#### 섹션 2: 초록
-
-| # | 항목 | 충족 | 위치 | 비고 |
-|---|------|------|------|------|
-| 2 | 구조화된 초록 | ⚠️ | p.1 | 목적 불명확 |
-
-[나머지 섹션 계속...]
+**Overall Compliance Rate**: [X]%
 
 ---
 
-### 미충족/부분충족 항목 상세
+### Detailed Check Results
 
-#### ❌ 미충족 항목
+#### Section 1: Title
 
-**항목 5: 프로토콜 등록**
-- 현재 상태: 프로토콜 등록 정보 없음
-- 가이드라인 요구: "프로토콜이 등록되었는지, 등록 번호, 접근 가능 여부"
-- **수정 방안**:
-  1. PROSPERO에 사후 등록 (systematic reviews)
-  2. OSF에 프로토콜 업로드
-  3. 등록하지 않은 경우 그 이유 기술
-- **예시 문구**: "본 연구의 프로토콜은 PROSPERO에 사전 등록되었다 (등록번호: CRD42024XXXXXX)."
+| # | Item | Fulfilled | Location | Notes |
+|---|------|-----------|----------|-------|
+| 1 | Identify as systematic review in title | ✅ | Title | - |
 
-**항목 15: 출판 편향 평가**
-- 현재 상태: 출판 편향 평가 방법 미기술
-- 가이드라인 요구: "출판 편향 또는 누락된 결과를 평가한 방법"
-- **수정 방안**:
-  1. Funnel plot 분석 추가
-  2. Egger's test 수행
-  3. Trim-and-fill 방법 적용
-- **예시 문구**: "출판 편향은 시각적으로 funnel plot을 통해 평가하고, Egger's regression test로 비대칭성을 검정했다."
+#### Section 2: Abstract
 
-#### ⚠️ 부분 충족 항목
+| # | Item | Fulfilled | Location | Notes |
+|---|------|-----------|----------|-------|
+| 2 | Structured abstract | ⚠️ | p.1 | Objectives unclear |
 
-**항목 2: 구조화된 초록**
-- 현재 상태: 초록이 있으나 목적이 불명확
-- 부족한 점: PICO 요소 중 Comparison 미명시
-- **수정 방안**: 목적 문장에 비교 대상 추가
-- **수정 전**: "본 연구는 AI 튜터의 효과를 분석하였다."
-- **수정 후**: "본 연구는 AI 튜터를 사용한 집단과 전통적 교수법 집단의 학업성취도 차이를 메타분석하였다."
+[Remaining sections continue...]
 
 ---
 
-### 우선순위별 수정 권고
+### Unfulfilled/Partially Fulfilled Items Detail
 
-#### 🔴 즉시 수정 필요 (필수 항목)
-1. **항목 17**: PRISMA 흐름도 추가
-2. **항목 5**: 프로토콜 등록 정보 추가
+#### ❌ Not Fulfilled Items
 
-#### 🟡 수정 권장 (권장 항목)
-1. **항목 15**: 출판 편향 평가 방법 기술
-2. **항목 16**: GRADE 확실성 평가 추가
+**Item 5: Protocol Registration**
+- Current status: No protocol registration information
+- Guideline requirement: "Whether protocol was registered, registration number, access"
+- **Revision plan**:
+  1. Retrospective registration in PROSPERO (systematic reviews)
+  2. Upload protocol to OSF
+  3. Describe reason if not registered
+- **Example phrase**: "The protocol for this study was prospectively registered in PROSPERO (Registration number: CRD42024XXXXXX)."
 
-#### 🟢 선택적 개선
-1. **항목 2**: 초록 PICO 명확화
+**Item 15: Publication Bias Assessment**
+- Current status: Publication bias assessment method not described
+- Guideline requirement: "Methods to assess publication bias or missing results"
+- **Revision plan**:
+  1. Add funnel plot analysis
+  2. Perform Egger's test
+  3. Apply trim-and-fill method
+- **Example phrase**: "Publication bias was assessed visually through funnel plots and tested for asymmetry using Egger's regression test."
+
+#### ⚠️ Partially Fulfilled Items
+
+**Item 2: Structured Abstract**
+- Current status: Abstract present but objectives unclear
+- Deficiency: Comparison not specified among PICO elements
+- **Revision plan**: Add comparison target to objectives sentence
+- **Before**: "This study analyzed the effects of AI tutors."
+- **After**: "This study meta-analyzed differences in academic achievement between groups using AI tutors and traditional instruction."
 
 ---
 
-### 제출 전 체크리스트
+### Revision Recommendations by Priority
 
-- [ ] PRISMA 흐름도 작성 및 삽입
-- [ ] 프로토콜 등록 번호 추가
-- [ ] 출판 편향 분석 수행 및 보고
-- [ ] GRADE 평가표 작성
-- [ ] 체크리스트 파일 준비 (저널 제출용)
+#### 🔴 Immediate Revision Needed (Essential Items)
+1. **Item 17**: Add PRISMA flow diagram
+2. **Item 5**: Add protocol registration information
+
+#### 🟡 Revision Recommended (Recommended Items)
+1. **Item 15**: Describe publication bias assessment method
+2. **Item 16**: Add GRADE certainty assessment
+
+#### 🟢 Optional Improvement
+1. **Item 2**: Clarify abstract PICO
+
+---
+
+### Pre-submission Checklist
+
+- [ ] Create and insert PRISMA flow diagram
+- [ ] Add protocol registration number
+- [ ] Perform and report publication bias analysis
+- [ ] Create GRADE assessment table
+- [ ] Prepare checklist file (for journal submission)
 ```
 
-## 프롬프트 템플릿
+## Prompt Template
 
 ```
-당신은 연구 보고 가이드라인 전문가입니다.
+You are a research reporting guideline expert.
 
-다음 연구를 해당 가이드라인으로 점검해주세요:
+Please check the following research against the applicable guideline:
 
-[연구 유형]: {study_type}
-[적용 가이드라인]: {guideline}
-[원고/프로토콜]: {document}
+[Study Type]: {study_type}
+[Applied Guideline]: {guideline}
+[Manuscript/Protocol]: {document}
 
-수행할 작업:
-1. 해당 체크리스트의 모든 항목 나열
+Tasks to perform:
+1. List all items in the checklist
 
-2. 각 항목에 대해:
-   - 충족 여부 (Yes / No / Partial / N/A)
-   - 해당 위치 (페이지, 섹션)
-   - 부족한 점
+2. For each item:
+   - Fulfillment status (Yes / No / Partial / N/A)
+   - Location (page, section)
+   - Deficiencies
 
-3. 결과 요약표
-   | 섹션 | 항목 | 충족 | 위치 | 비고 |
+3. Results summary table
+   | Section | Item | Fulfilled | Location | Notes |
 
-4. 누락/부족 항목에 대한 구체적 보완 가이드
-   - 무엇을 추가해야 하는가?
-   - 어떻게 작성해야 하는가?
-   - 예시 문구 제공
+4. Specific supplementation guidance for missing/deficient items
+   - What needs to be added?
+   - How should it be written?
+   - Provide example phrases
 
-5. 전체 준수율 (%)
+5. Overall compliance rate (%)
 ```
 
-## 가이드라인 선택 플로차트
+## Guideline Selection Flowchart
 
 ```
-연구 유형?
+Study Type?
     │
-    ├── 체계적 리뷰/메타분석 → PRISMA 2020
+    ├── Systematic review/Meta-analysis → PRISMA 2020
     │
-    ├── 중재 연구
+    ├── Intervention study
     │       │
-    │       ├── 무작위 배정 → CONSORT
-    │       └── 비무작위 → TIDieR + 해당 관찰연구 가이드라인
+    │       ├── Randomized → CONSORT
+    │       └── Non-randomized → TIDieR + applicable observational guideline
     │
-    ├── 관찰 연구
+    ├── Observational study
     │       │
-    │       ├── 코호트 → STROBE (코호트)
-    │       ├── 사례-대조 → STROBE (사례-대조)
-    │       └── 횡단 → STROBE (횡단)
+    │       ├── Cohort → STROBE (cohort)
+    │       ├── Case-control → STROBE (case-control)
+    │       └── Cross-sectional → STROBE (cross-sectional)
     │
-    ├── 질적 연구 → COREQ 또는 SRQR
+    ├── Qualitative research → COREQ or SRQR
     │
-    ├── 혼합 방법 → GRAMMS
+    ├── Mixed methods → GRAMMS
     │
-    └── 기타
+    └── Other
             │
-            ├── 진단 연구 → STARD
-            ├── 예후 모델 → TRIPOD
-            └── 사례 보고 → CARE
+            ├── Diagnostic study → STARD
+            ├── Prognostic model → TRIPOD
+            └── Case report → CARE
 ```
 
-## 관련 에이전트
+## Related Agents
 
-- **06-evidence-quality-appraiser**: 품질 평가와 연계
-- **13-internal-consistency-checker**: 일관성 검증
-- **15-reproducibility-auditor**: 재현성 점검
+- **06-evidence-quality-appraiser**: Linked with quality assessment
+- **13-internal-consistency-checker**: Consistency verification
+- **15-reproducibility-auditor**: Reproducibility checking
 
-## 참고 자료
+## References
 
 - EQUATOR Network: https://www.equator-network.org/
 - PRISMA 2020: Page et al. (2021)

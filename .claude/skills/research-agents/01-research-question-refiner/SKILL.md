@@ -1,11 +1,11 @@
 ---
 name: research-question-refiner
-version: 3.0.0
+version: 4.0.0
 description: |
-  VS-Enhanced 연구 질문 정제기 - Mode Collapse 방지 및 차별화된 연구 질문 도출
-  Enhanced VS 3단계 프로세스 적용: 모달 질문 회피, 대안 제시, 차별화된 RQ 추천
+  VS-Enhanced Research Question Refiner - Prevents Mode Collapse and derives differentiated research questions
+  Enhanced VS 3-Phase process: Modal question avoidance, alternatives presentation, differentiated RQ recommendation
   Use when: refining research ideas, formulating research questions, clarifying scope
-  트리거: 연구 질문, research question, PICO, SPIDER, 연구 아이디어
+  Triggers: research question, 연구 질문, PICO, SPIDER, research idea
 upgrade_level: ENHANCED
 v3_integration:
   dynamic_t_score: true
@@ -21,302 +21,260 @@ v3_integration:
     - CP-SD-001
 ---
 
-# 연구 질문 정제기 (Research Question Refiner)
+# Research Question Refiner
 
 **Agent ID**: 01
-**Category**: A - 이론 및 연구 설계
-**VS Level**: Enhanced (3단계)
+**Category**: A - Theory & Design
+**VS Level**: Enhanced (3-Phase)
+**Tier**: Core
 **Icon**: 🎯
 
-## 개요
+## Overview
 
-모호한 연구 아이디어를 명확하고 검증 가능한 연구 질문으로 변환합니다.
-PICO/SPIDER 프레임워크를 적용하여 체계적으로 연구 질문을 구조화합니다.
+Transforms vague research ideas into clear, testable research questions.
+Systematically structures research questions using PICO/SPIDER frameworks.
 
-**VS-Research 방법론**을 적용하여 너무 넓거나 뻔한 연구 질문을 피하고,
-학술적 기여가 명확한 차별화된 연구 질문을 도출합니다.
+Applies **VS-Research methodology** to avoid overly broad or predictable research questions,
+deriving differentiated questions with clear academic contribution.
 
-## VS-Research 3단계 프로세스 (Enhanced)
+## VS-Research 3-Phase Process (Enhanced)
 
-### Phase 1: 모달 연구 질문 식별
+### Phase 1: Modal Research Question Identification
 
-**목적**: 가장 예측 가능한 "뻔한" 연구 질문을 명시적으로 식별
-
-```markdown
-⚠️ **모달 경고**: 다음은 [주제]에 대한 가장 예측 가능한 연구 질문입니다:
-
-| 모달 연구 질문 | T-Score | 문제점 |
-|---------------|---------|--------|
-| "[X]가 [Y]에 미치는 영향" | 0.90 | 범위 과다, 차별화 불가 |
-| "[X]와 [Y]의 관계" | 0.85 | 구체성 부족 |
-| "[X]의 효과 분석" | 0.88 | 매개변수 불명확 |
-
-➡️ 이것은 기준선. 더 구체적이고 차별화된 질문을 탐색합니다.
-```
-
-### Phase 2: 대안적 연구 질문 제시
-
-**목적**: T-Score 기반 3개 방향의 차별화된 연구 질문 제시
+**Purpose**: Explicitly identify the most predictable "obvious" research questions
 
 ```markdown
-**방향 A** (T ≈ 0.7): 안전하지만 구체화
-- [구체적 맥락 추가, 조절변수 명시]
-- 예: "온라인 학습 환경에서 AI 피드백이 초보 영어 학습자의 쓰기 정확성에 미치는 영향"
+⚠️ **Modal Warning**: The following are the most predictable research questions for [topic]:
 
-**방향 B** (T ≈ 0.4): 차별화된 각도
-- [새로운 매개경로, 경계조건 탐색]
-- 예: "AI 피드백의 즉시성이 학습자의 메타인지 조절을 통해 쓰기 자기효능감에 미치는 간접 효과"
+| Modal Research Question | T-Score | Problem |
+|------------------------|---------|---------|
+| "Effect of [X] on [Y]" | 0.90 | Scope too broad, no differentiation |
+| "Relationship between [X] and [Y]" | 0.85 | Lacks specificity |
+| "Analysis of [X] effects" | 0.88 | Mediating variables unclear |
 
-**방향 C** (T < 0.3): 혁신적 접근
-- [기존 가정 도전, 역방향 인과, 비선형 관계]
-- 예: "AI 피드백에 대한 정서적 반응이 학습 지속성에 미치는 역설적 효과: 긍정적 피드백의 부정적 영향"
+➡️ This is the baseline. We will explore more specific and differentiated questions.
 ```
 
-### Phase 4: 추천 실행
+### Phase 2: Alternative Research Questions
 
-**선택된 연구 질문**에 대해:
-1. PICO(S)/SPIDER 구조화
-2. 변수 조작적 정의
-3. 연구 가능성 평가
-4. 이론적 기여 포인트 명시
+**Purpose**: Present differentiated research questions in 3 directions based on T-Score
+
+```markdown
+**Direction A** (T ≈ 0.7): Safe but specific
+- [Add specific context, specify moderators]
+- Example: "Effect of AI feedback on writing accuracy of novice English learners in online learning environments"
+
+**Direction B** (T ≈ 0.4): Differentiated angle
+- [Explore new mediation pathways, boundary conditions]
+- Example: "Indirect effect of AI feedback immediacy on writing self-efficacy through learner metacognitive regulation"
+
+**Direction C** (T < 0.3): Innovative approach
+- [Challenge existing assumptions, reverse causality, non-linear relationships]
+- Example: "Paradoxical effects of emotional responses to AI feedback on learning persistence: Negative impact of positive feedback"
+```
+
+### Phase 4: Recommendation Execution
+
+For **selected research question**:
+1. PICO(S)/SPIDER structuring
+2. Operational definition of variables
+3. Feasibility assessment
+4. Specify theoretical contribution points
 
 ---
 
-## 연구 질문 Typicality Score 참조표
+## Research Question Typicality Score Reference
 
 ```
-T > 0.8 (모달 - 회피):
-├── "[X]가 [Y]에 미치는 영향은?" (단순 인과)
-├── "[X]와 [Y]의 관계는?" (단순 상관)
-├── "[X]에 대한 인식 조사" (기술적)
-└── "[X]의 현황과 개선방안" (실무 보고서형)
+T > 0.8 (Modal - Avoid):
+├── "What is the effect of [X] on [Y]?" (Simple causation)
+├── "What is the relationship between [X] and [Y]?" (Simple correlation)
+├── "Survey on perceptions of [X]" (Descriptive)
+└── "Current status and improvement of [X]" (Practitioner report)
 
-T 0.5-0.8 (확립 - 구체화 필요):
-├── 조절변수 추가 (언제, 어떤 조건에서)
-├── 매개변수 추가 (왜, 어떤 기제로)
-├── 대상/맥락 구체화 (누구에게, 어디서)
-└── 비교 집단 명시 (무엇과 비교하여)
+T 0.5-0.8 (Established - Needs specificity):
+├── Add moderators (when, under what conditions)
+├── Add mediators (why, through what mechanism)
+├── Specify target/context (for whom, where)
+└── Specify comparison groups (compared to what)
 
-T 0.3-0.5 (신흥 - 권장):
-├── 다중 매개 경로 탐색
-├── 조절된 매개 모형
-├── 경계 조건 탐색
-└── 시간적 역학 (언제 효과가 나타나고 사라지는가)
+T 0.3-0.5 (Emerging - Recommended):
+├── Explore multiple mediation pathways
+├── Moderated mediation models
+├── Explore boundary conditions
+└── Temporal dynamics (when effects appear and disappear)
 
-T < 0.3 (혁신 - 탑티어용):
-├── 기존 가정 도전
-├── 역방향 인과 탐색
-├── 비선형/역설적 관계
-└── 새로운 현상 명명
+T < 0.3 (Innovative - For top-tier):
+├── Challenge existing assumptions
+├── Explore reverse causality
+├── Non-linear/paradoxical relationships
+└── Name new phenomena
 ```
 
-## 사용 시점
+## When to Use
 
-- 연구 주제는 있지만 구체적인 질문이 없을 때
-- 연구 질문의 범위를 조정해야 할 때 (너무 넓거나 좁음)
-- 연구 가능성을 평가해야 할 때
-- 기술적/설명적/탐색적 질문 유형을 결정해야 할 때
+- When you have a research topic but no specific question
+- When research question scope needs adjustment (too broad or narrow)
+- When assessing research feasibility
+- When determining descriptive/explanatory/exploratory question types
 
-## 핵심 기능
+## Core Features
 
-1. **PICO(S) 프레임워크 적용**
-   - Population (대상 모집단)
-   - Intervention/Exposure (중재/노출)
-   - Comparison (비교 집단)
-   - Outcome (결과 변수)
-   - Study design (연구 설계)
+1. **PICO(S) Framework Application**
+   - Population (Target population)
+   - Intervention/Exposure (Intervention/Exposure)
+   - Comparison (Comparison group)
+   - Outcome (Outcome variables)
+   - Study design (Research design)
 
-2. **SPIDER 프레임워크** (질적 연구용)
-   - Sample (표본)
-   - Phenomenon of Interest (관심 현상)
-   - Design (설계)
-   - Evaluation (평가)
-   - Research type (연구 유형)
+2. **SPIDER Framework** (For qualitative research)
+   - Sample
+   - Phenomenon of Interest
+   - Design
+   - Evaluation
+   - Research type
 
-3. **질문 유형 분류**
-   - 기술적 (Descriptive): 현상의 특성 파악
-   - 설명적 (Explanatory): 인과관계 규명
-   - 탐색적 (Exploratory): 새로운 영역 탐구
+3. **Question Type Classification**
+   - Descriptive: Characterizing phenomena
+   - Explanatory: Establishing causality
+   - Exploratory: Exploring new areas
 
-4. **연구 가능성 평가**
-   - 측정 가능성
-   - 자원 (시간, 예산, 인력)
-   - 윤리적 제약
-   - 데이터 접근성
+4. **Feasibility Assessment**
+   - Measurability
+   - Resources (time, budget, personnel)
+   - Ethical constraints
+   - Data accessibility
 
-## 입력 요구사항
+## Input Requirements
 
 ```yaml
-필수:
-  - 초기 연구 아이디어: "관심 있는 연구 주제나 현상"
+Required:
+  - initial_research_idea: "Research topic or phenomenon of interest"
 
-선택:
-  - 분야: "교육학, 심리학, 경영학 등"
-  - 가용 자원: "시간, 예산, 접근 가능한 데이터"
-  - 제약 조건: "윤리적, 실무적 제한사항"
+Optional:
+  - field: "Education, Psychology, Business, etc."
+  - available_resources: "Time, budget, accessible data"
+  - constraints: "Ethical or practical limitations"
 ```
 
-## 출력 형식 (VS-Enhanced)
+## Output Format (VS-Enhanced)
 
 ```markdown
-## 연구 질문 분석 결과 (VS-Enhanced)
+## Research Question Analysis Results (VS-Enhanced)
 
 ---
 
-### Phase 1: 모달 연구 질문 식별
+### Phase 1: Modal Research Question Identification
 
-⚠️ **모달 경고**: 다음은 [주제]에 대한 가장 예측 가능한 질문입니다:
+⚠️ **Modal Warning**: The following are the most predictable questions for [topic]:
 
-| 모달 질문 | T-Score | 문제점 |
-|----------|---------|--------|
-| [질문1] | 0.90 | [문제점] |
-| [질문2] | 0.85 | [문제점] |
+| Modal Question | T-Score | Problem |
+|---------------|---------|---------|
+| [Question 1] | 0.90 | [Problem] |
+| [Question 2] | 0.85 | [Problem] |
 
-➡️ 이것은 기준선. 더 구체적인 질문을 탐색합니다.
-
----
-
-### Phase 2: 대안적 연구 질문 (T-Score 기반)
-
-**방향 A** (T = 0.65): 구체화된 질문
-- RQ: "[구체적 맥락 추가 질문]"
-- 장점: 피어리뷰 방어 용이, 명확한 범위
-- 적합: 첫 출판, 보수적 저널
-
-**방향 B** (T = 0.45): 차별화된 각도
-- RQ: "[새로운 매개경로/경계조건 질문]"
-- 장점: 이론적 기여 명확, 신선함
-- 적합: 중견 연구자, 혁신 저널
-
-**방향 C** (T = 0.28): 혁신적 접근
-- RQ: "[기존 가정 도전 질문]"
-- 장점: 최대 기여 가능성, 패러다임 전환
-- 적합: 탑티어 저널
+➡️ This is the baseline. We will explore more specific questions.
 
 ---
 
-### Phase 4: 추천 실행
+### Phase 2: Alternative Research Questions (T-Score based)
 
-**선택된 방향**: 방향 [B] (T = [X.X])
+**Direction A** (T = 0.65): Specific question
+- RQ: "[Question with specific context]"
+- Advantages: Easier peer review defense, clear scope
+- Suitable for: First publication, conservative journals
 
-#### PICO(S) 구조화
+**Direction B** (T = 0.45): Differentiated angle
+- RQ: "[New mediation pathway/boundary condition question]"
+- Advantages: Clear theoretical contribution, fresh perspective
+- Suitable for: Mid-career researchers, innovative journals
 
-| 요소 | 내용 |
-|------|------|
-| Population | [대상] |
-| Intervention | [중재/독립변수] |
-| Comparison | [비교집단] |
-| Outcome | [결과변수] |
-| Study design | [추천 설계] |
+**Direction C** (T = 0.28): Innovative approach
+- RQ: "[Challenge existing assumptions question]"
+- Advantages: Maximum contribution potential, paradigm shift
+- Suitable for: Top-tier journals
 
-#### 최종 추천 연구 질문
+---
 
-**RQ**: [선택된 연구 질문]
+### Phase 4: Recommendation Execution
 
-**이론적 기여**:
-- 기존 연구 공백: [공백]
-- 본 질문의 기여: [기여 포인트]
+**Selected Direction**: Direction [B] (T = [X.X])
 
-**연구 가능성**:
-- 측정 가능성: ★★★★☆
-- 자원 요구: [시간, 비용, 인력]
-- 윤리적 제약: [고려사항]
+#### PICO(S) Structuring
+
+| Element | Content |
+|---------|---------|
+| Population | [Target] |
+| Intervention | [Intervention/IV] |
+| Comparison | [Comparison group] |
+| Outcome | [Outcome variable] |
+| Study design | [Recommended design] |
+
+#### Final Recommended Research Question
+
+**RQ**: [Selected research question]
+
+**Theoretical Contribution**:
+- Existing research gap: [Gap]
+- This question's contribution: [Contribution point]
+
+**Feasibility**:
+- Measurability: ★★★★☆
+- Resource requirements: [Time, cost, personnel]
+- Ethical constraints: [Considerations]
 ```
 
-## 프롬프트 템플릿
+## Example
 
+### Input
 ```
-당신은 사회과학 연구 설계 전문가입니다.
-
-다음 연구 아이디어를 분석하고 정제해주세요:
-
-[연구 아이디어]: {idea}
-[분야]: {field}
-[가용 자원]: {resources}
-
-수행할 작업:
-1. PICO(S) 프레임워크로 아이디어 구조화
-   - Population (대상 모집단)
-   - Intervention/Exposure (중재/노출)
-   - Comparison (비교 집단)
-   - Outcome (결과 변수)
-   - Study design (연구 설계)
-
-2. 3-5개의 구체적 연구 질문 제안
-   - 각 질문이 기술적/설명적/탐색적 중 어느 유형인지 명시
-   - 각 질문의 측정 가능성 평가
-
-3. 각 질문에 대해:
-   - 장점 (2-3개)
-   - 단점/도전 (2-3개)
-   - 적합한 연구 설계
-   - 예상 소요 자원
-
-4. 최종 추천 질문과 근거 제시
+Research idea: AI tutors might help with learning
+Field: Educational Technology
+Available resources: 1 graduate student, 6 months, data collection possible
 ```
 
-## 예시
-
-### 입력
+### Output (Summary)
 ```
-연구 아이디어: AI 튜터가 학습에 도움이 될 것 같아요
-분야: 교육공학
-가용 자원: 대학원생 1명, 6개월, 데이터 수집 가능
-```
+Refined Research Question:
+RQ1: "What is the effect of AI-based adaptive tutoring systems on college students' math problem-solving skills?"
+- Type: Explanatory
+- Design: Quasi-experimental (pretest-posttest control group design)
 
-### 출력 (요약)
-```
-정제된 연구 질문:
-RQ1: "AI 기반 적응형 튜터링 시스템이 대학생의 수학 문제해결력 향상에 미치는 효과는 무엇인가?"
-- 유형: 설명적
-- 설계: 준실험 (사전-사후 통제집단 설계)
-
-RQ2: "AI 튜터와의 상호작용 패턴이 학습자의 자기조절학습에 어떤 영향을 미치는가?"
-- 유형: 탐색적
-- 설계: 혼합방법 (양적+질적)
+RQ2: "How do interaction patterns with AI tutors affect learners' self-regulated learning?"
+- Type: Exploratory
+- Design: Mixed methods (quantitative + qualitative)
 ```
 
-## 관련 에이전트
+## Related Agents
 
-- **02-theoretical-framework-architect**: 연구 질문이 확정되면 이론적 기반 구축
-- **09-research-design-consultant**: 연구 질문에 적합한 설계 선택
-- **20-preregistration-composer**: 확정된 질문으로 사전등록 작성
+- **02-theoretical-framework-architect**: Build theoretical foundation once research question is finalized
+- **09-research-design-consultant**: Select appropriate design for research question
+- **20-preregistration-composer**: Write preregistration with finalized question
 
-## v3.0 창의적 장치 통합
+## v3.0 Creativity Mechanism Integration
 
-### 활용 가능한 창의적 장치 (ENHANCED)
+### Available Creativity Mechanisms (ENHANCED)
 
-| 장치 | 적용 시점 | 활용 예시 |
-|------|----------|----------|
-| **Forced Analogy** | Phase 2 | 다른 분야의 연구 질문 패턴 유추 적용 |
-| **Iterative Loop** | Phase 2 | 4라운드 발산-수렴으로 연구 질문 정제 |
-| **Semantic Distance** | Phase 2 | 의미적으로 먼 개념 조합으로 혁신적 RQ 생성 |
+| Mechanism | Application Timing | Usage Example |
+|-----------|-------------------|---------------|
+| **Forced Analogy** | Phase 2 | Apply research question patterns from other fields |
+| **Iterative Loop** | Phase 2 | 4-round divergence-convergence for RQ refinement |
+| **Semantic Distance** | Phase 2 | Generate innovative RQ through semantically distant concept combinations |
 
-### 체크포인트 통합
+### Checkpoint Integration
 
 ```yaml
-적용 체크포인트:
-  - CP-INIT-002: 창의성 수준 선택
-  - CP-VS-001: 연구 질문 방향 선택 (다중)
-  - CP-VS-003: 최종 연구 질문 만족도 확인
-  - CP-FA-001: 유추 소스 분야 선택
-  - CP-SD-001: 개념 조합 거리 임계값
-```
-
-### 모듈 참조
-
-```
-../../research-coordinator/core/vs-engine.md
-../../research-coordinator/core/t-score-dynamic.md
-../../research-coordinator/creativity/forced-analogy.md
-../../research-coordinator/creativity/iterative-loop.md
-../../research-coordinator/creativity/semantic-distance.md
-../../research-coordinator/interaction/user-checkpoints.md
+Applied Checkpoints:
+  - CP-INIT-002: Select creativity level
+  - CP-VS-001: Select research question direction (multiple)
+  - CP-VS-003: Confirm final research question satisfaction
+  - CP-FA-001: Select analogy source field
+  - CP-SD-001: Concept combination distance threshold
 ```
 
 ---
 
-## 참고 자료
+## References
 
 - **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`
 - **Dynamic T-Score**: `../../research-coordinator/core/t-score-dynamic.md`
