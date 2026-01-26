@@ -25,7 +25,7 @@ AI Research Assistant for the Complete Research Lifecycle - from question formul
 
 ## Project Overview
 
-Diverga provides **context-persistent research support** through 27 specialized agents across 8 categories (A-H). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
+Diverga provides **context-persistent research support** through **33 specialized agents** across 8 categories (A-H). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
 
 ## Core Value Proposition
 
@@ -112,28 +112,30 @@ The system will:
 
 ---
 
-## Agent Structure (27 Agents in 8 Categories)
+## Agent Structure (33 Agents in 8 Categories)
 
-| Category | Agents | Paradigm Affinity |
-|----------|--------|-------------------|
-| **A: Foundation** | A1-ResearchQuestionRefiner, A2-TheoreticalFrameworkArchitect, A3-DevilsAdvocate, A4-ResearchEthicsAdvisor, A5-ParadigmWorldviewAdvisor | All paradigms |
-| **B: Evidence** | B1-SystematicLiteratureScout, B2-EvidenceQualityAppraiser, B3-EffectSizeExtractor, B4-ResearchRadar | Quantitative-focused |
-| **C: Design** | C1-QuantitativeDesignConsultant, C2-QualitativeDesignConsultant, C3-MixedMethodsDesignConsultant, C4-ExperimentalMaterialsDeveloper | Paradigm-specific |
-| **D: Data Collection** | D1-SamplingStrategyAdvisor, D2-InterviewFocusGroupSpecialist, D3-ObservationProtocolDesigner, D4-MeasurementInstrumentDeveloper | Method-specific |
-| **E: Analysis** | E1-QuantitativeAnalysisGuide, E2-QualitativeCodingSpecialist, E3-MixedMethodsIntegration, E4-AnalysisCodeGenerator | Paradigm-specific |
-| **F: Quality** | F1-InternalConsistencyChecker, F2-ChecklistManager, F3-ReproducibilityAuditor, F4-BiasTrustworthinessDetector | All paradigms |
-| **G: Communication** | G1-JournalMatcher, G2-AcademicCommunicator, G3-PeerReviewStrategist, G4-PreregistrationComposer | All paradigms |
-| **H: Specialized** | H1-EthnographicResearchAdvisor, H2-ActionResearchFacilitator | Qualitative-focused |
+| Category | Count | Agents | Paradigm |
+|----------|-------|--------|----------|
+| **A: Foundation** | 6 | A1-ResearchQuestionRefiner, A2-TheoreticalFrameworkArchitect, A3-DevilsAdvocate, A4-ResearchEthicsAdvisor, A5-ParadigmWorldviewAdvisor, **A6-ConceptualFrameworkVisualizer** | All |
+| **B: Evidence** | 4 | B1-SystematicLiteratureScout, B2-EvidenceQualityAppraiser, B3-EffectSizeExtractor, B4-ResearchRadar | Quant |
+| **C: Design** | 4 | C1-QuantitativeDesignConsultant, C2-QualitativeDesignConsultant, C3-MixedMethodsDesignConsultant, C4-ExperimentalMaterialsDeveloper | Paradigm-specific |
+| **D: Data Collection** | 4 | D1-SamplingStrategyAdvisor, D2-InterviewFocusGroupSpecialist, D3-ObservationProtocolDesigner, D4-MeasurementInstrumentDeveloper | Method-specific |
+| **E: Analysis** | 5 | E1-QuantitativeAnalysisGuide, E2-QualitativeCodingSpecialist, E3-MixedMethodsIntegration, E4-AnalysisCodeGenerator, **E5-SensitivityAnalysisDesigner** | Paradigm-specific |
+| **F: Quality** | 4 | F1-InternalConsistencyChecker, F2-ChecklistManager, F3-ReproducibilityAuditor, F4-BiasTrustworthinessDetector | All |
+| **G: Communication** | 4 | G1-JournalMatcher, G2-AcademicCommunicator, G3-PeerReviewStrategist, G4-PreregistrationComposer | All |
+| **H: Specialized** | 2 | H1-EthnographicResearchAdvisor, H2-ActionResearchFacilitator | Qual |
+
+**Total: 6 + 4 + 4 + 4 + 5 + 4 + 4 + 2 = 33 agents**
 
 ---
 
-## Model Routing (Kept from v5.0)
+## Model Routing (v6.0)
 
-| Tier | Model | Agents |
-|------|-------|--------|
-| HIGH | Opus | A1, A2, A3, A5, C1, C2, C3, D4, E1, E3, G3, H1, H2 |
-| MEDIUM | Sonnet | A4, B1, B2, C4, D1, D2, E2, F3, F4, G1, G2, G4 |
-| LOW | Haiku | B3, B4, D3, E4, F1, F2 |
+| Tier | Model | Agents (33 total) |
+|------|-------|-------------------|
+| HIGH | Opus | A1, A2, A3, A5, C1, C2, C3, D4, E1, E2, E3, G3, H1, H2 (14) |
+| MEDIUM | Sonnet | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4 (13) |
+| LOW | Haiku | B3, B4, D3, E4, F1, F2 (6) |
 
 ---
 
@@ -257,12 +259,13 @@ When paradigm is detected, **ALWAYS ask for confirmation**:
 
 ## GitHub Repository
 
-https://github.com/HosungYou/research-coordinator
+https://github.com/HosungYou/Diverga
 
 ---
 
 ## Version History
 
+- **v6.0.1**: Agent restructuring - 33 agents with category-based naming (A1-H2)
 - **v6.0.0**: Clean Slate - Removed Sisyphus/OMC modes, mandatory checkpoints
 - **v5.0.0**: Sisyphus protocol, paradigm detection, 27 agents
 - **v4.0.0**: Context persistence, pipeline templates, integration hub

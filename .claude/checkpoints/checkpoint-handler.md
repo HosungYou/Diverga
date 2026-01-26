@@ -1,7 +1,9 @@
-# Checkpoint Handler Protocol
+# Checkpoint Handler Protocol v6.0 (Human-Centered Edition)
 
 ## Core Principle
 **Human decisions are NEVER bypassed. AI assists, humans decide.**
+
+> "인간이 할 일은 인간이, AI는 인간의 범주를 벗어난 것을 수행"
 
 ## Checkpoint Levels
 
@@ -30,7 +32,7 @@ When reaching a checkpoint:
 5. Proceed only after approval (for required)
 
 ## Checkpoint State Storage
-Location: .omc/state/checkpoints.json
+Location: `.claude/state/checkpoints.json`
 
 Format:
 ```json
@@ -39,10 +41,10 @@ Format:
   "checkpoints": [
     {
       "id": "CP_RESEARCH_DIRECTION",
-      "timestamp": "2025-01-25T...",
+      "timestamp": "2026-01-25T...",
       "status": "approved",
       "human_decision": "Approved research question B",
-      "agent": "01-research-question-refiner"
+      "agent": "A1-research-question-refiner"
     }
   ]
 }
@@ -57,7 +59,7 @@ When presenting a checkpoint to the user:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Checkpoint: CP_RESEARCH_DIRECTION
-Agent: 01-research-question-refiner
+Agent: A1-research-question-refiner
 
 Decision Required: Review and approve research question
 
@@ -70,9 +72,22 @@ Please respond with:
 - Your feedback for modifications
 ```
 
+## Agent-Checkpoint Mapping (v6.0)
+
+| Agent | Checkpoint | Level |
+|-------|------------|-------|
+| A1-research-question-refiner | CP_RESEARCH_DIRECTION | 🔴 REQUIRED |
+| A2-theoretical-framework-architect | CP_THEORY_SELECTION | 🔴 REQUIRED |
+| A5-paradigm-worldview-advisor | CP_PARADIGM_SELECTION | 🔴 REQUIRED |
+| C1/C2/C3-design-consultants | CP_METHODOLOGY_APPROVAL | 🔴 REQUIRED |
+| E1-quantitative-analysis-guide | CP_ANALYSIS_PLAN | 🟠 RECOMMENDED |
+| E3-mixed-methods-integration | CP_INTEGRATION_STRATEGY | 🟠 RECOMMENDED |
+| G3-peer-review-strategist | CP_RESPONSE_APPROVAL | 🟠 RECOMMENDED |
+| A6-conceptual-framework-visualizer | CP_VISUALIZATION_PREFERENCE | 🟡 OPTIONAL |
+
 ## Checkpoint Recording
 
-All checkpoint decisions are recorded in `.omc/state/checkpoints.json` with:
+All checkpoint decisions are recorded in `.claude/state/checkpoints.json` with:
 - Timestamp of decision
 - Human's exact response
 - Checkpoint ID and associated agent
@@ -98,4 +113,13 @@ Users can override checkpoint behavior:
 - `--fast-track`: Reduce recommended checkpoint delays to 10 seconds
 - `--strict`: Require review even for optional checkpoints
 
-Never override REQUIRED checkpoints.
+**Never override REQUIRED checkpoints.**
+
+## v6.0 Changes
+
+| Before (v5.0) | After (v6.0) |
+|---------------|--------------|
+| Sisyphus could bypass checkpoints | All checkpoints enforced |
+| "agent OR checkpoint" (Iron Law) | "checkpoint THEN agent" |
+| State in `.omc/` | State in `.claude/` |
+| Numbered agents (01-21) | Category agents (A1-H2) |

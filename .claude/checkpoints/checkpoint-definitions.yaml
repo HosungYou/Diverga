@@ -1,57 +1,109 @@
-# Human Decision Checkpoints for Research Coordinator
+# Human Decision Checkpoints for Research Coordinator v6.0
 # These checkpoints REQUIRE human approval before proceeding
+# Core Principle: 인간이 할 일은 인간이, AI는 인간 범위를 벗어난 작업 수행
 
 checkpoints:
-  # REQUIRED (Red) - Must have human approval
+  # ============================================
+  # REQUIRED (🔴 Red) - Must have human approval
+  # ============================================
   CP_RESEARCH_DIRECTION:
     level: required
+    icon: "🔴"
     description: "Research direction and question approval"
-    applies_to: [01-research-question-refiner]
+    applies_to: [A1-research-question-refiner]
     human_action: "Review and approve research question"
+    cannot_proceed_without: true
+
+  CP_PARADIGM_SELECTION:
+    level: required
+    icon: "🔴"
+    description: "Research paradigm selection (Quantitative/Qualitative/Mixed)"
+    applies_to: [A5-paradigm-worldview-advisor]
+    human_action: "Select and approve research paradigm"
     cannot_proceed_without: true
 
   CP_THEORY_SELECTION:
     level: required
+    icon: "🔴"
     description: "Theoretical framework selection"
-    applies_to: [02-theoretical-framework-architect]
+    applies_to: [A2-theoretical-framework-architect]
     human_action: "Select and approve theoretical framework"
     cannot_proceed_without: true
 
   CP_METHODOLOGY_APPROVAL:
     level: required
+    icon: "🔴"
     description: "Research methodology approval"
-    applies_to: [04-research-ethics-advisor, 09-research-design-consultant]
+    applies_to:
+      - A4-research-ethics-advisor
+      - C1-quantitative-design-consultant
+      - C2-qualitative-design-consultant
+      - C3-mixed-methods-design-consultant
+      - D4-measurement-instrument-developer
+      - H1-ethnographic-research-advisor
+      - H2-action-research-facilitator
     human_action: "Approve research design and methodology"
     cannot_proceed_without: true
 
-  # RECOMMENDED (Orange) - Should have human review
+  # ============================================
+  # RECOMMENDED (🟠 Orange) - Should have human review
+  # ============================================
   CP_ANALYSIS_PLAN:
     level: recommended
+    icon: "🟠"
     description: "Analysis plan review"
-    applies_to: [10-statistical-analysis-guide]
-    human_action: "Review statistical analysis plan"
-    can_auto_proceed: true
-    auto_proceed_delay: 30
+    applies_to: [E1-quantitative-analysis-guide]
+    human_action: "Review statistical/qualitative analysis plan"
+    can_auto_proceed: false
+
+  CP_INTEGRATION_STRATEGY:
+    level: recommended
+    icon: "🟠"
+    description: "Mixed methods integration strategy"
+    applies_to: [E3-mixed-methods-integration]
+    human_action: "Review integration approach"
+    can_auto_proceed: false
 
   CP_QUALITY_REVIEW:
     level: recommended
+    icon: "🟠"
     description: "Quality review of outputs"
-    applies_to: [21-conceptual-framework-visualizer]
+    applies_to: [A6-conceptual-framework-visualizer]
     human_action: "Review generated visualization quality"
     can_auto_proceed: false
 
-  # OPTIONAL (Yellow) - Human can choose to review
+  CP_RESPONSE_APPROVAL:
+    level: recommended
+    icon: "🟠"
+    description: "Peer review response approval"
+    applies_to: [G3-peer-review-strategist]
+    human_action: "Approve response to reviewers"
+    can_auto_proceed: false
+
+  CP_PREREGISTRATION_APPROVAL:
+    level: recommended
+    icon: "🟠"
+    description: "Pre-registration document approval"
+    applies_to: [G4-preregistration-composer]
+    human_action: "Review and approve pre-registration"
+    can_auto_proceed: false
+
+  # ============================================
+  # OPTIONAL (🟡 Yellow) - Human can choose to review
+  # ============================================
   CP_VISUALIZATION_PREFERENCE:
     level: optional
+    icon: "🟡"
     description: "Visualization direction selection"
-    applies_to: [21-conceptual-framework-visualizer]
+    applies_to: [A6-conceptual-framework-visualizer]
     human_action: "Select visualization direction (A/B/C)"
     default_if_skipped: "B"
 
   CP_RENDERING_METHOD:
     level: optional
+    icon: "🟡"
     description: "Rendering method selection"
-    applies_to: [21-conceptual-framework-visualizer]
+    applies_to: [A6-conceptual-framework-visualizer]
     human_action: "Choose Code-First, Nanobanana, or Hybrid"
     default_if_skipped: "Hybrid"
 
@@ -60,3 +112,20 @@ validation:
   required_checkpoints_must_pass: true
   max_auto_proceed_time: 60
   notify_on_checkpoint: true
+
+# Checkpoint behavior (v6.0 - Human-Centered)
+behavior:
+  on_required_checkpoint:
+    - STOP immediately
+    - Present options with VS alternatives
+    - WAIT for explicit human approval
+    - DO NOT proceed until approval received
+    - DO NOT assume approval based on context
+
+  forbidden_patterns:
+    - "진행하겠습니다" # without asking
+    - "Auto-approve based on implied consent"
+
+  required_patterns:
+    - "어떤 방향으로 진행하시겠습니까?"
+    - "Which direction would you like to proceed?"
