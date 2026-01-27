@@ -46,19 +46,11 @@
 
 **Diverga** is a research methodology assistant that transforms Claude Code into a 40-agent orchestra for social science research. Built on **Verbalized Sampling (VS)** and **HAVS** (Humanization-Adapted VS) methodologies, it prevents AI "mode collapse" — the tendency to recommend only safe, modal solutions.
 
-```
-        Modal AI Response              Diverga with VS/HAVS
-        ─────────────────              ────────────────────
-              ▲ │                         ◆   ◆   ◆
-              █ │                       ◆ ◆ ◆ ◆ ◆ ◆
-            ████│                     ◆ ◆ ◆ █ ◆ ◆ ◆
-          ██████│                   ◆ ◆ ◆ ███ ◆ ◆ ◆
-        ████████│                 ◆ ◆ ◆ █████ ◆ ◆ ◆
-        ────────┴────────        ────────────────────────
-         Narrow                    Diverse & Exceptional
-         Safe                      Creative & Rigorous
-         Common                    Methodologically Sound
-```
+<div align="center">
+
+![VS Methodology - Modal AI vs Diverga](docs/images/vs-methodology-infographic.svg)
+
+</div>
 
 <div align="center">
 

@@ -4,6 +4,92 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [6.5.1] - 2026-01-27 (Bugfix Release)
+
+### Overview
+
+Fixes critical plugin installation error caused by invalid `runtime` key in marketplace.json schema, and integrates artistic README design with v6.5 content.
+
+### Bug Fixes
+
+#### 🐛 Fixed: `runtime` Key Schema Validation Error
+
+**Error Message**:
+```
+Error: Invalid schema: plugins.0: Unrecognized key: "runtime"
+```
+
+**Root Cause**: The `runtime` object in `marketplace.json` was not part of Claude Code's plugin schema. Unlike expected, Claude Code plugins don't require explicit runtime declarations.
+
+**Solution**: Removed the invalid `runtime` object. The `/agents/` directory alone is sufficient for Task tool registration (same pattern as oh-my-claudecode).
+
+**Before** (❌ Caused Error):
+```json
+{
+  "plugins": [{
+    "name": "diverga",
+    "source": "./",
+    "runtime": {
+      "type": "typescript",
+      "entry": "./dist/index.js",
+      "agents": "./dist/agents/definitions.js"
+    },
+    "strict": false
+  }]
+}
+```
+
+**After** (✅ Fixed):
+```json
+{
+  "plugins": [{
+    "name": "diverga",
+    "source": "./",
+    "strict": false
+  }]
+}
+```
+
+### Documentation
+
+#### README.md Redesign
+
+Integrated artistic design from v6.4 with v6.5 content:
+
+| Element | Status |
+|---------|--------|
+| ASCII hero banner (DIVERGA logo) | ✅ Restored |
+| VS distribution diagram | ✅ Restored |
+| Quote box (Verbalized Sampling) | ✅ Restored |
+| Human checkpoint flowchart | ✅ Restored |
+| Agent ecosystem diagram (40 agents) | ✅ Restored |
+| v6.5 parallel execution content | ✅ Integrated |
+| for-the-badge style badges | ✅ Kept |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `.claude-plugin/marketplace.json` | Removed `runtime` object (5 lines) |
+| `README.md` | Integrated artistic design + v6.5 content |
+
+### Verification
+
+```bash
+# Test plugin installation
+/plugin uninstall diverga
+/plugin marketplace add https://github.com/HosungYou/Diverga
+/plugin install diverga
+
+# Verify Skill tool
+/diverga:setup
+
+# Verify Task tool
+Task(subagent_type="diverga:a1", prompt="Test")
+```
+
+---
+
 ## [6.5.0] - 2026-01-27 (Parallel Execution Edition)
 
 ### Overview
