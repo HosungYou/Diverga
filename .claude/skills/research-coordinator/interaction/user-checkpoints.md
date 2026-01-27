@@ -749,6 +749,236 @@ localization:
 
 ---
 
+---
+
+## Meta-Analysis Extraction Checkpoints (V7)
+
+### CP_SOURCE_VERIFY: Source Verification
+
+```yaml
+id: CP_SOURCE_VERIFY
+type: GUARDRAIL
+phase: "Gate 1 - Extraction Validation"
+
+question:
+  header: "Source Verify"
+  text: "Verify extracted values match original paper source."
+  context: |
+    Extracted data:
+    - Study: [study_name]
+    - n1: [value], n2: [value]
+    - M1: [value], M2: [value]
+    - SD1: [value], SD2: [value]
+    - Source: Page [X], Table [Y]
+
+options:
+  - label: "Verified - values match source"
+    description: "All extracted values confirmed against original paper."
+    recommended: true
+  - label: "Correction needed"
+    description: "Values need correction. Specify corrections below."
+    recommended: false
+  - label: "Unable to verify - original unclear"
+    description: "Original source is ambiguous. Flag for sensitivity analysis."
+    recommended: false
+
+multiSelect: false
+fallback: "Flag for manual review"
+```
+
+### CP_ES_HIERARCHY: Effect Size Selection
+
+```yaml
+id: CP_ES_HIERARCHY
+type: GUARDRAIL
+phase: "Gate 2 - Classification Validation"
+
+question:
+  header: "ES Selection"
+  text: "Multiple effect sizes detected. Select based on hierarchy."
+  context: |
+    Study: [study_name]
+
+    Multiple effect sizes detected:
+    ┌─────────┬─────────────────┬───────────┬──────────────┐
+    │ ES_ID   │ Comparison      │ Timepoint │ Priority     │
+    │ ES_01   │ AI vs Control   │ Post-test │ ⭐ Priority 1 │
+    │ ES_02   │ Pre vs Post     │ Change    │ Priority 3   │
+    │ ES_03   │ Baseline        │ Pre-test  │ ⛔ EXCLUDED  │
+    └─────────┴─────────────────┴───────────┴──────────────┘
+
+    Recommendation: Select ES_01 (highest priority)
+
+options:
+  - label: "Accept recommendation"
+    description: "Use highest priority ES as recommended."
+    recommended: true
+  - label: "Select different ES"
+    description: "Specify which ES to use with rationale."
+    recommended: false
+  - label: "Include multiple (specify handling)"
+    description: "Include multiple ES with clustering/averaging strategy."
+    recommended: false
+
+multiSelect: false
+fallback: "Accept recommendation"
+
+required_fields:
+  - selected_es_id
+  - selection_rationale
+  - excluded_es_handling  # document | sensitivity | none
+```
+
+### CP_PRETEST_REJECT: Pre-test Exclusion Alert
+
+```yaml
+id: CP_PRETEST_REJECT
+type: GUARDRAIL
+phase: "Gate 4 - Independence Validation"
+
+question:
+  header: "Pre-test Alert"
+  text: "AUTOMATIC REJECTION: Pre-test detected as potential outcome."
+  context: |
+    ⛔ AUTOMATIC REJECTION
+
+    Effect size [es_id] appears to be a pre-test measurement.
+
+    Detected pattern: "[pattern]"
+
+    Pre-test scores represent baseline equivalence, NOT treatment effects.
+    They MUST NOT be included as independent outcomes.
+
+    Action: EXCLUDED from analysis
+    Rationale: V7 Protocol - Pre-test Independence Rule
+
+options:
+  - label: "Acknowledge - Exclude pre-test"
+    description: "Confirm exclusion of pre-test from analysis."
+    recommended: true
+  - label: "Override (requires strong justification)"
+    description: "Override exclusion with documented rationale. Use with extreme caution."
+    risk_level: high
+    recommended: false
+
+multiSelect: false
+fallback: "Acknowledge - Exclude pre-test"
+```
+
+### CP_EXTREME_VALUE: Outlier Review
+
+```yaml
+id: CP_EXTREME_VALUE
+type: GUARDRAIL
+phase: "Gate 3 - Statistical Validation"
+
+question:
+  header: "Outlier Review"
+  text: "Extreme effect size detected. Review required."
+  context: |
+    Study: [study_name]
+    Calculated g: [value]
+
+    ⚠️ This effect size is unusually large (|g| > 2.0).
+
+    Possible explanations:
+    1. Genuine large effect (rare but possible)
+    2. Calculation error
+    3. Reporting error in original study
+    4. Small sample inflation
+
+options:
+  - label: "Include - verified as correct"
+    description: "Effect size verified, include in analysis with note."
+    recommended: false
+  - label: "Include - flag for sensitivity analysis"
+    description: "Include but run sensitivity analysis without this study."
+    recommended: true
+  - label: "Exclude - suspected error"
+    description: "Exclude from main analysis due to suspected error."
+    recommended: false
+  - label: "Recalculate - need verification"
+    description: "Return to extraction for recalculation."
+    recommended: false
+
+multiSelect: false
+fallback: "Include - flag for sensitivity analysis"
+```
+
+### CP_DEPENDENCY_HANDLING: Multiple ES Handling
+
+```yaml
+id: CP_DEPENDENCY_HANDLING
+type: APPROVAL
+phase: "Gate 4 - Independence Validation"
+
+question:
+  header: "Dependency"
+  text: "Multiple effect sizes from same study. Specify handling."
+  context: |
+    Study: [study_name]
+
+    Multiple ES from same participants detected:
+    - ES_01: [description] (g = X.XX)
+    - ES_02: [description] (g = X.XX)
+    - ES_03: [description] (g = X.XX)
+
+    Independence violation if included separately.
+
+options:
+  - label: "Average (same construct)"
+    description: "Average ES if measuring same construct."
+    recommended: false
+  - label: "Select primary outcome"
+    description: "Use only the primary/most relevant outcome."
+    recommended: false
+  - label: "3-level model (different constructs)"
+    description: "Include all with robust variance estimation."
+    recommended: true
+  - label: "Sensitivity analysis"
+    description: "Run separate analyses for each outcome."
+    recommended: false
+
+multiSelect: false
+fallback: "Select primary outcome"
+```
+
+---
+
+## Checkpoint Registry Update
+
+```python
+CHECKPOINT_REGISTRY.update({
+    # Meta-Analysis Extraction (V7)
+    "CP_SOURCE_VERIFY": "Source Verification",
+    "CP_ES_HIERARCHY": "Effect Size Selection",
+    "CP_PRETEST_REJECT": "Pre-test Exclusion Alert",
+    "CP_EXTREME_VALUE": "Outlier Review",
+    "CP_DEPENDENCY_HANDLING": "Multiple ES Handling",
+})
+```
+
+---
+
+## Meta-Analysis Checkpoint Sequence
+
+```
+Gate 1: Extraction
+├─ CP_SOURCE_VERIFY (REQUIRED for each study)
+│
+Gate 2: Classification
+├─ CP_ES_HIERARCHY (REQUIRED when >1 ES available)
+│
+Gate 3: Statistical
+├─ CP_EXTREME_VALUE (CONDITIONAL when |g| > 2.0)
+│
+Gate 4: Independence
+├─ CP_PRETEST_REJECT (AUTO-TRIGGER when pre-test detected)
+└─ CP_DEPENDENCY_HANDLING (REQUIRED when >1 ES from same study)
+```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
@@ -758,3 +988,9 @@ localization:
 | - | - | Integrated AskUserQuestion pattern |
 | - | - | Added conditional triggering |
 | - | - | Added checkpoint sequences |
+| 3.1.0 | 2026-01 | V7 Meta-Analysis Checkpoints |
+| - | - | Added CP_SOURCE_VERIFY |
+| - | - | Added CP_ES_HIERARCHY |
+| - | - | Added CP_PRETEST_REJECT |
+| - | - | Added CP_EXTREME_VALUE |
+| - | - | Added CP_DEPENDENCY_HANDLING |

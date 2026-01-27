@@ -406,6 +406,252 @@ recommended_integrations:
 
 ---
 
+---
+
+## Template 4: Multi-Gate Meta-Analysis Extraction Pipeline (V7)
+
+### Overview
+
+4-gate validation pipeline to prevent extraction errors in meta-analysis. Based on lessons learned from V7 project.
+
+**Core Principle**: Every effect size must pass through all 4 gates before inclusion.
+
+### Pipeline Structure
+
+```yaml
+meta_analysis_multigate:
+  name: "Multi-Gate Extraction Validation (V7)"
+  description: "4-gate validation to prevent extraction errors"
+
+  gates:
+    - gate: 1
+      name: "Extraction Validation"
+      checks:
+        - G1.1: "Data completeness (n, M, SD)"
+        - G1.2: "Design classification"
+        - G1.3: "Timepoint identification"
+        - G1.4: "Source verification"
+      checkpoint: "CP_SOURCE_VERIFY (REQUIRED)"
+
+    - gate: 2
+      name: "Classification Validation"
+      checks:
+        - G2.1: "Outcome type classification"
+        - G2.2: "Comparison type validation"
+        - G2.3: "Effect size hierarchy (CRITICAL)"
+        - G2.4: "Dependency detection"
+      checkpoint: "CP_ES_HIERARCHY (REQUIRED when >1 ES)"
+
+    - gate: 3
+      name: "Statistical Validation"
+      checks:
+        - G3.1: "Cohen's d calculation"
+        - G3.2: "Hedges' g conversion"
+        - G3.3: "Variance/SE calculation"
+        - G3.4: "CI sanity check"
+        - G3.5: "Outlier detection (|g| > 3.0)"
+      checkpoint: "CP_EXTREME_VALUE (CONDITIONAL)"
+
+    - gate: 4
+      name: "Independence Validation"
+      checks:
+        - G4.1: "Within-study dependency"
+        - G4.2: "Pre-test exclusion (AUTO-REJECT)"
+        - G4.3: "Multiple outcome handling"
+        - G4.4: "Independence certification"
+      checkpoint: "CP_DEPENDENCY_HANDLING (REQUIRED when >1 ES)"
+
+  forbidden_patterns:
+    - pattern: "Pre-test as independent outcome"
+      action: "NEVER include"
+    - pattern: "Uncorrected Cohen's d"
+      action: "NEVER include (must use Hedges' g)"
+    - pattern: "Multiple ES same participants without clustering"
+      action: "NEVER include"
+```
+
+### Gate 1: Extraction Validation
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  GATE 1: Extraction Validation                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  G1.1 Data Completeness                                         │
+│  ├─ Sample size (n) per group                                  │
+│  ├─ Means (M) or effect statistics                             │
+│  ├─ Standard deviations (SD) or variance                       │
+│  └─ Degrees of freedom (df) if applicable                      │
+│                                                                 │
+│  G1.2 Design Classification                                     │
+│  ├─ Between-groups (independent)                               │
+│  ├─ Within-subjects (repeated measures)                        │
+│  ├─ Mixed design                                               │
+│  └─ Clustered/multilevel                                       │
+│                                                                 │
+│  G1.3 Timepoint Identification                                  │
+│  ├─ Pre-test (baseline) - FLAG                                 │
+│  ├─ Post-test (outcome)                                        │
+│  ├─ Follow-up                                                  │
+│  └─ Multiple timepoints                                        │
+│                                                                 │
+│  G1.4 Source Verification                                       │
+│  ├─ Page number documented                                     │
+│  ├─ Table/figure reference                                     │
+│  └─ Direct quote if ambiguous                                  │
+│                                                                 │
+│  🔴 CHECKPOINT: CP_SOURCE_VERIFY                               │
+│  "Verify extracted values match original source"               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Gate 2: Classification Validation
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  GATE 2: Classification Validation                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  G2.3 Effect Size Hierarchy (CRITICAL)                          │
+│                                                                 │
+│  ┌────────────────────────────────────────────────────────┐    │
+│  │ Priority 1: Post-test between-groups                   │    │
+│  │   d = (M_post_T - M_post_C) / SD_pooled               │    │
+│  │   Use when: Control group exists                       │    │
+│  ├────────────────────────────────────────────────────────┤    │
+│  │ Priority 2: ANCOVA-adjusted means                      │    │
+│  │   Use adjusted means with pre-test covariate          │    │
+│  ├────────────────────────────────────────────────────────┤    │
+│  │ Priority 3: Change score                               │    │
+│  │   d = (ΔM_T - ΔM_C) / SD_pooled_change                │    │
+│  │   Use when: No between-group post available           │    │
+│  ├────────────────────────────────────────────────────────┤    │
+│  │ Priority 4: Single-group pre-post                      │    │
+│  │   d = (M_post - M_pre) / SD_pre                       │    │
+│  │   Use when: No control group (LAST RESORT)            │    │
+│  └────────────────────────────────────────────────────────┘    │
+│                                                                 │
+│  🔴 CHECKPOINT: CP_ES_HIERARCHY                                │
+│  Trigger: Study has >1 potential effect size                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Gate 3: Statistical Validation
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  GATE 3: Statistical Validation                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  G3.2 Hedges' g Verification                                    │
+│                                                                 │
+│  def verify_hedges_g(d, n1, n2):                               │
+│      df = n1 + n2 - 2                                          │
+│      J = 1 - (3 / (4 * df - 1))                                │
+│      g = d * J                                                  │
+│      SE_g = sqrt((n1+n2)/(n1*n2) + g**2/(2*(n1+n2)))          │
+│      return {'g': g, 'SE': SE_g, 'J': J}                       │
+│                                                                 │
+│  Tolerance: |calculated_g - reported_g| < 0.01                 │
+│                                                                 │
+│  G3.5 Outlier Detection                                         │
+│  ├─ |g| > 2.0: Review recommended                              │
+│  ├─ |g| > 3.0: Checkpoint required                             │
+│  └─ |g| > 5.0: Auto-flag for exclusion consideration          │
+│                                                                 │
+│  🟠 CHECKPOINT: CP_EXTREME_VALUE (CONDITIONAL)                 │
+│  Trigger: |g| > 2.0                                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Gate 4: Independence Validation
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  GATE 4: Independence Validation                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  G4.2 Pre-test Exclusion (AUTO-REJECT)                          │
+│                                                                 │
+│  EXCLUDE_PATTERNS = [                                           │
+│      r'pre[- ]?test', r'pretest', r'baseline',                 │
+│      r'pre[- ]?intervention', r'pre[- ]?training',             │
+│      r'time\s*1', r'T1(?!\d)', r'before\s+treatment'           │
+│  ]                                                              │
+│                                                                 │
+│  ⛔ Pre-test scores = baseline equivalence check               │
+│     NOT treatment effect → NEVER include as outcome            │
+│                                                                 │
+│  G4.3 Multiple Outcome Handling                                 │
+│  ├─ Same construct: Average or select primary                  │
+│  ├─ Different constructs: Include with clustering             │
+│  └─ Same participants: 3-level model required                  │
+│                                                                 │
+│  🔴 CHECKPOINT: CP_DEPENDENCY_HANDLING                         │
+│  Trigger: >1 ES from same study                                │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Workflow Stages
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│     Multi-Gate Meta-Analysis Extraction Pipeline                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Stage 1: Raw Extraction                                        │
+│  ├─ Extract all potential statistics from paper                │
+│  ├─ Document source (page, table, figure)                      │
+│  ├─ Flag pre-test values                                       │
+│  └─ 📋 Pass to Gate 1                                          │
+│                                                                 │
+│  Gate 1: Extraction Validation                                  │
+│  ├─ Verify completeness                                        │
+│  ├─ Classify design                                            │
+│  ├─ Identify timepoints                                        │
+│  └─ 🔴 CP_SOURCE_VERIFY                                        │
+│                                                                 │
+│  Gate 2: Classification Validation                              │
+│  ├─ Apply ES hierarchy                                         │
+│  ├─ Select optimal ES                                          │
+│  ├─ Document exclusions                                        │
+│  └─ 🔴 CP_ES_HIERARCHY (if >1 ES)                              │
+│                                                                 │
+│  Gate 3: Statistical Validation                                 │
+│  ├─ Calculate d                                                │
+│  ├─ Convert to g (verify)                                      │
+│  ├─ Calculate SE                                               │
+│  └─ 🟠 CP_EXTREME_VALUE (if |g|>2)                             │
+│                                                                 │
+│  Gate 4: Independence Validation                                │
+│  ├─ Check within-study dependency                              │
+│  ├─ ⛔ AUTO-REJECT pre-test as outcome                         │
+│  ├─ Plan clustering if needed                                  │
+│  └─ 🔴 CP_DEPENDENCY_HANDLING (if >1 ES)                       │
+│                                                                 │
+│  Stage 2: Final Dataset                                         │
+│  ├─ Only gate-passed ES included                               │
+│  ├─ All exclusions documented                                  │
+│  └─ Ready for meta-analysis                                    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Agents Activated
+
+| Gate | Primary Agents | Support Agents |
+|------|----------------|----------------|
+| 1 | B3-EffectSizeExtractor | B1-SystematicLiteratureScout |
+| 2 | B3-EffectSizeExtractor | B2-EvidenceQualityAppraiser |
+| 3 | B3-EffectSizeExtractor | E1-QuantitativeAnalysisGuide |
+| 4 | B2-EvidenceQualityAppraiser | E5-SensitivityAnalysisDesigner |
+
+---
+
 ## Stage Transitions
 
 ```

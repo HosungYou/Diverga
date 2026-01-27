@@ -407,6 +407,63 @@ Applied Checkpoints:
 
 ---
 
+---
+
+## Effect Size Selection Hierarchy (V7 Lesson)
+
+### Mandatory Selection Rules
+
+When a study reports multiple statistics, apply this hierarchy:
+
+| Priority | Type | Formula | Use When |
+|----------|------|---------|----------|
+| **1 (Best)** | Post-test between-groups | d = (M_post_T - M_post_C) / SD_pooled | Control group exists |
+| **2** | ANCOVA-adjusted | Use adjusted means | Pre-test as covariate |
+| **3** | Change score | d = (delta_M_T - delta_M_C) / SD_pooled_change | No between-group post |
+| **4 (Last)** | Single-group pre-post | d = (M_post - M_pre) / SD_pre | No control group |
+
+### NEVER Include
+
+- Pre-test scores as independent outcomes
+- Baseline equivalence checks (these verify, not measure effect)
+- Multiple timepoints without 3-level modeling
+
+### Human Checkpoint: CP_ES_HIERARCHY
+
+**Trigger**: Study has >1 potential effect size
+
+**Required Decision**:
+1. Which ES best represents treatment effect?
+2. Rationale for selection
+3. How to handle excluded ES (document or sensitivity analysis)
+
+### Pre-test Exclusion Patterns
+
+```python
+EXCLUDE_PATTERNS = [
+    r'pre[- ]?test', r'pretest', r'baseline',
+    r'pre[- ]?intervention', r'pre[- ]?training',
+    r'time\s*1', r'T1(?!\d)', r'before\s+treatment'
+]
+```
+
+### Cohen's d to Hedges' g Verification
+
+**ALWAYS verify the conversion:**
+
+```python
+def verify_hedges_g(d, n1, n2):
+    df = n1 + n2 - 2
+    J = 1 - (3 / (4 * df - 1))
+    g = d * J
+    SE_g = sqrt((n1 + n2) / (n1 * n2) + g**2 / (2 * (n1 + n2)))
+    return {'g': g, 'SE': SE_g, 'J': J}
+```
+
+**Tolerance**: |calculated_g - reported_g| < 0.01
+
+---
+
 ## References
 
 - **VS Engine v3.0**: `../../research-coordinator/core/vs-engine.md`

@@ -4,6 +4,106 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [6.3.0] - 2026-01-26 (Multi-Gate Validation Pipeline)
+
+### Overview
+
+Diverga v6.3.0 introduces the **Multi-Gate Validation Pipeline** for meta-analysis extraction, incorporating lessons learned from the V7 project to prevent common extraction errors.
+
+**Core Theme**: "Every effect size must pass through all 4 gates before inclusion"
+
+### Added
+
+#### Multi-Gate Validation Pipeline
+
+4-gate validation system to ensure extraction quality:
+
+| Gate | Name | Key Checks |
+|------|------|------------|
+| Gate 1 | Extraction Validation | Data completeness, design classification, source verification |
+| Gate 2 | Classification Validation | Outcome type, comparison type, **Effect Size Hierarchy** |
+| Gate 3 | Statistical Validation | Hedges' g verification, SE calculation, outlier detection |
+| Gate 4 | Independence Validation | Pre-test exclusion, dependency handling |
+
+#### Effect Size Selection Hierarchy (V7 Lesson)
+
+Priority-based selection when multiple effect sizes are available:
+
+| Priority | Type | Use When |
+|----------|------|----------|
+| 1 (Best) | Post-test between-groups | Control group exists |
+| 2 | ANCOVA-adjusted | Pre-test as covariate |
+| 3 | Change score | No between-group post available |
+| 4 (Last) | Single-group pre-post | No control group |
+
+**Critical Rule**: Pre-test scores NEVER as independent outcomes
+
+#### New Checkpoints
+
+| Checkpoint | Level | Trigger |
+|------------|-------|---------|
+| CP_SOURCE_VERIFY | REQUIRED | After data extraction |
+| CP_ES_HIERARCHY | REQUIRED | Study has >1 potential ES |
+| CP_PRETEST_REJECT | AUTO | Pre-test detected as outcome |
+| CP_EXTREME_VALUE | CONDITIONAL | \|g\| > 2.0 |
+| CP_DEPENDENCY_HANDLING | REQUIRED | >1 ES from same study |
+
+#### Hedges' g Verification
+
+Mandatory verification with tolerance < 0.01:
+
+```python
+def verify_hedges_g(d, n1, n2):
+    df = n1 + n2 - 2
+    J = 1 - (3 / (4 * df - 1))
+    g = d * J
+    SE_g = sqrt((n1 + n2) / (n1 * n2) + g**2 / (2 * (n1 + n2)))
+    return {'g': g, 'SE': SE_g, 'J': J}
+```
+
+### Changed
+
+#### B3-EffectSizeExtractor
+
+- Added Effect Size Selection Hierarchy section
+- Added Pre-test Exclusion Patterns (regex)
+- Added Cohen's d to Hedges' g verification requirement
+- Added CP_ES_HIERARCHY checkpoint integration
+
+#### B2-EvidenceQualityAppraiser
+
+- Added Extraction Quality Validation section
+- Added Statistical Consistency Checks table
+- Added Effect Size Quality Rating (HIGH/MEDIUM/LOW/UNACCEPTABLE)
+- Added Quality Validation Checklist
+
+#### pipeline-templates.md
+
+- Added Template 4: Multi-Gate Meta-Analysis Extraction Pipeline
+- Added 4-gate workflow structure with checkpoints
+- Added forbidden patterns section
+
+#### user-checkpoints.md
+
+- Added 5 new meta-analysis checkpoints
+- Added Meta-Analysis Checkpoint Sequence
+- Updated Checkpoint Registry
+
+### V7 Lessons Integrated
+
+| Lesson | Implementation |
+|--------|----------------|
+| Pre-test as outcome | AUTO-REJECT with CP_PRETEST_REJECT |
+| Hierarchy violation | Mandatory CP_ES_HIERARCHY checkpoint |
+| Unverified conversion | Tolerance check (< 0.01) required |
+| Missing dependency handling | CP_DEPENDENCY_HANDLING enforced |
+
+### No Breaking Changes
+
+Existing workflows continue unchanged. Multi-Gate Pipeline is an additional template for meta-analysis projects.
+
+---
+
 ## [6.1.0] - 2025-01-26 (Human-Centered Edition + Humanization Pipeline)
 
 ### Overview

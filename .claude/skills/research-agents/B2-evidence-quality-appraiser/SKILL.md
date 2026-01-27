@@ -302,6 +302,49 @@ Final output:
 | Dose-response | Clear gradient | +1 |
 | Confounding | Acts toward reducing effect | +1 |
 
+## Extraction Quality Validation (V7 Lesson)
+
+### Statistical Consistency Checks
+
+| Check | Rule | Alert |
+|-------|------|-------|
+| F-to-t consistency | F(1, df) = t^2 | Error if >5% deviation |
+| Standardization detection | "standardized" in measure | Critical flag |
+| Pre-test as outcome | Pre-test used as ES | REJECT |
+| Missing correlation | Gain score needs r_pre_post | Warning |
+
+### Effect Size Quality Rating
+
+| Rating | Criteria |
+|--------|----------|
+| HIGH | Reported g with n, verified calculation |
+| MEDIUM | Calculated from M/SD, needs verification |
+| LOW | Estimated from t/F/p, high uncertainty |
+| UNACCEPTABLE | Pre-test as outcome, missing key data |
+
+### Quality Validation Checklist
+
+```yaml
+extraction_quality_checklist:
+  - item: "Source verification"
+    check: "ES matches original paper values"
+    required: true
+  - item: "Calculation verification"
+    check: "d-to-g conversion within tolerance"
+    required: true
+  - item: "Independence check"
+    check: "No pre-test as outcome"
+    required: true
+  - item: "Design classification"
+    check: "Between/within/mixed correctly identified"
+    required: true
+  - item: "Dependency documentation"
+    check: "Multiple ES from same study flagged"
+    required: true
+```
+
+---
+
 ## Related Agents
 
 - **05-systematic-literature-scout**: Search for studies to evaluate
