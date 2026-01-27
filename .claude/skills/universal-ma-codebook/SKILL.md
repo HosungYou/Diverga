@@ -1,8 +1,9 @@
 # Universal Meta-Analysis Codebook
 
-**Version**: 2.1
+**Version**: 2.2
 **Status**: Production
 **Codex Review**: APPROVE WITH MINOR CHANGES (2026-01-26)
+**Update**: Context-specific extensions (2026-01-26)
 
 ## Purpose
 
@@ -11,6 +12,68 @@ A **universal, AI-Human collaboration codebook** for meta-analysis that enables:
 2. Human verification of AI-extracted values
 3. 100% human-verified data through structured workflow
 4. Integration with Diverga C5/C6/C7 agents and ScholaRAG
+5. **Context-specific extensions** for domain-specific moderator variables
+
+## Context-Specific Extensions
+
+The Universal Codebook supports **project-specific moderator layers** that extend the base 4-layer structure. Each meta-analysis context may have unique moderator variables.
+
+### Extension Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│              UNIVERSAL CODEBOOK WITH CONTEXT EXTENSION              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  LAYER 1: IDENTIFIERS + METADATA (10 fields) ← Universal           │
+│  LAYER 2: CORE STATISTICAL VALUES (18 fields) ← Universal          │
+│  LAYER 3: CONTEXT-SPECIFIC MODERATORS ← Project Extension          │
+│  LAYER 4: AI EXTRACTION PROVENANCE ← Universal                     │
+│  LAYER 5: HUMAN VERIFICATION (8 fields) ← Universal                │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Available Context Extensions
+
+| Context | Extension File | Moderator Count |
+|---------|----------------|-----------------|
+| GenAI-HE | `GENAI_HE_CODEBOOK.md` | 15 moderators |
+| Clinical Trials | `CLINICAL_CODEBOOK.md` | TBD |
+| Educational Tech | `EDTECH_CODEBOOK.md` | TBD |
+
+### Creating a Context Extension
+
+1. **Define moderator variables** specific to your research domain
+2. **Create classification rules** for categorical moderators
+3. **Write AI extraction prompts** for each moderator
+4. **Configure C6 agent** with the extension schema
+
+```python
+# Example: Configure C6 for GenAI-HE context
+c6.configure_extension(
+    context="genai_he",
+    moderators=[
+        {"name": "genai_tool", "type": "categorical", "values": ["ChatGPT", "Claude", ...]},
+        {"name": "blooms_level", "type": "ordinal", "values": ["remember", "understand", ...]},
+        {"name": "study_design", "type": "categorical", "values": ["RCT", "quasi", ...]},
+    ],
+    extraction_prompts=GENAI_HE_PROMPTS
+)
+```
+
+### GenAI-HE Extension (Example)
+
+**Layer 3: GenAI-HE Moderator Variables (15 fields)**
+
+| Category | Fields |
+|----------|--------|
+| GenAI Tool | genai_tool, genai_tool_version, genai_access_type |
+| Educational Outcome | blooms_level, outcome_dimension, learning_domain |
+| Study Design | study_design, intervention_duration, intervention_type, control_condition |
+| Context | education_level, discipline, country, sample_size_total, publication_type |
+
+See: `GenAI-HE-Review-AIMC/docs/GENAI_HE_CODEBOOK.md` for full specification
 
 ## Architecture: Four-Layer Design
 
