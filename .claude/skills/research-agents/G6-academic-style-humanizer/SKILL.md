@@ -12,9 +12,19 @@ v3_integration:
   dynamic_t_score: true
   creativity_modules:
     - semantic-distance
+    - iterative-loop
+  humanization_modules:
+    - h-style-transfer
+    - h-flow-optimizer
   checkpoints:
     - CP-INIT-001
+    - CP_HUMANIZATION_REVIEW
+    - CP_HAVS_DIRECTION
     - CP_HUMANIZATION_VERIFICATION
+  havs:
+    enabled: true
+    phases: [0, 1, 2]
+    max_iterations: 2
 ---
 
 # Academic Style Humanizer
@@ -326,6 +336,290 @@ H3_generic_conclusions:
     - before: "Future research is needed"
       after: "Future research should examine [specific question]"
 ```
+
+---
+
+## HAVS: Humanization-Adapted VS
+
+HAVS (Humanization-Adapted VS) is a specialized 3-phase approach designed specifically for text transformation, distinct from the standard VS 5-phase methodology used for research decision-making.
+
+### Why HAVS Instead of Standard VS?
+
+| Aspect | Standard VS (Research) | HAVS (Humanization) |
+|--------|------------------------|---------------------|
+| **Purpose** | Theory/methodology selection | Text transformation strategy |
+| **T-Score Meaning** | Theory typicality | Transformation pattern typicality |
+| **Phase Count** | 5 phases (0-5) | 3 phases (0-2) |
+| **Creativity Focus** | Conceptual innovation | Natural expression |
+
+> **Key Insight**: Standard VS is designed for research decision-making (choosing theories, methodologies). HAVS adapts the core anti-modal principle specifically for text transformation.
+
+### HAVS Phase 0: Transformation Context
+
+Before any transformation, collect contextual information:
+
+```yaml
+phase_0_inputs:
+  g5_analysis:
+    description: "Pattern analysis from G5-AcademicStyleAuditor"
+    required: true
+    includes:
+      - pattern_categories: "C, L, S, M, H classifications"
+      - risk_levels: "high/medium/low per pattern"
+      - density_map: "Pattern distribution across text"
+
+  target_style:
+    description: "Desired output characteristics"
+    options:
+      - journal: "Formal academic journal style"
+      - conference: "Conference paper style"
+      - thesis: "Dissertation style"
+      - informal: "Blog/commentary style"
+
+  user_mode:
+    description: "Transformation aggressiveness"
+    options:
+      - conservative: "High-risk patterns only"
+      - balanced: "High + medium-risk (recommended)"
+      - aggressive: "All patterns"
+```
+
+### HAVS Phase 1: Modal Transformation Warning
+
+⚠️ **MODAL TRANSFORMATIONS (T > 0.7) - AVOID THESE**
+
+Most humanization tools apply predictable transformations that AI detectors easily identify. HAVS explicitly warns against these modal approaches:
+
+| Modal Transformation | T-Score | Why It Fails |
+|---------------------|---------|--------------|
+| **Synonym-only replacement** | 0.9 | Most common approach; AI detectors trained to spot it |
+| **Sentence reordering only** | 0.85 | Structure preserved; patterns remain detectable |
+| **Passive↔Active only** | 0.8 | Inconsistent voice creates new patterns |
+| **Thesaurus cycling** | 0.85 | Unnatural word choices; semantic drift |
+| **Paragraph shuffling** | 0.75 | Logical flow disrupted; easy to detect |
+
+```yaml
+modal_warning_system:
+  threshold: 0.7
+
+  warning_template: |
+    ⚠️ MODAL TRANSFORMATION DETECTED (T = {t_score})
+
+    This approach ({transformation_name}) is used by {percentage}% of
+    humanization tools, making it predictable and detectable.
+
+    Consider Direction B or C below for better differentiation.
+
+  auto_block:
+    enabled: false  # Warning only, user decides
+    reason: "Humanization requires user judgment on risk tolerance"
+```
+
+### HAVS Phase 2: Differentiated Transformation Directions
+
+After identifying patterns and warning about modal approaches, HAVS presents three differentiated transformation directions:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 HAVS Transformation Directions                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  DIRECTION A (T ≈ 0.6) - Conservative                           │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ Strategies:                                              │   │
+│  │   ✓ Vocabulary substitution (L1 patterns)                │   │
+│  │   ✓ Phrase-level rewording                               │   │
+│  │                                                          │   │
+│  │ Best for:                                                │   │
+│  │   - Journal submissions with strict formatting           │   │
+│  │   - Documents where structure must be preserved          │   │
+│  │   - Low risk tolerance                                   │   │
+│  │                                                          │   │
+│  │ Expected AI Detection Change: -15-25%                    │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                  │
+│                              ▼                                  │
+│  DIRECTION B (T ≈ 0.4) - Balanced ⭐ RECOMMENDED                │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ Strategies:                                              │   │
+│  │   ✓ All Direction A strategies                           │   │
+│  │   ✓ Sentence recombination (merge/split)                 │   │
+│  │   ✓ Flow transition improvements                         │   │
+│  │   ✓ Hedge calibration (H2 patterns)                      │   │
+│  │                                                          │   │
+│  │ Best for:                                                │   │
+│  │   - Most academic writing                                │   │
+│  │   - Balanced naturalness vs. preservation                │   │
+│  │   - Moderate risk tolerance                              │   │
+│  │                                                          │   │
+│  │ Expected AI Detection Change: -30-45%                    │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                  │
+│                              ▼                                  │
+│  DIRECTION C (T ≈ 0.2) - Aggressive                             │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ Strategies:                                              │   │
+│  │   ✓ All Direction B strategies                           │   │
+│  │   ✓ Paragraph reorganization                             │   │
+│  │   ✓ Style transfer (domain-specific)                     │   │
+│  │   ✓ Structural reformatting                              │   │
+│  │                                                          │   │
+│  │ Best for:                                                │   │
+│  │   - Blog posts, informal writing                         │   │
+│  │   - Documents where extensive rewriting is acceptable    │   │
+│  │   - High risk tolerance                                  │   │
+│  │                                                          │   │
+│  │ Expected AI Detection Change: -50-70%                    │   │
+│  │ ⚠️ Requires careful review for meaning preservation     │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 🟡 CHECKPOINT: CP_HAVS_DIRECTION
+
+After presenting the analysis and directions, pause for user selection:
+
+```markdown
+---
+### 🟡 CHECKPOINT: CP_HAVS_DIRECTION
+
+Based on the G5 analysis showing {pattern_count} patterns ({high_count} high-risk,
+{medium_count} medium-risk), select your transformation direction:
+
+**[A] Direction A** (Conservative, T ≈ 0.6)
+   - Vocabulary + phrase changes only
+   - Best for: Strict journal requirements
+   - Preserves: Document structure
+
+**[B] Direction B** (Balanced, T ≈ 0.4) ⭐ Recommended
+   - + Sentence recombination + flow improvements
+   - Best for: Most academic writing
+   - Preserves: Core meaning and citations
+
+**[C] Direction C** (Aggressive, T ≈ 0.2)
+   - + Paragraph reorganization + style transfer
+   - Best for: Informal writing
+   - ⚠️ Requires careful meaning verification
+
+**[D] Custom** - Specify custom strategies
+---
+```
+
+### HAVS Iterative Refinement
+
+For Balanced (B) and Aggressive (C) modes, HAVS applies iterative refinement using the `iterative-loop` module:
+
+```yaml
+iterative_humanization:
+  enabled: true
+  trigger: "balanced or aggressive mode"
+  max_iterations: 2
+
+  iteration_1:
+    action: "Apply primary transformation strategies"
+    output: "First-pass humanized text"
+
+  self_check:
+    action: "Analyze transformed text for new AI patterns"
+    criteria:
+      - "No new AI patterns introduced by transformation"
+      - "Meaning preserved (semantic similarity > 0.95)"
+      - "Citations intact (100% preservation)"
+      - "Statistics unchanged (100% preservation)"
+
+  iteration_2:
+    trigger: "self_check finds issues"
+    action: "Remove self-generated AI patterns"
+    output: "Refined humanized text"
+
+  termination:
+    conditions:
+      - "max_iterations reached"
+      - "self_check passes all criteria"
+      - "no improvement from previous iteration"
+```
+
+### HAVS + Humanization Modules
+
+HAVS integrates with two specialized humanization modules:
+
+#### h-style-transfer Module
+
+Applies discipline-specific writing styles:
+
+```yaml
+h_style_transfer:
+  enabled_for: ["direction_b", "direction_c"]
+
+  profiles:
+    education:
+      characteristics:
+        - "Practice-oriented language"
+        - "Explicit implications"
+        - "Accessible terminology"
+      avoid:
+        - "Excessive abstraction"
+        - "Overly technical jargon"
+
+    psychology:
+      characteristics:
+        - "Person-centered framing"
+        - "Measurement specificity"
+        - "Careful hedging"
+      avoid:
+        - "Overgeneralization"
+        - "Unqualified claims"
+
+    management:
+      characteristics:
+        - "Action-oriented recommendations"
+        - "Case-based examples"
+        - "Practical implications"
+      avoid:
+        - "Pure theory without application"
+        - "Vague recommendations"
+```
+
+#### h-flow-optimizer Module
+
+Optimizes paragraph and sentence flow:
+
+```yaml
+h_flow_optimizer:
+  enabled_for: ["direction_b", "direction_c"]
+
+  strategies:
+    sentence_level:
+      - "Vary sentence length (short-medium-long patterns)"
+      - "Balance simple and complex structures"
+      - "Natural transition placement"
+
+    paragraph_level:
+      - "Topic sentence clarity"
+      - "Evidence-analysis-synthesis flow"
+      - "Cohesive device variation"
+
+    document_level:
+      - "Section balance"
+      - "Argument progression"
+      - "Conclusion echo of introduction"
+```
+
+### Verification Integration
+
+After HAVS transformation, the result flows to F5-HumanizationVerifier:
+
+```
+G5 Analysis → G6 HAVS Transformation → CP_HUMANIZATION_VERIFICATION → F5 Verification
+                     │
+                     ├── Phase 0: Context collection
+                     ├── Phase 1: Modal warning
+                     ├── Phase 2: Direction selection
+                     └── Iterative refinement (if B or C)
+```
+
+---
 
 ## Output Format
 
