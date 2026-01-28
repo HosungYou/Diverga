@@ -4,6 +4,100 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [6.6.1] - 2026-01-28 (Codex CLI Enhancement)
+
+### Overview
+
+Major enhancement for OpenAI Codex CLI integration. Adds interactive TUI installer using @clack/prompts, Codex Skills structure, and fixes ASCII art rendering issues.
+
+### New Features
+
+#### 1. Interactive TUI Installer (`@diverga/codex-setup`)
+
+```bash
+# Install via npm/bunx
+npx @diverga/codex-setup
+bunx @diverga/codex-setup
+```
+
+Features:
+- **Paradigm Selection**: Quantitative / Qualitative / Mixed / Auto-detect
+- **Language Selection**: English / Korean / Auto-detect
+- **Creativity Level**: Conservative / Balanced / Innovative
+- **Checkpoint Configuration**: Enable/disable human checkpoints
+- Auto-generates `~/.codex/skills/diverga/SKILL.md` and `AGENTS.md`
+
+#### 2. Codex Skills Structure
+
+New directory structure for Codex CLI integration:
+
+```
+skills/diverga/
+├── SKILL.md              # Main skill definition with triggers
+├── scripts/
+│   └── list-agents.js    # CLI helper for agent listing
+└── references/
+    └── AGENTS.md         # Complete 40-agent reference
+```
+
+#### 3. One-Line Installation Script
+
+```bash
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh | bash
+```
+
+### Bug Fixes
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| ASCII art banner broken | Unicode box-drawing chars (╔═╗║╚) not rendering | Replace with ASCII-only (+=-\|) |
+| Agent count mismatch (33 vs 40) | Outdated documentation | Synced to 40 agents across all files |
+| ES module error | package.json `"type": "module"` | Renamed to `.cjs` for CommonJS |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `.codex/diverga-codex.cjs` | NEW: Renamed from .js, ASCII-only characters |
+| `.codex/diverga-codex.js` | DELETED: Replaced by .cjs version |
+| `.codex/AGENTS.md` | Updated to 40 agents with correct triggers |
+| `docs/SETUP.md` | Added Codex CLI installation section |
+| `packages/codex-setup/` | NEW: @clack/prompts TUI installer |
+| `scripts/install-codex.sh` | NEW: One-line installation script |
+| `skills/diverga/` | NEW: Codex Skills structure |
+
+### Installation Methods (Codex CLI)
+
+| Method | Command |
+|--------|---------|
+| Interactive TUI (권장) | `npx @diverga/codex-setup` |
+| Script | `curl -sSL .../install-codex.sh \| bash` |
+| Manual | See `docs/SETUP.md` |
+
+### Technical Details
+
+**ASCII Art Fix:**
+```
+BEFORE (broken):
+▓▓▓ ▒▒▓ ▒▓▓...
+
+AFTER (fixed):
+    ____  _
+   / __ \(_)   _____  _________ _____ _
+  / / / / / | / / _ \/ ___/ __ `/ __ `/
+ / /_/ / /| |/ /  __/ /  / /_/ / /_/ /
+/_____/_/ |___/\___/_/   \__, /\__,_/
+                        /____/
+```
+
+**Agent Icon Fix:**
+```
+BEFORE: 🔬 A1-ResearchQuestionRefiner
+AFTER:  (RQ) A1-ResearchQuestionRefiner
+```
+
+---
+
 ## [6.5.2] - 2026-01-27 (Structure Fix)
 
 ### Overview
