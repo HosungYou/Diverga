@@ -1,14 +1,15 @@
-# Research Coordinator 설치 가이드
+# Diverga Research Coordinator 설치 가이드
 
 ## 목차
 
 1. [시스템 요구사항](#시스템-요구사항)
-2. [마켓플레이스 설치 (권장)](#마켓플레이스-설치-권장)
-3. [로컬 설치 (개발용)](#로컬-설치-개발용)
-4. [설치 확인](#설치-확인)
-5. [업데이트](#업데이트)
-6. [제거](#제거)
-7. [문제 해결](#문제-해결)
+2. [Claude Code 설치](#claude-code-설치-권장)
+3. [Codex CLI 설치](#codex-cli-설치)
+4. [로컬 설치 (개발용)](#로컬-설치-개발용)
+5. [설치 확인](#설치-확인)
+6. [업데이트](#업데이트)
+7. [제거](#제거)
+8. [문제 해결](#문제-해결)
 
 ---
 
@@ -28,9 +29,9 @@ claude --version
 
 ---
 
-## 마켓플레이스 설치 (권장)
+## Claude Code 설치 (권장)
 
-> **v2.1.0 신규**: 단일 플러그인 설치로 21개 스킬 모두 사용 가능!
+> **v6.6.1**: 40개 연구 에이전트, VS 방법론, 휴먼 체크포인트 지원!
 
 ### 설치 (단 2줄)
 
@@ -72,6 +73,82 @@ claude plugin list | grep research-coordinator
 | **C: 방법론** | `/research-design-consultant`, `/statistical-analysis-guide`, `/analysis-code-generator`, `/sensitivity-analysis-designer` |
 | **D: 품질 검증** | `/internal-consistency-checker`, `/checklist-manager`, `/reproducibility-auditor`, `/bias-detector` |
 | **E: 출판** | `/journal-matcher`, `/academic-communicator`, `/peer-review-strategist`, `/preregistration-composer` |
+
+---
+
+## Codex CLI 설치
+
+> **v6.6.1 신규**: OpenAI Codex CLI 지원! 40개 연구 에이전트 사용 가능!
+
+### 방법 1: Interactive 설치 (권장)
+
+```bash
+# npx 사용
+npx @diverga/codex-setup
+
+# 또는 bunx 사용
+bunx @diverga/codex-setup
+```
+
+Interactive TUI에서 다음을 설정할 수 있습니다:
+- 연구 패러다임 (양적/질적/혼합/자동감지)
+- 언어 선택 (영어/한국어/자동)
+- 창의성 수준 (Conservative/Balanced/Innovative)
+- 체크포인트 설정
+
+### 방법 2: 스크립트 설치
+
+```bash
+# curl 사용
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh | bash
+
+# 또는 wget 사용
+wget -qO- https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh | bash
+```
+
+### 방법 3: 수동 설치
+
+```bash
+# 디렉토리 생성
+mkdir -p ~/.codex/diverga/.codex/agents
+
+# 파일 다운로드
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/.codex/diverga-codex.js \
+  -o ~/.codex/diverga/.codex/diverga-codex.js
+
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/.codex/AGENTS.md \
+  -o ~/.codex/diverga/.codex/AGENTS.md
+
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/.codex/agents/index.json \
+  -o ~/.codex/diverga/.codex/agents/index.json
+
+# 실행 권한 부여
+chmod +x ~/.codex/diverga/.codex/diverga-codex.js
+```
+
+### Codex CLI 사용법
+
+```bash
+# 에이전트 목록 보기
+diverga-codex list
+
+# 특정 에이전트 정보
+diverga-codex agent A1
+
+# T-Score 참조
+diverga-codex tscore
+
+# VS 방법론 설명
+diverga-codex vs
+```
+
+### Codex 세션에서 에이전트 트리거
+
+키워드를 사용하여 에이전트를 자동으로 활성화:
+- `"research question"` → A1-ResearchQuestionRefiner
+- `"meta-analysis"` → C5-MetaAnalysisMaster
+- `"theoretical framework"` → A2-TheoreticalFrameworkArchitect
+- `"phenomenology"` → C2-QualitativeDesignConsultant
 
 ---
 
