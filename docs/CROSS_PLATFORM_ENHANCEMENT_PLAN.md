@@ -1,8 +1,8 @@
 # Diverga 크로스 플랫폼 사용성 강화 계획
 
 **작성일**: 2026-01-28
-**버전**: v6.5.2
-**상태**: 진행 중
+**버전**: v6.6.1
+**상태**: P0-P2 완료, P3 대기
 
 ---
 
@@ -299,12 +299,12 @@ function detectRuntime() {
 
 | 우선순위 | 작업 | 영향도 | 난이도 | 예상 시간 | 상태 |
 |:--------:|------|:------:|:------:|:---------:|:----:|
-| **P0** | Codex ESM 수정 | 🔴 Critical | 🟢 Easy | 10분 | ⏳ |
-| **P0** | OpenCode types.ts 완성 | 🔴 Critical | 🟢 Easy | 30분 | ⏳ |
-| **P1** | OpenCode tsconfig 추가 | 🟠 High | 🟢 Easy | 15분 | ⏳ |
-| **P1** | 통합 설치 스크립트 | 🟠 High | 🟡 Medium | 2시간 | 📋 |
-| **P2** | 문서화 | 🟡 Medium | 🟡 Medium | 4시간 | 📋 |
-| **P3** | CI/CD 테스트 | 🟢 Low | 🟠 Hard | 1일 | 📋 |
+| **P0** | Codex ESM 수정 | 🔴 Critical | 🟢 Easy | 10분 | ✅ 완료 |
+| **P0** | OpenCode types.ts 완성 | 🔴 Critical | 🟢 Easy | 30분 | ✅ 완료 |
+| **P1** | OpenCode tsconfig 추가 | 🟠 High | 🟢 Easy | 15분 | ✅ 완료 |
+| **P1** | 통합 설치 스크립트 | 🟠 High | 🟡 Medium | 2시간 | ✅ 완료 |
+| **P2** | 문서화 (QUICKSTART, TROUBLESHOOTING) | 🟡 Medium | 🟡 Medium | 4시간 | ✅ 완료 |
+| **P3** | CI/CD 테스트 | 🟢 Low | 🟠 Hard | 1일 | ⏳ 대기 |
 
 ---
 
@@ -313,3 +313,6 @@ function detectRuntime() {
 | 날짜 | 버전 | 변경 내용 |
 |------|------|----------|
 | 2026-01-28 | 1.0 | 초안 작성 |
+| 2026-01-28 | 1.1 | P0 완료 - Codex .cjs, OpenCode 빌드 시스템 |
+| 2026-01-28 | 1.2 | P1 완료 - 통합 설치 스크립트 (install.sh, install-codex.sh, install-opencode.sh) |
+| 2026-01-28 | 1.3 | P2 완료 - QUICKSTART.md, TROUBLESHOOTING.md |

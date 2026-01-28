@@ -1,253 +1,213 @@
-# Quick Start Guide
+# Diverga Quick Start Guide
 
-Get started with Diverga in under 5 minutes!
-
-**Version**: 6.0.1 (Human-Centered Edition)
+Get Diverga running in under 5 minutes on any platform.
 
 ---
 
-## What is Diverga?
+## 🚀 One-Line Installation
 
-Diverga is an AI research assistant that helps you make **creative, defensible research choices** while ensuring **human decisions remain with humans**.
+### Auto-Detect (Recommended)
 
-Unlike other AI tools that always recommend the same obvious options (mode collapse), Diverga uses **Verbalized Sampling (VS)** methodology to present you with innovative alternatives.
-
----
-
-## Installation (2 minutes)
-
-### Option A: Clone and Install (Recommended)
+Automatically detects and installs for all available platforms:
 
 ```bash
-git clone https://github.com/HosungYou/Diverga.git
-cd Diverga
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install.sh | bash
 ```
 
-### Verify Installation
+### Platform-Specific
 
-In Claude Code, simply describe your research need:
+| Platform | Command |
+|----------|---------|
+| **Codex CLI** | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh \| bash` |
+| **OpenCode** | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-opencode.sh \| bash` |
+| **Claude Code** | `/plugin marketplace add https://github.com/HosungYou/Diverga` |
+
+---
+
+## 📦 Claude Code (Recommended)
+
+### Step 1: Add to Marketplace
+
+```bash
+/plugin marketplace add https://github.com/HosungYou/Diverga
+```
+
+### Step 2: Install
+
+```bash
+/plugin install diverga
+```
+
+### Step 3: Setup
+
+```bash
+/diverga:setup
+```
+
+### Step 4: Start Using
+
+Just describe your research:
 
 ```
 "I want to conduct a systematic review on AI in education"
-"메타분석 연구를 시작하고 싶어요"
+"메타분석을 시작하고 싶어"
+"Help me design an experimental study"
 ```
 
 ---
 
-## Your First Research Session (3 minutes)
+## 🤖 OpenAI Codex CLI
 
-### Step 1: Describe Your Research
+### Option A: One-Line Install
 
-Simply tell Diverga what you want to research:
-
-```
-"AI 학습 시스템이 학생들에게 도움이 될 것 같은데, 연구 질문을 어떻게 만들어야 할까요?"
+```bash
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh | bash
 ```
 
-### Step 2: Wait for Checkpoint
+### Option B: Manual Install
 
-Diverga will analyze your request and present options:
+```bash
+# Clone repository
+git clone https://github.com/HosungYou/Diverga.git ~/.codex/diverga
 
-```
-🔴 CHECKPOINT: CP_RESEARCH_DIRECTION
-
-I've analyzed your research topic. Here are three directions:
-
-Direction A (T≈0.6): AI tutoring effects on academic achievement
-Direction B (T≈0.4): AI-enhanced self-regulated learning ⭐
-Direction C (T≈0.2): Neuroplasticity-based AI learning systems
-
-Which direction would you like to proceed?
+# Run setup
+node ~/.codex/diverga/.codex/diverga-codex.cjs setup
 ```
 
-### Step 3: Make Your Choice
+### Usage
 
-Simply respond with your selection:
+```bash
+# List all 40 agents
+node ~/.codex/diverga/.codex/diverga-codex.cjs list
 
-```
-"Direction B, please"
-```
+# Get agent details
+node ~/.codex/diverga/.codex/diverga-codex.cjs agent A1
 
-### Step 4: Continue Through Checkpoints
+# Show checkpoints
+node ~/.codex/diverga/.codex/diverga-codex.cjs checkpoint
 
-Diverga will guide you through the research process, stopping at each checkpoint for your approval.
+# Show T-Score reference
+node ~/.codex/diverga/.codex/diverga-codex.cjs tscore
 
----
-
-## How It Works
-
-### VS-Research Methodology
-
-Diverga uses **Verbalized Sampling (VS)** to prevent "Mode Collapse":
-
-```
-❌ Without VS:
-   "이론 추천해줘" → "TAM 쓰세요" (always the same answer)
-
-✅ With VS:
-   "이론 추천해줘"
-   → Phase 1: "TAM, UTAUT are predictable choices (T=0.9)"
-   → Phase 2: "Exploring alternatives..."
-   → Phase 3: "Differentiated theory: SDT × TAM integration (T=0.4)"
+# VS Methodology explanation
+node ~/.codex/diverga/.codex/diverga-codex.cjs vs
 ```
 
-### T-Score System
+### In Codex Sessions
 
-Every recommendation comes with a **Typicality Score (T-Score)**:
-
-| T-Score | Meaning | Recommendation |
-|---------|---------|----------------|
-| > 0.8 | Most common choice | ⚠️ Predictable - consider alternatives |
-| 0.5-0.8 | Established alternative | ✅ Safe differentiation |
-| 0.3-0.5 | Emerging approach | ✅ Innovative, well-justified |
-| < 0.3 | Creative/Novel | ⚠️ Needs strong justification |
-
-### Human Checkpoint System
-
-Diverga stops at critical points and waits for your decision:
-
-| Level | Icon | Behavior |
-|-------|------|----------|
-| **REQUIRED** | 🔴 | System STOPS - Cannot proceed without your approval |
-| **RECOMMENDED** | 🟠 | System PAUSES - Strongly suggests your review |
-| **OPTIONAL** | 🟡 | System ASKS - Defaults available if you skip |
-
----
-
-## Agent Categories (33 Agents)
-
-| Category | Count | Purpose |
-|----------|-------|---------|
-| A: Foundation | 6 | Research question, theory, ethics, paradigm |
-| B: Evidence | 4 | Literature review, quality appraisal, effect sizes |
-| C: Design | 4 | Quantitative, qualitative, mixed methods design |
-| D: Data Collection | 4 | Sampling, interviews, observation, instruments |
-| E: Analysis | 5 | Statistical analysis, coding, integration |
-| F: Quality | 4 | Consistency, checklists, reproducibility, bias |
-| G: Communication | 4 | Journal matching, communication, peer review |
-| H: Specialized | 2 | Ethnography, action research |
-
----
-
-## Common Use Cases
-
-### Use Case 1: Planning a New Study
+Diverga agents are triggered by keywords:
 
 ```
-1. Describe your research topic
-   → A1: Research Question Refiner activates
-   → 🔴 CP_RESEARCH_DIRECTION: Choose your direction
-
-2. Select theoretical framework
-   → A2: Theoretical Framework Architect activates
-   → 🔴 CP_THEORY_SELECTION: Approve framework
-
-3. Design your methodology
-   → C1/C2/C3: Design Consultant activates
-   → 🔴 CP_METHODOLOGY_APPROVAL: Approve design
-```
-
-### Use Case 2: Literature Review
-
-```
-1. "I want to conduct a systematic review on [topic]"
-   → B1: Systematic Literature Scout activates
-   → Develops PRISMA-compliant search strategy
-
-2. Quality assessment
-   → B2: Evidence Quality Appraiser activates
-   → Applies RoB, GRADE criteria
-
-3. Effect size extraction
-   → B3: Effect Size Extractor activates
-   → Calculates and converts effect sizes
-```
-
-### Use Case 3: Data Analysis
-
-```
-1. "How should I analyze my data?"
-   → E1: Quantitative Analysis Guide activates
-   → 🟠 CP_ANALYSIS_PLAN: Review analysis plan
-
-2. Code generation
-   → E4: Analysis Code Generator activates
-   → Generates R/Python/SPSS code
-
-3. Sensitivity analysis
-   → E5: Sensitivity Analysis Designer activates
-   → Plans robustness checks
+"Help me refine my research question"  → A1-research-question-refiner
+"I need a theoretical framework"       → A2-theoretical-framework-architect
+"Let's do a meta-analysis"             → C5-meta-analysis-master
 ```
 
 ---
 
-## Tips for Best Results
+## 💻 OpenCode
 
-### 1. Provide Context
+### Option A: One-Line Install
 
-```
-❌ "이론 추천해줘"
-
-✅ "교육공학 분야에서 AI 기반 적응형 학습 시스템의
-   학습 효과를 연구하려고 합니다.
-   박사 학위 논문용으로 차별화된 이론을 추천해주세요."
+```bash
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-opencode.sh | bash
 ```
 
-### 2. Specify Your Goals
+### Option B: Manual Install
 
-- First publication → Conservative approach (T > 0.5)
-- Top-tier journal → Innovative approach (T < 0.5)
-- Replication study → Standard approach (T > 0.6)
+```bash
+# Clone repository
+git clone https://github.com/HosungYou/Diverga.git /tmp/diverga
 
-### 3. Take Time at Checkpoints
+# Build plugin
+cd /tmp/diverga/.opencode/plugins/diverga
+npm install
+npm run build
 
-When you see 🔴 CHECKPOINT, carefully review the options before deciding. These are strategic research decisions that should be made thoughtfully.
-
-### 4. Use Bilingual Input
-
+# Install to OpenCode
+mkdir -p ~/.opencode/plugins/diverga
+cp -r dist/* ~/.opencode/plugins/diverga/
 ```
-English: "I want to conduct a systematic review"
-Korean: "체계적 문헌고찰을 하고 싶어요"
-Mixed: "메타분석을 하려는데, can you help?"
+
+### Usage
+
+```bash
+# List agents
+opencode "diverga:list"
+
+# Get agent details
+opencode "diverga:agent A1"
+
+# Show checkpoints
+opencode "diverga:checkpoint"
 ```
 
 ---
 
-## Getting Help
+## ⚡ Quick Commands Reference
 
-### Documentation
-
-- [Full Documentation](../README.md)
-- [Agent Reference](./AGENT-REFERENCE.md)
-- [CLAUDE.md](../CLAUDE.md) - System documentation
-- [AGENTS.md](../AGENTS.md) - AI-readable documentation
-
-### Issues
-
-- [GitHub Issues](https://github.com/HosungYou/Diverga/issues)
+| Platform | List Agents | Agent Details | Checkpoints |
+|----------|-------------|---------------|-------------|
+| **Claude Code** | `/diverga:help` | `/diverga:A1-...` | `/diverga:checkpoint` |
+| **Codex CLI** | `diverga-codex.cjs list` | `diverga-codex.cjs agent A1` | `diverga-codex.cjs checkpoint` |
+| **OpenCode** | `diverga:list` | `diverga:agent A1` | `diverga:checkpoint` |
 
 ---
 
-## Key Differences from v5.0
+## 🎯 What's Next?
 
-| Feature | v5.0 (Sisyphus) | v6.0.1 (Human-Centered) |
-|---------|-----------------|------------------------|
-| Checkpoints | Could be bypassed | ✅ MANDATORY |
-| OMC Modes | ralph/ultrawork/ecomode | ❌ Removed |
-| Agent Naming | Numbered (01-21) | Category-based (A1-H2) |
-| Agent Count | 27 | 33 |
+### 1. Explore Agents
+
+Diverga has 40 specialized agents across 8 categories:
+
+- **A: Foundation** (6) - Research questions, theory, ethics
+- **B: Evidence** (5) - Literature, quality appraisal
+- **C: Design** (7) - Quantitative, qualitative, mixed methods, meta-analysis
+- **D: Data Collection** (4) - Sampling, interviews, observation
+- **E: Analysis** (5) - Statistical, coding, integration
+- **F: Quality** (5) - Consistency, checklists, bias
+- **G: Communication** (6) - Journals, writing, peer review
+- **H: Specialized** (2) - Ethnography, action research
+
+### 2. Understand VS Methodology
+
+Diverga uses **Verbalized Sampling (VS)** to prevent AI mode collapse:
+
+- T-Score measures "typicality" of recommendations
+- High T-Score (>0.7) = common/modal choice
+- Low T-Score (<0.3) = creative/novel choice
+- Human checkpoints enforce deliberate choice
+
+### 3. Try a Workflow
+
+**Meta-Analysis Example:**
+```
+"I want to conduct a meta-analysis on AI tutoring effects on learning outcomes"
+```
+
+Diverga will:
+1. 🔴 CHECKPOINT: Confirm research direction
+2. Activate C5-meta-analysis-master
+3. Guide through PRISMA workflow
+4. Present VS alternatives at each decision point
 
 ---
 
-## Next Steps
+## 📚 More Documentation
 
-1. **Try it out**: Describe your research need and follow the checkpoints
-2. **Explore agents**: Read the [Agent Reference](./AGENT-REFERENCE.md)
-3. **Learn VS methodology**: Understand T-Scores and creative alternatives
-4. **Join the community**: Star the repo on GitHub!
+- [Full Documentation (CLAUDE.md)](../CLAUDE.md)
+- [All 40 Agents (AGENTS.md)](../AGENTS.md)
+- [Troubleshooting](TROUBLESHOOTING.md)
+- [VS Methodology](VS-METHODOLOGY.md)
+- [Cross-Platform Guide](DESIGN_SYSTEM.md)
 
 ---
 
-**Happy Researching!** 🧬
+## ❓ Need Help?
 
-*Diverga: Where creativity meets rigor. Beyond the obvious, toward the innovative.*
+- **Issues**: https://github.com/HosungYou/Diverga/issues
+- **Documentation**: https://github.com/HosungYou/Diverga
+
+---
+
+*Diverga v6.6.1 - Where creativity meets rigor*
