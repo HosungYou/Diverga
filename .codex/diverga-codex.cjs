@@ -15,9 +15,36 @@
 const fs = require('fs');
 const path = require('path');
 
+// ANSI Colors
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  dim: '\x1b[2m',
+  cyan: '\x1b[36m',
+  yellow: '\x1b[33m',
+  green: '\x1b[32m',
+  magenta: '\x1b[35m',
+  blue: '\x1b[34m',
+  red: '\x1b[31m',
+  white: '\x1b[37m',
+};
+
+// ASCII Art Banner
+const BANNER = `${colors.cyan}
+    ██████╗ ██╗██╗   ██╗███████╗██████╗  ██████╗  █████╗
+    ██╔══██╗██║██║   ██║██╔════╝██╔══██╗██╔════╝ ██╔══██╗
+    ██║  ██║██║██║   ██║█████╗  ██████╔╝██║  ███╗███████║
+    ██║  ██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██║
+    ██████╔╝██║ ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║
+    ╚═════╝ ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+${colors.reset}
+${colors.yellow}    🎯 Diverge from the Modal · Discover the Exceptional${colors.reset}
+${colors.dim}    ─────────────────────────────────────────────────────${colors.reset}
+`;
+
 // Configuration
 const CONFIG = {
-  version: '6.0.0',
+  version: '6.6.1',
   registryPath: path.join(__dirname, 'agents', 'index.json'),
   contextPath: path.join(process.cwd(), '.research', 'project-state.yaml'),
   skillsPath: path.join(process.env.HOME || '~', '.claude', 'skills', 'research-agents'),
@@ -77,37 +104,34 @@ const AGENT_REGISTRY = {
 // Commands
 const commands = {
   help() {
-    console.log(`
-╔═══════════════════════════════════════════════════════════════╗
-║           Diverga Research Coordinator - Codex CLI            ║
-║                       Version ${CONFIG.version}                        ║
-╚═══════════════════════════════════════════════════════════════╝
+    console.log(BANNER);
+    console.log(`${colors.bright}    Research Coordinator for Codex CLI${colors.reset}  │  ${colors.green}v${CONFIG.version}${colors.reset}  │  ${colors.cyan}40 Agents${colors.reset}
+    ${colors.dim}Powered by VS (Verbalized Sampling) Methodology${colors.reset}
 
-Usage: diverga-codex <command> [options]
+${colors.bright}Usage:${colors.reset} diverga-codex <command> [options]
 
-Commands:
-  setup              First-time setup and verification
-  list               List all available agents
-  agent <id>         Show details for a specific agent (e.g., A1, B2)
-  context            Show current research project context
-  checkpoint         Show checkpoint status
-  tscore             Display T-Score reference table
-  vs                 Explain VS methodology
+${colors.bright}Commands:${colors.reset}
+  ${colors.green}setup${colors.reset}              First-time setup and verification
+  ${colors.green}list${colors.reset}               List all available agents
+  ${colors.green}agent${colors.reset} <id>         Show details for a specific agent (e.g., A1, B2)
+  ${colors.green}context${colors.reset}            Show current research project context
+  ${colors.green}checkpoint${colors.reset}         Show checkpoint status
+  ${colors.green}tscore${colors.reset}             Display T-Score reference table
+  ${colors.green}vs${colors.reset}                 Explain VS methodology
 
-Examples:
-  diverga-codex list
-  diverga-codex agent A1
-  diverga-codex tscore
+${colors.bright}Examples:${colors.reset}
+  ${colors.dim}$${colors.reset} diverga-codex list
+  ${colors.dim}$${colors.reset} diverga-codex agent A1
+  ${colors.dim}$${colors.reset} diverga-codex tscore
+
+${colors.dim}Documentation: https://github.com/HosungYou/Diverga${colors.reset}
 `);
   },
 
   setup() {
-    console.log(`
-╔═══════════════════════════════════════════════════════════════╗
-║                    Diverga Setup for Codex                    ║
-╚═══════════════════════════════════════════════════════════════╝
-
-Checking configuration...
+    console.log(BANNER);
+    console.log(`${colors.bright}    Setup & Configuration Check${colors.reset}
+    ${colors.dim}────────────────────────────────────────────────────────${colors.reset}
 `);
 
     // Check for AGENTS.md
@@ -127,22 +151,26 @@ Checking configuration...
     }
 
     console.log(`
-Setup complete!
+${colors.green}✓ Setup Complete!${colors.reset}
 
-To use Diverga with Codex:
-1. Copy this directory to ~/.codex/diverga/
-2. Codex will automatically read AGENTS.md on startup
-3. Use keywords to trigger agents (e.g., "research question", "meta-analysis")
+${colors.bright}Quick Start:${colors.reset}
+  ${colors.dim}$${colors.reset} diverga-codex list          ${colors.dim}# View all 40 agents${colors.reset}
+  ${colors.dim}$${colors.reset} diverga-codex agent A1      ${colors.dim}# Get agent details${colors.reset}
+  ${colors.dim}$${colors.reset} diverga-codex tscore        ${colors.dim}# T-Score reference${colors.reset}
 
-For more information, see AGENTS.md
+${colors.bright}In Codex sessions, use keywords to trigger agents:${colors.reset}
+  ${colors.cyan}"research question"${colors.reset}  → A1-ResearchQuestionRefiner
+  ${colors.cyan}"meta-analysis"${colors.reset}      → C5-MetaAnalysisMaster
+  ${colors.cyan}"theoretical framework"${colors.reset} → A2-TheoreticalFrameworkArchitect
+
+${colors.dim}Documentation: https://github.com/HosungYou/Diverga${colors.reset}
 `);
   },
 
   list() {
-    console.log(`
-╔═══════════════════════════════════════════════════════════════╗
-║                  Diverga Agent Catalog                        ║
-╚═══════════════════════════════════════════════════════════════╝
+    console.log(BANNER);
+    console.log(`${colors.bright}    Agent Catalog${colors.reset}  │  ${colors.cyan}40 Specialized Research Agents${colors.reset}
+    ${colors.dim}────────────────────────────────────────────────────────${colors.reset}
 `);
 
     const categories = {};
@@ -154,14 +182,16 @@ For more information, see AGENTS.md
     }
 
     for (const [category, agents] of Object.entries(categories)) {
-      console.log(`\n## ${category}\n`);
+      console.log(`\n${colors.bright}${colors.magenta}${category}${colors.reset}\n`);
       for (const agent of agents) {
         const model = MODEL_MAP[agent.tier];
-        console.log(`  ${agent.icon} ${agent.id}: ${agent.name} (${model})`);
+        const tierColor = agent.tier === 'HIGH' ? colors.red : agent.tier === 'MEDIUM' ? colors.yellow : colors.green;
+        console.log(`  ${agent.icon} ${colors.cyan}${agent.id}${colors.reset}: ${agent.name} ${colors.dim}(${tierColor}${model}${colors.reset}${colors.dim})${colors.reset}`);
       }
     }
 
-    console.log(`\n\nTotal: ${Object.keys(AGENT_REGISTRY).length} agents`);
+    console.log(`\n${colors.dim}────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(`${colors.bright}Total:${colors.reset} ${colors.cyan}${Object.keys(AGENT_REGISTRY).length}${colors.reset} agents  │  ${colors.red}HIGH${colors.reset}=o1  ${colors.yellow}MEDIUM${colors.reset}=gpt-4  ${colors.green}LOW${colors.reset}=gpt-3.5`);
   },
 
   agent(id) {
