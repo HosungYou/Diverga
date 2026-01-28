@@ -14,11 +14,12 @@
 
 | 영역 | 변경 내용 |
 |------|----------|
-| **Codex CLI** | ESM/CommonJS 충돌 해결 (.cjs 파일 추가) |
-| **OpenCode** | TypeScript 빌드 시스템 완성 |
+| **Codex CLI** | ESM/CommonJS 충돌 해결 (.cjs 파일 추가), ASCII 아트 배너 추가 |
+| **OpenCode** | TypeScript 빌드 시스템 완성, ASCII 아트 배너 추가 |
 | **설치** | 원라인 설치 스크립트 3종 추가 |
-| **문서** | QUICKSTART.md, TROUBLESHOOTING.md 신규 |
+| **문서** | QUICKSTART.md, TROUBLESHOOTING.md 신규, diverga-docs 업데이트 |
 | **CI/CD** | GitHub Actions 워크플로우 추가 |
+| **UX** | ANSI 컬러 출력, 티어별 색상 표시 |
 
 ---
 
@@ -166,6 +167,30 @@ jobs:
 
 ---
 
+### P5: UX 개선 (ASCII Art Banner)
+
+#### 1. Codex CLI ASCII Art 배너
+
+```
+    ██████╗ ██╗██╗   ██╗███████╗██████╗  ██████╗  █████╗
+    ██╔══██╗██║██║   ██║██╔════╝██╔══██╗██╔════╝ ██╔══██╗
+    ██║  ██║██║██║   ██║█████╗  ██████╔╝██║  ███╗███████║
+    ██║  ██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██║
+    ██████╔╝██║ ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║
+    ╚═════╝ ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+
+    🎯 Diverge from the Modal · Discover the Exceptional
+```
+
+**기능**:
+- ANSI 컬러 출력 (Cyan, Yellow, Green, Red)
+- 티어별 색상 구분 (HIGH=Red, MEDIUM=Yellow, LOW=Green)
+- 모든 명령어에서 배너 표시
+
+**커밋**: `f5b557b`, `9a5dd64`
+
+---
+
 ## 📁 변경된 파일 목록
 
 ### 신규 파일 (9개)
@@ -215,12 +240,12 @@ curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/insta
 ### Codex CLI 명령어
 
 ```bash
-node ~/.codex/diverga/.codex/diverga-codex.cjs setup      # 설정 확인
-node ~/.codex/diverga/.codex/diverga-codex.cjs list       # 에이전트 목록
-node ~/.codex/diverga/.codex/diverga-codex.cjs agent A1   # 에이전트 상세
-node ~/.codex/diverga/.codex/diverga-codex.cjs tscore     # T-Score 참조
-node ~/.codex/diverga/.codex/diverga-codex.cjs checkpoint # 체크포인트
-node ~/.codex/diverga/.codex/diverga-codex.cjs vs         # VS 방법론
+node ~/.codex/diverga/diverga-codex.cjs setup      # 설정 확인
+node ~/.codex/diverga/diverga-codex.cjs list       # 에이전트 목록
+node ~/.codex/diverga/diverga-codex.cjs agent A1   # 에이전트 상세
+node ~/.codex/diverga/diverga-codex.cjs tscore     # T-Score 참조
+node ~/.codex/diverga/diverga-codex.cjs checkpoint # 체크포인트
+node ~/.codex/diverga/diverga-codex.cjs vs         # VS 방법론
 ```
 
 ### OpenCode 명령어
@@ -241,6 +266,9 @@ opencode "diverga:checkpoint"
 | `2138224` | P1 | feat(v6.6.1): Add unified install scripts for cross-platform support |
 | `b7349d8` | P2 | docs(v6.6.1): Add comprehensive platform documentation |
 | `ccfbe17` | P3 | ci(v6.6.1): Add GitHub Actions workflow for cross-platform testing |
+| `f19586c` | P4 | docs: Add comprehensive v6.6.1 release changelog |
+| `f5b557b` | P5 | feat(v6.6.1): Add ASCII art banner and colored output to Codex CLI |
+| `9a5dd64` | P5 | feat(v6.6.1): Add ASCII art banner and colored output to OpenCode plugin |
 
 ---
 
