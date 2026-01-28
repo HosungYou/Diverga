@@ -1,6 +1,6 @@
 {
   "name": "diverga-opencode-plugin",
-  "version": "6.5.2",
+  "version": "6.6.1",
   "description": "Diverga Research Coordinator - Multi-agent system for social science research (OpenCode Plugin)",
   "type": "module",
   "main": "dist/index.js",

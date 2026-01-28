@@ -17,11 +17,42 @@ import { CHECKPOINTS, formatCheckpoint } from './checkpoints';
 import { T_SCORE_REFERENCE, formatTScoreTable } from './tscore';
 
 /**
+ * ANSI Color codes for terminal output
+ */
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  dim: '\x1b[2m',
+  cyan: '\x1b[36m',
+  yellow: '\x1b[33m',
+  green: '\x1b[32m',
+  magenta: '\x1b[35m',
+  blue: '\x1b[34m',
+  red: '\x1b[31m',
+  white: '\x1b[37m',
+};
+
+/**
+ * ASCII Art Banner
+ */
+const BANNER = `${colors.cyan}
+    ██████╗ ██╗██╗   ██╗███████╗██████╗  ██████╗  █████╗
+    ██╔══██╗██║██║   ██║██╔════╝██╔══██╗██╔════╝ ██╔══██╗
+    ██║  ██║██║██║   ██║█████╗  ██████╔╝██║  ███╗███████║
+    ██║  ██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██║
+    ██████╔╝██║ ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║
+    ╚═════╝ ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+${colors.reset}
+${colors.yellow}    🎯 Diverge from the Modal · Discover the Exceptional${colors.reset}
+${colors.dim}    ─────────────────────────────────────────────────────${colors.reset}
+`;
+
+/**
  * Diverga Plugin Configuration
  */
 export const PLUGIN_CONFIG = {
   name: 'diverga',
-  version: '6.0.0',
+  version: '6.6.1',
   description: 'Research Coordinator - Multi-agent system for social science research',
 };
 
@@ -29,7 +60,9 @@ export const PLUGIN_CONFIG = {
  * Plugin initialization
  */
 export function initialize(context: PluginContext): Plugin {
-  console.log(`[Diverga] Initializing v${PLUGIN_CONFIG.version}`);
+  console.log(BANNER);
+  console.log(`${colors.bright}    Research Coordinator for OpenCode${colors.reset}  │  ${colors.green}v${PLUGIN_CONFIG.version}${colors.reset}  │  ${colors.cyan}40 Agents${colors.reset}`);
+  console.log(`${colors.dim}    Powered by VS (Verbalized Sampling) Methodology${colors.reset}\n`);
 
   // Load research context if exists
   const researchContext = loadContext();
@@ -102,10 +135,14 @@ export function initialize(context: PluginContext): Plugin {
  */
 function listAgents(): string {
   const agents = getAgentList();
+  const tierColors: Record<string, string> = {
+    HIGH: colors.red,
+    MEDIUM: colors.yellow,
+    LOW: colors.green,
+  };
   const output: string[] = [
-    '╔═══════════════════════════════════════════════════════════════╗',
-    '║                  Diverga Agent Catalog                        ║',
-    '╚═══════════════════════════════════════════════════════════════╝',
+    BANNER,
+    `${colors.bright}    Agent Catalog${colors.reset}  │  ${colors.cyan}${agents.length} Agents${colors.reset}`,
     '',
   ];
 
@@ -118,13 +155,14 @@ function listAgents(): string {
   }
 
   for (const [category, categoryAgents] of categories) {
-    output.push(`\n## ${category}\n`);
+    output.push(`\n${colors.bright}${category}${colors.reset}\n`);
     for (const agent of categoryAgents) {
-      output.push(`  ${agent.icon} ${agent.id}: ${agent.name} (${agent.tier})`);
+      const tierColor = tierColors[agent.tier] || colors.white;
+      output.push(`  ${agent.icon} ${colors.cyan}${agent.id}${colors.reset}: ${agent.name} ${tierColor}(${agent.tier})${colors.reset}`);
     }
   }
 
-  output.push(`\n\nTotal: ${agents.length} agents`);
+  output.push(`\n${colors.dim}Total: ${agents.length} agents${colors.reset}`);
   return output.join('\n');
 }
 
@@ -134,27 +172,32 @@ function listAgents(): string {
 function showAgent(agentId: string): string {
   const agent = getAgent(agentId);
   if (!agent) {
-    return `Agent "${agentId}" not found. Use "diverga:list" to see all agents.`;
+    return `${colors.red}Agent "${agentId}" not found.${colors.reset} Use ${colors.cyan}diverga:list${colors.reset} to see all agents.`;
   }
 
-  return `
-╔═══════════════════════════════════════════════════════════════╗
-║  ${agent.icon} ${agent.id}: ${agent.name.padEnd(45)}║
-╚═══════════════════════════════════════════════════════════════╝
+  const tierColors: Record<string, string> = {
+    HIGH: colors.red,
+    MEDIUM: colors.yellow,
+    LOW: colors.green,
+  };
+  const tierColor = tierColors[agent.tier] || colors.white;
 
-Category:     ${agent.category}
-Tier:         ${agent.tier}
-Model:        ${agent.claudeModel}
-VS Level:     ${agent.vsLevel}
+  return `${BANNER}
+${colors.bright}    ${agent.icon} ${agent.id}: ${agent.name}${colors.reset}
 
-Description:
+${colors.cyan}Category:${colors.reset}     ${agent.category}
+${colors.cyan}Tier:${colors.reset}         ${tierColor}${agent.tier}${colors.reset}
+${colors.cyan}Model:${colors.reset}        ${agent.claudeModel}
+${colors.cyan}VS Level:${colors.reset}     ${agent.vsLevel}
+
+${colors.bright}Description:${colors.reset}
 ${agent.description}
 
-Triggers:
-${agent.triggers.keywords.map(k => `  - ${k}`).join('\n')}
+${colors.bright}Triggers:${colors.reset}
+${agent.triggers.keywords.map(k => `  ${colors.green}•${colors.reset} ${k}`).join('\n')}
 
-Checkpoints:
-${(agent.checkpoints || []).map(c => `  - ${c}`).join('\n') || '  (none)'}
+${colors.bright}Checkpoints:${colors.reset}
+${(agent.checkpoints || []).map(c => `  ${colors.yellow}•${colors.reset} ${c}`).join('\n') || `  ${colors.dim}(none)${colors.reset}`}
 `;
 }
 
@@ -163,32 +206,31 @@ ${(agent.checkpoints || []).map(c => `  - ${c}`).join('\n') || '  (none)'}
  */
 function showCheckpoints(): string {
   const output: string[] = [
-    '╔═══════════════════════════════════════════════════════════════╗',
-    '║                  Checkpoint Reference                         ║',
-    '╚═══════════════════════════════════════════════════════════════╝',
+    BANNER,
+    `${colors.bright}    Checkpoint Reference${colors.reset}`,
     '',
-    'REQUIRED CHECKPOINTS (🔴 MANDATORY HALT)',
-    '─────────────────────────────────────────',
+    `${colors.red}REQUIRED CHECKPOINTS (🔴 MANDATORY HALT)${colors.reset}`,
+    `${colors.dim}─────────────────────────────────────────${colors.reset}`,
   ];
 
   for (const cp of CHECKPOINTS.filter(c => c.level === 'REQUIRED')) {
-    output.push(`  ${cp.id.padEnd(28)} ${cp.when}`);
+    output.push(`  ${colors.red}●${colors.reset} ${colors.cyan}${cp.id.padEnd(28)}${colors.reset} ${cp.when}`);
   }
 
   output.push('');
-  output.push('RECOMMENDED CHECKPOINTS (🟠 SUGGESTED HALT)');
-  output.push('─────────────────────────────────────────');
+  output.push(`${colors.yellow}RECOMMENDED CHECKPOINTS (🟠 SUGGESTED HALT)${colors.reset}`);
+  output.push(`${colors.dim}─────────────────────────────────────────${colors.reset}`);
 
   for (const cp of CHECKPOINTS.filter(c => c.level === 'RECOMMENDED')) {
-    output.push(`  ${cp.id.padEnd(28)} ${cp.when}`);
+    output.push(`  ${colors.yellow}●${colors.reset} ${colors.cyan}${cp.id.padEnd(28)}${colors.reset} ${cp.when}`);
   }
 
   output.push('');
-  output.push('OPTIONAL CHECKPOINTS (🟡 DEFAULTS AVAILABLE)');
-  output.push('─────────────────────────────────────────');
+  output.push(`${colors.green}OPTIONAL CHECKPOINTS (🟡 DEFAULTS AVAILABLE)${colors.reset}`);
+  output.push(`${colors.dim}─────────────────────────────────────────${colors.reset}`);
 
   for (const cp of CHECKPOINTS.filter(c => c.level === 'OPTIONAL')) {
-    output.push(`  ${cp.id.padEnd(28)} ${cp.when}`);
+    output.push(`  ${colors.green}●${colors.reset} ${colors.cyan}${cp.id.padEnd(28)}${colors.reset} ${cp.when}`);
   }
 
   return output.join('\n');
@@ -208,42 +250,38 @@ function showContext(): string {
   const context = loadContext();
 
   if (!context) {
-    return `
-╔═══════════════════════════════════════════════════════════════╗
-║                  Research Project Context                     ║
-╚═══════════════════════════════════════════════════════════════╝
+    return `${BANNER}
+${colors.bright}    Research Project Context${colors.reset}
 
-No active research project found.
+${colors.yellow}No active research project found.${colors.reset}
 
 To start a new project, use a research-related prompt such as:
-- "I want to conduct a systematic review on AI in education"
-- "Help me design a phenomenological study"
-- "메타분석 연구를 시작하고 싶어"
+  ${colors.green}•${colors.reset} "I want to conduct a systematic review on AI in education"
+  ${colors.green}•${colors.reset} "Help me design a phenomenological study"
+  ${colors.green}•${colors.reset} "메타분석 연구를 시작하고 싶어"
 `;
   }
 
-  return `
-╔═══════════════════════════════════════════════════════════════╗
-║                  Research Project Context                     ║
-╚═══════════════════════════════════════════════════════════════╝
+  return `${BANNER}
+${colors.bright}    Research Project Context${colors.reset}
 
-Project:        ${context.projectName}
-Type:           ${context.projectType}
-Paradigm:       ${context.paradigm}
-Current Stage:  ${context.currentStage}
-Created:        ${context.createdAt}
+${colors.cyan}Project:${colors.reset}        ${context.projectName}
+${colors.cyan}Type:${colors.reset}           ${context.projectType}
+${colors.cyan}Paradigm:${colors.reset}       ${context.paradigm}
+${colors.cyan}Current Stage:${colors.reset}  ${context.currentStage}
+${colors.cyan}Created:${colors.reset}        ${context.createdAt}
 
-Research Question:
-${context.researchQuestion || '(not set)'}
+${colors.bright}Research Question:${colors.reset}
+${context.researchQuestion || `${colors.dim}(not set)${colors.reset}`}
 
-Theoretical Framework:
-${context.theoreticalFramework || '(not set)'}
+${colors.bright}Theoretical Framework:${colors.reset}
+${context.theoreticalFramework || `${colors.dim}(not set)${colors.reset}`}
 
-Completed Checkpoints:
-${context.completedCheckpoints.map(c => `  ✅ ${c}`).join('\n') || '  (none)'}
+${colors.bright}Completed Checkpoints:${colors.reset}
+${context.completedCheckpoints.map(c => `  ${colors.green}✅${colors.reset} ${c}`).join('\n') || `  ${colors.dim}(none)${colors.reset}`}
 
-Pending Checkpoints:
-${context.pendingCheckpoints.map(c => `  ⏳ ${c}`).join('\n') || '  (none)'}
+${colors.bright}Pending Checkpoints:${colors.reset}
+${context.pendingCheckpoints.map(c => `  ${colors.yellow}⏳${colors.reset} ${c}`).join('\n') || `  ${colors.dim}(none)${colors.reset}`}
 `;
 }
 
@@ -251,34 +289,32 @@ ${context.pendingCheckpoints.map(c => `  ⏳ ${c}`).join('\n') || '  (none)'}
  * Show VS methodology explanation
  */
 function showVSMethodology(): string {
-  return `
-╔═══════════════════════════════════════════════════════════════╗
-║                  VS Methodology Explained                     ║
-╚═══════════════════════════════════════════════════════════════╝
+  return `${BANNER}
+${colors.bright}    VS Methodology Explained${colors.reset}
 
-VS (Verbalized Sampling) prevents AI "mode collapse" - the tendency
+${colors.cyan}VS (Verbalized Sampling)${colors.reset} prevents AI "mode collapse" - the tendency
 to always recommend the most common approaches.
 
-PROCESS:
-─────────────────────────────────────────────────────────────────
+${colors.bright}PROCESS:${colors.reset}
+${colors.dim}─────────────────────────────────────────────────────────────────${colors.reset}
 
-  Phase 1: MODAL IDENTIFICATION
+  ${colors.yellow}Phase 1: MODAL IDENTIFICATION${colors.reset}
   ┌─────────────────────────────────────────────────────────────┐
   │ Explicitly identify the most predictable recommendations     │
   │ (T > 0.7) and mark them as BASELINE to exceed               │
   └─────────────────────────────────────────────────────────────┘
                                │
                                ▼
-  Phase 2: LONG-TAIL SAMPLING
+  ${colors.yellow}Phase 2: LONG-TAIL SAMPLING${colors.reset}
   ┌─────────────────────────────────────────────────────────────┐
   │ Generate alternatives across the T-Score spectrum:           │
-  │   Direction A (T ≈ 0.7): Safe differentiation               │
-  │   Direction B (T ≈ 0.4): Balanced novelty                   │
-  │   Direction C (T < 0.3): Innovative approach                │
+  │   ${colors.green}Direction A (T ≈ 0.7):${colors.reset} Safe differentiation               │
+  │   ${colors.yellow}Direction B (T ≈ 0.4):${colors.reset} Balanced novelty                   │
+  │   ${colors.red}Direction C (T < 0.3):${colors.reset} Innovative approach                │
   └─────────────────────────────────────────────────────────────┘
                                │
                                ▼
-  Phase 3: HUMAN SELECTION (🔴 CHECKPOINT)
+  ${colors.red}Phase 3: HUMAN SELECTION (🔴 CHECKPOINT)${colors.reset}
   ┌─────────────────────────────────────────────────────────────┐
   │ Present ALL options with T-Scores                           │
   │ WAIT for explicit user selection                            │
