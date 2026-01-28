@@ -43,7 +43,7 @@ export function initialize(context: PluginContext): Plugin {
 
     // Hook registrations
     hooks: {
-      'tool.execute.before': async (params) => {
+      'tool.execute.before': async (params): Promise<HookResult> => {
         // Check for checkpoints
         const checkpointResult = await checkpointEnforcer(params, context);
         if (!checkpointResult.proceed) {
@@ -52,7 +52,7 @@ export function initialize(context: PluginContext): Plugin {
 
         // Route to correct model
         const routedParams = modelRouter(params);
-        return { proceed: true, params: routedParams };
+        return { proceed: true, params: routedParams as unknown as Record<string, unknown> };
       },
 
       'tool.execute.after': async (params, result) => {
@@ -88,7 +88,7 @@ export function initialize(context: PluginContext): Plugin {
     // Command handlers
     commands: {
       'diverga:list': () => listAgents(),
-      'diverga:agent': (args) => showAgent(args.agentId),
+      'diverga:agent': (args) => showAgent(args?.agentId ?? ''),
       'diverga:checkpoint': () => showCheckpoints(),
       'diverga:tscore': () => showTScore(),
       'diverga:context': () => showContext(),

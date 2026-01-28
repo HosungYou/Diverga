@@ -1,0 +1,47 @@
+{
+  "name": "diverga-opencode-plugin",
+  "version": "6.5.2",
+  "description": "Diverga Research Coordinator - Multi-agent system for social science research (OpenCode Plugin)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "research",
+    "social-science",
+    "meta-analysis",
+    "systematic-review",
+    "diverga"
+  ],
+  "author": "Hosung You",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "files": [
+    "dist",
+    "hooks"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HosungYou/Diverga.git",
+    "directory": ".opencode/plugins/diverga"
+  }
+}
