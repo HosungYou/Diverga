@@ -1,0 +1,145 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/main/schema.json",
+  "name": "diverga",
+  "version": "6.0.0",
+  "description": "Diverga Research Coordinator - Multi-agent system for social science research",
+  "author": "Diverga Team",
+  "repository": "https://github.com/HosungYou/Diverga",
+
+  "plugins": [
+    "./plugins/diverga"
+  ],
+
+  "settings": {
+    "defaultModel": "sonnet",
+    "checkpointEnforcement": "strict",
+    "vsMethodology": true,
+    "koreanSupport": true,
+    "autoTrigger": true
+  },
+
+  "hooks": {
+    "tool.execute.before": [
+      "checkpoint-enforcer",
+      "model-router"
+    ],
+    "tool.execute.after": [
+      "vs-display",
+      "state-update"
+    ],
+    "tui.prompt.append": [
+      "auto-trigger"
+    ],
+    "session.created": [
+      "load-context"
+    ]
+  },
+
+  "commands": {
+    "diverga:list": {
+      "description": "List all available research agents",
+      "handler": "listAgents"
+    },
+    "diverga:agent": {
+      "description": "Show details for a specific agent",
+      "handler": "showAgent",
+      "args": ["agentId"]
+    },
+    "diverga:checkpoint": {
+      "description": "Show checkpoint status",
+      "handler": "showCheckpoints"
+    },
+    "diverga:tscore": {
+      "description": "Display T-Score reference",
+      "handler": "showTScore"
+    },
+    "diverga:context": {
+      "description": "Show current research context",
+      "handler": "showContext"
+    }
+  },
+
+  "triggers": {
+    "A1": {
+      "keywords": ["research question", "연구 질문", "PICO", "SPIDER"],
+      "autoActivate": true
+    },
+    "A2": {
+      "keywords": ["theoretical framework", "이론적 프레임워크", "theory"],
+      "autoActivate": true
+    },
+    "A3": {
+      "keywords": ["devil's advocate", "criticism", "weakness", "reviewer"],
+      "autoActivate": true
+    },
+    "B1": {
+      "keywords": ["literature review", "PRISMA", "systematic review", "선행연구"],
+      "autoActivate": true
+    },
+    "C1": {
+      "keywords": ["experimental design", "RCT", "quasi-experimental"],
+      "autoActivate": true
+    },
+    "C2": {
+      "keywords": ["phenomenology", "grounded theory", "case study", "현상학"],
+      "autoActivate": true
+    },
+    "C3": {
+      "keywords": ["mixed methods", "혼합방법", "convergent"],
+      "autoActivate": true
+    },
+    "C5": {
+      "keywords": ["meta-analysis", "메타분석", "MASEM"],
+      "autoActivate": true
+    },
+    "E1": {
+      "keywords": ["statistical analysis", "regression", "SEM", "통계 분석"],
+      "autoActivate": true
+    },
+    "E2": {
+      "keywords": ["thematic analysis", "coding", "질적 분석"],
+      "autoActivate": true
+    }
+  },
+
+  "modelRouting": {
+    "HIGH": {
+      "model": "opus",
+      "agents": ["A2", "A5", "A6", "C1", "C2", "C3", "C5", "D4", "E1", "E3", "G3", "H1", "H2"]
+    },
+    "MEDIUM": {
+      "model": "sonnet",
+      "agents": ["A1", "A3", "A4", "B1", "B2", "B5", "C4", "C6", "C7", "D1", "D2", "E2", "E5", "F3", "F4", "F5", "G1", "G2", "G4", "G5", "G6"]
+    },
+    "LOW": {
+      "model": "haiku",
+      "agents": ["B3", "B4", "D3", "E4", "F1", "F2"]
+    }
+  },
+
+  "checkpoints": {
+    "required": [
+      "CP_RESEARCH_DIRECTION",
+      "CP_PARADIGM_SELECTION",
+      "CP_THEORY_SELECTION",
+      "CP_METHODOLOGY_APPROVAL",
+      "CP_VS_001",
+      "CP_VS_003"
+    ],
+    "recommended": [
+      "CP_ANALYSIS_PLAN",
+      "CP_INTEGRATION_STRATEGY",
+      "CP_QUALITY_REVIEW",
+      "CP_SCREENING_CRITERIA",
+      "CP_SAMPLING_STRATEGY",
+      "CP_CODING_APPROACH",
+      "CP_THEME_VALIDATION"
+    ],
+    "optional": [
+      "CP_VISUALIZATION_PREFERENCE",
+      "CP_SEARCH_STRATEGY",
+      "CP_WRITING_STYLE",
+      "CP_PROTOCOL_DESIGN"
+    ]
+  }
+}

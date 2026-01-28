@@ -20,8 +20,10 @@
               └─────────────────────────────────────────────────┘
 ```
 
-[![Version](https://img.shields.io/badge/version-6.5.2-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
+[![Version](https://img.shields.io/badge/version-6.6.0-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-FF6B00?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code)
+[![Codex CLI](https://img.shields.io/badge/Codex_CLI-Support-412991?style=for-the-badge&logo=openai&logoColor=white)](docs/DESIGN_SYSTEM.md)
+[![OpenCode](https://img.shields.io/badge/OpenCode-Plugin-0969da?style=for-the-badge&logo=github&logoColor=white)](docs/DESIGN_SYSTEM.md)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Methodology](https://img.shields.io/badge/Powered_by-VS+HAVS-violet?style=for-the-badge&logo=academia&logoColor=white)](docs/methodology.md)
 [![Language](https://img.shields.io/badge/language-English%20%7C%20한국어-orange?style=for-the-badge)](docs/i18n/ko/README-ko.md)
@@ -450,6 +452,7 @@ The system will:
 
 | Version | Feature |
 |---------|---------|
+| **v6.6.0** | Cross-Platform Edition - Codex CLI & OpenCode support, shared lib/ |
 | **v6.5.0** | Parallel Execution Edition - Task tool support, /agents/ directory |
 | **v6.4.0** | Plugin Marketplace - `/plugin marketplace add`, auto-trigger dispatch |
 | **v6.3.0** | Meta-Analysis Agent System - C5/C6/C7 for Hedges' g calculation |
@@ -492,6 +495,82 @@ Mixed: "메타분석을 하려는데, can you help?"
 
 ---
 
+## 🌐 Cross-Platform Support (v6.6)
+
+Diverga now works across **three AI coding platforms** with a unified shared library:
+
+| Platform | Status | Installation |
+|----------|--------|--------------|
+| **Claude Code** | ✅ Full Support | `/plugin install diverga` |
+| **OpenAI Codex CLI** | ✅ Full Support | `.codex/diverga-codex.js setup` |
+| **OpenCode** | ✅ Full Support | Add to `oh-my-opencode.json` |
+
+### Architecture
+
+```
+Diverga/
+├── lib/                         # 🆕 Shared Core Module
+│   ├── agents/                  # Agent discovery & registry
+│   ├── checkpoints/             # Checkpoint definitions
+│   └── tscore/                  # T-Score reference
+├── .claude/skills/              # Claude Code (source of truth)
+├── .codex/                      # 🆕 Codex CLI Adapter
+│   ├── AGENTS.md               # Bootstrap markdown
+│   └── diverga-codex.js        # CLI wrapper
+└── .opencode/                   # 🆕 OpenCode Plugin
+    ├── oh-my-opencode.json     # Config
+    └── plugins/diverga/        # JavaScript plugin
+```
+
+### Codex CLI Quick Start
+
+```bash
+# Setup
+node .codex/diverga-codex.js setup
+
+# List agents
+node .codex/diverga-codex.js list
+
+# Invoke agent
+node .codex/diverga-codex.js agent a1
+```
+
+### OpenCode Quick Start
+
+```jsonc
+// .opencode/oh-my-opencode.json
+{
+  "plugins": ["./plugins/diverga"],
+  "diverga": {
+    "autoTrigger": true,
+    "defaultModel": "sonnet"
+  }
+}
+```
+
+### Model Mapping
+
+| Tier | Claude Code | Codex CLI | OpenCode |
+|------|-------------|-----------|----------|
+| HIGH | opus | o1 | opus |
+| MEDIUM | sonnet | gpt-4 | sonnet |
+| LOW | haiku | gpt-3.5-turbo | haiku |
+
+### Tool Mapping (Claude → Codex)
+
+| Claude Tool | Codex Equivalent |
+|-------------|------------------|
+| `TodoWrite` | `update_plan` |
+| `Task` | Direct execution |
+| `Read` | `read_file` |
+| `Edit` | `apply_diff` |
+| `Grep` | `grep` |
+| `Bash` | `shell` |
+
+All 40 agents work identically across all platforms with VS methodology and human checkpoints enforced.
+
+---
+
 ## 📚 Documentation
 
 | Document | Description |
@@ -505,6 +584,7 @@ Mixed: "메타분석을 하려는데, can you help?"
 | [Quick Start](docs/QUICKSTART.md) | Get started in 5 minutes |
 | [VS Methodology](docs/VS-METHODOLOGY.md) | Deep dive into Verbalized Sampling |
 | [Humanization Pipeline](docs/v6.1.0-humanization-pipeline.md) | v6.1 humanization documentation |
+| [Cross-Platform Guide](docs/DESIGN_SYSTEM.md) | Cross-platform support details |
 | [CHANGELOG](CHANGELOG.md) | Version history |
 
 ---
@@ -530,9 +610,9 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {6.5.0},
+  version = {6.6.0},
   url = {https://github.com/HosungYou/Diverga},
-  note = {40 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Plugin Marketplace, and Parallel Execution. Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
+  note = {40 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
 }
 ```
 
