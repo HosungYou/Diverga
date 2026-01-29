@@ -1,18 +1,24 @@
-# Diverga QA Protocol v2.0 - 완전 문서
+# Diverga QA Protocol v2.1 - 완전 문서
 
 ## 개요
 
-Diverga QA Protocol v2.0은 **실제 Claude Code 대화**를 통해 Diverga 연구 방법론 플러그인을 검증하는 시스템입니다.
+Diverga QA Protocol v2.1은 **실제 Claude Code 대화**를 통해 Diverga 연구 방법론 플러그인을 검증하는 시스템입니다.
 
-### v1.0 vs v2.0 비교
+### 버전 비교
 
-| 항목 | v1.0 (이전) | v2.0 (현재) |
-|------|-------------|-------------|
-| **실행 방식** | Mock Python 스크립트 | Claude Code 내 실제 대화 |
-| **사용자 입력** | 단답식 선택 | 복잡한 기술적 질문 및 도전 |
-| **응답 언어** | 한영 혼합 | 사용자 입력 언어 따라가기 |
-| **대화 추출** | 수동 기록 | JSONL 자동 파싱 |
-| **평가 방식** | 수동 체크리스트 | 자동화된 검증 스크립트 |
+| 항목 | v1.0 | v2.0 | v2.1 (현재) |
+|------|------|------|-------------|
+| **실행 방식** | Mock 스크립트 | 실제 대화 | 실제 대화 |
+| **사용자 입력** | 단답식 선택 | 복잡한 질문 | 복잡한 질문 |
+| **대화 추출** | 수동 기록 | JSONL 파싱 | **세션 폴더 기반** |
+| **대화 저장** | 없음 | YAML만 | **RAW JSON + Markdown** |
+| **폴더 구조** | 단일 폴더 | 단일 폴더 | **세션별 폴더** |
+
+### v2.1 신규 기능
+
+1. **세션 기반 폴더 관리** - 각 테스트 세션을 개별 폴더로 관리
+2. **RAW 대화 추출** - 완전한 대화 내용을 JSON 및 Markdown으로 저장
+3. **GitHub 배포 가능** - 모든 대화 내용을 버전 관리 및 공유
 
 ---
 
@@ -44,12 +50,13 @@ Diverga QA Protocol v2.0은 **실제 Claude Code 대화**를 통해 Diverga 연�
 
 ---
 
-## 디렉토리 구조
+## 디렉토리 구조 (v2.1)
 
 ```
 qa/
 ├── README.md                    # 빠른 시작 가이드
 ├── run_tests.py                 # 메인 테스트 러너
+├── .gitignore                   # Git 제외 패턴 (대용량 JSONL 등)
 ├── docs/
 │   ├── QA_PROTOCOL_v2.md        # 이 문서
 │   ├── CHECKPOINT_SPEC.md       # 체크포인트 명세
@@ -63,8 +70,145 @@ qa/
 │   ├── test_mixed_002.yaml      # 혼합방법 시나리오
 │   └── test_human_002.yaml      # 휴먼화 시나리오
 └── reports/
-    ├── real-transcripts/        # 추출된 대화
-    └── evaluations/             # 평가 결과
+    ├── README.md                # 리포트 가이드
+    ├── sessions/                # [v2.1 NEW] 세션별 폴더
+    │   ├── META-002/            # META-002 테스트 세션
+    │   │   ├── README.md                    # 세션 개요
+    │   │   ├── conversation_transcript.md   # 사람이 읽기 쉬운 대화록
+    │   │   ├── conversation_raw.json        # RAW 대화 데이터
+    │   │   ├── META-002_test_result.yaml    # 테스트 평가 결과
+    │   │   └── META-002_report.html         # HTML 보고서
+    │   ├── QUAL-002/            # (예정)
+    │   └── MIXED-002/           # (예정)
+    └── (legacy files...)        # v1.0 레거시 파일
+```
+
+---
+
+## 세션 기반 폴더 관리 (v2.1 NEW)
+
+### 개요
+
+v2.1부터 각 테스트 세션은 **독립된 폴더**에서 관리됩니다.
+이를 통해 RAW 대화 내용을 GitHub에 배포하고 버전 관리할 수 있습니다.
+
+### 세션 폴더 구조
+
+```
+reports/sessions/{SCENARIO-ID}/
+├── README.md                    # 세션 개요 및 테스트 결과 요약
+├── conversation_transcript.md   # 사람이 읽기 쉬운 마크다운 형식
+├── conversation_raw.json        # 프로그래밍 접근용 RAW JSON
+├── {SCENARIO-ID}_test_result.yaml   # 평가 결과
+├── {SCENARIO-ID}_report.html        # 시각적 HTML 리포트
+└── session_{session-id}.jsonl       # [Git 제외] 원본 세션 로그
+```
+
+### 파일별 용도
+
+| 파일 | 용도 | Git 포함 | 크기 |
+|------|------|----------|------|
+| `README.md` | 세션 개요, GitHub 미리보기 | ✅ | ~2KB |
+| `conversation_transcript.md` | 전체 대화 읽기 | ✅ | ~500KB |
+| `conversation_raw.json` | API/스크립트 접근 | ✅ | ~600KB |
+| `*_test_result.yaml` | 테스트 평가 | ✅ | ~6KB |
+| `*_report.html` | 브라우저 리포트 | ✅ | ~16KB |
+| `session_*.jsonl` | 원본 Claude Code 로그 | ❌ | ~8MB |
+
+### RAW 대화 추출 프로토콜
+
+세션 JSONL에서 RAW 대화를 추출하는 절차:
+
+**Step 1: Claude Code 세션 로그 찾기**
+```bash
+# 세션 로그 위치
+~/.claude/projects/{project-id}/{session-id}.jsonl
+```
+
+**Step 2: 세션 폴더 생성**
+```bash
+mkdir -p qa/reports/sessions/{SCENARIO-ID}
+```
+
+**Step 3: RAW 대화 추출**
+```python
+import json
+from pathlib import Path
+from datetime import datetime
+
+session_file = '~/.claude/projects/.../session.jsonl'
+output_dir = Path('qa/reports/sessions/{SCENARIO-ID}')
+
+# JSONL 파싱
+entries = []
+with open(session_file, 'r', encoding='utf-8') as f:
+    for line in f:
+        if line.strip():
+            entries.append(json.loads(line))
+
+# user/assistant 메시지만 추출
+conversation = []
+for e in entries:
+    if e.get('type') in ['user', 'assistant']:
+        conversation.append({
+            'type': e['type'],
+            'timestamp': e.get('timestamp', ''),
+            'content': e.get('message', {}).get('content', '')
+        })
+
+# JSON 저장
+with open(output_dir / 'conversation_raw.json', 'w') as f:
+    json.dump(conversation, f, indent=2, ensure_ascii=False)
+
+# Markdown 저장
+with open(output_dir / 'conversation_transcript.md', 'w') as f:
+    f.write("# Session Transcript\n\n")
+    for i, msg in enumerate(conversation, 1):
+        role = "👤 USER" if msg['type'] == 'user' else "🤖 ASSISTANT"
+        f.write(f"## Turn {i}: {role}\n\n")
+        f.write(f"{msg['content']}\n\n---\n\n")
+```
+
+**Step 4: 자동 추출 CLI**
+```bash
+python qa/runners/extract_conversation.py \
+  --session ~/.claude/projects/{project-id}/{session-id}.jsonl \
+  --output qa/reports/sessions/{SCENARIO-ID}/ \
+  --scenario-id {SCENARIO-ID}
+```
+
+### 새 세션 추가 워크플로우
+
+```
+1. Claude Code에서 테스트 대화 진행
+   └─ /diverga:research-coordinator 호출
+   └─ 시나리오 대로 대화 진행
+
+2. 세션 완료 후 폴더 생성
+   └─ mkdir -p qa/reports/sessions/{SCENARIO-ID}
+
+3. 대화 추출
+   └─ python extract_conversation.py ...
+
+4. 평가 실행
+   └─ python run_tests.py --evaluate-extracted ...
+
+5. README.md 생성 (자동 또는 수동)
+   └─ 세션 요약, 테스트 결과 포함
+
+6. Git 커밋 및 푸시
+   └─ git add qa/reports/sessions/{SCENARIO-ID}/
+   └─ git commit -m "feat(qa): Add {SCENARIO-ID} session"
+   └─ git push
+```
+
+### .gitignore 설정
+
+대용량 원본 JSONL 파일은 Git에서 제외합니다:
+
+```gitignore
+# qa/.gitignore
+reports/sessions/**/session_*.jsonl
 ```
 
 ---
@@ -370,8 +514,25 @@ result = extractor.extract()
 
 | 버전 | 날짜 | 변경 사항 |
 |------|------|----------|
+| **v2.1** | 2026-01-29 | 세션 기반 폴더 관리, RAW 대화 추출 프로토콜, GitHub 배포 지원 |
 | v2.0 | 2026-01-29 | 실제 대화 테스트, 복잡한 입력 유형, JSONL 추출 |
 | v1.0 | 2026-01-15 | 초기 Mock 스크립트 버전 |
+
+### v2.1 변경 상세
+
+1. **세션 기반 폴더 관리**
+   - 각 테스트 세션을 `reports/sessions/{SCENARIO-ID}/` 폴더에 저장
+   - 모든 관련 파일 (대화록, 평가, 리포트)을 한 곳에 관리
+
+2. **RAW 대화 추출**
+   - `conversation_raw.json`: 프로그래밍 접근용 완전한 대화 데이터
+   - `conversation_transcript.md`: 사람이 읽기 쉬운 마크다운 형식
+   - JSONL → JSON/Markdown 변환 자동화
+
+3. **GitHub 배포 최적화**
+   - 대용량 JSONL 파일 Git 제외 (`.gitignore`)
+   - 추출된 JSON/Markdown 파일만 버전 관리
+   - 각 세션 폴더에 README.md로 GitHub 미리보기 지원
 
 ---
 

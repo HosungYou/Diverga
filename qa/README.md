@@ -1,6 +1,8 @@
-# Diverga QA Protocol v2.0
+# Diverga QA Protocol v2.1
 
 Real Conversation Testing for Diverga Research Methodology Plugin
+
+**v2.1 New**: Session-based folder management + RAW conversation extraction
 
 ## Overview
 
@@ -53,12 +55,17 @@ python qa/run_tests.py \
   --expected qa/protocol/test_meta_002.yaml
 ```
 
-## Directory Structure
+## Directory Structure (v2.1)
 
 ```
 qa/
 ├── README.md                    # This file
 ├── run_tests.py                 # Test runner and evaluator
+├── .gitignore                   # Excludes large JSONL files
+├── docs/
+│   ├── QA_PROTOCOL_v2.md        # Full protocol documentation
+│   ├── CHECKPOINT_SPEC.md       # Checkpoint system spec
+│   └── AGENT_TRIGGER_SPEC.md    # 40 agent trigger map
 ├── runners/
 │   ├── __init__.py
 │   └── extract_conversation.py  # Session log extractor
@@ -68,7 +75,15 @@ qa/
 │   ├── test_mixed_002.yaml      # Advanced mixed methods
 │   └── test_human_002.yaml      # Academic humanization
 └── reports/
-    └── real-transcripts/        # Extracted conversation outputs
+    ├── README.md                # Reports guide
+    ├── sessions/                # [v2.1] Session-based folders
+    │   └── META-002/            # Complete test session
+    │       ├── README.md
+    │       ├── conversation_transcript.md  # Human-readable
+    │       ├── conversation_raw.json       # RAW data
+    │       ├── META-002_test_result.yaml
+    │       └── META-002_report.html
+    └── (legacy files...)        # v1.0 outputs
 ```
 
 ## Test Scenarios
@@ -225,6 +240,12 @@ When adding new test scenarios:
 5. Extract and evaluate against expected
 
 ## Changelog
+
+### v2.1 (2026-01-29)
+- **Session-based folder management** - Each test session in `reports/sessions/{SCENARIO-ID}/`
+- **RAW conversation extraction** - `conversation_raw.json` + `conversation_transcript.md`
+- **GitHub deployment support** - Large JSONL files excluded, extracted files included
+- **Session README** - Each session folder has overview and test results
 
 ### v2.0 (2026-01-29)
 - Migrated from mock Python scripts to real Claude Code conversations
