@@ -1,24 +1,23 @@
 """
-Diverga QA Runners Module
-==========================
+Diverga QA Protocol v2.0 - Runners Module
 
-Execution engines for running QA tests and collecting metrics.
-
-Classes:
-- ConversationSimulator: Simulates conversations against scenarios
-- CheckpointValidator: Validates checkpoint behavior
-- AgentTracker: Tracks agent invocations and accuracy
+Provides conversation extraction and analysis tools for QA testing.
 """
 
-from .conversation_simulator import ConversationSimulator, SimulationResult
-from .checkpoint_validator import CheckpointValidator, ValidationResult
-from .agent_tracker import AgentTracker, AgentInvocation
+from .extract_conversation import (
+    ConversationExtractor,
+    ConversationEvaluator,
+    ExtractionResult,
+    Turn,
+    Checkpoint,
+    AgentInvocation,
+)
 
 __all__ = [
-    "ConversationSimulator",
-    "SimulationResult",
-    "CheckpointValidator",
-    "ValidationResult",
-    "AgentTracker",
-    "AgentInvocation",
+    'ConversationExtractor',
+    'ConversationEvaluator',
+    'ExtractionResult',
+    'Turn',
+    'Checkpoint',
+    'AgentInvocation',
 ]

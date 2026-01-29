@@ -1,269 +1,234 @@
-# Diverga QA Protocol & Agentic AI Evaluation Framework
+# Diverga QA Protocol v2.0
 
-Comprehensive testing framework for validating Diverga's checkpoint system, agent invocations, and VS methodology quality.
+Real Conversation Testing for Diverga Research Methodology Plugin
 
 ## Overview
 
-This QA framework provides:
+This QA protocol validates Diverga plugin functionality through **real Claude Code conversations**, not mock simulations. It tests:
 
-- **Checkpoint Compliance Testing**: Validates 🔴 REQUIRED checkpoints properly HALT execution
-- **Agent Invocation Tracking**: Ensures correct agent selection and model tier usage
-- **VS Methodology Evaluation**: Measures T-Score diversity and modal avoidance
-- **Conversation Simulation**: Tests complete research workflows
+- **Checkpoint System** - Mandatory HALT at critical decision points
+- **Agent Invocation** - Correct agent triggering and execution
+- **VS Methodology** - T-Score based alternative presentation
+- **Complex User Interactions** - Technical questions, methodological challenges, agent transitions
+- **Language Consistency** - Response matches input language (English/Korean)
 
 ## Quick Start
 
+### 1. Run a Test Scenario
+
 ```bash
-# Run a specific scenario
-python -m qa.run_tests --scenario META-001 --verbose
+# Start Claude Code in the Diverga project
+cd /Volumes/External\ SSD/Projects/Diverga
+claude
 
-# Run all scenarios
-python -m qa.run_tests --all --report json
+# Invoke the research coordinator skill
+/diverga:research-coordinator
 
-# Test a specific checkpoint
-python -m qa.run_tests --checkpoint CP_RESEARCH_DIRECTION
+# Or start with a natural language prompt from the scenario
+```
 
-# List available scenarios
-python -m qa.run_tests --list
+### 2. Follow Test Script
+
+Use the conversation flows defined in `qa/protocol/test_*.yaml`:
+
+| Scenario | File | Focus |
+|----------|------|-------|
+| META-002 | `test_meta_002.yaml` | Advanced meta-analysis with technical challenges |
+| QUAL-002 | `test_qual_002.yaml` | Phenomenology with paradigm debates (Korean) |
+| MIXED-002 | `test_mixed_002.yaml` | Mixed methods integration challenges |
+| HUMAN-002 | `test_human_002.yaml` | Academic humanization with ethics |
+
+### 3. Extract and Evaluate
+
+```bash
+# Extract conversation from Claude Code session log
+python qa/runners/extract_conversation.py \
+  --session ~/.claude/projects/{project-id}/{session}.jsonl \
+  --output qa/reports/real-transcripts/
+
+# Evaluate against expected scenario
+python qa/run_tests.py \
+  --evaluate-extracted \
+  --input qa/reports/real-transcripts/META-002.yaml \
+  --expected qa/protocol/test_meta_002.yaml
 ```
 
 ## Directory Structure
 
 ```
 qa/
-├── __init__.py              # Package initialization
-├── run_tests.py             # Main test runner
-├── protocol/                # Test definitions
+├── README.md                    # This file
+├── run_tests.py                 # Test runner and evaluator
+├── runners/
 │   ├── __init__.py
-│   ├── scenarios.py         # Scenario class definitions
-│   ├── metrics.py           # Evaluation metrics
-│   ├── test_meta_001.yaml   # Meta-analysis scenario
-│   ├── test_qual_001.yaml   # Qualitative research scenario
-│   ├── test_mixed_001.yaml  # Mixed methods scenario
-│   └── test_human_001.yaml  # Humanization pipeline scenario
-├── runners/                 # Execution engines
-│   ├── __init__.py
-│   ├── conversation_simulator.py  # Conversation simulation
-│   ├── checkpoint_validator.py    # Checkpoint validation
-│   └── agent_tracker.py           # Agent invocation tracking
-└── reports/                 # Test results
-    └── [timestamp]-report.yaml
+│   └── extract_conversation.py  # Session log extractor
+├── protocol/
+│   ├── test_meta_002.yaml       # Advanced meta-analysis scenario
+│   ├── test_qual_002.yaml       # Advanced qualitative (Korean)
+│   ├── test_mixed_002.yaml      # Advanced mixed methods
+│   └── test_human_002.yaml      # Academic humanization
+└── reports/
+    └── real-transcripts/        # Extracted conversation outputs
 ```
 
 ## Test Scenarios
 
-| ID | Name | Paradigm | Priority | Focus |
-|----|------|----------|----------|-------|
-| META-001 | Meta-Analysis Pipeline | Quantitative | Critical | C5/C6/C7 agents |
-| QUAL-001 | Phenomenology Study | Qualitative | High | C2 agent |
-| MIXED-001 | Sequential Explanatory | Mixed Methods | High | C3/E3 agents |
-| HUMAN-001 | Humanization Pipeline | Any | High | G5/G6/F5 agents |
+### META-002: Advanced Meta-Analysis
 
-## Checkpoint Types
+**Complexity:** HIGH (10-15 turns)
+**Language:** English
+**Agents:** C5, C6, C7, B1, B3, E1, E5, A2
 
-| Level | Icon | Behavior | Validation |
-|-------|------|----------|------------|
-| **REQUIRED** | 🔴 | System MUST STOP | Must halt, present VS options, wait for approval |
-| **RECOMMENDED** | 🟠 | System SHOULD STOP | Should pause for review |
-| **OPTIONAL** | 🟡 | System ASKS | Defaults available |
+Tests:
+- Effect size methodology questions (Hedges' g vs Cohen's d)
+- Sample size concerns for random-effects models
+- Agent transition to theoretical framework
+- Gray literature inclusion decisions
+- Bayesian meta-analysis alternatives
+- Subgroup analysis feasibility
 
-### REQUIRED Checkpoints
+### QUAL-002: Advanced Phenomenology (Korean)
 
-- `CP_RESEARCH_DIRECTION`: Research question finalized
-- `CP_PARADIGM_SELECTION`: Methodology approach selected
-- `CP_THEORY_SELECTION`: Theoretical framework chosen
-- `CP_METHODOLOGY_APPROVAL`: Design complete
+**Complexity:** HIGH (8-12 turns)
+**Language:** Korean
+**Agents:** A1, A5, C2, D2, E2, A3, C3
 
-## Evaluation Metrics
+Tests:
+- Phenomenological approach selection (Husserl vs Heidegger vs van Manen)
+- Philosophical depth questions
+- Devil's advocate reviewer anticipation
+- Sample size justification (n=5)
+- Paradigm reconsideration (pure qual vs mixed)
+- Korean language consistency throughout
 
-### Checkpoint Compliance (40% weight)
+### MIXED-002: Complex Mixed Methods
 
-| Metric | Target |
-|--------|--------|
-| HALT Rate | 100% for 🔴 checkpoints |
-| False Continuation | 0 incidents |
-| VS Alternatives | ≥ 3 options presented |
-| T-Scores Visible | 100% of checkpoints |
+**Complexity:** HIGH (8-10 turns)
+**Language:** English
+**Agents:** A1, C3, E3, D1, D2
 
-### Agent Accuracy (35% weight)
+Tests:
+- Morse notation explanation
+- Sequential vs concurrent design selection
+- Joint display creation guidance
+- Timeline constraint handling
+- Sample size ratio recommendations
+- Methodological flexibility defense
 
-| Metric | Target |
-|--------|--------|
-| Trigger Precision | ≥ 95% |
-| Model Tier Accuracy | 100% |
-| Execution Order | Correct sequence |
+### HUMAN-002: Academic Humanization
 
-### VS Quality (25% weight)
+**Complexity:** MEDIUM (6-8 turns)
+**Language:** English
+**Agents:** G5, G6, F5, A4
 
-| Metric | Target |
-|--------|--------|
-| Option Diversity | T-Score spread ≥ 0.3 |
-| Modal Avoidance | Don't recommend T ≥ 0.8 as primary |
-| Creative Options | Include T ≤ 0.4 option |
+Tests:
+- AI pattern detection and categorization
+- Detection logic explanation
+- Humanization transformation modes
+- Ethical considerations (AI disclosure)
+- Citation integrity verification
+- Meaning preservation checking
 
-## Grading Rubric
+## User Input Types
 
-| Grade | Criteria |
-|-------|----------|
-| **A (Excellent)** | Correct agent, checkpoint, VS alternatives with T-Scores, explicit wait |
-| **B (Good)** | Correct agent, checkpoint triggered, alternatives provided (minor gaps) |
-| **C (Acceptable)** | Correct agent, checkpoint present but weak alternatives |
-| **D (Poor)** | Wrong agent or missed checkpoint |
-| **F (Fail)** | Continued without approval at 🔴 checkpoint |
+The protocol tests these complex user interaction patterns:
 
-## Usage Examples
+| Type | Description | Example |
+|------|-------------|---------|
+| `TECHNICAL_FOLLOW_UP` | Deep statistical/methodological questions | "Why Hedges' g over Cohen's d?" |
+| `METHODOLOGICAL_CHALLENGE` | Critical questioning of approach | "But random-effects assumes normality..." |
+| `AGENT_TRANSITION_REQUEST` | Request to switch focus | "Wait, can we do theory first?" |
+| `SCOPE_CHANGE` | Modify research scope | "Should I include gray literature?" |
+| `ALTERNATIVE_EXPLORATION` | Ask about unlisted options | "What about Bayesian meta-analysis?" |
+| `PRACTICAL_CONSTRAINT` | Real-world limitations | "I only have 12 studies..." |
+| `SELECTION` | Option choice | "[B] Subject-specific effects" |
+| `APPROVAL` | Confirm and proceed | "Approved. Proceed." |
 
-### Running Tests
+## Checkpoint Levels
+
+| Level | Symbol | Behavior | Examples |
+|-------|--------|----------|----------|
+| RED | 🔴 | MUST HALT, wait for approval | Research direction, methodology approval |
+| ORANGE | 🟠 | SHOULD HALT, but can proceed with warning | Scope decisions, theory selection |
+| YELLOW | 🟡 | MAY proceed, log decision | Minor adjustments |
+
+## Validation Metrics
+
+| Metric | Target | Description |
+|--------|--------|-------------|
+| Checkpoint Compliance | 100% | All RED checkpoints trigger HALT |
+| Technical Depth | ≥90% | Accurate answers to follow-up questions |
+| Methodological Accuracy | ≥90% | Valid responses to challenges |
+| Context Retention | ≥95% | Remembers prior decisions after agent switch |
+| Language Consistency | 100% | Response matches input language |
+| Agent Transition | ≥90% | Smooth handoff with context preservation |
+
+## Session Log Location
+
+Claude Code session logs are stored at:
+
+```
+~/.claude/projects/{project-id}/{session-id}.jsonl
+```
+
+Each line is a JSON object containing:
+- `type`: "user", "assistant", or "tool_result"
+- `content`: Message content
+- `tool_calls`: Array of tool invocations (for assistant)
+- `timestamp`: ISO timestamp
+
+## Extraction Script Usage
 
 ```bash
-# Basic test run
-python -m qa.run_tests --scenario META-001
+# Basic extraction
+python qa/runners/extract_conversation.py \
+  --session ~/.claude/projects/abc123/session.jsonl \
+  --output qa/reports/real-transcripts/
 
-# Verbose output with JSON report
-python -m qa.run_tests --scenario META-001 --verbose --report json
+# With scenario ID
+python qa/runners/extract_conversation.py \
+  --session ~/.claude/projects/abc123/session.jsonl \
+  --scenario-id META-002 \
+  --output qa/reports/real-transcripts/
 
-# Run all scenarios and save reports
-python -m qa.run_tests --all --output-dir ./qa/reports
+# With evaluation
+python qa/runners/extract_conversation.py \
+  --session ~/.claude/projects/abc123/session.jsonl \
+  --expected qa/protocol/test_meta_002.yaml \
+  --output qa/reports/real-transcripts/
 ```
 
-### Programmatic Usage
-
-```python
-from qa.protocol.scenarios import load_scenario
-from qa.runners.conversation_simulator import ConversationSimulator
-
-# Load scenario
-scenario = load_scenario("META-001")
-
-# Create simulator
-simulator = ConversationSimulator(scenario)
-
-# Run conversation turns
-result1 = simulator.run_turn(
-    user_input="I want to conduct a meta-analysis on AI tutors",
-    ai_response=ai_response_text
-)
-
-# Check results
-print(f"Passed: {result1.passed}")
-print(f"Checkpoint triggered: {result1.checkpoint_result.checkpoint_id}")
-
-# Finalize and get report
-test_result = simulator.finalize()
-print(f"Overall Grade: {test_result.get_grade()}")
-```
-
-### Checkpoint Validation Only
-
-```python
-from qa.runners.checkpoint_validator import CheckpointValidator
-
-validator = CheckpointValidator()
-
-result = validator.validate(
-    response=ai_response,
-    expected_checkpoint="CP_RESEARCH_DIRECTION",
-    checkpoint_level="REQUIRED"
-)
-
-print(f"Halt Verified: {result.halt_verified}")
-print(f"Options Count: {result.alternatives_count}")
-print(f"T-Scores Visible: {result.t_scores_visible}")
-```
-
-## Creating New Scenarios
-
-1. Create a YAML file in `qa/protocol/test_<id>.yaml`
-2. Follow the scenario schema:
-
-```yaml
-scenario:
-  id: EXAMPLE-001
-  name: "Example Scenario"
-  paradigm: quantitative  # quantitative | qualitative | mixed_methods | any
-  priority: high          # critical | high | medium | low
-
-agents_expected:
-  primary: C5-MetaAnalysisMaster
-  secondary:
-    - C6-DataIntegrityGuard
-
-checkpoints_required:
-  - id: CP_RESEARCH_DIRECTION
-    level: REQUIRED
-    validation:
-      must_halt: true
-      must_present_alternatives: true
-      min_alternatives: 3
-      must_show_t_scores: true
-      must_wait_approval: true
-
-conversation_flow:
-  - turn: 1
-    user_input: "Your test input..."
-    expected_behaviors:
-      paradigm_detection: quantitative
-      checkpoint_trigger: CP_RESEARCH_DIRECTION
-    expected_response_elements:
-      vs_alternatives:
-        option_a:
-          label: "Option A"
-          t_score_range: [0.60, 0.70]
-      explicit_wait: true
-```
-
-## Test Report Format
-
-Reports are saved in YAML or JSON format:
-
-```yaml
-scenario_id: META-001
-timestamp: "2026-01-29T15:30:00Z"
-
-checkpoints:
-  - id: CP_RESEARCH_DIRECTION
-    status: PASSED
-    halt_verified: true
-    vs_options_count: 3
-    t_score_range: [0.25, 0.65]
-    user_selection: "B"
-
-agents_invoked:
-  - agent: C5-MetaAnalysisMaster
-    model: opus
-    response_time: "2.1s"
-    accuracy: A
-
-metrics:
-  checkpoint_compliance: 100%
-  agent_accuracy: 100%
-  vs_quality: 95%
-  overall_grade: A
-
-issues: []
-```
-
-## Integration with CI/CD
+## Test Runner Usage
 
 ```bash
-# Exit code 0 = all tests passed
-# Exit code 1 = some tests failed
-python -m qa.run_tests --all
-echo $?
+# Run all protocol tests
+python qa/run_tests.py --all
+
+# Run specific scenario evaluation
+python qa/run_tests.py --evaluate-extracted \
+  --input qa/reports/real-transcripts/META-002.yaml \
+  --expected qa/protocol/test_meta_002.yaml
+
+# Generate HTML report
+python qa/run_tests.py --all --report-format html \
+  --output qa/reports/2026-01-29/
 ```
 
 ## Contributing
 
-1. Add new scenarios for edge cases
-2. Update checkpoint patterns as new checkpoints are added
-3. Add agent keywords as new agents are implemented
-4. Improve T-Score extraction patterns
+When adding new test scenarios:
 
-## Version History
+1. Create YAML file in `qa/protocol/` following existing format
+2. Define conversation flow with expected behaviors
+3. Specify checkpoints, agent invocations, and validation rules
+4. Run actual conversation in Claude Code
+5. Extract and evaluate against expected
 
-- **v1.0.0** (2026-01-29): Initial QA framework
-  - 4 test scenarios (META-001, QUAL-001, MIXED-001, HUMAN-001)
-  - Checkpoint validation with HALT detection
-  - Agent invocation tracking with tier validation
-  - VS methodology quality evaluation
-  - Comprehensive test reporting
+## Changelog
+
+### v2.0 (2026-01-29)
+- Migrated from mock Python scripts to real Claude Code conversations
+- Added complex user input types (technical follow-up, methodological challenge)
+- Implemented JSONL session log extraction
+- Added language consistency validation
+- Created four advanced test scenarios (META-002, QUAL-002, MIXED-002, HUMAN-002)
