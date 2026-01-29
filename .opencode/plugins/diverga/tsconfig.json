@@ -14,7 +14,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "lib": ["ES2022"]
+    "types": ["node"],
+    "lib": ["ES2022", "DOM"]
   },
   "include": [
     "*.ts",

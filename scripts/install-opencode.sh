@@ -16,7 +16,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 REPO_URL="https://github.com/HosungYou/Diverga.git"
-DEST_DIR="$HOME/.opencode/plugins/diverga"
+DEST_DIR="$HOME/.config/opencode/plugins/diverga"
 
 echo -e "${CYAN}"
 echo "╔═══════════════════════════════════════════════════════════════╗"
