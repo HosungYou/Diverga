@@ -20,7 +20,7 @@
               └─────────────────────────────────────────────────┘
 ```
 
-[![Version](https://img.shields.io/badge/version-6.6.1-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
+[![Version](https://img.shields.io/badge/version-6.6.2-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-FF6B00?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code)
 [![Codex CLI](https://img.shields.io/badge/Codex_CLI-Support-412991?style=for-the-badge&logo=openai&logoColor=white)](docs/DESIGN_SYSTEM.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-Plugin-0969da?style=for-the-badge&logo=github&logoColor=white)](docs/DESIGN_SYSTEM.md)
@@ -452,6 +452,7 @@ The system will:
 
 | Version | Feature |
 |---------|---------|
+| **v6.6.2** | Multi-CLI Compatibility Edition - unified install script, NPM package (@diverga/codex-setup) |
 | **v6.6.0** | Cross-Platform Edition - Codex CLI & OpenCode support, shared lib/ |
 | **v6.5.0** | Parallel Execution Edition - Task tool support, /agents/ directory |
 | **v6.4.0** | Plugin Marketplace - `/plugin marketplace add`, auto-trigger dispatch |
@@ -495,16 +496,16 @@ Mixed: "메타분석을 하려는데, can you help?"
 
 ---
 
-## 🌐 Cross-Platform Support (v6.6.1)
+## 🌐 Cross-Platform Support (v6.6.2)
 
-Diverga now works across **three AI coding platforms** with unified install scripts:
+Diverga now works across **three AI coding platforms** with a unified install script:
 
 | Platform | Status | One-Line Install |
 |----------|--------|------------------|
 | **Claude Code** | ✅ Full Support | `/plugin install diverga` |
-| **OpenAI Codex CLI** | ✅ Full Support | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh \| bash` |
-| **OpenCode** | ✅ Full Support | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-opencode.sh \| bash` |
-| **Auto-Detect All** | ✅ Universal | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install.sh \| bash` |
+| **OpenAI Codex CLI** | ✅ Full Support | `npx @diverga/codex-setup` or `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh \| bash -s -- --codex` |
+| **OpenCode** | ✅ Full Support | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh \| bash -s -- --opencode` |
+| **All CLIs (Auto-Detect)** | ✅ Universal | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh \| bash` |
 
 ### Architecture
 
@@ -628,7 +629,7 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {6.6.1},
+  version = {6.6.2},
   url = {https://github.com/HosungYou/Diverga},
   note = {40 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
 }

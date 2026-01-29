@@ -109,6 +109,38 @@ jobs:
       - name: Test install-opencode.sh syntax
         run: bash -n scripts/install-opencode.sh
 
+      - name: Test install-multi-cli.sh syntax
+        run: bash -n scripts/install-multi-cli.sh
+
+  test-npm-package:
+    name: Test NPM Package (@diverga/codex-setup)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check package exists
+        run: test -d packages/codex-setup
+
+      - name: Install dependencies
+        working-directory: packages/codex-setup
+        run: npm install
+
+      - name: Build TypeScript
+        working-directory: packages/codex-setup
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          test -f packages/codex-setup/dist/index.js
+          test -f packages/codex-setup/bin/diverga-setup.js
+
   lint-docs:
     name: Verify Documentation
     runs-on: ubuntu-latest
