@@ -218,38 +218,79 @@ To run with real AI responses, remove --dry-run flag.
         checkpoints = []
 
         # Pattern matching for checkpoint markers
+        # Note: Responses may include markdown bold markers (**) around checkpoint IDs
         patterns = [
-            r'🔴\s*CHECKPOINT[:\s]+(\w+)',
-            r'🟠\s*CHECKPOINT[:\s]+(\w+)',
-            r'🟡\s*CHECKPOINT[:\s]+(\w+)',
-            r'CHECKPOINT[:\s]+(CP_\w+)',
-            r'\*\*CHECKPOINT\*\*[:\s]+(CP_\w+)',
+            # With emoji + optional bold markers
+            r'🔴\s*CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
+            r'🟠\s*CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
+            r'🟡\s*CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
+            # Plain text with optional bold
+            r'CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
+            r'\*\*CHECKPOINT\*\*[:\s]+\*?\*?(CP_\w+)\*?\*?',
+            # Without CP_ prefix (fallback)
+            r'🔴\s*CHECKPOINT[:\s]+\*?\*?(\w+)\*?\*?',
+            r'🟠\s*CHECKPOINT[:\s]+\*?\*?(\w+)\*?\*?',
+            r'🟡\s*CHECKPOINT[:\s]+\*?\*?(\w+)\*?\*?',
         ]
 
         for pattern in patterns:
             matches = re.findall(pattern, response, re.IGNORECASE)
             checkpoints.extend(matches)
 
-        return list(set(checkpoints))
+        # Normalize: Ensure CP_ prefix
+        normalized = []
+        for cp in set(checkpoints):
+            if not cp.upper().startswith('CP_'):
+                cp = f"CP_{cp.upper()}"
+            else:
+                cp = cp.upper()
+            normalized.append(cp)
+
+        return list(set(normalized))
 
     def _detect_agents(self, response: str) -> List[str]:
-        """Detect agent invocations in response."""
+        """
+        Detect agent invocations in response.
+
+        Note: Agent detection depends on CLI capabilities:
+        - Claude Code: Full Diverga plugin support, agents are invoked via Task tool
+        - Codex: No plugin system, agents cannot be invoked (only mentioned in text)
+        - OpenCode: Limited plugin support
+        """
         agents = []
 
         # Various agent reference patterns
         patterns = [
+            # Diverga agent patterns
             r'diverga:([a-z]\d+)',  # diverga:a1, diverga:c5
-            r'([A-Z]\d+)-\w+',  # A1-ResearchQuestionRefiner
-            r'Agent[:\s]+([A-Z]\d+-\w+)',
+            r'([A-Z]\d+)-[A-Za-z]+',  # A1-ResearchQuestionRefiner
+            r'Agent[:\s]+([A-Z]\d+-[A-Za-z]+)',
             r'([A-Z]\d+)\s+에이전트',  # Korean pattern
             r'Task.*subagent_type.*diverga:(\w+)',
+            # Direct agent ID patterns (with optional bold)
+            r'\*?\*?([A-Z]\d+)\*?\*?\s*[-:]\s*[A-Za-z]+',
+            # Agent mentions in bullet points
+            r'[-•]\s*\*?\*?([A-Z]\d+)\*?\*?',
         ]
 
         for pattern in patterns:
             matches = re.findall(pattern, response, re.IGNORECASE)
             agents.extend(matches)
 
-        return list(set(agents))
+        # Normalize agent IDs (uppercase, like A1, C5, D1)
+        normalized = []
+        for agent in set(agents):
+            agent_upper = agent.upper()
+            # Only accept valid agent patterns (letter + digit)
+            if re.match(r'^[A-Z]\d+$', agent_upper):
+                normalized.append(agent_upper)
+            elif '-' in agent:
+                # Extract ID from full name like A1-ResearchQuestionRefiner
+                agent_id = agent.split('-')[0].upper()
+                if re.match(r'^[A-Z]\d+$', agent_id):
+                    normalized.append(agent_id)
+
+        return list(set(normalized))
 
     def _extract_vs_options(self, response: str) -> List[Dict]:
         """Extract VS methodology options with T-Scores."""

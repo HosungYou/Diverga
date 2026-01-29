@@ -7,7 +7,13 @@
   "status": "completed",
   "error": null,
   "total_turns": 4,
-  "checkpoints": [],
+  "checkpoints": [
+    {
+      "checkpoint": "CP_RESEARCH_DIRECTION",
+      "turn": 1,
+      "timestamp": "2026-01-29T15:12:39.488793"
+    }
+  ],
   "agents_invoked": [],
   "validation_results": {
     "checkpoints": {
@@ -17,7 +23,9 @@
         "CP_SAMPLE_SIZE",
         "CP_METHODOLOGY_APPROVAL"
       ],
-      "found": [],
+      "found": [
+        "CP_RESEARCH_DIRECTION"
+      ],
       "missing": [
         "CP_PARADIGM_SELECTION",
         "CP_RESEARCH_DESIGN",
@@ -91,7 +99,9 @@
       "role": "assistant",
       "content": "You’re clearly in a **quantitative RCT** paradigm. Before I can calculate sample size or recommend tests, Diverga requires a **mandatory checkpoint** to finalize the research direction.\n\n🔴 CHECKPOINT: **CP_RESEARCH_DIRECTION**  \nPlease choose one research‑question direction (or propose your own). I will proceed only after your explicit selection.\n\nOption A (T≈0.6, standard):  \n“Does gamified corporate e‑learning improve overall employee engagement compared to traditional e‑learning?”\n\nOption B (T≈0.4, balanced novelty ⭐):  \n“Does gamified corporate e‑learning improve **behavioral engagement** (e.g., completion, time‑on‑task) more than traditional e‑learning?”\n\nOption C (T≈0.2, innovative):  \n“Does gamified corporate e‑learning improve **sustained engagement** (e.g., 30‑day follow‑through) more than traditional e‑learning?”\n\nWhich option do you want to proceed with?  \n\nOnce you select, I’ll immediately compute sample size and tests. To do that, please also answer these (you can reply in one message):\n\n1) Primary outcome type: continuous (e.g., engagement score), binary (e.g., completion yes/no), or count?  \n2) Expected effect size (Cohen’s d / OR / rate ratio) or a minimal detectable effect you care about.  \n3) Desired power (e.g., 0.80) and alpha (e.g., 0.05).  \n4) Allocation ratio (1:1?)  \n5) Any clustering (e.g., teams, departments) or repeated measures (pre/post)?\n",
       "timestamp": "2026-01-29T15:12:39.488793",
-      "checkpoints_detected": [],
+      "checkpoints_detected": [
+        "CP_RESEARCH_DIRECTION"
+      ],
       "agents_detected": [],
       "vs_options": [],
       "metadata": {

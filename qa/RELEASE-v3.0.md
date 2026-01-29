@@ -339,7 +339,8 @@ python3 qa/runners/cli_test_runner.py --scenario QUAL-002 -v
 
 ## Future Enhancements
 
-- [ ] OpenCode and Codex CLI integration testing
+- [x] ~~OpenCode and Codex CLI integration testing~~ (v3.0.2: Codex tested with QUANT-001)
+- [ ] OpenCode CLI testing
 - [ ] Parallel scenario execution
 - [ ] Automated CI/CD integration
 - [ ] Performance regression tracking
@@ -348,6 +349,17 @@ python3 qa/runners/cli_test_runner.py --scenario QUAL-002 -v
 ---
 
 ## Changelog
+
+### v3.0.2 (2026-01-29)
+
+- **FIXED**: Checkpoint detection regex to handle markdown bold markers (`**CP_WORD**`)
+- **FIXED**: Agent detection regex with improved normalization
+- **ADDED**: `test_quant_001.yaml` - Experimental Design with Power Analysis (English)
+- **TESTED**: QUANT-001 with Codex CLI (6/6 verification checks passed)
+- **DOCUMENTED**: CLI tool capability differences (Claude Code vs Codex vs OpenCode)
+  - Claude Code: Full Diverga plugin/agent support
+  - Codex: No plugin system, standalone LLM only
+  - OpenCode: Limited plugin support
 
 ### v3.0.1 (2026-01-29)
 

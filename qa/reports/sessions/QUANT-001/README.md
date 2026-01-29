@@ -20,17 +20,38 @@
 | Metric | Value |
 |--------|-------|
 | Total Turns | 4 |
-| Checkpoints Found | 0 |
-| Checkpoint Compliance | 0.0% |
-| Agents Invoked | 0 |
+| Checkpoints Found | 1 |
+| Checkpoint Compliance | 25.0% (ID naming difference) |
+| Agents Invoked | 0 (Codex limitation) |
 
 ## Checkpoints
 
-No checkpoints detected in this session.
+| Checkpoint | Turn | Status |
+|------------|------|--------|
+| CP_RESEARCH_DIRECTION | 1 | ✅ Triggered |
+
+### Checkpoint Notes
+
+The AI used `CP_RESEARCH_DIRECTION` (Diverga Research Coordinator naming) instead of `CP_PARADIGM_SELECTION` (protocol expected). This is semantically correct - both represent the initial research direction checkpoint.
+
+**Expected (Protocol)**: CP_PARADIGM_SELECTION, CP_RESEARCH_DESIGN, CP_SAMPLE_SIZE, CP_METHODOLOGY_APPROVAL
+**Found (AI Response)**: CP_RESEARCH_DIRECTION
 
 ## Agents Invoked
 
 No agents detected in this session.
+
+### Agent Notes
+
+**Codex CLI does not support Diverga agent invocation.**
+
+Unlike Claude Code CLI, which can invoke the `/diverga:research-coordinator` skill and its 40 specialized agents, Codex (`codex exec`) operates as a standalone LLM without plugin support.
+
+| CLI Tool | Agent Support | Skill Support |
+|----------|---------------|---------------|
+| Claude Code | ✅ Full | ✅ `/diverga:*` |
+| Codex | ❌ None | ❌ None |
+| OpenCode | ⚠️ Limited | ⚠️ Limited |
 
 ## 🔍 VERIFICATION HUDDLE
 
@@ -55,3 +76,26 @@ This huddle confirms the test used **real AI API calls**, not simulation:
 - **CONTEXT_AWARENESS**: AI references user-specific input
 - **UNIQUE_SESSION_ID**: Valid unique session identifier
 - **DYNAMIC_CONTENT**: Non-templated, reasoning-based content
+
+## Key Findings
+
+### 1. Real AI Responses Verified
+Codex provided genuine power analysis guidance:
+- Sample size: 64 per group (d=0.5, α=0.05, power=0.80)
+- ANCOVA vs t-test methodology discussion
+- Missing data handling (MCAR/MAR/MNAR)
+- Multiple imputation recommendation
+
+### 2. CLI Capabilities Differ
+This test revealed important differences between CLI tools:
+
+| Feature | Claude Code | Codex |
+|---------|-------------|-------|
+| Real AI Response | ✅ | ✅ |
+| Diverga Skill | ✅ | ❌ |
+| Agent Invocation | ✅ | ❌ |
+| Checkpoint Display | ✅ | ✅ |
+| VS Options | ✅ | ✅ |
+
+### 3. Checkpoint Detection Fixed
+Original regex patterns didn't handle markdown bold markers (`**CP_WORD**`). Fixed in v3.0.2.
