@@ -26,7 +26,7 @@ import yaml
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -69,6 +69,116 @@ class CLITestRunner:
     SUPPORTED_CLIS = ['claude', 'opencode', 'codex']
     PROTOCOL_DIR = Path(__file__).parent.parent / "protocol"
     DEFAULT_TIMEOUT = 300  # 5 minutes per turn
+
+    # Checkpoint alias mapping: descriptive names → formal CP_ identifiers
+    # This enables hybrid detection that works with both formal and natural language checkpoints
+    CHECKPOINT_ALIASES = {
+        # Research Direction & Paradigm
+        'Research Direction': 'CP_RESEARCH_DIRECTION',
+        'Paradigm Selection': 'CP_PARADIGM_SELECTION',
+        'Paradigm Confirmation': 'CP_PARADIGM_CONFIRMATION',
+        'Research Question': 'CP_RESEARCH_DIRECTION',
+        '연구 방향': 'CP_RESEARCH_DIRECTION',
+        '패러다임 선택': 'CP_PARADIGM_SELECTION',
+        '패러다임 확인': 'CP_PARADIGM_CONFIRMATION',
+
+        # Theory & Framework
+        'Theory Selection': 'CP_THEORY_SELECTION',
+        'Theoretical Framework': 'CP_THEORY_SELECTION',
+        '이론 선택': 'CP_THEORY_SELECTION',
+        '이론적 프레임워크': 'CP_THEORY_SELECTION',
+
+        # Methodology
+        'Methodology Approval': 'CP_METHODOLOGY_APPROVAL',
+        'Method Approval': 'CP_METHODOLOGY_APPROVAL',
+        '방법론 승인': 'CP_METHODOLOGY_APPROVAL',
+
+        # Meta-Analysis Specific
+        'Effect Size Selection': 'CP_EFFECT_SIZE_SELECTION',
+        'Effect Size Target Selection': 'CP_EFFECT_SIZE_SELECTION',
+        'Effect Size': 'CP_EFFECT_SIZE_SELECTION',
+        '효과크기 선택': 'CP_EFFECT_SIZE_SELECTION',
+
+        'Heterogeneity Analysis': 'CP_HETEROGENEITY_ANALYSIS',
+        'Heterogeneity Strategy': 'CP_HETEROGENEITY_ANALYSIS',
+        '이질성 분석': 'CP_HETEROGENEITY_ANALYSIS',
+
+        'Moderator Analysis': 'CP_MODERATOR_ANALYSIS',
+        'Moderator Analysis Strategy': 'CP_MODERATOR_ANALYSIS',
+        'Moderator Strategy': 'CP_MODERATOR_ANALYSIS',
+        '조절변수 분석': 'CP_MODERATOR_ANALYSIS',
+
+        'Multiple Testing': 'CP_MULTIPLE_TESTING',
+        'Multiple Testing Strategy': 'CP_MULTIPLE_TESTING',
+        '다중검정': 'CP_MULTIPLE_TESTING',
+
+        'Single-Group Study Decision': 'CP_SINGLE_GROUP_DECISION',
+        'Single Group Decision': 'CP_SINGLE_GROUP_DECISION',
+        '단일그룹 연구 결정': 'CP_SINGLE_GROUP_DECISION',
+
+        'F-Statistic Details': 'CP_FSTAT_DETAILS',
+        'F-Statistic': 'CP_FSTAT_DETAILS',
+        'F통계량': 'CP_FSTAT_DETAILS',
+
+        # Analysis
+        'Analysis Plan': 'CP_ANALYSIS_PLAN',
+        '분석 계획': 'CP_ANALYSIS_PLAN',
+
+        # Quality & Integration
+        'Quality Review': 'CP_QUALITY_REVIEW',
+        '품질 검토': 'CP_QUALITY_REVIEW',
+
+        'Integration Strategy': 'CP_INTEGRATION_STRATEGY',
+        '통합 전략': 'CP_INTEGRATION_STRATEGY',
+
+        # Humanization
+        'Humanization Review': 'CP_HUMANIZATION_REVIEW',
+        'Humanization Verify': 'CP_HUMANIZATION_VERIFY',
+        '휴먼화 검토': 'CP_HUMANIZATION_REVIEW',
+
+        # Sampling & Data Collection
+        'Sampling Strategy': 'CP_SAMPLING_STRATEGY',
+        '표집 전략': 'CP_SAMPLING_STRATEGY',
+
+        'Protocol Design': 'CP_PROTOCOL_DESIGN',
+        '프로토콜 설계': 'CP_PROTOCOL_DESIGN',
+
+        # Qualitative
+        'Coding Approach': 'CP_CODING_APPROACH',
+        '코딩 접근': 'CP_CODING_APPROACH',
+
+        'Theme Validation': 'CP_THEME_VALIDATION',
+        '주제 검증': 'CP_THEME_VALIDATION',
+
+        'Trustworthiness': 'CP_TRUSTWORTHINESS',
+        '신뢰성': 'CP_TRUSTWORTHINESS',
+
+        'Member Check': 'CP_MEMBER_CHECK',
+        '멤버 체크': 'CP_MEMBER_CHECK',
+
+        # Writing & Review
+        'Writing Style': 'CP_WRITING_STYLE',
+        '작성 스타일': 'CP_WRITING_STYLE',
+
+        'Final Review': 'CP_FINAL_REVIEW',
+        '최종 검토': 'CP_FINAL_REVIEW',
+
+        # Additional mappings for AI-generated variants
+        'Analysis Plan Approval': 'CP_METHODOLOGY_APPROVAL',
+        'Moderator Selection': 'CP_MODERATOR_ANALYSIS',
+        'Analysis Model': 'CP_HETEROGENEITY_ANALYSIS',
+        'Data Extraction': 'CP_DATA_EXTRACTION',
+
+        # Search & Screening
+        'Search Strategy': 'CP_SEARCH_STRATEGY',
+        '검색 전략': 'CP_SEARCH_STRATEGY',
+
+        'Screening Criteria': 'CP_SCREENING_CRITERIA',
+        '선별 기준': 'CP_SCREENING_CRITERIA',
+
+        'Extraction Template': 'CP_EXTRACTION_TEMPLATE',
+        '추출 템플릿': 'CP_EXTRACTION_TEMPLATE',
+    }
 
     def __init__(
         self,
@@ -134,6 +244,95 @@ class CLITestRunner:
                 '--continue',
                 '--output-format', 'text'
             ]
+
+    def _check_skill_loaded(self, response: str) -> Dict[str, Any]:
+        """
+        Verify if Diverga skill was actually loaded and active.
+
+        Looks for definitive markers that indicate the skill is loaded:
+        1. Skill activation confirmation message
+        2. Research Coordinator specific terminology
+        3. VS methodology markers (T-Score, options with typicality)
+        4. Checkpoint system markers with proper formatting
+        5. Agent invocation patterns via Task tool
+
+        Returns dict with 'loaded', 'confidence', 'evidence' keys.
+        """
+        evidence = []
+        confidence_score = 0
+
+        # Check 1: Skill activation markers (weight: 30)
+        activation_patterns = [
+            r'Research\s*Coordinator\s*v[\d.]+',  # Version mention
+            r'diverga[:\-]research[:\-]coordinator',  # Skill name
+            r'Human[:\-]Centered\s*Edition',  # v6.0 marker
+            r'(27|33|40)\s*specialized\s*agents',  # Agent system mention (v5.0=27, v6.0.1=33, v6.3+=40)
+            r'패러다임\s*(탐지|감지)',  # Korean paradigm detection
+            r'[A-H][1-7][-\s]?[A-Za-z-]+',  # Agent name pattern like A1-ResearchQuestionRefiner
+        ]
+        for pattern in activation_patterns:
+            if re.search(pattern, response, re.IGNORECASE):
+                evidence.append(f"Skill marker: {pattern[:30]}...")
+                confidence_score += 30
+                break
+
+        # Check 2: VS Methodology markers (weight: 25)
+        vs_patterns = [
+            r'\(T\s*=\s*\d+\.?\d*\)',  # T-Score notation
+            r'T[:\-]Score',  # T-Score label
+            r'Typicality\s*Score',  # Full name
+            r'\[A\].*\[B\].*\[C\]',  # Option format
+            r'modal\s*(recommendation|option)',  # Modal awareness
+        ]
+        for pattern in vs_patterns:
+            if re.search(pattern, response, re.IGNORECASE):
+                evidence.append(f"VS marker: {pattern[:30]}...")
+                confidence_score += 25
+                break
+
+        # Check 3: Checkpoint system markers (weight: 25)
+        checkpoint_patterns = [
+            r'🔴\s*CHECKPOINT',  # Red checkpoint emoji
+            r'🟠\s*CHECKPOINT',  # Orange checkpoint emoji
+            r'체크포인트.*CP_',  # Korean checkpoint
+            r'Human\s*Checkpoint\s*System',  # System mention
+            r'MANDATORY\s*HALT',  # Halt terminology
+        ]
+        for pattern in checkpoint_patterns:
+            if re.search(pattern, response, re.IGNORECASE):
+                evidence.append(f"Checkpoint marker: {pattern[:30]}...")
+                confidence_score += 25
+                break
+
+        # Check 4: Agent invocation evidence (weight: 20)
+        agent_patterns = [
+            r'Task\(subagent_type\s*=\s*["\']diverga:',  # Task tool call
+            r'diverga:[a-h][1-7]',  # Agent ID pattern
+            r'([A-H][1-7])\s*에이전트\s*실행',  # Korean agent execution
+        ]
+        for pattern in agent_patterns:
+            if re.search(pattern, response, re.IGNORECASE):
+                evidence.append(f"Agent marker: {pattern[:30]}...")
+                confidence_score += 20
+                break
+
+        # Determine overall confidence
+        if confidence_score >= 50:
+            loaded = True
+            confidence = 'HIGH' if confidence_score >= 75 else 'MEDIUM'
+        elif confidence_score >= 25:
+            loaded = True
+            confidence = 'LOW'
+        else:
+            loaded = False
+            confidence = 'NONE'
+
+        return {
+            'loaded': loaded,
+            'confidence': confidence,
+            'score': confidence_score,
+            'evidence': evidence
+        }
 
     def _build_opencode_command(self, message: str) -> List[str]:
         """Build OpenCode CLI command."""
@@ -213,84 +412,330 @@ DRY RUN MODE: No actual API calls made.
 To run with real AI responses, remove --dry-run flag.
 """
 
-    def _detect_checkpoints(self, response: str) -> List[str]:
-        """Detect checkpoint markers in response."""
-        checkpoints = []
+    def _normalize_checkpoint_name(self, name: str) -> Optional[str]:
+        """
+        Normalize a checkpoint name to formal CP_ format using alias mapping.
 
-        # Pattern matching for checkpoint markers
-        # Note: Responses may include markdown bold markers (**) around checkpoint IDs
-        patterns = [
-            # With emoji + optional bold markers
-            r'🔴\s*CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
-            r'🟠\s*CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
-            r'🟡\s*CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
-            # Plain text with optional bold
-            r'CHECKPOINT[:\s]+\*?\*?(CP_\w+)\*?\*?',
-            r'\*\*CHECKPOINT\*\*[:\s]+\*?\*?(CP_\w+)\*?\*?',
-            # Without CP_ prefix (fallback)
-            r'🔴\s*CHECKPOINT[:\s]+\*?\*?(\w+)\*?\*?',
-            r'🟠\s*CHECKPOINT[:\s]+\*?\*?(\w+)\*?\*?',
-            r'🟡\s*CHECKPOINT[:\s]+\*?\*?(\w+)\*?\*?',
+        Args:
+            name: Raw checkpoint name (could be formal CP_XXX or descriptive)
+
+        Returns:
+            Normalized CP_ identifier or None if not recognized
+        """
+        name = name.strip()
+
+        # Already in formal format
+        if name.upper().startswith('CP_'):
+            return name.upper()
+
+        # Check alias mapping (case-insensitive)
+        name_lower = name.lower()
+        for alias, formal_id in self.CHECKPOINT_ALIASES.items():
+            if alias.lower() == name_lower:
+                return formal_id
+
+        # Try partial matching for common patterns
+        for alias, formal_id in self.CHECKPOINT_ALIASES.items():
+            # If the name contains the core keywords from the alias
+            alias_words = set(alias.lower().split())
+            name_words = set(name_lower.split())
+            if len(alias_words) >= 2 and alias_words <= name_words:
+                return formal_id
+
+        return None
+
+    def _detect_checkpoints(self, response: str) -> List[Dict[str, Any]]:
+        """
+        Detect checkpoint markers in response with confidence scoring.
+
+        HYBRID DETECTION (v3.2.0):
+        1. Primary: Look for formal CP_XXX identifiers
+        2. Fallback: Detect descriptive names and map via CHECKPOINT_ALIASES
+
+        Returns list of dicts with 'id', 'confidence', 'level', 'context', and 'original' keys.
+
+        Checkpoint naming convention (from research-coordinator):
+        - CP_RESEARCH_DIRECTION, CP_PARADIGM_SELECTION, CP_THEORY_SELECTION
+        - CP_METHODOLOGY_APPROVAL, CP_ANALYSIS_PLAN, CP_INTEGRATION_STRATEGY
+        - CP_QUALITY_REVIEW, CP_EFFECT_SIZE_SELECTION, CP_HETEROGENEITY_ANALYSIS
+        - CP_HUMANIZATION_REVIEW, CP_HUMANIZATION_VERIFY, etc.
+
+        Confidence levels:
+        - HIGH: Emoji marker + formal CP_XXX with options OR emoji + descriptive with options
+        - MEDIUM: Text "CHECKPOINT" + CP_XXX format OR emoji + descriptive without options
+        - LOW: Partial match or text mention without action
+        """
+        detected = []
+        seen_ids = set()
+
+        # Valid checkpoint ID pattern: CP_ followed by uppercase words/digits
+        # Examples: CP_RESEARCH_DIRECTION, CP_META_TIER3_REVIEW, CP_GATE_2
+        VALID_CP_PATTERN = r'^CP_[A-Z0-9]+(?:_[A-Z0-9]+)*$'
+
+        # ============================================
+        # PHASE 1: Detect formal CP_XXX identifiers
+        # ============================================
+
+        # HIGH confidence: Emoji + full checkpoint format + options presented
+        # Supports multiple formats:
+        # - 🔴 CHECKPOINT: CP_XXX
+        # - 🔴 CP_XXX (확인)
+        # - 🔴 CP_XXX
+        # - ## 🔴 CP_XXX
+        high_patterns_formal = [
+            # Format: 🔴 CHECKPOINT: CP_XXX
+            (r'🔴\s*(?:CHECKPOINT|체크포인트)[:\s]+\*?\*?(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\*?\*?', 'RED'),
+            (r'🟠\s*(?:CHECKPOINT|체크포인트)[:\s]+\*?\*?(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\*?\*?', 'ORANGE'),
+            (r'🟡\s*(?:CHECKPOINT|체크포인트)[:\s]+\*?\*?(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\*?\*?', 'YELLOW'),
+            # Format: 🔴 CP_XXX (with optional markdown headers and annotations)
+            (r'(?:#+\s*)?🔴\s*(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\s*(?:\([^)]*\))?', 'RED'),
+            (r'(?:#+\s*)?🟠\s*(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\s*(?:\([^)]*\))?', 'ORANGE'),
+            (r'(?:#+\s*)?🟡\s*(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\s*(?:\([^)]*\))?', 'YELLOW'),
         ]
 
-        for pattern in patterns:
-            matches = re.findall(pattern, response, re.IGNORECASE)
-            checkpoints.extend(matches)
+        for pattern, level in high_patterns_formal:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                cp_id = match.group(1).upper()
+                after_match = response[match.end():match.end() + 500]
+                has_options = bool(re.search(r'\[(?:Y|N|A|B|C|[1-3])\]|옵션\s*[A-C]|Option\s*[A-C]', after_match, re.IGNORECASE))
 
-        # Normalize: Ensure CP_ prefix
-        normalized = []
-        for cp in set(checkpoints):
-            if not cp.upper().startswith('CP_'):
-                cp = f"CP_{cp.upper()}"
-            else:
-                cp = cp.upper()
-            normalized.append(cp)
+                if re.match(VALID_CP_PATTERN, cp_id) and cp_id not in seen_ids:
+                    detected.append({
+                        'id': cp_id,
+                        'confidence': 'HIGH' if has_options else 'MEDIUM',
+                        'level': level,
+                        'context': 'formal CP_ with emoji' + (' + options' if has_options else ''),
+                        'original': cp_id
+                    })
+                    seen_ids.add(cp_id)
 
-        return list(set(normalized))
-
-    def _detect_agents(self, response: str) -> List[str]:
-        """
-        Detect agent invocations in response.
-
-        Note: Agent detection depends on CLI capabilities:
-        - Claude Code: Full Diverga plugin support, agents are invoked via Task tool
-        - Codex: No plugin system, agents cannot be invoked (only mentioned in text)
-        - OpenCode: Limited plugin support
-        """
-        agents = []
-
-        # Various agent reference patterns
-        patterns = [
-            # Diverga agent patterns
-            r'diverga:([a-z]\d+)',  # diverga:a1, diverga:c5
-            r'([A-Z]\d+)-[A-Za-z]+',  # A1-ResearchQuestionRefiner
-            r'Agent[:\s]+([A-Z]\d+-[A-Za-z]+)',
-            r'([A-Z]\d+)\s+에이전트',  # Korean pattern
-            r'Task.*subagent_type.*diverga:(\w+)',
-            # Direct agent ID patterns (with optional bold)
-            r'\*?\*?([A-Z]\d+)\*?\*?\s*[-:]\s*[A-Za-z]+',
-            # Agent mentions in bullet points
-            r'[-•]\s*\*?\*?([A-Z]\d+)\*?\*?',
+        # MEDIUM confidence: Plain text checkpoint format with CP_
+        medium_patterns_formal = [
+            r'(?:\*\*)?CHECKPOINT(?:\*\*)?[:\s]+\*?\*?(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\*?\*?',
+            r'(?:checkpoint|체크포인트)\s*[:]\s*(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)',
+            r'(?:\*\*)?CHECKPOINT(?:\*\*)?[:\s]+\*?\*?(META_[A-Z0-9]+(?:_[A-Z0-9]+)*)\*?\*?',
+            # Format: ## CP_XXX or ### CP_XXX (without emoji)
+            r'^#+\s*(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\s*(?:\([^)]*\))?',
+            # Format: **CP_XXX** in bold
+            r'\*\*(CP_[A-Z0-9]+(?:_[A-Z0-9]+)*)\*\*',
         ]
 
-        for pattern in patterns:
-            matches = re.findall(pattern, response, re.IGNORECASE)
-            agents.extend(matches)
+        for pattern in medium_patterns_formal:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                cp_id = match.group(1).upper()
+                if re.match(VALID_CP_PATTERN, cp_id) and cp_id not in seen_ids:
+                    detected.append({
+                        'id': cp_id,
+                        'confidence': 'MEDIUM',
+                        'level': 'UNKNOWN',
+                        'context': 'formal CP_ text mention',
+                        'original': cp_id
+                    })
+                    seen_ids.add(cp_id)
 
-        # Normalize agent IDs (uppercase, like A1, C5, D1)
-        normalized = []
-        for agent in set(agents):
-            agent_upper = agent.upper()
-            # Only accept valid agent patterns (letter + digit)
-            if re.match(r'^[A-Z]\d+$', agent_upper):
-                normalized.append(agent_upper)
-            elif '-' in agent:
-                # Extract ID from full name like A1-ResearchQuestionRefiner
-                agent_id = agent.split('-')[0].upper()
-                if re.match(r'^[A-Z]\d+$', agent_id):
-                    normalized.append(agent_id)
+        # ============================================
+        # PHASE 2: Detect descriptive checkpoint names (HYBRID)
+        # ============================================
 
-        return list(set(normalized))
+        # HIGH/MEDIUM confidence: Emoji + descriptive name (no CP_ prefix)
+        # Pattern: 🔴 CHECKPOINT: Effect Size Target Selection
+        descriptive_patterns = [
+            (r'🔴\s*(?:CHECKPOINT|체크포인트)[:\s]+([A-Za-z가-힣][A-Za-z0-9가-힣\s\-]+?)(?:\n|\*\*|$)', 'RED'),
+            (r'🟠\s*(?:CHECKPOINT|체크포인트)[:\s]+([A-Za-z가-힣][A-Za-z0-9가-힣\s\-]+?)(?:\n|\*\*|$)', 'ORANGE'),
+            (r'🟡\s*(?:CHECKPOINT|체크포인트)[:\s]+([A-Za-z가-힣][A-Za-z0-9가-힣\s\-]+?)(?:\n|\*\*|$)', 'YELLOW'),
+        ]
+
+        for pattern, level in descriptive_patterns:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                raw_name = match.group(1).strip()
+
+                # Skip if it's already a formal CP_ identifier (handled in Phase 1)
+                if raw_name.upper().startswith('CP_'):
+                    continue
+
+                # Try to map to formal identifier
+                formal_id = self._normalize_checkpoint_name(raw_name)
+
+                if formal_id and formal_id not in seen_ids:
+                    after_match = response[match.end():match.end() + 500]
+                    has_options = bool(re.search(r'\[(?:Y|N|A|B|C|[1-3])\]|옵션\s*[A-C]|Option\s*[A-C]', after_match, re.IGNORECASE))
+
+                    detected.append({
+                        'id': formal_id,
+                        'confidence': 'HIGH' if has_options else 'MEDIUM',
+                        'level': level,
+                        'context': f'descriptive → {formal_id}' + (' + options' if has_options else ''),
+                        'original': raw_name
+                    })
+                    seen_ids.add(formal_id)
+                elif not formal_id:
+                    # Unknown descriptive name - still record it with LOW confidence
+                    # Generate a pseudo-ID from the name
+                    pseudo_id = 'CP_' + re.sub(r'[^A-Z0-9]', '_', raw_name.upper()).strip('_')
+                    pseudo_id = re.sub(r'_+', '_', pseudo_id)  # Remove duplicate underscores
+
+                    if pseudo_id not in seen_ids and len(pseudo_id) > 4:
+                        detected.append({
+                            'id': pseudo_id,
+                            'confidence': 'LOW',
+                            'level': level,
+                            'context': f'unmapped descriptive: {raw_name[:30]}',
+                            'original': raw_name
+                        })
+                        seen_ids.add(pseudo_id)
+
+        # ============================================
+        # PHASE 3: LOW confidence - partial mentions
+        # ============================================
+
+        low_patterns = [
+            r'(?:checkpoint|체크포인트)\s+(?:for\s+)?([A-Z][A-Z_]+)',
+        ]
+
+        for pattern in low_patterns:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                raw_id = match.group(1).upper()
+                cp_id = f"CP_{raw_id}" if not raw_id.startswith('CP_') else raw_id
+                if re.match(VALID_CP_PATTERN, cp_id) and cp_id not in seen_ids:
+                    detected.append({
+                        'id': cp_id,
+                        'confidence': 'LOW',
+                        'level': 'UNKNOWN',
+                        'context': 'inferred from text',
+                        'original': raw_id
+                    })
+                    seen_ids.add(cp_id)
+
+        return detected
+
+    def _get_checkpoint_ids(self, detected_checkpoints: List[Dict[str, Any]], min_confidence: str = 'MEDIUM') -> List[str]:
+        """Extract checkpoint IDs from detected checkpoints, filtered by minimum confidence."""
+        confidence_order = {'HIGH': 3, 'MEDIUM': 2, 'LOW': 1}
+        min_level = confidence_order.get(min_confidence, 2)
+
+        return [
+            cp['id'] for cp in detected_checkpoints
+            if confidence_order.get(cp['confidence'], 0) >= min_level
+        ]
+
+    def _detect_agents(self, response: str) -> List[Dict[str, Any]]:
+        """
+        Detect agent invocations in response with confidence scoring.
+
+        Returns list of dicts with 'id', 'confidence', and 'context' keys.
+
+        Confidence levels:
+        - HIGH: Task tool invocation (e.g., Task(subagent_type="diverga:a1"))
+        - MEDIUM: Explicit agent reference with action verb (e.g., "A1 에이전트 실행")
+        - LOW: Text mention only (e.g., "A1-ResearchQuestionRefiner를 사용할 수 있습니다")
+
+        Note: Valid Diverga agents per category (33 agents total, v6.0.1):
+        - A1-A6: Foundation (6)
+        - B1-B4: Evidence (4) - Note: B5 does not exist
+        - C1-C7: Design & Meta-Analysis (7)
+        - D1-D4: Data Collection (4)
+        - E1-E5: Analysis (5)
+        - F1-F4: Quality (4) - Note: F5 does not exist
+        - G1-G4: Communication (4) - Note: G5-G7 do not exist
+        - H1-H2: Specialized (2)
+        """
+        # Valid agent IDs per category (strict validation)
+        VALID_AGENTS = {
+            'A': [1, 2, 3, 4, 5, 6],      # Foundation
+            'B': [1, 2, 3, 4],             # Evidence (no B5)
+            'C': [1, 2, 3, 4, 5, 6, 7],    # Design & Meta-Analysis
+            'D': [1, 2, 3, 4],             # Data Collection
+            'E': [1, 2, 3, 4, 5],          # Analysis
+            'F': [1, 2, 3, 4],             # Quality (no F5)
+            'G': [1, 2, 3, 4],             # Communication (no G5-G7)
+            'H': [1, 2],                   # Specialized
+        }
+
+        def is_valid_agent(agent_id: str) -> bool:
+            """Check if agent ID is in the valid registry."""
+            if len(agent_id) < 2:
+                return False
+            letter = agent_id[0].upper()
+            try:
+                number = int(agent_id[1:])
+                return letter in VALID_AGENTS and number in VALID_AGENTS[letter]
+            except ValueError:
+                return False
+
+        detected = []
+        seen_ids = set()
+
+        # HIGH confidence: Task tool invocation
+        task_patterns = [
+            r'Task\s*\(\s*subagent_type\s*=\s*["\']diverga:([a-h][1-7])["\']',
+            r'subagent_type\s*=\s*["\']diverga:([a-h][1-7])["\']',
+            r'Task.*diverga:([a-h][1-7])',
+            # Also detect general-purpose with agent ID in prompt
+            r'Task\s*\(.*model.*["\']([A-H][1-7])["\']',
+            r'description\s*=\s*["\'][^"\']*([A-H][1-7])[^"\']*["\']',
+        ]
+        for pattern in task_patterns:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                agent_id = match.group(1).upper()
+                if is_valid_agent(agent_id) and agent_id not in seen_ids:
+                    detected.append({
+                        'id': agent_id,
+                        'confidence': 'HIGH',
+                        'context': 'Task tool invocation'
+                    })
+                    seen_ids.add(agent_id)
+
+        # MEDIUM confidence: Explicit execution with action verbs
+        action_patterns = [
+            # Korean action verbs
+            (r'([A-H][1-7])[-\s]?[A-Za-z-]*\s*(에이전트|agent)?\s*(실행|호출|사용|활성화)', '실행/호출'),
+            (r'(실행|호출).*([A-H][1-7])', '실행/호출'),
+            # English action verbs
+            (r'([A-H][1-7])[-\s]?[A-Za-z-]*\s*(agent)?\s*(invoke|invok|execut|running|activat)', 'invocation'),
+            (r'(invoking|executing|running)\s+([A-H][1-7])', 'invocation'),
+        ]
+        for pattern, context in action_patterns:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                # Extract agent ID from match groups
+                for group in match.groups():
+                    if group and len(group) >= 2:
+                        potential_id = group[:2].upper() if group[0].isalpha() and group[1].isdigit() else None
+                        if potential_id and is_valid_agent(potential_id) and potential_id not in seen_ids:
+                            detected.append({
+                                'id': potential_id,
+                                'confidence': 'MEDIUM',
+                                'context': context
+                            })
+                            seen_ids.add(potential_id)
+
+        # LOW confidence: Text mentions only (for reference, not counted as invocations)
+        mention_patterns = [
+            r'diverga:([a-h][1-7])',  # diverga:a1
+            r'([A-H][1-7])-[A-Za-z-]+',  # A1-ResearchQuestionRefiner or A1-research-question-refiner
+            r'\*?\*?([A-H][1-7])\*?\*?\s*[-:]\s*[A-Za-z-]+',  # A1: ResearchQuestionRefiner or **A1**-...
+        ]
+        for pattern in mention_patterns:
+            for match in re.finditer(pattern, response, re.IGNORECASE):
+                agent_id = match.group(1).upper()
+                if is_valid_agent(agent_id) and agent_id not in seen_ids:
+                    detected.append({
+                        'id': agent_id,
+                        'confidence': 'LOW',
+                        'context': 'text mention'
+                    })
+                    seen_ids.add(agent_id)
+
+        return detected
+
+    def _get_agent_ids(self, detected_agents: List[Dict[str, Any]], min_confidence: str = 'LOW') -> List[str]:
+        """Extract agent IDs from detected agents, filtered by minimum confidence."""
+        confidence_order = {'HIGH': 3, 'MEDIUM': 2, 'LOW': 1}
+        min_level = confidence_order.get(min_confidence, 1)
+
+        return [
+            agent['id'] for agent in detected_agents
+            if confidence_order.get(agent['confidence'], 0) >= min_level
+        ]
 
     def _extract_vs_options(self, response: str) -> List[Dict]:
         """Extract VS methodology options with T-Scores."""
@@ -351,9 +796,18 @@ To run with real AI responses, remove --dry-run flag.
                 print(f"  Received: {len(response)} chars")
 
                 # Analyze response
-                checkpoints = self._detect_checkpoints(response)
-                agents = self._detect_agents(response)
+                detected_checkpoints = self._detect_checkpoints(response)
+                detected_agents = self._detect_agents(response)
                 vs_options = self._extract_vs_options(response)
+
+                # Check if skill is loaded (for first turn)
+                skill_check = {}
+                if self._turn_count == 1:
+                    skill_check = self._check_skill_loaded(response)
+
+                # Extract IDs for backward compatibility
+                checkpoint_ids = self._get_checkpoint_ids(detected_checkpoints, min_confidence='MEDIUM')
+                agent_ids = self._get_agent_ids(detected_agents, min_confidence='MEDIUM')
 
                 # Record assistant turn
                 assistant_turn = Turn(
@@ -361,23 +815,38 @@ To run with real AI responses, remove --dry-run flag.
                     role='assistant',
                     content=response,
                     timestamp=datetime.now().isoformat(),
-                    checkpoints_detected=checkpoints,
-                    agents_detected=agents,
+                    checkpoints_detected=checkpoint_ids,
+                    agents_detected=agent_ids,
                     vs_options=vs_options,
-                    metadata={'expected': expected}
+                    metadata={
+                        'expected': expected,
+                        'detected_checkpoints_full': detected_checkpoints,
+                        'detected_agents_full': detected_agents,
+                        'skill_check': skill_check
+                    }
                 )
                 self.session.turns.append(assistant_turn)
 
                 # Update session-level aggregates
-                for cp in checkpoints:
-                    self.session.checkpoints.append({
-                        'checkpoint': cp,
-                        'turn': turn_num,
-                        'timestamp': datetime.now().isoformat()
-                    })
-                self.session.agents_invoked.extend(agents)
+                for cp in detected_checkpoints:
+                    if cp['confidence'] in ['HIGH', 'MEDIUM']:
+                        self.session.checkpoints.append({
+                            'checkpoint': cp['id'],
+                            'turn': turn_num,
+                            'confidence': cp['confidence'],
+                            'level': cp.get('level', 'UNKNOWN'),
+                            'timestamp': datetime.now().isoformat()
+                        })
 
-                print(f"  ✓ Completed (CP: {len(checkpoints)}, Agents: {len(agents)})")
+                # Only count agents with HIGH/MEDIUM confidence as actually invoked
+                for agent in detected_agents:
+                    if agent['confidence'] in ['HIGH', 'MEDIUM']:
+                        if agent['id'] not in self.session.agents_invoked:
+                            self.session.agents_invoked.append(agent['id'])
+
+                high_cp = len([c for c in detected_checkpoints if c['confidence'] == 'HIGH'])
+                high_agents = len([a for a in detected_agents if a['confidence'] in ['HIGH', 'MEDIUM']])
+                print(f"  ✓ Completed (CP: {high_cp} high/{len(detected_checkpoints)} total, Agents: {high_agents})")
 
             # Finalize session
             self.session.end_time = datetime.now().isoformat()
@@ -400,6 +869,83 @@ To run with real AI responses, remove --dry-run flag.
 
         return self.session
 
+    # Checkpoint equivalence groups: IDs that should be treated as equivalent
+    CHECKPOINT_EQUIVALENCES = {
+        # Paradigm checkpoints (selection vs confirmation are equivalent)
+        'CP_PARADIGM_SELECTION': 'CP_PARADIGM_CONFIRMATION',
+        'CP_PARADIGM_CONFIRMATION': 'CP_PARADIGM_SELECTION',
+
+        # Moderator checkpoints (selection vs analysis are equivalent)
+        'CP_MODERATOR_SELECTION': 'CP_MODERATOR_ANALYSIS',
+        'CP_MODERATOR_ANALYSIS': 'CP_MODERATOR_SELECTION',
+
+        # Approval checkpoints (analysis plan vs methodology are equivalent)
+        'CP_ANALYSIS_PLAN_APPROVAL': 'CP_METHODOLOGY_APPROVAL',
+        'CP_METHODOLOGY_APPROVAL': 'CP_ANALYSIS_PLAN_APPROVAL',
+
+        # Analysis model vs heterogeneity (both relate to model selection)
+        'CP_ANALYSIS_MODEL': 'CP_HETEROGENEITY_ANALYSIS',
+        'CP_HETEROGENEITY_ANALYSIS': 'CP_ANALYSIS_MODEL',
+    }
+
+    def _fuzzy_checkpoint_match(self, found: str, expected: str) -> bool:
+        """
+        Check if found checkpoint matches expected checkpoint using fuzzy matching.
+
+        Handles cases like:
+        - CP_RESEARCH vs CP_RESEARCH_DIRECTION (partial match)
+        - CP_EFFECT_SIZE vs CP_EFFECT_SIZE_SELECTION (partial match)
+        - Case insensitivity
+        - Equivalent checkpoint IDs (v3.2.0)
+
+        Stricter matching (v3.1.1):
+        - Requires 75% keyword overlap instead of 50%
+        - All expected keywords must appear in found (for short expected names)
+        """
+        found_upper = found.upper()
+        expected_upper = expected.upper()
+
+        # Exact match (highest priority)
+        if found_upper == expected_upper:
+            return True
+
+        # Equivalence match (v3.2.0): Check if IDs are equivalent
+        if found_upper in self.CHECKPOINT_EQUIVALENCES:
+            if self.CHECKPOINT_EQUIVALENCES[found_upper] == expected_upper:
+                return True
+
+        # Prefix match: found is a prefix of expected
+        # Example: CP_RESEARCH matches CP_RESEARCH_DIRECTION
+        if expected_upper.startswith(found_upper) and len(found_upper) >= 6:  # At least "CP_XX"
+            return True
+
+        # Prefix match: expected is a prefix of found
+        if found_upper.startswith(expected_upper) and len(expected_upper) >= 6:
+            return True
+
+        # Strict keyword match: extract key words and compare
+        found_words = set(found_upper.replace('CP_', '').replace('META_', '').split('_'))
+        expected_words = set(expected_upper.replace('CP_', '').replace('META_', '').split('_'))
+
+        # Remove empty strings
+        found_words.discard('')
+        expected_words.discard('')
+
+        if not expected_words:
+            return False
+
+        overlap = found_words & expected_words
+
+        # For short expected names (1-2 words), require ALL expected words in found
+        if len(expected_words) <= 2:
+            return expected_words <= found_words
+
+        # For longer names, require 75% overlap
+        if len(overlap) >= len(expected_words) * 0.75:
+            return True
+
+        return False
+
     def _validate_session(self) -> Dict[str, Any]:
         """Validate session against protocol expectations."""
         expected_checkpoints = [
@@ -412,23 +958,87 @@ To run with real AI responses, remove --dry-run flag.
         # Run verification huddle if enabled in protocol
         verification_huddle = self._run_verification_huddle()
 
+        # Skill loading verification
+        skill_verification = self._verify_skill_loading()
+
+        # Fuzzy checkpoint matching
+        matched_checkpoints = []
+        for expected_cp in expected_checkpoints:
+            for found_cp in found_checkpoints:
+                if self._fuzzy_checkpoint_match(found_cp, expected_cp):
+                    matched_checkpoints.append({
+                        'expected': expected_cp,
+                        'found': found_cp,
+                        'exact': found_cp.upper() == expected_cp.upper()
+                    })
+                    break
+
+        # Calculate compliance with fuzzy matching
+        fuzzy_compliance = len(matched_checkpoints) / max(len(expected_checkpoints), 1) * 100
+        exact_compliance = len([m for m in matched_checkpoints if m['exact']]) / max(len(expected_checkpoints), 1) * 100
+
+        # Agent matching - extract agent IDs from expected (e.g., "A1-ResearchQuestionRefiner" -> "A1")
+        expected_agent_ids = []
+        for agent in expected_agents:
+            if '-' in agent:
+                agent_id = agent.split('-')[0].upper()
+            else:
+                agent_id = agent.upper()
+            if re.match(r'^[A-H][1-7]$', agent_id):
+                expected_agent_ids.append(agent_id)
+
         return {
             'checkpoints': {
                 'expected': expected_checkpoints,
                 'found': found_checkpoints,
-                'missing': [cp for cp in expected_checkpoints if cp not in found_checkpoints],
-                'compliance': len([cp for cp in expected_checkpoints if cp in found_checkpoints]) / max(len(expected_checkpoints), 1) * 100
+                'matched': matched_checkpoints,
+                'missing': [cp for cp in expected_checkpoints
+                           if not any(self._fuzzy_checkpoint_match(f, cp) for f in found_checkpoints)],
+                'compliance': fuzzy_compliance,
+                'exact_compliance': exact_compliance
             },
             'agents': {
                 'expected': expected_agents,
+                'expected_ids': expected_agent_ids,
                 'found': self.session.agents_invoked,
-                'match_rate': len(set(expected_agents) & set(self.session.agents_invoked)) / max(len(expected_agents), 1) * 100
+                'match_rate': len(set(expected_agent_ids) & set(self.session.agents_invoked)) / max(len(expected_agent_ids), 1) * 100 if expected_agent_ids else 0
             },
             'turns': {
                 'expected_min': int(self.protocol.get('expected_turns', '1').split('-')[0]) if isinstance(self.protocol.get('expected_turns'), str) else self.protocol.get('expected_turns', 1),
                 'actual': len([t for t in self.session.turns if t.role == 'user']),
             },
+            'skill_loading': skill_verification,
             'verification_huddle': verification_huddle
+        }
+
+    def _verify_skill_loading(self) -> Dict[str, Any]:
+        """Aggregate skill loading verification from all turns."""
+        assistant_turns = [t for t in self.session.turns if t.role == 'assistant']
+
+        if not assistant_turns:
+            return {'verified': False, 'reason': 'No assistant responses'}
+
+        # Check first turn for skill loading
+        first_turn = assistant_turns[0]
+        skill_check = first_turn.metadata.get('skill_check', {})
+
+        if skill_check:
+            return {
+                'verified': skill_check.get('loaded', False),
+                'confidence': skill_check.get('confidence', 'NONE'),
+                'score': skill_check.get('score', 0),
+                'evidence': skill_check.get('evidence', [])
+            }
+
+        # Fallback: Run skill check on first response if not done during execution
+        first_response = first_turn.content
+        skill_check = self._check_skill_loaded(first_response)
+
+        return {
+            'verified': skill_check.get('loaded', False),
+            'confidence': skill_check.get('confidence', 'NONE'),
+            'score': skill_check.get('score', 0),
+            'evidence': skill_check.get('evidence', [])
         }
 
     def _run_verification_huddle(self) -> Dict[str, Any]:
@@ -616,9 +1226,30 @@ To run with real AI responses, remove --dry-run flag.
                 f.write(f"{turn.content}\n\n")
 
                 if turn.checkpoints_detected:
-                    f.write(f"**Checkpoints Detected**: {', '.join(turn.checkpoints_detected)}\n\n")
+                    f.write(f"**Checkpoints Detected**: {', '.join(turn.checkpoints_detected)}\n")
+                    # Show confidence from metadata if available
+                    full_cps = turn.metadata.get('detected_checkpoints_full', [])
+                    if full_cps:
+                        f.write("  - Details: ")
+                        cp_details = [f"{cp['id']}({cp['confidence']})" for cp in full_cps]
+                        f.write(", ".join(cp_details) + "\n")
+                    f.write("\n")
+
                 if turn.agents_detected:
-                    f.write(f"**Agents Detected**: {', '.join(turn.agents_detected)}\n\n")
+                    f.write(f"**Agents Detected**: {', '.join(turn.agents_detected)}\n")
+                    # Show confidence from metadata if available
+                    full_agents = turn.metadata.get('detected_agents_full', [])
+                    if full_agents:
+                        f.write("  - Details: ")
+                        agent_details = [f"{a['id']}({a['confidence']})" for a in full_agents]
+                        f.write(", ".join(agent_details) + "\n")
+                    f.write("\n")
+
+                # Show skill check for first turn
+                skill_check = turn.metadata.get('skill_check', {})
+                if skill_check and turn.number == 1:
+                    verified = "✅" if skill_check.get('loaded') else "❌"
+                    f.write(f"**Skill Loaded**: {verified} (Confidence: {skill_check.get('confidence', 'NONE')})\n\n")
                 if turn.vs_options:
                     f.write("**VS Options**:\n")
                     for opt in turn.vs_options:
@@ -654,7 +1285,18 @@ To run with real AI responses, remove --dry-run flag.
         result_file = output_path / f'{self.session.scenario_id}_test_result.yaml'
 
         validation = self.session.validation_results
-        status = "PASSED" if validation.get('checkpoints', {}).get('compliance', 0) >= 80 else "FAILED"
+        skill_loading = validation.get('skill_loading', {})
+
+        # Status based on both checkpoint compliance and skill loading
+        checkpoint_compliance = validation.get('checkpoints', {}).get('compliance', 0)
+        skill_verified = skill_loading.get('verified', False)
+
+        if checkpoint_compliance >= 80 and skill_verified:
+            status = "PASSED"
+        elif checkpoint_compliance >= 80:
+            status = "PARTIAL"  # Checkpoints OK but skill not verified
+        else:
+            status = "FAILED"
 
         test_result = {
             'scenario_id': self.session.scenario_id,
@@ -667,12 +1309,19 @@ To run with real AI responses, remove --dry-run flag.
             'metrics': {
                 'total_turns': len([t for t in self.session.turns if t.role == 'user']),
                 'checkpoints_found': len(self.session.checkpoints),
-                'checkpoint_compliance': f"{validation.get('checkpoints', {}).get('compliance', 0):.1f}%",
+                'checkpoint_compliance': f"{checkpoint_compliance:.1f}%",
                 'agents_invoked': len(self.session.agents_invoked),
+                'skill_loaded': skill_verified,
+                'skill_confidence': skill_loading.get('confidence', 'NONE'),
             },
             'validation': validation,
             'checkpoints': [
-                {'id': cp['checkpoint'], 'turn': cp['turn'], 'status': 'TRIGGERED'}
+                {
+                    'id': cp['checkpoint'],
+                    'turn': cp['turn'],
+                    'status': 'TRIGGERED',
+                    'confidence': cp.get('confidence', 'UNKNOWN')
+                }
                 for cp in self.session.checkpoints
             ],
             'agents': [{'agent': a} for a in self.session.agents_invoked]
@@ -712,7 +1361,25 @@ To run with real AI responses, remove --dry-run flag.
             f.write(f"| Total Turns | {len([t for t in self.session.turns if t.role == 'user'])} |\n")
             f.write(f"| Checkpoints Found | {len(self.session.checkpoints)} |\n")
             f.write(f"| Checkpoint Compliance | {validation.get('checkpoints', {}).get('compliance', 0):.1f}% |\n")
-            f.write(f"| Agents Invoked | {len(self.session.agents_invoked)} |\n\n")
+            f.write(f"| Agents Invoked | {len(self.session.agents_invoked)} |\n")
+
+            # Skill loading verification
+            skill_loading = validation.get('skill_loading', {})
+            skill_status = "✅ Yes" if skill_loading.get('verified') else "❌ No"
+            f.write(f"| Skill Loaded | {skill_status} ({skill_loading.get('confidence', 'NONE')}) |\n\n")
+
+            # Skill loading details
+            if skill_loading:
+                f.write("## 🔧 SKILL LOADING VERIFICATION\n\n")
+                f.write(f"**Verified**: {skill_loading.get('verified', False)}\n")
+                f.write(f"**Confidence**: {skill_loading.get('confidence', 'NONE')}\n")
+                f.write(f"**Score**: {skill_loading.get('score', 0)}/100\n\n")
+
+                if skill_loading.get('evidence'):
+                    f.write("**Evidence**:\n")
+                    for ev in skill_loading['evidence']:
+                        f.write(f"- {ev}\n")
+                    f.write("\n")
 
             f.write("## Checkpoints\n\n")
             if self.session.checkpoints:
