@@ -1,6 +1,6 @@
 {
   "name": "@diverga/codex-setup",
-  "version": "6.6.2",
+  "version": "6.6.3",
   "description": "Interactive TUI installer for Diverga Research Coordinator on Codex CLI",
   "type": "module",
   "main": "./dist/index.js",
