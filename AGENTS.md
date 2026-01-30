@@ -1,13 +1,13 @@
 # AGENTS.md
 
-> AI-readable documentation for Diverga v6.0.1 (Human-Centered Edition)
+> AI-readable documentation for Diverga v6.5 (ScholaRAG Integration Edition)
 
 ## Project Overview
 
 **Diverga** is a Claude Code Skills-based AI research assistant system that breaks free from mode collapse through **Verbalized Sampling (VS) methodology**. It provides context-persistent support for the complete research lifecycle with a focus on **creative, defensible research choices** while ensuring **human decisions remain with humans**.
 
-**Version**: 6.0.1 (Human-Centered Edition)
-**Generated**: 2026-01-25
+**Version**: 6.5 (ScholaRAG Integration Edition)
+**Generated**: 2026-01-30
 **Repository**: https://github.com/HosungYou/Diverga
 
 ---
@@ -32,8 +32,8 @@
 | **Iron Law** | "agent OR checkpoint" | ❌ REMOVED |
 | **OMC Autonomous Modes** | ralph/ultrawork/ecomode | ❌ REMOVED |
 | **Human Checkpoints** | Could be bypassed | ✅ MANDATORY |
-| **Agent Naming** | Numbered (01-21) | ✅ Category-based (A1-H2) |
-| **Agent Count** | 27 agents | ✅ 33 agents |
+| **Agent Naming** | Numbered (01-21) | ✅ Category-based (A1-I3) |
+| **Agent Count** | 27 agents | ✅ 37 agents (v6.5) |
 | **State Location** | `.omc/` | ✅ `.claude/` |
 
 ---
@@ -304,13 +304,76 @@ Advanced qualitative and participatory research methodologies.
 
 ---
 
-## Model Routing (v6.0.1)
+### Category I: Systematic Review Automation (4 agents) - NEW v6.5
+
+ScholaRAG integration for automated PRISMA 2020 systematic literature reviews.
+
+| ID | Agent | Purpose | Tier | Model | Checkpoint |
+|----|-------|---------|------|-------|------------|
+| **I0** | **scholar-agent-orchestrator** | **Pipeline coordination, checkpoint management** | **HIGH** | **opus** | **🔴 All SCH_* checkpoints** |
+| I1 | paper-retrieval-agent | Multi-database paper fetching (SS, OA, arXiv) | MEDIUM | sonnet | 🔴 SCH_DATABASE_SELECTION |
+| I2 | screening-assistant | AI-PRISMA 6-dimension screening (Groq LLM) | MEDIUM | sonnet | 🔴 SCH_SCREENING_CRITERIA |
+| I3 | rag-builder | Vector database construction (local, $0 cost) | LOW | haiku | 🟠 SCH_RAG_READINESS |
+
+**Paradigm Coverage**: Systematic Review, Meta-Analysis
+
+#### Category I ScholaRAG System (v6.5 New)
+
+Integrates ScholaRAG systematic review automation into Diverga:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│           CATEGORY I: SCHOLARAG INTEGRATION                  │
+├─────────────────────────────────────────────────────────────┤
+│ I0-ScholarAgentOrchestrator (Conductor - DECISION AUTHORITY)│
+│   └─ Pipeline coordination (7 stages)                       │
+│   └─ Checkpoint enforcement (4 checkpoints)                 │
+│   └─ Cost optimization (Groq → 100x cheaper)               │
+│                                                             │
+│ I1-PaperRetrievalAgent (Service Provider)                   │
+│   └─ Semantic Scholar, OpenAlex, arXiv                      │
+│   └─ Scopus, Web of Science (institutional)                 │
+│   └─ Rate limiting, deduplication                           │
+│                                                             │
+│ I2-ScreeningAssistant (Service Provider)                    │
+│   └─ AI-PRISMA 6-dimension scoring                          │
+│   └─ Groq LLM (100x cheaper than Claude)                    │
+│   └─ knowledge_repository (50%) / systematic_review (90%)   │
+│                                                             │
+│ I3-RAGBuilder (Service Provider)                            │
+│   └─ PDF download with retry                                │
+│   └─ Token-based chunking (tiktoken)                        │
+│   └─ Local embeddings + ChromaDB ($0 cost)                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**New Checkpoints**:
+| Checkpoint | Level | When |
+|------------|-------|------|
+| `SCH_DATABASE_SELECTION` | 🔴 | Database choice before retrieval |
+| `SCH_SCREENING_CRITERIA` | 🔴 | PRISMA criteria before screening |
+| `SCH_RAG_READINESS` | 🟠 | RAG system ready for queries |
+| `SCH_PRISMA_GENERATION` | 🟡 | PRISMA diagram generation |
+
+**Cost Optimization**:
+| Task | Provider | Cost/100 papers |
+|------|----------|-----------------|
+| Screening | Groq (llama-3.3-70b) | $0.01 |
+| RAG Queries | Groq | $0.02 |
+| Embeddings | Local (MiniLM) | $0 |
+| **Total 500-paper review** | **Mixed** | **~$0.07** |
+
+---
+
+## Model Routing (v6.5)
 
 | Tier | Model | Count | Agents |
 |------|-------|-------|--------|
-| HIGH | Opus | 14 | A1, A2, A3, A5, C1, C2, C3, D4, E1, E2, E3, G3, H1, H2 |
-| MEDIUM | Sonnet | 13 | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4 |
-| LOW | Haiku | 6 | B3, B4, D3, E4, F1, F2 |
+| HIGH | Opus | 15 | A1, A2, A3, A5, C1, C2, C3, D4, E1, E2, E3, G3, H1, H2, **I0** |
+| MEDIUM | Sonnet | 15 | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4, **I1, I2** |
+| LOW | Haiku | 7 | B3, B4, D3, E4, F1, F2, **I3** |
+
+**Total: 37 agents** (33 original + 4 Category I)
 
 ### Temperature Settings by Category
 
@@ -608,6 +671,15 @@ project:
 | ethnography, fieldwork | 민족지학, 현장연구 | H1 |
 | action research, PAR, CBPR | 실행연구, 참여적 연구 | H2 |
 
+### Category I: Systematic Review Automation (NEW v6.5)
+
+| Keywords | Korean | Agent |
+|----------|--------|-------|
+| systematic review, PRISMA, ScholaRAG | 체계적 문헌고찰, 프리즈마 | I0 |
+| fetch papers, retrieve papers, database search | 논문 수집, 데이터베이스 검색 | I1 |
+| screen papers, inclusion criteria, AI screening | 논문 스크리닝, 포함 기준 | I2 |
+| build RAG, vector database, PDF download | RAG 구축, PDF 다운로드 | I3 |
+
 ---
 
 ## Key Files Reference
@@ -625,6 +697,7 @@ project:
 
 ## Version History
 
+- **v6.5.0**: ScholaRAG Integration - Category I agents (I0-I3), 37 total agents, Groq LLM support
 - **v6.0.1**: Agent restructuring - 33 agents with category-based naming (A1-H2)
 - **v6.0.0**: Clean Slate - Removed Sisyphus/OMC modes, mandatory checkpoints
 - **v5.0.0**: Sisyphus protocol, paradigm detection, 27 agents

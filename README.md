@@ -16,7 +16,7 @@
 
               ┌─────────────────────────────────────────────────┐
               │  Research Methodology AI Assistant for          │
-              │  Claude Code · 40 Specialized Agents · VS+HAVS  │
+              │  Claude Code · 44 Specialized Agents · VS+HAVS  │
               └─────────────────────────────────────────────────┘
 ```
 
@@ -27,7 +27,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Methodology](https://img.shields.io/badge/Powered_by-VS+HAVS-violet?style=for-the-badge&logo=academia&logoColor=white)](docs/methodology.md)
 [![Language](https://img.shields.io/badge/language-English%20%7C%20한국어-orange?style=for-the-badge)](docs/i18n/ko/README-ko.md)
-[![Agents](https://img.shields.io/badge/agents-40-purple?style=for-the-badge)](docs/AGENTS.md)
+[![Agents](https://img.shields.io/badge/agents-44-purple?style=for-the-badge)](docs/AGENTS.md)
 
 ```
          ╭──────────────────────────────────────────────────────────╮
@@ -46,7 +46,7 @@
 
 ## ✨ What is Diverga?
 
-**Diverga** is a research methodology assistant that transforms Claude Code into a 40-agent orchestra for social science research. Built on **Verbalized Sampling (VS)** and **HAVS** (Humanization-Adapted VS) methodologies, it prevents AI "mode collapse" — the tendency to recommend only safe, modal solutions.
+**Diverga** is a research methodology assistant that transforms Claude Code into a 44-agent orchestra for social science research. Built on **Verbalized Sampling (VS)** and **HAVS** (Humanization-Adapted VS) methodologies, it prevents AI "mode collapse" — the tendency to recommend only safe, modal solutions.
 
 <div align="center">
 
@@ -156,6 +156,7 @@ Diverga:
 | **⚡ oh-my-claudecode Compatible** | Same invocation pattern: `Task(subagent_type="diverga:a1")` |
 | **🔧 TypeScript Runtime** | Programmatic agent access via `getAgentDefinitions()` |
 | **🔄 Dual Invocation** | Both Skill (`/diverga:A1-...`) and Task (`diverga:a1`) supported |
+| **🔬 Category I Agents** | ScholaRAG integration with I0-I3 for systematic reviews |
 
 ### Parallel Execution Quick Start
 
@@ -278,13 +279,13 @@ Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 
 ---
 
-## 🏗️ Architecture (40 Agents in 8 Categories)
+## 🏗️ Architecture (44 Agents in 9 Categories)
 
 <div align="center">
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════╗
-║                         🎯 AGENT ECOSYSTEM (40 AGENTS)                        ║
+║                         🎯 AGENT ECOSYSTEM (44 AGENTS)                        ║
 ╠═══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                               ║
 ║   📐 Category A: Foundation (6)         🔍 Category B: Evidence (5)          ║
@@ -322,6 +323,11 @@ Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 ║   ◆ G4-preregistration-composer                                              ║
 ║   ◆ G5-academic-style-auditor                                                ║
 ║   ◆ G6-academic-style-humanizer 🆕 HAVS                                      ║
+║                                                                               ║
+║   🔬 Category I: Systematic Review (4)   [NEW - ScholaRAG Integration]       ║
+║   ────────────────────────────────────                                        ║
+║   ◆ I0-scholar-agent-orchestrator        ◆ I1-paper-retrieval-agent         ║
+║   ◆ I2-screening-assistant               ◆ I3-rag-builder                    ║
 ║                                                                               ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 ```
@@ -401,6 +407,14 @@ Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 |-------|-------|---------|
 | H1-ethnographic-research-advisor | Opus | Fieldwork, thick description |
 | H2-action-research-facilitator | Opus | PAR, CBPR cycles |
+
+#### Category I: Systematic Review Automation (4 Agents) [NEW v6.5]
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| I0-scholar-agent-orchestrator | Opus | ScholaRAG 7-stage pipeline orchestration |
+| I1-paper-retrieval-agent | Sonnet | Multi-database paper fetching |
+| I2-screening-assistant | Sonnet | AI-PRISMA screening with Groq |
+| I3-rag-builder | Haiku | Vector database construction |
 
 ---
 
@@ -588,7 +602,7 @@ opencode
 | `Grep` | `grep` |
 | `Bash` | `shell` |
 
-All 40 agents work identically across all platforms with VS methodology and human checkpoints enforced.
+All 44 agents work identically across all platforms with VS methodology and human checkpoints enforced.
 
 ---
 

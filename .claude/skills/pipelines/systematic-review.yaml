@@ -1,0 +1,317 @@
+# Systematic Review Pipeline Template
+# Diverga v6.5 - ScholaRAG Integration
+#
+# This pipeline orchestrates a complete PRISMA 2020 systematic literature review
+# using Category I agents (I0-I3) integrated with existing Diverga agents.
+#
+# Usage:
+#   "Run systematic review pipeline for AI chatbots in language learning"
+#   "/pipeline systematic-review"
+
+name: systematic-review
+description: Complete PRISMA 2020 systematic literature review automation
+version: "1.0.0"
+category: I
+
+# =============================================================================
+# PIPELINE STAGES
+# =============================================================================
+
+stages:
+  # ---------------------------------------------------------------------------
+  # Stage 1: Research Design (Diverga Foundation)
+  # ---------------------------------------------------------------------------
+  - name: research_design
+    description: "Define research question and scope"
+    agents:
+      - agent: A1-research-question-refiner
+        model: opus
+        task: "Refine research question using PICO/SPIDER framework"
+
+      - agent: A5-paradigm-worldview-advisor
+        model: opus
+        task: "Confirm quantitative paradigm for systematic review"
+
+    checkpoint: CP_RESEARCH_DIRECTION
+    parallel: true
+
+  # ---------------------------------------------------------------------------
+  # Stage 2: Search Strategy (Diverga + ScholaRAG)
+  # ---------------------------------------------------------------------------
+  - name: search_strategy
+    description: "Develop database search strategy"
+    agents:
+      - agent: B1-systematic-literature-scout
+        model: sonnet
+        task: "Design Boolean search strings for each database"
+
+      - agent: I1-paper-retrieval-agent
+        model: sonnet
+        task: "Validate database availability and API access"
+
+    checkpoint: SCH_DATABASE_SELECTION
+    parallel: true
+    depends_on: [research_design]
+
+  # ---------------------------------------------------------------------------
+  # Stage 3: Paper Retrieval (ScholaRAG)
+  # ---------------------------------------------------------------------------
+  - name: paper_retrieval
+    description: "Execute multi-database paper retrieval"
+    agents:
+      - agent: I1-paper-retrieval-agent
+        model: sonnet
+        task: |
+          Execute ScholaRAG scripts:
+          1. python scripts/01_fetch_papers.py
+          2. python scripts/02_deduplicate.py
+
+    output:
+      - deduplicated.csv
+
+    depends_on: [search_strategy]
+
+  # ---------------------------------------------------------------------------
+  # Stage 4: PRISMA Screening (ScholaRAG)
+  # ---------------------------------------------------------------------------
+  - name: prisma_screening
+    description: "AI-assisted PRISMA 6-dimension screening"
+    agents:
+      - agent: I2-screening-assistant
+        model: sonnet
+        task: |
+          Execute PRISMA screening with Groq LLM:
+          python scripts/03_screen_papers.py
+
+    checkpoint: SCH_SCREENING_CRITERIA
+    llm_provider: groq
+    model: llama-3.3-70b-versatile
+
+    output:
+      - relevant_papers.csv
+      - excluded_papers.csv
+      - human_review_queue.csv
+
+    depends_on: [paper_retrieval]
+
+  # ---------------------------------------------------------------------------
+  # Stage 5: Human Review (Optional)
+  # ---------------------------------------------------------------------------
+  - name: human_review
+    description: "Expert validation of edge cases"
+    condition: "human_review_queue.csv is not empty"
+
+    agents:
+      - agent: I2-screening-assistant
+        model: sonnet
+        task: "Facilitate human review of edge cases"
+
+    checkpoint: null  # User reviews directly
+
+    depends_on: [prisma_screening]
+
+  # ---------------------------------------------------------------------------
+  # Stage 6: Quality Appraisal (Diverga)
+  # ---------------------------------------------------------------------------
+  - name: quality_appraisal
+    description: "Assess methodological quality of included papers"
+    agents:
+      - agent: B2-evidence-quality-appraiser
+        model: sonnet
+        task: |
+          Apply quality assessment tools:
+          - RoB 2.0 for RCTs
+          - Newcastle-Ottawa for observational
+          - GRADE for overall evidence
+
+    output:
+      - quality_assessment.csv
+
+    parallel_with: [pdf_download]
+    depends_on: [prisma_screening]
+
+  # ---------------------------------------------------------------------------
+  # Stage 7: PDF Download + RAG Build (ScholaRAG)
+  # ---------------------------------------------------------------------------
+  - name: pdf_download
+    description: "Download PDFs and build vector database"
+    agents:
+      - agent: I3-rag-builder
+        model: haiku
+        task: |
+          Execute:
+          1. python scripts/04_download_pdfs.py
+          2. python scripts/05_build_rag.py
+
+    checkpoint: SCH_RAG_READINESS
+
+    output:
+      - data/03_pdfs/*.pdf
+      - data/04_rag/chroma_db/
+
+    depends_on: [prisma_screening]
+
+  # ---------------------------------------------------------------------------
+  # Stage 8: Data Extraction (Diverga Meta-Analysis)
+  # ---------------------------------------------------------------------------
+  - name: data_extraction
+    description: "Extract data from included papers"
+    condition: "project_type == 'systematic_review'"
+
+    agents:
+      - agent: C6-data-integrity-guard
+        model: sonnet
+        task: "Extract effect sizes, sample sizes, study characteristics"
+
+      - agent: B3-effect-size-extractor
+        model: haiku
+        task: "Calculate/convert effect sizes to Hedges' g"
+
+    checkpoint: CP_META_GATE
+    parallel: true
+
+    depends_on: [pdf_download]
+
+  # ---------------------------------------------------------------------------
+  # Stage 9: Meta-Analysis (Diverga, Optional)
+  # ---------------------------------------------------------------------------
+  - name: meta_analysis
+    description: "Conduct meta-analysis if applicable"
+    condition: "extracted_studies >= 3 AND homogeneous_outcomes"
+
+    agents:
+      - agent: C5-meta-analysis-master
+        model: opus
+        task: |
+          Conduct meta-analysis:
+          1. Forest plots
+          2. Heterogeneity analysis (I², Q-test)
+          3. Publication bias (funnel plot, Egger's test)
+          4. Sensitivity analysis
+
+      - agent: C7-error-prevention-engine
+        model: sonnet
+        task: "Validate data integrity, detect anomalies"
+
+    parallel: true
+    depends_on: [data_extraction]
+
+  # ---------------------------------------------------------------------------
+  # Stage 10: Documentation (ScholaRAG + Diverga)
+  # ---------------------------------------------------------------------------
+  - name: documentation
+    description: "Generate PRISMA diagram and reports"
+    agents:
+      - agent: I0-scholar-agent-orchestrator
+        model: opus
+        task: "Execute python scripts/07_generate_prisma.py"
+
+      - agent: F2-checklist-manager
+        model: haiku
+        task: "Verify PRISMA 2020 checklist compliance"
+
+    checkpoint: SCH_PRISMA_GENERATION
+
+    output:
+      - outputs/prisma_diagram.png
+      - outputs/statistics_report.md
+
+    depends_on: [pdf_download]
+
+# =============================================================================
+# PIPELINE CONFIGURATION
+# =============================================================================
+
+config:
+  # ScholaRAG path
+  scholarag_path: "/Volumes/External SSD/Projects/ScholaRAG"
+
+  # LLM Provider preferences
+  llm_providers:
+    screening: groq
+    analysis: groq
+    generation: claude
+
+  # Cost limits
+  max_cost_usd: 10.0
+
+  # Parallelization
+  max_parallel_agents: 3
+
+# =============================================================================
+# CHECKPOINTS SUMMARY
+# =============================================================================
+
+checkpoints:
+  - id: CP_RESEARCH_DIRECTION
+    level: REQUIRED
+    stage: research_design
+
+  - id: SCH_DATABASE_SELECTION
+    level: REQUIRED
+    stage: search_strategy
+
+  - id: SCH_SCREENING_CRITERIA
+    level: REQUIRED
+    stage: prisma_screening
+
+  - id: SCH_RAG_READINESS
+    level: RECOMMENDED
+    stage: pdf_download
+
+  - id: CP_META_GATE
+    level: REQUIRED
+    stage: data_extraction
+    condition: "meta_analysis enabled"
+
+  - id: SCH_PRISMA_GENERATION
+    level: OPTIONAL
+    stage: documentation
+
+# =============================================================================
+# EXPECTED OUTPUTS
+# =============================================================================
+
+outputs:
+  identification:
+    - semantic_scholar_results.csv
+    - openalex_results.csv
+    - arxiv_results.csv
+    - deduplicated.csv
+
+  screening:
+    - relevant_papers.csv
+    - excluded_papers.csv
+    - all_screened_papers.csv
+
+  pdfs:
+    - data/03_pdfs/*.pdf
+    - papers_metadata.csv
+
+  rag:
+    - data/04_rag/chroma_db/
+    - rag_config.json
+
+  documentation:
+    - outputs/prisma_diagram.png
+    - outputs/prisma_diagram.pdf
+    - outputs/statistics_report.md
+    - outputs/statistics.json
+
+# =============================================================================
+# AUTO-TRIGGER
+# =============================================================================
+
+triggers:
+  keywords:
+    - systematic review
+    - PRISMA
+    - literature review automation
+    - ScholaRAG
+    - 체계적 문헌고찰
+    - 문헌고찰 자동화
+
+  patterns:
+    - "conduct a systematic review"
+    - "run systematic review pipeline"
+    - "PRISMA 2020 review"
