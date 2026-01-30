@@ -2,7 +2,7 @@
 
 **Scenario**: Hybrid Checkpoint Detection - Korean Meta-Analysis
 **Test Date**: 2026-01-30
-**CLI Tool**: codex
+**CLI Tool**: claude
 **Status**: ✅ COMPLETED
 
 ---
@@ -20,22 +20,28 @@
 | Metric | Value |
 |--------|-------|
 | Total Turns | 4 |
-| Checkpoints Found | 1 |
-| Checkpoint Compliance | 0.0% |
+| Checkpoints Found | 4 |
+| Checkpoint Compliance | 25.0% |
 | Agents Invoked | 0 |
-| Skill Loaded | ❌ No (NONE) |
+| Skill Loaded | ✅ Yes (LOW) |
 
 ## 🔧 SKILL LOADING VERIFICATION
 
-**Verified**: False
-**Confidence**: NONE
-**Score**: 0/100
+**Verified**: True
+**Confidence**: LOW
+**Score**: 25/100
+
+**Evidence**:
+- VS marker: T[:\-]Score...
 
 ## Checkpoints
 
 | Checkpoint | Turn | Status |
 |------------|------|--------|
-| CP_ANALYSIS_PLAN | 4 | ✅ Triggered |
+| CP_RESEARCH_DIRECTION | 1 | ✅ Triggered |
+| CP_ANALYSIS_PLAN | 2 | ✅ Triggered |
+| CP_ANALYSIS_PLAN | 3 | ✅ Triggered |
+| CP_MODERATOR_SELECTION | 3 | ✅ Triggered |
 
 ## Agents Invoked
 
@@ -43,15 +49,15 @@ No agents detected in this session.
 
 ## 🔍 VERIFICATION HUDDLE
 
-**Result**: ❌ VERIFICATION FAILED (5/6): CONTEXT_AWARENESS
+**Result**: ✅ VERIFICATION PASSED (6/6 checks)
 
 | Check | Status | Detail |
 |-------|--------|--------|
 | NO_SIMULATION_MARKERS | ✅ PASS | No simulation markers found |
-| RESPONSE_LENGTH_VARIANCE | ✅ PASS | Length variance: 592 chars (min: 313, max: 905) |
-| TIMESTAMP_VARIANCE | ✅ PASS | Response intervals: ['14.2s', '14.1s', '15.1s'] |
-| CONTEXT_AWARENESS | ❌ FAIL | 0 context references found |
-| UNIQUE_SESSION_ID | ✅ PASS | Session ID: 2eacd0dd... |
+| RESPONSE_LENGTH_VARIANCE | ✅ PASS | Length variance: 2120 chars (min: 1149, max: 3269) |
+| TIMESTAMP_VARIANCE | ✅ PASS | Response intervals: ['19.2s', '24.2s', '26.9s'] |
+| CONTEXT_AWARENESS | ✅ PASS | 7 context references found |
+| UNIQUE_SESSION_ID | ✅ PASS | Session ID: 48d2e06d... |
 | DYNAMIC_CONTENT | ✅ PASS | Content appears dynamic |
 
 ### Verification Huddle Purpose

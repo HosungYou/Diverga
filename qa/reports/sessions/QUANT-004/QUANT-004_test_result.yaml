@@ -1,17 +1,29 @@
 agents: []
 checkpoints:
-- confidence: MEDIUM
+- confidence: HIGH
+  id: CP_RESEARCH_DIRECTION
+  status: TRIGGERED
+  turn: 1
+- confidence: HIGH
   id: CP_ANALYSIS_PLAN
   status: TRIGGERED
-  turn: 4
-cli_tool: codex
+  turn: 2
+- confidence: HIGH
+  id: CP_ANALYSIS_PLAN
+  status: TRIGGERED
+  turn: 3
+- confidence: HIGH
+  id: CP_MODERATOR_SELECTION
+  status: TRIGGERED
+  turn: 3
+cli_tool: claude
 error: null
 metrics:
   agents_invoked: 0
-  checkpoint_compliance: 0.0%
-  checkpoints_found: 1
-  skill_confidence: NONE
-  skill_loaded: false
+  checkpoint_compliance: 25.0%
+  checkpoints_found: 4
+  skill_confidence: LOW
+  skill_loaded: true
   total_turns: 4
 name: Hybrid Checkpoint Detection - Korean Meta-Analysis
 scenario_id: QUANT-004
@@ -33,7 +45,7 @@ validation:
     found: []
     match_rate: 0.0
   checkpoints:
-    compliance: 0.0
+    compliance: 25.0
     exact_compliance: 0.0
     expected:
     - CP_PARADIGM_CONFIRMATION
@@ -41,26 +53,32 @@ validation:
     - CP_MODERATOR_ANALYSIS
     - CP_METHODOLOGY_APPROVAL
     found:
+    - CP_RESEARCH_DIRECTION
     - CP_ANALYSIS_PLAN
-    matched: []
+    - CP_ANALYSIS_PLAN
+    - CP_MODERATOR_SELECTION
+    matched:
+    - exact: false
+      expected: CP_MODERATOR_ANALYSIS
+      found: CP_MODERATOR_SELECTION
     missing:
     - CP_PARADIGM_CONFIRMATION
     - CP_EFFECT_SIZE_SELECTION
-    - CP_MODERATOR_ANALYSIS
     - CP_METHODOLOGY_APPROVAL
   skill_loading:
-    confidence: NONE
-    evidence: []
-    score: 0
-    verified: false
+    confidence: LOW
+    evidence:
+    - 'VS marker: T[:\-]Score...'
+    score: 25
+    verified: true
   turns:
     actual: 4
     expected_min: 4
   verification_huddle:
     checks:
       CONTEXT_AWARENESS:
-        detail: 0 context references found
-        passed: false
+        detail: 7 context references found
+        passed: true
       DYNAMIC_CONTENT:
         detail: Content appears dynamic
         passed: true
@@ -68,14 +86,14 @@ validation:
         detail: No simulation markers found
         passed: true
       RESPONSE_LENGTH_VARIANCE:
-        detail: 'Length variance: 592 chars (min: 313, max: 905)'
+        detail: 'Length variance: 2120 chars (min: 1149, max: 3269)'
         passed: true
       TIMESTAMP_VARIANCE:
-        detail: 'Response intervals: [''14.2s'', ''14.1s'', ''15.1s'']'
+        detail: 'Response intervals: [''19.2s'', ''24.2s'', ''26.9s'']'
         passed: true
       UNIQUE_SESSION_ID:
-        detail: 'Session ID: 2eacd0dd...'
+        detail: 'Session ID: 48d2e06d...'
         passed: true
     enabled: true
-    passed: false
-    summary: '❌ VERIFICATION FAILED (5/6): CONTEXT_AWARENESS'
+    passed: true
+    summary: ✅ VERIFICATION PASSED (6/6 checks)
