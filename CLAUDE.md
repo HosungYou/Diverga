@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v6.6.3 (Codex CLI SKILL.md Implementation)
+# Diverga v6.7.0 (Systematic Review Automation)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v6.7.0**: Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline
 **v6.6.3**: Codex CLI SKILL.md implementation - actual skill loading via `.codex/skills/`
 **v6.6.2**: Multi-CLI Compatibility - unified install script, NPM package (@diverga/codex-setup)
 **v6.5.0**: Parallel execution via Task tool - `Task(subagent_type="diverga:a1", ...)`
@@ -46,7 +47,7 @@ AI Research Assistant for the Complete Research Lifecycle - from question formul
 
 ## Project Overview
 
-Diverga provides **context-persistent research support** through **40 specialized agents** across 8 categories (A-H). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
+Diverga provides **context-persistent research support** through **44 specialized agents** across 9 categories (A-I). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
 
 ## Core Value Proposition
 
@@ -133,7 +134,7 @@ The system will:
 
 ---
 
-## Agent Structure (40 Agents in 8 Categories)
+## Agent Structure (44 Agents in 9 Categories)
 
 | Category | Count | Agents | Paradigm |
 |----------|-------|--------|----------|
@@ -145,8 +146,9 @@ The system will:
 | **F: Quality** | 5 | F1-InternalConsistencyChecker, F2-ChecklistManager, F3-ReproducibilityAuditor, F4-BiasTrustworthinessDetector, **F5-HumanizationVerifier** | All |
 | **G: Communication** | 6 | G1-JournalMatcher, G2-AcademicCommunicator, G3-PeerReviewStrategist, G4-PreregistrationComposer, **G5-AcademicStyleAuditor**, **G6-AcademicStyleHumanizer** | All |
 | **H: Specialized** | 2 | H1-EthnographicResearchAdvisor, H2-ActionResearchFacilitator | Qual |
+| **I: Systematic Review Automation** | 4 | **I0-ScholarAgentOrchestrator**, **I1-PaperRetrievalAgent**, **I2-ScreeningAssistant**, **I3-RAGBuilder** | All |
 
-**Total: 6 + 5 + 7 + 4 + 5 + 5 + 6 + 2 = 40 agents**
+**Total: 6 + 5 + 7 + 4 + 5 + 5 + 6 + 2 + 4 = 44 agents**
 
 ### New in v6.3: Meta-Analysis Agent System (C5/C6/C7)
 
@@ -177,15 +179,31 @@ Based on V7 GenAI meta-analysis lessons learned:
 |-------|---------|-------|
 | **B5-ParallelDocumentProcessor** | Batch PDF processing with parallel workers | Opus |
 
+### New in v6.7.0: Systematic Review Automation (Category I)
+
+PRISMA 2020 compliant systematic literature review pipeline with automated paper retrieval, screening, and RAG building.
+
+| Agent | Purpose | Model | Checkpoint |
+|-------|---------|-------|------------|
+| **I0-ScholarAgentOrchestrator** | Pipeline coordination, stage management | Opus | - |
+| **I1-PaperRetrievalAgent** | Multi-database fetching (Semantic Scholar, OpenAlex, arXiv) | Sonnet | 🔴 SCH_DATABASE_SELECTION |
+| **I2-ScreeningAssistant** | AI-PRISMA 6-dimension screening | Sonnet | 🔴 SCH_SCREENING_CRITERIA |
+| **I3-RAGBuilder** | Vector database construction (zero cost) | Haiku | 🟠 SCH_RAG_READINESS |
+
+**Human Checkpoints**:
+- 🔴 **SCH_DATABASE_SELECTION**: User must approve database selection before retrieval
+- 🔴 **SCH_SCREENING_CRITERIA**: User must approve inclusion/exclusion criteria
+- 🟠 **SCH_RAG_READINESS**: Recommended checkpoint before RAG queries
+
 ---
 
-## Model Routing (v6.2)
+## Model Routing (v6.7)
 
-| Tier | Model | Agents (37 total) |
+| Tier | Model | Agents (44 total) |
 |------|-------|-------------------|
-| HIGH | Opus | A1, A2, A3, A5, **B5**, C1, C2, C3, D4, E1, E2, E3, G3, **G6**, H1, H2 (16) |
-| MEDIUM | Sonnet | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4, **G5** (14) |
-| LOW | Haiku | B3, B4, D3, E4, F1, F2, **F5** (7) |
+| HIGH | Opus | A1, A2, A3, A5, **B5**, C1, C2, C3, D4, E1, E2, E3, G3, **G6**, H1, H2, **I0** (17) |
+| MEDIUM | Sonnet | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4, **G5**, **I1**, **I2** (16) |
+| LOW | Haiku | B3, B4, D3, E4, F1, F2, **F5**, **I3** (8) |
 
 ---
 
@@ -457,6 +475,15 @@ Task(
 | `diverga:h1` | "ethnography", "fieldwork", "participant observation" | "민족지학", "현장연구", "참여관찰" | opus |
 | `diverga:h2` | "action research", "participatory", "practitioner" | "실행연구", "참여적 연구" | opus |
 
+#### Category I: Systematic Review Automation (4 agents)
+
+| Agent | Trigger Keywords (EN) | 트리거 키워드 (KR) | Model |
+|-------|----------------------|-------------------|-------|
+| `diverga:i0` | "systematic review", "PRISMA", "literature review automation" | "체계적 문헌고찰", "프리즈마", "문헌고찰 자동화" | opus |
+| `diverga:i1` | "fetch papers", "retrieve papers", "database search" | "논문 수집", "논문 검색", "데이터베이스 검색" | sonnet |
+| `diverga:i2` | "screen papers", "PRISMA screening", "inclusion criteria" | "논문 스크리닝", "선별", "포함 기준" | sonnet |
+| `diverga:i3` | "build RAG", "vector database", "embed documents" | "RAG 구축", "벡터 DB", "문서 임베딩" | haiku |
+
 ### Parallel Execution Groups
 
 Diverga can run multiple agents in parallel when tasks are independent:
@@ -479,6 +506,10 @@ Diverga can run multiple agents in parallel when tasks are independent:
 │                                                                  │
 │ Group 5: Publication Prep                                        │
 │   diverga:g1 + diverga:g2 + diverga:g5                         │
+│                                                                  │
+│ Group 6: Systematic Review Screening (NEW in v6.7)              │
+│   diverga:i1 + diverga:i2 (parallel)                           │
+│   diverga:i0 → diverga:i1 → diverga:i2 → diverga:i3 (pipeline) │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -518,6 +549,7 @@ Execution Plan:
 
 ## Version History
 
+- **v6.7.0**: Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline (44 agents total)
 - **v6.6.3**: Codex CLI SKILL.md Implementation - actual skill loading via `.codex/skills/`, QUANT-005 verified
 - **v6.6.2**: Multi-CLI Compatibility Edition - unified install script, NPM package (@diverga/codex-setup)
 - **v6.5.0**: Parallel Execution Edition - Task tool support via `/agents/` directory

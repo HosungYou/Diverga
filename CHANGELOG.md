@@ -4,6 +4,93 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [6.7.0] - 2026-01-30 (Systematic Review Automation)
+
+### Overview
+
+Diverga v6.7.0 introduces **Category I: Systematic Review Automation** with 4 new agents (I0-I3) for PRISMA 2020 compliant literature review pipelines. Expands from 40 to 44 agents across 9 categories.
+
+**Core Theme**: "Automate systematic reviews with human checkpoints at every critical decision"
+
+### New Category: I - Systematic Review Automation (4 agents)
+
+| Agent | Name | Model | Purpose |
+|-------|------|-------|---------|
+| **I0** | ScholarAgentOrchestrator | Opus | Pipeline coordination, stage management |
+| **I1** | PaperRetrievalAgent | Sonnet | Multi-database fetching (Semantic Scholar, OpenAlex, arXiv) |
+| **I2** | ScreeningAssistant | Sonnet | AI-PRISMA 6-dimension screening |
+| **I3** | RAGBuilder | Haiku | Vector database construction (zero cost) |
+
+### New Human Checkpoints
+
+| Checkpoint | Level | Trigger |
+|------------|-------|---------|
+| SCH_DATABASE_SELECTION | 🔴 REQUIRED | User specifies databases for paper retrieval |
+| SCH_SCREENING_CRITERIA | 🔴 REQUIRED | User approves inclusion/exclusion criteria |
+| SCH_RAG_READINESS | 🟠 RECOMMENDED | Before RAG queries begin |
+| SCH_PRISMA_GENERATION | 🟡 OPTIONAL | Before generating PRISMA flow diagram |
+
+### New Workflows
+
+| Workflow | Stages | Description |
+|----------|--------|-------------|
+| `automated-systematic-review` | I0→I1→I2→I3 | Full PRISMA 2020 pipeline |
+| `knowledge-repository-build` | I0→I1→I3 | Broad corpus (5K-15K papers, 50% threshold) |
+
+### Agent Auto-Trigger Keywords
+
+| Agent | English Keywords | Korean Keywords |
+|-------|------------------|-----------------|
+| `diverga:i0` | "systematic review", "PRISMA", "literature review automation" | "체계적 문헌고찰", "프리즈마" |
+| `diverga:i1` | "fetch papers", "retrieve papers", "database search" | "논문 수집", "논문 검색" |
+| `diverga:i2` | "screen papers", "PRISMA screening", "inclusion criteria" | "논문 스크리닝", "선별" |
+| `diverga:i3` | "build RAG", "vector database", "embed documents" | "RAG 구축", "벡터 DB" |
+
+### New Files
+
+| Path | Purpose |
+|------|---------|
+| `.claude/skills/research-agents/I0-scholar-agent-orchestrator/SKILL.md` | Orchestrator skill |
+| `.claude/skills/research-agents/I1-paper-retrieval-agent/SKILL.md` | Paper retrieval skill |
+| `.claude/skills/research-agents/I2-screening-assistant/SKILL.md` | Screening skill |
+| `.claude/skills/research-agents/I3-rag-builder/SKILL.md` | RAG builder skill |
+
+### Modified Files
+
+| File | Changes |
+|------|---------|
+| `CLAUDE.md` | v6.7.0, 44 agents, 9 categories, Category I section |
+| `agent-registry.yaml` | v6.7.0, Category I agents, new checkpoints, workflows |
+
+### Model Routing (Updated)
+
+| Tier | Model | Agents (44 total) |
+|------|-------|-------------------|
+| HIGH | Opus | A1, A2, A3, A5, B5, C1, C2, C3, C5, D4, E1, E2, E3, G3, G6, H1, H2, **I0** (17) |
+| MEDIUM | Sonnet | A4, A6, B1, B2, C4, C6, C7, D1, D2, E5, F3, F4, G1, G2, G4, G5, **I1**, **I2** (18) |
+| LOW | Haiku | B3, B4, D3, E4, F1, F2, F5, **I3** (8) |
+
+### Category Summary (v6.7.0)
+
+| Category | Name | Count |
+|----------|------|-------|
+| A | Foundation | 6 |
+| B | Evidence | 5 |
+| C | Design & Meta-Analysis | 7 |
+| D | Data Collection | 4 |
+| E | Analysis | 5 |
+| F | Quality | 5 |
+| G | Communication | 6 |
+| H | Specialized | 2 |
+| **I** | **Systematic Review Automation** | **4** |
+| **Total** | | **44** |
+
+### No Breaking Changes
+
+Existing workflows continue unchanged. Category I agents are additive.
+
+---
+
 ## [6.6.3] - 2026-01-30 (Codex CLI SKILL.md Implementation)
 
 ### Overview

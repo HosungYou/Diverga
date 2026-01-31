@@ -1,22 +1,24 @@
-# Agent Registry - Research Coordinator v6.2.0
+# Agent Registry - Research Coordinator v6.7.0
 # Centralized agent capabilities, schemas, and metadata
-# 37 agents across 8 categories (A-H) with expanded qualitative/mixed methods support
+# 44 agents across 9 categories (A-I) with expanded qualitative/mixed methods support
+# v6.7 New: Systematic Review Automation agents (I0, I1, I2, I3) - Category I
+# v6.3 New: Meta-Analysis agents (C5, C6, C7)
 # v6.2 New: Parallel Document Processing agent (B5)
 # v6.1: Humanization Pipeline agents (G5, G6, F5)
 
-version: "6.2.0"
-last_updated: "2026-01-26"
+version: "6.7.0"
+last_updated: "2026-01-30"
 
 # =============================================================================
 # REGISTRY METADATA
 # =============================================================================
 
 registry:
-  description: "Centralized registry for 37 research agents with VS methodology"
-  schema_version: "2.2.0"
+  description: "Centralized registry for 44 research agents with VS methodology"
+  schema_version: "2.4.0"
   contract_reference: "agent-contract-schema.md"
-  total_agents: 37
-  categories: 8
+  total_agents: 44
+  categories: 9
 
 # =============================================================================
 # V5.0 ENHANCEMENTS
@@ -30,11 +32,11 @@ v5_config:
 
   paradigm_support:
     quantitative:
-      primary_agents: ["A1", "A2", "A3", "A4", "B5", "C1", "C4", "D1", "D4", "E1", "E4", "F1", "F2", "F3", "G1", "G2", "G3", "G4"]
+      primary_agents: ["A1", "A2", "A3", "A4", "B5", "C1", "C4", "D1", "D4", "E1", "E4", "F1", "F2", "F3", "G1", "G2", "G3", "G4", "I0", "I1", "I2", "I3"]
     qualitative:
-      primary_agents: ["A1", "A2", "A5", "B5", "C2", "D1", "D2", "D3", "E2", "F4", "G1", "G2", "G3", "H1", "H2"]
+      primary_agents: ["A1", "A2", "A5", "B5", "C2", "D1", "D2", "D3", "E2", "F4", "G1", "G2", "G3", "H1", "H2", "I3"]
     mixed:
-      primary_agents: ["A1", "A2", "A5", "B5", "C3", "D1", "D2", "D4", "E1", "E2", "E3", "F4", "G1", "G2", "G3", "G4", "H2"]
+      primary_agents: ["A1", "A2", "A5", "B5", "C3", "D1", "D2", "D4", "E1", "E2", "E3", "F4", "G1", "G2", "G3", "G4", "H2", "I0", "I1", "I2", "I3"]
 
   upgrade_levels:
     FULL:
@@ -1873,6 +1875,255 @@ agents:
       checkpoints: ["CP-ACTION-001"]
 
 # =============================================================================
+# CATEGORY I: SYSTEMATIC REVIEW AUTOMATION (4 agents) - NEW v6.5.0
+# =============================================================================
+
+  "I0-scholar-agent-orchestrator":
+    name: "Scholar Agent Orchestrator"
+    icon: "📚🔄"
+    category: "I - Systematic Review Automation"
+    tier: "HIGH"
+    model: "opus"
+    legacy_id: null
+    vs_level: "Enhanced"
+    vs_phases: [0, 1, 2, 4]
+
+    capabilities:
+      - "ScholaRAG 7-stage pipeline coordination"
+      - "PRISMA 2020 compliance orchestration"
+      - "Agent delegation (I1, I2, I3)"
+      - "Checkpoint enforcement"
+      - "Project type management (knowledge_repository, systematic_review)"
+      - "Cost optimization via Groq LLM routing"
+      - "Integration with Diverga agents (B1, B2, C5)"
+
+    input_schema:
+      required:
+        - research_question: "string"
+        - domain: "string"
+      optional:
+        - project_type: "enum[knowledge_repository, systematic_review]"
+        - databases: "list[string]"
+        - year_range: "list[int, int]"
+        - language: "string"
+
+    output_schema:
+      main_output:
+        pipeline_status: "enum[completed, in_progress, error]"
+        stages_completed: "list[int]"
+        checkpoints_passed: "list[string]"
+        statistics: "object"
+        outputs: "object"
+
+    t_score_domains:
+      - "Systematic review methodology"
+      - "PRISMA 2020 guidelines"
+      - "Pipeline orchestration patterns"
+
+    triggers:
+      keywords: ["systematic review", "PRISMA", "ScholaRAG", "문헌고찰 자동화", "체계적 문헌고찰", "스콜라래그"]
+      context: ["systematic literature review", "knowledge repository", "PRISMA automation"]
+
+    paradigm_affinity: ["quantitative", "mixed"]
+
+    dependencies:
+      sequential_next: ["I1-paper-retrieval-agent"]
+      parallel_compatible: ["B1-literature-review-strategist"]
+
+    human_checkpoints:
+      required:
+        - "SCH_DATABASE_SELECTION"
+        - "SCH_SCREENING_CRITERIA"
+      recommended:
+        - "SCH_RAG_READINESS"
+      optional:
+        - "SCH_PRISMA_GENERATION"
+
+    upgrade_level: "ENHANCED"
+    v6_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["SCH_DATABASE_SELECTION", "SCH_SCREENING_CRITERIA", "SCH_RAG_READINESS", "SCH_PRISMA_GENERATION"]
+
+  "I1-paper-retrieval-agent":
+    name: "Paper Retrieval Agent"
+    icon: "📄🔍"
+    category: "I - Systematic Review Automation"
+    tier: "MEDIUM"
+    model: "sonnet"
+    legacy_id: null
+    vs_level: "Enhanced"
+    vs_phases: [0, 1, 2, 4]
+
+    capabilities:
+      - "Multi-database paper fetching (Semantic Scholar, OpenAlex, arXiv)"
+      - "Institutional database support (Scopus, WoS with API keys)"
+      - "Rate limiting with exponential backoff"
+      - "Deduplication by DOI, arXiv ID, title similarity"
+      - "PDF URL extraction"
+      - "Boolean query optimization"
+
+    input_schema:
+      required:
+        - query: "string"
+        - databases: "list[enum[semantic_scholar, openalex, arxiv, scopus, wos]]"
+      optional:
+        - year_range: "list[int, int]"
+        - max_results_per_db: "int"
+        - open_access_only: "boolean"
+
+    output_schema:
+      main_output:
+        databases_queried: "list[string]"
+        results: "object"
+        total_identified: "int"
+        after_deduplication: "int"
+        duplicates_removed: "int"
+        output_file: "string"
+
+    t_score_domains:
+      - "Database API patterns"
+      - "Search query optimization"
+      - "Deduplication strategies"
+
+    triggers:
+      keywords: ["fetch papers", "retrieve papers", "database search", "논문 수집", "논문 검색", "Semantic Scholar", "OpenAlex", "arXiv"]
+      context: ["paper retrieval", "literature search", "systematic review"]
+
+    paradigm_affinity: ["quantitative", "mixed"]
+
+    dependencies:
+      requires: ["I0-scholar-agent-orchestrator"]
+      sequential_next: ["I2-screening-assistant"]
+      parallel_compatible: ["B1-literature-review-strategist", "B4-research-radar"]
+
+    upgrade_level: "ENHANCED"
+    v6_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["SCH_DATABASE_SELECTION"]
+
+  "I2-screening-assistant":
+    name: "Screening Assistant"
+    icon: "📋✅"
+    category: "I - Systematic Review Automation"
+    tier: "MEDIUM"
+    model: "sonnet"
+    legacy_id: null
+    vs_level: "Enhanced"
+    vs_phases: [0, 1, 2, 4]
+
+    capabilities:
+      - "AI-PRISMA 6-dimension screening"
+      - "Configurable LLM provider (Groq 100x cheaper, Claude, Ollama)"
+      - "Project type thresholds (50% knowledge_repository, 90% systematic_review)"
+      - "Hallucination detection and validation"
+      - "Human review queue management"
+      - "Cost tracking and optimization"
+
+    input_schema:
+      required:
+        - project_path: "string"
+        - research_question: "string"
+        - project_type: "enum[knowledge_repository, systematic_review]"
+      optional:
+        - llm_provider: "enum[groq, claude, ollama]"
+        - custom_criteria: "object"
+        - max_workers: "int"
+        - batch_size: "int"
+
+    output_schema:
+      main_output:
+        stage: "prisma_screening"
+        project_type: "string"
+        threshold: "int"
+        llm_provider: "string"
+        model: "string"
+        results: "object"
+        cost: "object"
+        output_files: "object"
+
+    t_score_domains:
+      - "PRISMA screening criteria"
+      - "LLM-based classification"
+      - "Quality threshold optimization"
+
+    triggers:
+      keywords: ["screen papers", "PRISMA screening", "inclusion criteria", "exclusion criteria", "논문 스크리닝", "포함 기준", "제외 기준", "AI screening"]
+      context: ["paper screening", "systematic review", "PRISMA"]
+
+    paradigm_affinity: ["quantitative", "mixed"]
+
+    dependencies:
+      requires: ["I1-paper-retrieval-agent"]
+      sequential_next: ["I3-rag-builder"]
+      parallel_compatible: ["B2-evidence-quality-appraiser"]
+
+    human_checkpoint: "SCH_SCREENING_CRITERIA"
+
+    upgrade_level: "ENHANCED"
+    v6_integration:
+      dynamic_t_score: true
+      creativity_modules: ["forced-analogy", "semantic-distance"]
+      checkpoints: ["SCH_SCREENING_CRITERIA"]
+
+  "I3-rag-builder":
+    name: "RAG Builder"
+    icon: "🗄️⚡"
+    category: "I - Systematic Review Automation"
+    tier: "LOW"
+    model: "haiku"
+    legacy_id: null
+    vs_level: "Light"
+    vs_phases: [0, 1, 4]
+
+    capabilities:
+      - "PDF download with retry logic"
+      - "Text extraction (PyMuPDF, OCR fallback)"
+      - "Token-based chunking (tiktoken)"
+      - "Local embeddings (all-MiniLM-L6-v2, zero cost)"
+      - "ChromaDB vector database creation"
+      - "Query testing and validation"
+
+    input_schema:
+      required:
+        - project_path: "string"
+      optional:
+        - chunk_size_tokens: "int"
+        - chunk_overlap_tokens: "int"
+        - embedding_model: "string"
+        - delay_between_downloads: "float"
+        - download_timeout: "int"
+
+    output_schema:
+      main_output:
+        stage: "rag_build"
+        pdf_download: "object"
+        rag_build: "object"
+        output_paths: "object"
+
+    t_score_domains:
+      - "RAG system architecture"
+      - "Embedding model selection"
+      - "Vector database optimization"
+
+    triggers:
+      keywords: ["build RAG", "create vector database", "download PDFs", "embed documents", "RAG 구축", "벡터 DB", "PDF 다운로드", "문서 임베딩"]
+      context: ["RAG building", "vector database", "document embedding"]
+
+    paradigm_affinity: ["quantitative", "qualitative", "mixed"]
+
+    dependencies:
+      requires: ["I2-screening-assistant"]
+      parallel_compatible: ["B5-parallel-document-processor"]
+
+    upgrade_level: "LIGHT"
+    v6_integration:
+      dynamic_t_score: false
+      creativity_modules: []
+      checkpoints: ["SCH_RAG_READINESS"]
+
+# =============================================================================
 # WORKFLOW ORCHESTRATION
 # =============================================================================
 
@@ -2089,6 +2340,36 @@ workflows:
       - stage: "publication"
         agents: ["G1", "G2"]
 
+  "automated-systematic-review":
+    description: "Automated 7-stage PRISMA 2020 systematic literature review pipeline"
+    agents: ["I0", "I1", "I2", "I3", "B1", "B2"]
+    stages:
+      - stage: "orchestration"
+        agents: ["I0"]
+      - stage: "search-strategy"
+        agents: ["B1", "I0"]
+      - stage: "paper-retrieval"
+        agents: ["I1"]
+      - stage: "screening"
+        agents: ["I2", "B2"]
+      - stage: "rag-building"
+        agents: ["I3"]
+      - stage: "documentation"
+        agents: ["I0"]
+
+  "knowledge-repository-build":
+    description: "Knowledge repository workflow with lenient screening (50% threshold)"
+    agents: ["I0", "I1", "I2", "I3"]
+    stages:
+      - stage: "orchestration"
+        agents: ["I0"]
+      - stage: "paper-retrieval"
+        agents: ["I1"]
+      - stage: "screening"
+        agents: ["I2"]
+      - stage: "rag-building"
+        agents: ["I3"]
+
 # =============================================================================
 # PARALLEL EXECUTION GROUPS
 # =============================================================================
@@ -2174,6 +2455,12 @@ parallel_execution_groups:
     description: "Communication and peer review"
     parallel: true
 
+  # Systematic Review Automation
+  systematic_review_screening:
+    agents: ["I2", "B2"]
+    description: "PRISMA screening with quality appraisal"
+    parallel: true
+
 # =============================================================================
 # MODEL ROUTING
 # =============================================================================
@@ -2181,18 +2468,18 @@ parallel_execution_groups:
 model_routing:
   HIGH:
     model: "opus"
-    agents: ["A2", "A5", "B1", "C2", "C3", "E1", "E2", "E3", "F4", "G6", "H1"]
-    description: "Complex reasoning, strategic decisions, deep analysis, humanization transformation"
+    agents: ["A2", "A5", "B1", "C2", "C3", "E1", "E2", "E3", "F4", "G6", "H1", "I0"]
+    description: "Complex reasoning, strategic decisions, deep analysis, humanization transformation, pipeline orchestration"
 
   MEDIUM:
     model: "sonnet"
-    agents: ["A1", "A3", "A4", "B2", "B3", "B4", "C1", "C4", "D1", "D2", "D3", "D4", "E4", "G3", "G5", "H2"]
-    description: "Standard analytical tasks, moderate complexity, AI pattern detection"
+    agents: ["A1", "A3", "A4", "B2", "B3", "B4", "C1", "C4", "D1", "D2", "D3", "D4", "E4", "G3", "G5", "H2", "I1", "I2"]
+    description: "Standard analytical tasks, moderate complexity, AI pattern detection, paper retrieval, screening"
 
   LOW:
     model: "haiku"
-    agents: ["F1", "F2", "F3", "F5", "G1", "G2", "G4"]
-    description: "Simple lookups, checklist management, basic tasks, verification"
+    agents: ["F1", "F2", "F3", "F5", "G1", "G2", "G4", "I3"]
+    description: "Simple lookups, checklist management, basic tasks, verification, RAG building"
 
 # =============================================================================
 # HUMAN CHECKPOINTS
@@ -2212,6 +2499,14 @@ human_checkpoints:
       description: "User approval required for theoretical framework"
       applicable_agents: ["A2"]
 
+    - id: "SCH_DATABASE_SELECTION"
+      description: "User approval required for database selection in ScholaRAG pipeline"
+      applicable_agents: ["I0", "I1"]
+
+    - id: "SCH_SCREENING_CRITERIA"
+      description: "User approval required for PRISMA screening criteria"
+      applicable_agents: ["I0", "I2"]
+
   recommended:
     - id: "CP_ANALYSIS_PLAN"
       description: "Review recommended for analysis plan"
@@ -2229,6 +2524,10 @@ human_checkpoints:
       description: "Review recommended after G5 analysis, before G6 transformation"
       applicable_agents: ["G5", "G6"]
 
+    - id: "SCH_RAG_READINESS"
+      description: "Review recommended before RAG queries begin"
+      applicable_agents: ["I0", "I3"]
+
   optional:
     - id: "CP_VISUALIZATION_PREFERENCE"
       description: "Optional review for visualization choices"
@@ -2237,6 +2536,10 @@ human_checkpoints:
     - id: "CP_HUMANIZATION_VERIFY"
       description: "Optional verification of humanization transformation"
       applicable_agents: ["F5"]
+
+    - id: "SCH_PRISMA_GENERATION"
+      description: "Optional PRISMA flow diagram generation review"
+      applicable_agents: ["I0"]
 
 # =============================================================================
 # EVALUATION METRICS
