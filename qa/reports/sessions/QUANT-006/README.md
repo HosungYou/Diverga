@@ -1,8 +1,8 @@
 # QUANT-006: Systematic Review Automation (Category I Agents)
 
 **Test Date**: 2026-01-30
-**Status**: ✅ RESOLVED (Plugin cache updated)
-**Retest Sessions**: 2 (Session 1: Initial, Session 2: Cache fix)
+**Status**: ✅ **FULL PASS** (Direct invocation verified)
+**Retest Sessions**: 3 (Initial → Cache fix → Direct invocation verified)
 
 ## Overview
 
@@ -33,15 +33,17 @@ This QA session validates the new Category I agents (I0-I3) for PRISMA 2020 syst
 |------|-------------|
 | `QUANT-006_REPORT.md` | Full test report with analysis |
 | `claude_code_retest_2026-01-30.md` | Session 1 retest: Caching behavior identified |
-| `claude_code_retest_2026-01-30_session2.md` | **Session 2 retest: Cache fix applied** |
+| `claude_code_retest_2026-01-30_session2.md` | Session 2 retest: Cache fix applied |
+| `QUANT-006_RETEST_FINAL.md` | **Session 3 retest: Direct invocation verified** ✅ |
 | `conversation_transcript_claude.md` | Claude Code conversation (8 turns) |
 | `conversation_transcript_codex.md` | Codex CLI conversation (5 turns) |
 | `claude_code_test_result.md` | Claude Code actual test output |
 | `codex_cli_test_result.md` | Codex CLI actual test output |
 | `README.md` | This file |
 
-## Resolution (Session 2)
+## Resolution History
 
+### Session 2: Cache Fix
 **Root Cause**: Diverga plugin cache was outdated (installed Jan 27) and missing Category I agents (added Jan 30 in v6.7.0).
 
 **Fix Applied**: Manually copied i0-i3.md files to plugin cache:
@@ -49,7 +51,19 @@ This QA session validates the new Category I agents (I0-I3) for PRISMA 2020 syst
 ~/.claude/plugins/cache/diverga/diverga/b0aebcdb66f9/agents/
 ```
 
-**Next Step**: Start a new Claude Code session to load updated agent list.
+### Session 3: Direct Invocation Verified ✅
+**Test Results**: All 4 Category I agents successfully invoked via Task tool:
+
+| Agent | Invocation | Status |
+|-------|------------|--------|
+| `diverga:i0` | `Task(subagent_type="diverga:i0", model="opus")` | ✅ Working |
+| `diverga:i1` | `Task(subagent_type="diverga:i1", model="sonnet")` | ✅ Working |
+| `diverga:i2` | `Task(subagent_type="diverga:i2", model="sonnet")` | ✅ Working |
+| `diverga:i3` | `Task(subagent_type="diverga:i3", model="haiku")` | ✅ Working |
+
+**Human Checkpoints**: All properly enforced (🔴 SCH_DATABASE_SELECTION, 🔴 SCH_SCREENING_CRITERIA, 🟠 SCH_RAG_READINESS)
+
+**VS T-Scores**: Correctly displayed (T=0.70, T=0.45⭐, T=0.25)
 
 ## Key Findings
 

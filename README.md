@@ -20,7 +20,7 @@
               └─────────────────────────────────────────────────┘
 ```
 
-[![Version](https://img.shields.io/badge/version-6.6.3-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
+[![Version](https://img.shields.io/badge/version-6.7.0-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-FF6B00?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code)
 [![Codex CLI](https://img.shields.io/badge/Codex_CLI-Support-412991?style=for-the-badge&logo=openai&logoColor=white)](docs/DESIGN_SYSTEM.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-Plugin-0969da?style=for-the-badge&logo=github&logoColor=white)](docs/DESIGN_SYSTEM.md)
@@ -466,6 +466,7 @@ The system will:
 
 | Version | Feature |
 |---------|---------|
+| **v6.7.0** | Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline, 44 total agents |
 | **v6.6.3** | Codex SKILL.md Implementation - actual skill loading via `.codex/skills/`, QUANT-005 verified |
 | **v6.6.2** | Multi-CLI Compatibility Edition - unified install script, NPM package (@diverga/codex-setup) |
 | **v6.6.0** | Cross-Platform Edition - Codex CLI & OpenCode support, shared lib/ |
@@ -645,9 +646,9 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {6.6.3},
+  version = {6.7.0},
   url = {https://github.com/HosungYou/Diverga},
-  note = {40 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
+  note = {44 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Systematic Review Automation (Category I), Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
 }
 ```
 
