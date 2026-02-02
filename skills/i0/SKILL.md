@@ -6,6 +6,7 @@ description: |
   Delegates to specialized agents (I1, I2, I3) while enforcing human checkpoints
   Use when: conducting systematic reviews, building knowledge repositories, PRISMA automation
   Triggers: systematic review, PRISMA, ScholaRAG, literature review automation
+version: "6.9.0"
 ---
 
 # I0-ScholarAgentOrchestrator

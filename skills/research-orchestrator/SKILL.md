@@ -5,6 +5,7 @@ description: |
   Manages 44 research agents across 9 categories (A-I) with MANDATORY human checkpoints
   No autonomous modes - all critical decisions require explicit human approval
   Features: ScholaRAG Integration, Meta-Analysis System, Humanization Pipeline
+version: "6.9.0"
 ---
 
 # Research Orchestrator v2.7.0 (Human-Centered)

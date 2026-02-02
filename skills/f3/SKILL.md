@@ -5,6 +5,7 @@ description: |
   Light VS applied: Avoids superficial reproducibility checks + in-depth practical reproducibility analysis
   Use when: assessing reproducibility, preparing open science materials, auditing transparency
   Triggers: reproducibility, replication, OSF, open science, transparency, data sharing
+version: "6.9.0"
 ---
 
 # Reproducibility Auditor

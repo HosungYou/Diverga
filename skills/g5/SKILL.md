@@ -5,6 +5,7 @@ description: |
   Detects 24+ AI writing patterns adapted from Wikipedia AI Cleanup guidelines
   Use when: checking drafts before submission, auditing AI-generated content, preparing for humanization
   Triggers: AI patterns, style audit, detection check, humanize review, AI writing check
+version: "6.9.0"
 ---
 
 # Academic Style Auditor

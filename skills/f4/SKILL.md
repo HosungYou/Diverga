@@ -5,6 +5,7 @@ description: |
   Full VS 5-Phase process: Avoids generic bias identification, delivers research-specific analysis for ALL paradigms
   Use when: detecting biases (quant), assessing trustworthiness (qual), reviewing research integrity, checking for p-hacking
   Triggers: bias, p-hacking, HARKing, trustworthiness, credibility, transferability, dependability, confirmability, reflexivity
+version: "6.9.0"
 ---
 
 # F4-Bias & Trustworthiness Detector

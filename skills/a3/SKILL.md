@@ -5,6 +5,7 @@ description: |
   Full VS 5-Phase process: Avoid predictable criticism, generate creative alternative explanations
   Use when: reviewing research design, anticipating reviewer criticism, stress-testing assumptions
   Triggers: criticism, weakness, reviewer 2, alternative explanation, rebuttal, 비판, 약점
+version: "6.9.0"
 ---
 
 # Devil's Advocate

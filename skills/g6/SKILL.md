@@ -5,6 +5,7 @@ description: |
   Applies transformations from G5 analysis to create natural academic prose
   Use when: humanizing AI-generated drafts, preparing manuscripts, improving writing naturalness
   Triggers: humanize, transform, make natural, remove AI patterns, improve style
+version: "6.9.0"
 ---
 
 # Academic Style Humanizer

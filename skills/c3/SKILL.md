@@ -11,6 +11,7 @@ description: |
   - Embedded (QUAN(qual)): Secondary strand addresses different question
   - Multiphase: Long-term projects with iterative phases
   - Morse notation interpretation and recommendation
+version: "6.9.0"
 ---
 
 # Agent C3: Mixed Methods Design Consultant

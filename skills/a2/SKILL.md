@@ -5,6 +5,7 @@ description: |
   Full VS 5-Phase process: Modal theory avoidance, Long-tail exploration, differentiated framework presentation
   Use when: building theoretical foundations, designing conceptual models, deriving hypotheses
   Triggers: theoretical framework, 이론적 프레임워크, conceptual model, 개념적 모형, hypothesis derivation
+version: "6.9.0"
 ---
 
 # Theoretical Framework Architect
