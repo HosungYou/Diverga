@@ -5,7 +5,6 @@ description: |
   Provides semantic search, project-scoped context, decision audit trails, and lifecycle hooks.
   Triggers: remember, memory, context, recall, session, checkpoint, decision, persist
   한국어: 기억, 맥락, 세션, 체크포인트
-version: "1.0.0"
 ---
 
 # DIVERGA Memory System

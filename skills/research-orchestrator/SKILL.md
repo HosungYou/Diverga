@@ -1,6 +1,5 @@
 ---
 name: research-orchestrator
-version: 2.7.0
 description: |
   Human-Centered Orchestrator for Research Coordinator v6.7.0
   Manages 44 research agents across 9 categories (A-I) with MANDATORY human checkpoints
