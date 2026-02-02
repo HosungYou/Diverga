@@ -1,32 +1,32 @@
 ---
 name: setup
 description: |
-  Diverga initial configuration wizard. Sets up LLM API, checkpoints, paradigm, language.
-  Triggers: setup, configure, 설정
-version: "6.9.0"
+  Diverga initial configuration wizard. Sets up local skills, LLM API, checkpoints, paradigm, language.
+  Triggers: setup, configure, 설정, install
+version: "6.9.1"
 ---
 
-# /diverga:setup
+# /diverga-setup
 
-**Version**: 1.0.0
-**Trigger**: `/diverga:setup`
+**Version**: 2.0.0
+**Trigger**: `/diverga-setup` or `/diverga:setup`
 
 ## Description
 
-Initial configuration wizard for Diverga. Sets up LLM API, human checkpoints, research paradigm, and language preferences.
+Initial configuration wizard for Diverga. Installs local skill symlinks, sets up LLM API, human checkpoints, research paradigm, and language preferences.
 
 ## Workflow
 
-When user invokes `/diverga:setup`, execute this interactive wizard:
+When user invokes `/diverga-setup`, execute this interactive wizard:
 
 ### Step 1: Welcome Message
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                    Welcome to Diverga v6.4.0                     ║
+║                    Welcome to Diverga v6.9.1                     ║
 ║         AI Research Assistant for the Complete Lifecycle         ║
 ╠══════════════════════════════════════════════════════════════════╣
-║  40 specialized agents across 8 categories (A-H)                 ║
+║  44 specialized agents across 9 categories (A-I)                 ║
 ║  Human-centered design with mandatory checkpoints                ║
 ║  Verbalized Sampling (VS) methodology for creative alternatives  ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -34,7 +34,77 @@ When user invokes `/diverga:setup`, execute this interactive wizard:
 Let's configure Diverga for your research environment.
 ```
 
-### Step 2: LLM API Selection
+### Step 2: Local Skills Installation (NEW in v6.9.1)
+
+**Purpose**: Create symlinks in `~/.claude/skills/` for reliable skill discovery.
+
+Use AskUserQuestion tool:
+
+```
+question: "Install local skill symlinks for reliable /diverga-xxx access?"
+header: "Skills"
+options:
+  - label: "Yes, install symlinks (Recommended)"
+    description: "Creates 51 symlinks in ~/.claude/skills/. Enables /diverga-help, /diverga-memory, etc."
+  - label: "No, skip installation"
+    description: "Use plugin system only. /diverga:xxx format (may require restart)."
+```
+
+If user selects "Yes", execute:
+
+```bash
+# Detect Diverga installation path
+DIVERGA_PATH=""
+if [[ -d "$HOME/.claude/plugins/cache/diverga/diverga/6.9.0/skills" ]]; then
+  DIVERGA_PATH="$HOME/.claude/plugins/cache/diverga/diverga/6.9.0/skills"
+elif [[ -d "./skills" ]]; then
+  DIVERGA_PATH="$(pwd)/skills"
+fi
+
+if [[ -z "$DIVERGA_PATH" ]]; then
+  echo "❌ Diverga skills not found. Please clone the repository first."
+  exit 1
+fi
+
+# Create symlinks
+mkdir -p ~/.claude/skills
+count=0
+for skill_dir in "$DIVERGA_PATH"/*/; do
+  skill_name=$(basename "$skill_dir")
+  target="$HOME/.claude/skills/diverga-${skill_name}"
+  if [[ -L "$target" ]]; then
+    rm "$target"  # Remove existing symlink
+  fi
+  ln -sf "$skill_dir" "$target"
+  ((count++))
+done
+
+echo "✅ Created $count local skill symlinks in ~/.claude/skills/"
+echo ""
+echo "Available commands:"
+echo "  /diverga-help     - View all agents"
+echo "  /diverga-memory   - Memory system"
+echo "  /diverga-a1       - Research Question Refiner"
+echo "  /diverga-c5       - Meta-Analysis Master"
+```
+
+Display result:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 Local Skills Installation                        │
+├─────────────────────────────────────────────────────────────────┤
+│ ✅ Created 51 symlinks in ~/.claude/skills/                     │
+│                                                                  │
+│ Skill Access Methods:                                            │
+│ ├── /diverga-help   (hyphen) → Always works                     │
+│ └── /diverga:help   (colon)  → Requires plugin load             │
+│                                                                  │
+│ Recommendation: Use hyphen prefix for reliability                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Step 3: LLM API Selection
 
 Use AskUserQuestion tool:
 
@@ -52,7 +122,7 @@ options:
     description: "Privacy-focused, no API key needed. Requires Ollama installed."
 ```
 
-### Step 3: Human Checkpoint Configuration
+### Step 4: Human Checkpoint Configuration
 
 Use AskUserQuestion tool:
 
@@ -68,7 +138,7 @@ options:
     description: "Fully autonomous mode. Not recommended for research."
 ```
 
-### Step 4: Default Research Paradigm
+### Step 5: Default Research Paradigm
 
 Use AskUserQuestion tool:
 
@@ -86,7 +156,7 @@ options:
     description: "Sequential, convergent, or embedded designs."
 ```
 
-### Step 5: Language Preference
+### Step 6: Language Preference
 
 Use AskUserQuestion tool:
 
@@ -102,7 +172,7 @@ options:
     description: "Always respond in Korean."
 ```
 
-### Step 6: Generate Configuration
+### Step 7: Generate Configuration
 
 After collecting all preferences, generate `~/.claude/plugins/diverga/config/diverga-config.json`:
 
@@ -126,7 +196,7 @@ After collecting all preferences, generate `~/.claude/plugins/diverga/config/div
 }
 ```
 
-### Step 7: Verification
+### Step 8: Verification
 
 ```bash
 # Create config directory
@@ -141,24 +211,25 @@ EOF
 echo "✅ Diverga configuration saved!"
 ```
 
-### Step 8: Completion Message
+### Step 9: Completion Message
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║                   Diverga Setup Complete! ✅                     ║
 ╠══════════════════════════════════════════════════════════════════╣
-║  Configuration saved to:                                         ║
-║  ~/.claude/plugins/diverga/config/diverga-config.json            ║
+║  ✅ Local skills installed (51 symlinks)                         ║
+║  ✅ Configuration saved to diverga-config.json                   ║
 ║                                                                  ║
-║  Quick Commands:                                                 ║
-║  • /diverga:help     - View all 40 agents                       ║
-║  • diverga:a1        - Research Question Refiner                ║
-║  • diverga:c5        - Meta-Analysis Master                     ║
+║  Quick Commands (use hyphen prefix):                             ║
+║  • /diverga-help     - View all 44 agents                       ║
+║  • /diverga-a1       - Research Question Refiner                ║
+║  • /diverga-c5       - Meta-Analysis Master                     ║
+║  • /diverga-memory   - Memory System                            ║
 ║                                                                  ║
 ║  Auto-Trigger Keywords:                                          ║
-║  • "research question" → A1-ResearchQuestionRefiner             ║
-║  • "meta-analysis"     → C5-MetaAnalysisMaster                  ║
-║  • "theoretical framework" → A2-TheoreticalFrameworkArchitect   ║
+║  • "research question" → diverga-a1                             ║
+║  • "meta-analysis"     → diverga-c5                             ║
+║  • "systematic review" → diverga-i0                             ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 Start by saying: "I want to conduct a systematic review on [topic]"
