@@ -599,3 +599,74 @@ The Memory System automatically captures context at critical lifecycle events:
 - **v4.0.0**: Context persistence, pipeline templates, integration hub
 - **v3.2.0**: OMC integration, model routing
 - **v3.0.0**: Creativity modules, user checkpoints, dynamic T-Score
+
+---
+
+## Developer Notes
+
+### SKILL.md Format for Claude Code Plugins
+
+When creating skills for Claude Code plugins, the `SKILL.md` frontmatter must follow a specific format.
+
+**Correct Format** (works):
+```yaml
+---
+name: skill-name
+description: |
+  Brief description of the skill.
+  Include triggers and additional info as text here.
+version: "1.0.0"
+---
+
+# Skill Title
+
+Markdown content follows...
+```
+
+**Incorrect Format** (causes "Unknown skill" error):
+```yaml
+---
+name: skill-name
+command: /plugin:skill-name       # ❌ BREAKS parsing
+category: system                  # ❌ Not supported
+model_tier: medium                # ❌ Not supported
+triggers:                         # ❌ Not supported
+  - "keyword1"
+  - "keyword2"
+dependencies:                     # ❌ Not supported
+  required:
+    - package>=1.0
+---
+```
+
+**Rules**:
+1. Only `name`, `description`, `version` fields are supported
+2. Put extra metadata (triggers, dependencies) in description text
+3. Quote version numbers: `"1.0.0"` not `1.0.0`
+4. Do NOT use `command` field - it breaks skill recognition
+
+**Testing Skills**:
+```bash
+# After editing SKILL.md, sync to plugin directory:
+cp ".claude/skills/your-skill/SKILL.md" \
+   ~/.claude/plugins/diverga/.claude/skills/your-skill/SKILL.md
+
+# Restart Claude Code for changes to take effect
+/exit
+```
+
+### Plugin Directory Structure
+
+```
+~/.claude/plugins/diverga/
+├── .claude/
+│   └── skills/
+│       ├── memory/
+│       │   └── SKILL.md          # Skill definition
+│       ├── research-coordinator/
+│       │   └── SKILL.md
+│       └── ...
+├── .claude-plugin/
+│   └── marketplace.json          # Plugin metadata
+└── CLAUDE.md                     # Project instructions
+```

@@ -339,6 +339,87 @@ The CLI commands are designed to be called from SKILL.md patterns:
 
 Each command returns a formatted string ready for display to users.
 
+## Troubleshooting
+
+### "Unknown skill: diverga:memory" Error
+
+**Problem**: Claude Code shows `Unknown skill: diverga:memory` when invoking the skill.
+
+**Cause**: The `SKILL.md` frontmatter format is incompatible with Claude Code's skill parser.
+
+**Incorrect Format** (causes the error):
+```yaml
+---
+name: memory
+command: /diverga:memory           # ❌ This field breaks parsing
+version: 1.0.0
+description: Some description
+category: system                   # ❌ Extra fields not supported
+model_tier: medium                 # ❌
+triggers:                          # ❌
+  - "remember"
+  - "memory"
+dependencies:                      # ❌
+  required:
+    - tabulate>=0.9.0
+---
+```
+
+**Correct Format**:
+```yaml
+---
+name: memory
+description: |
+  DIVERGA Memory System - Persistent context preservation.
+  Triggers: remember, memory, context, recall
+version: "1.0.0"
+---
+```
+
+**Key Rules for SKILL.md Frontmatter**:
+1. Only use `name`, `description`, and `version` fields
+2. Put triggers and other metadata in the `description` field as text
+3. Use quoted version numbers (e.g., `"1.0.0"` not `1.0.0`)
+4. Do NOT include `command`, `category`, `model_tier`, `triggers`, `dependencies`, or other extra fields
+
+**Solution**:
+```bash
+# 1. Edit the source SKILL.md
+nano "/Volumes/External SSD/Projects/Diverga/.claude/skills/memory/SKILL.md"
+
+# 2. Simplify the frontmatter to only name, description, version
+
+# 3. Copy to plugin directory
+cp "/Volumes/External SSD/Projects/Diverga/.claude/skills/memory/SKILL.md" \
+   ~/.claude/plugins/diverga/.claude/skills/memory/SKILL.md
+
+# 4. Restart Claude Code
+/exit
+```
+
+### Skill Changes Not Reflected
+
+**Problem**: After editing `SKILL.md`, Claude Code still uses the old version.
+
+**Solution**:
+1. Copy the updated file to `~/.claude/plugins/diverga/.claude/skills/memory/SKILL.md`
+2. Restart Claude Code with `/exit` and start a new session
+
+### Plugin Not Installed
+
+**Problem**: Diverga skills not available at all.
+
+**Solution**:
+```bash
+# Re-install from source
+rm -rf ~/.claude/plugins/diverga/
+cp -r "/Volumes/External SSD/Projects/Diverga" ~/.claude/plugins/diverga
+
+# Or via marketplace
+/plugin marketplace add https://github.com/HosungYou/Diverga
+/plugin install diverga
+```
+
 ## Version
 
 1.0.0 - Initial release with 3-layer retrieval, semantic search, project detection, and CLI

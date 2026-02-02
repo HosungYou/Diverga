@@ -1,35 +1,11 @@
 ---
 name: memory
-command: /diverga:memory
-version: 1.0.0
-description: Persistent memory system for research lifecycle context preservation
-category: system
-model_tier: medium
-author: Diverga Team
-updated: 2026-02-01
-repository: https://github.com/HosungYou/Diverga
-triggers:
-  - "remember"
-  - "memory"
-  - "context"
-  - "recall"
-  - "session"
-  - "checkpoint"
-  - "decision"
-  - "persist"
-triggers_ko:
-  - "기억"
-  - "맥락"
-  - "세션"
-  - "체크포인트"
-dependencies:
-  required:
-    - tabulate>=0.9.0
-    - pyyaml>=6.0
-  optional:
-    - sentence-transformers
-    - openai
-    - scikit-learn
+description: |
+  DIVERGA Memory System - Persistent context preservation for research lifecycle continuity.
+  Provides semantic search, project-scoped context, decision audit trails, and lifecycle hooks.
+  Triggers: remember, memory, context, recall, session, checkpoint, decision, persist
+  한국어: 기억, 맥락, 세션, 체크포인트
+version: "1.0.0"
 ---
 
 # DIVERGA Memory System
