@@ -4,6 +4,110 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [6.9.2] - 2026-02-03 (Marketplace Cache Fix)
+
+### Overview
+
+**Critical fix** for marketplace cache synchronization issue. When users installed Diverga via `/plugin install`, Claude Code's marketplace was pulling an outdated cached version that lacked the `version` field fix from v6.9.1.
+
+### The Problem
+
+```
+/plugin install diverga     → (no content)
+/diverga:help               → Unknown skill: diverga:help
+/diverga-help               → Unknown skill: diverga-help
+
+BUT Plugin shows as "Installed" with all skills listed!
+```
+
+### Root Cause
+
+| Issue | Description |
+|-------|-------------|
+| **Marketplace Cache Lag** | GitHub marketplace doesn't update immediately after push |
+| **Stale Commit** | Plugin install pulled `08b1ebb` (old) instead of `efc024a` (fixed) |
+| **Missing Version Field** | Old cached version didn't have `version` in SKILL.md |
+
+### Timeline of Discovery
+
+```
+Phase 1: Initial Investigation (2+ hours)
+├─ Plugin shows installed ✅
+├─ Skills listed in /plugin ✅
+├─ But /diverga:help → Unknown skill ❌
+└─ Compared with oh-my-claudecode (works)
+
+Phase 2: SKILL.md Analysis (1 hour)
+├─ Both OMC and Diverga have same structure
+├─ Hypothesis: version field needed?
+└─ Added version to all 51 files
+
+Phase 3: Symlink Workaround (1 hour)
+├─ Created ~/.claude/skills/diverga-xxx symlinks
+├─ /diverga-help (hyphen) works! ✅
+└─ /diverga:help (colon) still fails ❌
+
+Phase 4: Cache Investigation (1 hour)
+├─ Removed and reinstalled plugin
+├─ Plugin shows installed with skills
+└─ Still "Unknown skill" ❌
+
+Phase 5: Root Cause Found (30 min)
+├─ Checked cache SKILL.md - NO version field!
+├─ Marketplace pulled OLD cached version
+└─ Solution: Manual cache update + wait for marketplace
+```
+
+### Changes
+
+#### 1. Comprehensive Troubleshooting Guide
+
+New `docs/TROUBLESHOOTING-PLUGIN.md` with:
+- Complete 6+ hour debugging journey
+- Three identified root causes
+- Multiple solution approaches
+- Diagnostic commands
+- SKILL.md format reference
+
+#### 2. Updated Setup Wizard
+
+`/diverga-setup` now includes automatic symlink installation:
+```bash
+# Automatically creates 51 symlinks during setup
+~/.claude/skills/diverga-help → /path/to/skills/help/
+```
+
+#### 3. GitHub Action for SKILL.md Validation
+
+`.github/workflows/validate-skills.yml` validates:
+- All SKILL.md files have required fields
+- Version follows semver format
+- Skill count matches expected (51)
+
+### Solutions Provided
+
+| Solution | Method | Reliability |
+|----------|--------|-------------|
+| **A** | Update marketplace → Reinstall | Recommended |
+| **B** | Manual cache copy | Quick fix |
+| **C** | Local symlinks | Most reliable |
+
+### Key Learnings
+
+1. **SKILL.md requires `version` field** - Undocumented requirement discovered through debugging
+2. **Marketplace has cache lag** - Wait ~10-15 min after push or click "Update marketplace"
+3. **Two skill loading systems** - Plugin (colon) vs Local (hyphen) use different paths
+
+### Verification
+
+After fix:
+```
+/diverga:help     ✅ Works (colon prefix)
+/diverga-help     ✅ Works (hyphen prefix)
+```
+
+---
+
 ## [6.9.1] - 2026-02-03 (Plugin Discovery Fix)
 
 ### Overview

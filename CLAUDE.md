@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v6.9.1 (Plugin Discovery Fix)
+# Diverga v6.9.2 (Marketplace Cache Fix)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v6.9.2**: Marketplace Cache Fix - Fixed cache sync issue, comprehensive troubleshooting guide
 **v6.9.1**: Plugin Discovery Fix - Added version field to SKILL.md, removed orphaned directories, local symlinks
 **v6.8.0**: Memory System - Persistent context preservation with semantic search and lifecycle hooks
 **v6.7.0**: Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline
