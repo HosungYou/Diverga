@@ -1,0 +1,6 @@
+{
+  "name": "diverga",
+  "version": "6.9.0",
+  "description": "AI Research Assistant - 44 specialized agents with VS methodology, human checkpoints, and parallel execution",
+  "skills": "./skills/"
+}

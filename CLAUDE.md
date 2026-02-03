@@ -5,7 +5,12 @@
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
 **v7.0.0**: Memory System - 3-layer context, checkpoint auto-trigger, cross-session persistence
-**v6.5.2**: Structure fix for Task tool agent recognition - `/skills/` moved to root level
+**v6.9.2**: Marketplace Cache Fix - Fixed cache sync issue, comprehensive troubleshooting guide
+**v6.9.1**: Plugin Discovery Fix - Added version field to SKILL.md, removed orphaned directories, local symlinks
+**v6.8.0**: Memory System - Persistent context preservation with semantic search and lifecycle hooks
+**v6.7.0**: Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline
+**v6.6.3**: Codex CLI SKILL.md implementation - actual skill loading via `.codex/skills/`
+**v6.6.2**: Multi-CLI Compatibility - unified install script, NPM package (@diverga/codex-setup)
 **v6.5.0**: Parallel execution via Task tool - `Task(subagent_type="diverga:a1", ...)`
 **v6.4**: Plugin Marketplace Registration - Install via `/plugin marketplace add`
 
@@ -17,6 +22,27 @@ AI Research Assistant for the Complete Research Lifecycle - from question formul
 
 ## Installation
 
+### Recommended Method (Local Skills - Most Reliable)
+
+```bash
+# Step 1: Clone repository
+git clone https://github.com/HosungYou/Diverga.git
+cd Diverga
+
+# Step 2: Create local skill symlinks
+for skill_dir in skills/*/; do
+  skill_name=$(basename "$skill_dir")
+  ln -sf "$(pwd)/$skill_dir" ~/.claude/skills/diverga-${skill_name}
+done
+
+# Step 3: Restart Claude Code
+
+# Step 4: Verify
+/diverga-help       # Should display help guide
+```
+
+### Alternative Method (Plugin Marketplace)
+
 ```bash
 # Step 1: Add to marketplace
 /plugin marketplace add https://github.com/HosungYou/Diverga
@@ -25,8 +51,17 @@ AI Research Assistant for the Complete Research Lifecycle - from question formul
 /plugin install diverga
 
 # Step 3: Configure
-/diverga:setup
+/diverga-setup
 ```
+
+### Skill Access
+
+| Method | Command | Reliability |
+|--------|---------|-------------|
+| **Hyphen prefix** | `/diverga-help` | ✅ Always works |
+| Colon prefix | `/diverga:help` | ⚠️ Requires plugin load |
+
+**Recommendation**: Use hyphen prefix (`/diverga-xxx`) for reliable skill invocation.
 
 ---
 
@@ -45,7 +80,7 @@ AI Research Assistant for the Complete Research Lifecycle - from question formul
 
 ## Project Overview
 
-Diverga provides **context-persistent research support** through **40 specialized agents** across 8 categories (A-H). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
+Diverga provides **context-persistent research support** through **44 specialized agents** across 9 categories (A-I). Unlike other AI tools that suffer from **mode collapse** (always recommending the same predictable options), Diverga uses **Verbalized Sampling (VS) methodology** to guide you toward creative, defensible research choices while maintaining research context across the entire project lifecycle in a single platform.
 
 ## Core Value Proposition
 
@@ -187,7 +222,7 @@ Diverga Memory System provides **context-persistent research support** with:
 
 ---
 
-## Agent Structure (40 Agents in 8 Categories)
+## Agent Structure (44 Agents in 9 Categories)
 
 | Category | Count | Agents | Paradigm |
 |----------|-------|--------|----------|
@@ -199,8 +234,9 @@ Diverga Memory System provides **context-persistent research support** with:
 | **F: Quality** | 5 | F1-InternalConsistencyChecker, F2-ChecklistManager, F3-ReproducibilityAuditor, F4-BiasTrustworthinessDetector, **F5-HumanizationVerifier** | All |
 | **G: Communication** | 6 | G1-JournalMatcher, G2-AcademicCommunicator, G3-PeerReviewStrategist, G4-PreregistrationComposer, **G5-AcademicStyleAuditor**, **G6-AcademicStyleHumanizer** | All |
 | **H: Specialized** | 2 | H1-EthnographicResearchAdvisor, H2-ActionResearchFacilitator | Qual |
+| **I: Systematic Review Automation** | 4 | **I0-ScholarAgentOrchestrator**, **I1-PaperRetrievalAgent**, **I2-ScreeningAssistant**, **I3-RAGBuilder** | All |
 
-**Total: 6 + 5 + 7 + 4 + 5 + 5 + 6 + 2 = 40 agents**
+**Total: 6 + 5 + 7 + 4 + 5 + 5 + 6 + 2 + 4 = 44 agents**
 
 ### New in v6.3: Meta-Analysis Agent System (C5/C6/C7)
 
@@ -231,15 +267,32 @@ Based on V7 GenAI meta-analysis lessons learned:
 |-------|---------|-------|
 | **B5-ParallelDocumentProcessor** | Batch PDF processing with parallel workers | Opus |
 
+### New in v6.7.0: Systematic Review Automation (Category I)
+
+PRISMA 2020 compliant systematic literature review pipeline with automated paper retrieval, screening, and RAG building.
+
+| Agent | Purpose | Model | Checkpoint |
+|-------|---------|-------|------------|
+| **I0-ScholarAgentOrchestrator** | Pipeline coordination, stage management | Opus | - |
+| **I1-PaperRetrievalAgent** | Multi-database fetching (Semantic Scholar, OpenAlex, arXiv) | Sonnet | 🔴 SCH_DATABASE_SELECTION |
+| **I2-ScreeningAssistant** | AI-PRISMA 6-dimension screening | Sonnet | 🔴 SCH_SCREENING_CRITERIA |
+| **I3-RAGBuilder** | Vector database construction (zero cost) | Haiku | 🟠 SCH_RAG_READINESS |
+
+**Human Checkpoints**:
+- 🔴 **SCH_DATABASE_SELECTION**: User must approve database selection before retrieval
+- 🔴 **SCH_SCREENING_CRITERIA**: User must approve inclusion/exclusion criteria
+- 🟠 **SCH_RAG_READINESS**: Recommended checkpoint before RAG queries
+- 🟡 **SCH_PRISMA_GENERATION**: Optional checkpoint before PRISMA flow diagram generation
+
 ---
 
-## Model Routing (v6.2)
+## Model Routing (v6.7)
 
-| Tier | Model | Agents (37 total) |
+| Tier | Model | Agents (44 total) |
 |------|-------|-------------------|
-| HIGH | Opus | A1, A2, A3, A5, **B5**, C1, C2, C3, D4, E1, E2, E3, G3, **G6**, H1, H2 (16) |
-| MEDIUM | Sonnet | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4, **G5** (14) |
-| LOW | Haiku | B3, B4, D3, E4, F1, F2, **F5** (7) |
+| HIGH | Opus | A1, A2, A3, A5, **B5**, C1, C2, C3, D4, E1, E2, E3, G3, **G6**, H1, H2, **I0** (17) |
+| MEDIUM | Sonnet | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4, **G5**, **I1**, **I2** (16) |
+| LOW | Haiku | B3, B4, D3, E4, F1, F2, **F5**, **I3** (8) |
 
 ---
 
@@ -511,6 +564,15 @@ Task(
 | `diverga:h1` | "ethnography", "fieldwork", "participant observation" | "민족지학", "현장연구", "참여관찰" | opus |
 | `diverga:h2` | "action research", "participatory", "practitioner" | "실행연구", "참여적 연구" | opus |
 
+#### Category I: Systematic Review Automation (4 agents)
+
+| Agent | Trigger Keywords (EN) | 트리거 키워드 (KR) | Model |
+|-------|----------------------|-------------------|-------|
+| `diverga:i0` | "systematic review", "PRISMA", "literature review automation" | "체계적 문헌고찰", "프리즈마", "문헌고찰 자동화" | opus |
+| `diverga:i1` | "fetch papers", "retrieve papers", "database search" | "논문 수집", "논문 검색", "데이터베이스 검색" | sonnet |
+| `diverga:i2` | "screen papers", "PRISMA screening", "inclusion criteria" | "논문 스크리닝", "선별", "포함 기준" | sonnet |
+| `diverga:i3` | "build RAG", "vector database", "embed documents" | "RAG 구축", "벡터 DB", "문서 임베딩" | haiku |
+
 ### Parallel Execution Groups
 
 Diverga can run multiple agents in parallel when tasks are independent:
@@ -533,6 +595,10 @@ Diverga can run multiple agents in parallel when tasks are independent:
 │                                                                  │
 │ Group 5: Publication Prep                                        │
 │   diverga:g1 + diverga:g2 + diverga:g5                         │
+│                                                                  │
+│ Group 6: Systematic Review Screening (NEW in v6.7)              │
+│   diverga:i1 + diverga:i2 (parallel)                           │
+│   diverga:i0 → diverga:i1 → diverga:i2 → diverga:i3 (pipeline) │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -570,9 +636,45 @@ Execution Plan:
 
 ---
 
+## Memory System Commands (v6.8)
+
+The DIVERGA Memory System provides persistent context preservation for research lifecycle continuity.
+
+| Command | Description |
+|---------|-------------|
+| `/diverga:memory search "query"` | Semantic memory search |
+| `/diverga:memory status` | Memory system status |
+| `/diverga:memory context` | Current project context |
+| `/diverga:memory history` | Recent session history |
+| `/diverga:memory stats` | Memory statistics |
+| `/diverga:memory export --format md` | Export to Markdown |
+| `/diverga:memory export --format json` | Export to JSON |
+
+### Auto-Behavior (Lifecycle Hooks)
+
+The Memory System automatically captures context at critical lifecycle events:
+
+| Hook | Trigger | Auto-Capture |
+|------|---------|--------------|
+| `session_start` | Conversation begins | Loads project context, recent decisions |
+| `checkpoint_reached` | Human checkpoint passed | Saves decision with rationale, T-Score |
+| `session_end` | Conversation ends | Generates summary, saves session record |
+| `agent_completed` | Agent finishes task | Agent output, time taken, success/failure |
+
+### Trigger Keywords
+
+**English**: "remember", "memory", "context", "recall", "session", "checkpoint", "decision", "persist"
+
+**Korean**: "기억", "맥락", "세션", "체크포인트"
+
+---
+
 ## Version History
 
-- **v6.5.2**: Structure Fix - Moved `/skills/` to root level for Task tool agent recognition
+- **v6.8.0**: Memory System - Persistent context preservation with semantic search and lifecycle hooks
+- **v6.7.0**: Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline (44 agents total)
+- **v6.6.3**: Codex CLI SKILL.md Implementation - actual skill loading via `.codex/skills/`, QUANT-005 verified
+- **v6.6.2**: Multi-CLI Compatibility Edition - unified install script, NPM package (@diverga/codex-setup)
 - **v6.5.0**: Parallel Execution Edition - Task tool support via `/agents/` directory
 - **v6.4.0**: Plugin Marketplace Edition - `/plugin marketplace add`, auto-trigger dispatch, /diverga:setup wizard
 - **v6.3.0**: Meta-Analysis Agent System - C5-MetaAnalysisMaster, C6-DataIntegrityGuard, C7-ErrorPreventionEngine (40 agents total)
@@ -584,3 +686,74 @@ Execution Plan:
 - **v4.0.0**: Context persistence, pipeline templates, integration hub
 - **v3.2.0**: OMC integration, model routing
 - **v3.0.0**: Creativity modules, user checkpoints, dynamic T-Score
+
+---
+
+## Developer Notes
+
+### SKILL.md Format for Claude Code Plugins
+
+When creating skills for Claude Code plugins, the `SKILL.md` frontmatter must follow a specific format.
+
+**Correct Format** (works):
+```yaml
+---
+name: skill-name
+description: |
+  Brief description of the skill.
+  Include triggers and additional info as text here.
+version: "1.0.0"
+---
+
+# Skill Title
+
+Markdown content follows...
+```
+
+**Incorrect Format** (causes "Unknown skill" error):
+```yaml
+---
+name: skill-name
+command: /plugin:skill-name       # ❌ BREAKS parsing
+category: system                  # ❌ Not supported
+model_tier: medium                # ❌ Not supported
+triggers:                         # ❌ Not supported
+  - "keyword1"
+  - "keyword2"
+dependencies:                     # ❌ Not supported
+  required:
+    - package>=1.0
+---
+```
+
+**Rules**:
+1. Only `name`, `description`, `version` fields are supported
+2. Put extra metadata (triggers, dependencies) in description text
+3. Quote version numbers: `"1.0.0"` not `1.0.0`
+4. Do NOT use `command` field - it breaks skill recognition
+
+**Testing Skills**:
+```bash
+# After editing SKILL.md, sync to plugin directory:
+cp ".claude/skills/your-skill/SKILL.md" \
+   ~/.claude/plugins/diverga/.claude/skills/your-skill/SKILL.md
+
+# Restart Claude Code for changes to take effect
+/exit
+```
+
+### Plugin Directory Structure
+
+```
+~/.claude/plugins/diverga/
+├── .claude/
+│   └── skills/
+│       ├── memory/
+│       │   └── SKILL.md          # Skill definition
+│       ├── research-coordinator/
+│       │   └── SKILL.md
+│       └── ...
+├── .claude-plugin/
+│   └── marketplace.json          # Plugin metadata
+└── CLAUDE.md                     # Project instructions
+```

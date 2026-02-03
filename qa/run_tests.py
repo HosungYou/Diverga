@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-Diverga QA Test Runner
-=======================
+Diverga QA Protocol v2.0 - Test Runner and Evaluator
 
-Main entry point for running Diverga QA tests.
-Executes test scenarios and generates comprehensive reports.
+Main entry point for running QA tests and generating reports.
 
 Usage:
-    python -m qa.run_tests --scenario META-001 --verbose
-    python -m qa.run_tests --all --report json
-    python -m qa.run_tests --checkpoint CP_RESEARCH_DIRECTION
+    python run_tests.py --all                    # Run all protocol tests
+    python run_tests.py --evaluate-extracted ... # Evaluate extracted conversation
+    python run_tests.py --report ...             # Generate report from results
 """
 
 import argparse
@@ -17,413 +15,498 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from dataclasses import dataclass, field, asdict
+from typing import Optional
+import yaml
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from qa.protocol.scenarios import Scenario, list_scenarios, load_scenario
-from qa.protocol.metrics import TestResult, GradeLevel
-from qa.runners.conversation_simulator import ConversationSimulator
-from qa.runners.checkpoint_validator import CheckpointValidator
-from qa.runners.agent_tracker import AgentTracker
-
-
-def print_header(text: str, char: str = "="):
-    """Print formatted header."""
-    print(f"\n{char * 60}")
-    print(f"  {text}")
-    print(f"{char * 60}\n")
+# Add runners to path
+sys.path.insert(0, str(Path(__file__).parent))
+from runners.extract_conversation import (
+    ConversationExtractor,
+    ConversationEvaluator,
+    ExtractionResult,
+)
 
 
-def print_result_summary(result: TestResult, verbose: bool = False):
-    """Print test result summary."""
-    grade = result.get_grade()
-    grade_colors = {
-        GradeLevel.A_EXCELLENT: "\033[92m",  # Green
-        GradeLevel.B_GOOD: "\033[94m",       # Blue
-        GradeLevel.C_ACCEPTABLE: "\033[93m", # Yellow
-        GradeLevel.D_POOR: "\033[91m",       # Red
-        GradeLevel.F_FAIL: "\033[91m",       # Red
-    }
-    reset = "\033[0m"
-    color = grade_colors.get(grade, "")
-
-    print(f"Scenario: {result.scenario_id}")
-    print(f"Timestamp: {result.timestamp.isoformat()}")
-    print(f"Overall Grade: {color}{grade.value}{reset}")
-    print(f"Overall Score: {result.compute_overall_score():.1f}%")
-    print(f"Status: {'PASS' if result.is_passing() else 'FAIL'}")
-
-    print("\nMetrics:")
-    print(f"  Checkpoint Compliance: {result.compute_checkpoint_compliance():.1f}%")
-    print(f"  Agent Accuracy: {result.compute_agent_accuracy():.1f}%")
-    print(f"  VS Quality: {result.vs_quality.compute_score():.1f}%")
-
-    if result.issues:
-        print(f"\nIssues ({len(result.issues)}):")
-        for issue in result.issues:
-            print(f"  ❌ {issue}")
-
-    if result.warnings:
-        print(f"\nWarnings ({len(result.warnings)}):")
-        for warning in result.warnings:
-            print(f"  ⚠️ {warning}")
-
-    if verbose:
-        print("\nCheckpoint Details:")
-        for cp in result.checkpoint_results:
-            status = "✅" if cp.is_passing() else "❌"
-            print(f"  {status} {cp.checkpoint_id}: {cp.compute_score():.0f}%")
-            if not cp.halt_verified:
-                print(f"      - HALT not verified")
-            if not cp.vs_options_presented:
-                print(f"      - VS alternatives not presented")
-
-        print("\nAgent Details:")
-        for agent in result.agent_results:
-            status = "✅" if agent.invoked else "❌"
-            tier_status = "✅" if agent.correct_model_tier else "⚠️"
-            print(f"  {status} {agent.agent_id}: {agent.compute_score():.0f}%")
-            print(f"      - Tier: {tier_status} {agent.model_tier}")
+@dataclass
+class TestResult:
+    """Single test result."""
+    scenario_id: str
+    passed: bool
+    checks: list
+    summary: dict
+    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    errors: list = field(default_factory=list)
 
 
-def run_manual_simulation(
-    scenario: Scenario,
-    verbose: bool = False,
-) -> TestResult:
+@dataclass
+class TestReport:
+    """Complete test report."""
+    generated_at: str
+    total_scenarios: int
+    passed: int
+    failed: int
+    pass_rate: float
+    results: list
+    summary: dict
+
+
+class DivergaQARunner:
     """
-    Run manual simulation for a scenario.
+    QA Test Runner for Diverga plugin.
 
-    In manual mode, we don't have actual AI responses,
-    so we simulate expected behavior for testing the framework.
+    Orchestrates test execution, evaluation, and report generation.
     """
-    print(f"Running manual simulation for: {scenario.name}")
-    print(f"Paradigm: {scenario.paradigm.value}")
-    print(f"Priority: {scenario.priority.value}")
 
-    simulator = ConversationSimulator(scenario)
+    PROTOCOL_DIR = Path(__file__).parent / "protocol"
+    REPORTS_DIR = Path(__file__).parent / "reports"
 
-    # For manual simulation, we create mock responses
-    for turn in scenario.conversation_flow:
-        print(f"\n--- Turn {turn.turn_number} ---")
-        print(f"User: {turn.user_input[:100]}...")
+    def __init__(self, verbose: bool = False):
+        """Initialize runner."""
+        self.verbose = verbose
+        self.results: list[TestResult] = []
 
-        # Generate mock AI response based on expected behavior
-        mock_response = generate_mock_response(turn)
+    def run_all(self) -> TestReport:
+        """
+        Run all protocol tests.
 
-        if verbose:
-            print(f"Mock Response: {mock_response[:200]}...")
+        Note: This validates protocol YAML files, not actual conversations.
+        For real conversation testing, use evaluate_extracted().
+        """
+        print("=" * 60)
+        print("Diverga QA Protocol v2.0 - Protocol Validation")
+        print("=" * 60)
+        print()
 
-        result = simulator.run_turn(turn.user_input, mock_response)
+        protocol_files = list(self.PROTOCOL_DIR.glob("test_*.yaml"))
 
-        print(f"Result: {'PASS' if result.passed else 'FAIL'}")
-        if result.checkpoint_result:
-            print(f"Checkpoint: {result.checkpoint_result.checkpoint_id}")
-            print(f"  - Halt: {'✅' if result.checkpoint_result.halt_verified else '❌'}")
-            print(f"  - Wait: {'✅' if result.checkpoint_result.wait_behavior_detected else '❌'}")
-            print(f"  - Options: {result.checkpoint_result.alternatives_count}")
+        if not protocol_files:
+            print("No protocol files found in:", self.PROTOCOL_DIR)
+            return self._generate_report()
 
-        if result.issues:
-            for issue in result.issues:
-                print(f"  ❌ {issue}")
+        for protocol_file in protocol_files:
+            self._validate_protocol(protocol_file)
 
-    return simulator.finalize()
+        return self._generate_report()
 
+    def _validate_protocol(self, protocol_path: Path) -> None:
+        """Validate a protocol YAML file structure."""
+        scenario_id = protocol_path.stem.replace("test_", "").upper()
+        print(f"Validating: {scenario_id}...")
 
-def generate_mock_response(turn) -> str:
-    """Generate mock AI response for testing."""
-    expected = turn.expected_behaviors
-    elements = turn.expected_response_elements
+        try:
+            with open(protocol_path, 'r', encoding='utf-8') as f:
+                protocol = yaml.safe_load(f)
 
-    response_parts = []
+            checks = []
 
-    # Add checkpoint trigger text
-    if expected.checkpoint_trigger:
-        if expected.checkpoint_trigger == "CP_RESEARCH_DIRECTION":
-            response_parts.append("연구 방향에 대해 몇 가지 옵션을 제시합니다:")
-        elif expected.checkpoint_trigger == "CP_METHODOLOGY_APPROVAL":
-            response_parts.append("연구 방법론 설계를 검토해 주세요:")
-        elif expected.checkpoint_trigger == "CP_PARADIGM_SELECTION":
-            response_parts.append("연구 패러다임을 선택해 주세요:")
+            # Check required fields
+            required_fields = [
+                'scenario_id', 'name', 'paradigm', 'agents_involved',
+                'language', 'conversation_flow', 'checkpoints_expected'
+            ]
+            for field in required_fields:
+                passed = field in protocol
+                checks.append({
+                    'name': f'Required field: {field}',
+                    'passed': passed,
+                    'details': ['Present' if passed else 'Missing']
+                })
 
-    # Add VS alternatives
-    if elements.vs_alternatives:
-        for i, opt in enumerate(elements.vs_alternatives):
-            letter = chr(65 + i)  # A, B, C...
-            t_score = opt.t_score or 0.5
-            recommended = " ⭐" if opt.recommended else ""
-            response_parts.append(f"[{letter}] {opt.label} (T={t_score:.2f}){recommended}")
-            response_parts.append(f"    {opt.description}")
+            # Check conversation flow structure
+            flow = protocol.get('conversation_flow', [])
+            if flow:
+                for i, turn in enumerate(flow):
+                    turn_valid = all(k in turn for k in ['turn', 'user', 'expected_behavior'])
+                    if not turn_valid:
+                        checks.append({
+                            'name': f'Turn {i+1} structure',
+                            'passed': False,
+                            'details': ['Missing required keys']
+                        })
 
-    # Add wait behavior
-    if elements.explicit_wait:
-        response_parts.append("")
-        response_parts.append("어떤 방향으로 진행하시겠습니까?")
+            # Check checkpoints
+            checkpoints = protocol.get('checkpoints_expected', [])
+            for cp in checkpoints:
+                cp_valid = all(k in cp for k in ['id', 'level'])
+                if not cp_valid:
+                    checks.append({
+                        'name': f'Checkpoint {cp.get("id", "unknown")}',
+                        'passed': False,
+                        'details': ['Missing level or id']
+                    })
 
-    # Add design summary if required
-    if elements.design_summary:
-        response_parts.insert(0, "설계 요약:")
-        response_parts.insert(1, "- 연구 유형: 메타분석")
-        response_parts.insert(2, "- 접근 방식: 하위요인 분석")
-        response_parts.insert(3, "")
+            # Check agents format
+            agents = protocol.get('agents_involved', [])
+            if not isinstance(agents, list) or len(agents) == 0:
+                checks.append({
+                    'name': 'Agents list',
+                    'passed': False,
+                    'details': ['Must be non-empty list']
+                })
 
-    return "\n".join(response_parts)
+            all_passed = all(c['passed'] for c in checks)
 
+            result = TestResult(
+                scenario_id=scenario_id,
+                passed=all_passed,
+                checks=checks,
+                summary={
+                    'total_checks': len(checks),
+                    'passed': sum(1 for c in checks if c['passed']),
+                    'failed': sum(1 for c in checks if not c['passed'])
+                }
+            )
+            self.results.append(result)
 
-def run_scenario(
-    scenario_id: str,
-    verbose: bool = False,
-    output_format: str = "text",
-    output_dir: Path | None = None,
-) -> TestResult:
-    """Run a single test scenario."""
-    try:
-        scenario = load_scenario(scenario_id)
-    except ValueError as e:
-        print(f"Error: {e}")
-        sys.exit(1)
+            status = "PASS" if all_passed else "FAIL"
+            print(f"  [{status}] {protocol.get('name', scenario_id)}")
+            if self.verbose and not all_passed:
+                for check in checks:
+                    if not check['passed']:
+                        print(f"    - {check['name']}: {check['details']}")
 
-    print_header(f"Testing Scenario: {scenario_id}")
+        except Exception as e:
+            result = TestResult(
+                scenario_id=scenario_id,
+                passed=False,
+                checks=[],
+                summary={'error': str(e)},
+                errors=[str(e)]
+            )
+            self.results.append(result)
+            print(f"  [ERROR] {e}")
 
-    result = run_manual_simulation(scenario, verbose)
+    def evaluate_extracted(
+        self,
+        extracted_path: str,
+        expected_path: str
+    ) -> TestResult:
+        """
+        Evaluate an extracted conversation against expected scenario.
 
-    print_header("Results", "-")
-    print_result_summary(result, verbose)
+        Args:
+            extracted_path: Path to extracted conversation YAML/JSON
+            expected_path: Path to expected scenario YAML
 
-    # Save report if output directory specified
-    if output_dir:
-        output_dir = Path(output_dir)
+        Returns:
+            TestResult with evaluation details
+        """
+        print("=" * 60)
+        print("Diverga QA Protocol v2.0 - Conversation Evaluation")
+        print("=" * 60)
+        print()
+
+        # Load extracted conversation
+        with open(extracted_path, 'r', encoding='utf-8') as f:
+            if extracted_path.endswith('.json'):
+                extracted_data = json.load(f)
+            else:
+                extracted_data = yaml.safe_load(f)
+
+        # Convert to ExtractionResult if dict
+        if isinstance(extracted_data, dict):
+            # Create a minimal ExtractionResult-like object
+            class ExtractedResult:
+                def __init__(self, data):
+                    self.session_id = data.get('session_id', 'unknown')
+                    self.scenario_id = data.get('scenario_id')
+                    self.language = data.get('language', 'unknown')
+                    self.total_turns = data.get('total_turns', len(data.get('turns', [])))
+                    self.turns = data.get('turns', [])
+                    self.checkpoints = data.get('checkpoints', [])
+                    self.agents_invoked = data.get('agents_invoked', [])
+                    self.metrics = data.get('metrics', {})
+
+            extracted = ExtractedResult(extracted_data)
+        else:
+            extracted = extracted_data
+
+        # Run evaluation
+        evaluator = ConversationEvaluator(extracted, expected_path)
+        eval_result = evaluator.evaluate()
+
+        scenario_id = eval_result.get('scenario_id', extracted.scenario_id or 'unknown')
+
+        result = TestResult(
+            scenario_id=scenario_id,
+            passed=eval_result.get('passed', False),
+            checks=eval_result.get('checks', []),
+            summary=eval_result.get('summary', {})
+        )
+        self.results.append(result)
+
+        # Print results
+        status = "PASS" if result.passed else "FAIL"
+        print(f"Scenario: {scenario_id}")
+        print(f"Status: [{status}]")
+        print()
+        print("Checks:")
+        for check in result.checks:
+            check_status = "✓" if check['passed'] else "✗"
+            print(f"  {check_status} {check['name']}")
+            for detail in check.get('details', []):
+                print(f"      {detail}")
+        print()
+        print(f"Summary: {result.summary}")
+
+        return result
+
+    def evaluate_session(
+        self,
+        session_path: str,
+        expected_path: str,
+        scenario_id: Optional[str] = None
+    ) -> TestResult:
+        """
+        Extract and evaluate a Claude Code session in one step.
+
+        Args:
+            session_path: Path to Claude Code session JSONL
+            expected_path: Path to expected scenario YAML
+            scenario_id: Optional scenario ID
+
+        Returns:
+            TestResult with evaluation details
+        """
+        print("Extracting conversation...")
+
+        extractor = ConversationExtractor(session_path, scenario_id)
+        extracted = extractor.extract()
+
+        print(f"Extracted {extracted.total_turns} turns")
+        print(f"Language: {extracted.language}")
+        print(f"Checkpoints: {len(extracted.checkpoints)}")
+        print(f"Agents: {len(extracted.agents_invoked)}")
+        print()
+
+        # Save extraction
+        output_dir = self.REPORTS_DIR / "real-transcripts"
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        output_file = output_dir / f"{scenario_id or extracted.session_id}.yaml"
+        with open(output_file, 'w', encoding='utf-8') as f:
+            yaml.dump(asdict(extracted), f, default_flow_style=False, allow_unicode=True)
+        print(f"Saved extraction: {output_file}")
+
+        # Evaluate
+        return self.evaluate_extracted(str(output_file), expected_path)
+
+    def _generate_report(self) -> TestReport:
+        """Generate test report from results."""
+        passed = sum(1 for r in self.results if r.passed)
+        failed = len(self.results) - passed
+        pass_rate = (passed / len(self.results) * 100) if self.results else 0
+
+        report = TestReport(
+            generated_at=datetime.now().isoformat(),
+            total_scenarios=len(self.results),
+            passed=passed,
+            failed=failed,
+            pass_rate=round(pass_rate, 1),
+            results=[asdict(r) for r in self.results],
+            summary={
+                'protocol_version': '2.0',
+                'test_type': 'real_conversation',
+                'total': len(self.results),
+                'passed': passed,
+                'failed': failed,
+            }
+        )
+
+        return report
+
+    def save_report(
+        self,
+        report: TestReport,
+        output_dir: str,
+        format: str = 'yaml'
+    ) -> Path:
+        """
+        Save report to file.
+
+        Args:
+            report: TestReport to save
+            output_dir: Output directory
+            format: Output format ('yaml', 'json', 'html')
+
+        Returns:
+            Path to saved report
+        """
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{scenario_id}_{timestamp}"
+        filename = f"qa_report_{timestamp}"
 
-        if output_format == "json":
-            result.to_json(output_dir / f"{filename}.json")
-            print(f"\nReport saved: {output_dir / filename}.json")
+        if format == 'html':
+            filepath = output_path / f"{filename}.html"
+            self._generate_html_report(report, filepath)
+        elif format == 'json':
+            filepath = output_path / f"{filename}.json"
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(asdict(report), f, indent=2, ensure_ascii=False)
         else:
-            result.to_yaml(output_dir / f"{filename}.yaml")
-            print(f"\nReport saved: {output_dir / filename}.yaml")
+            filepath = output_path / f"{filename}.yaml"
+            with open(filepath, 'w', encoding='utf-8') as f:
+                yaml.dump(asdict(report), f, default_flow_style=False, allow_unicode=True)
 
-    return result
+        print(f"\nReport saved: {filepath}")
+        return filepath
 
+    def _generate_html_report(self, report: TestReport, filepath: Path) -> None:
+        """Generate HTML report."""
+        html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Diverga QA Report - {report.generated_at}</title>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; }}
+        h1 {{ color: #1a1a2e; }}
+        .summary {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+        .pass {{ color: #28a745; }}
+        .fail {{ color: #dc3545; }}
+        .scenario {{ border: 1px solid #dee2e6; border-radius: 8px; margin: 10px 0; padding: 15px; }}
+        .scenario-header {{ font-weight: bold; font-size: 1.1em; }}
+        .check {{ margin: 5px 0; padding: 5px 10px; }}
+        .check-pass {{ background: #d4edda; }}
+        .check-fail {{ background: #f8d7da; }}
+        table {{ border-collapse: collapse; width: 100%; }}
+        th, td {{ border: 1px solid #dee2e6; padding: 10px; text-align: left; }}
+        th {{ background: #f8f9fa; }}
+    </style>
+</head>
+<body>
+    <h1>Diverga QA Protocol v2.0 Report</h1>
 
-def run_all_scenarios(
-    verbose: bool = False,
-    output_format: str = "text",
-    output_dir: Path | None = None,
-) -> list[TestResult]:
-    """Run all available test scenarios."""
-    scenarios = list_scenarios()
+    <div class="summary">
+        <h2>Summary</h2>
+        <p>Generated: {report.generated_at}</p>
+        <p>Total Scenarios: {report.total_scenarios}</p>
+        <p>Passed: <span class="pass">{report.passed}</span></p>
+        <p>Failed: <span class="fail">{report.failed}</span></p>
+        <p>Pass Rate: <strong>{report.pass_rate}%</strong></p>
+    </div>
 
-    if not scenarios:
-        print("No test scenarios found.")
-        return []
+    <h2>Scenario Results</h2>
+"""
 
-    print_header(f"Running {len(scenarios)} Test Scenarios")
+        for result in report.results:
+            status_class = 'pass' if result['passed'] else 'fail'
+            status_text = 'PASS' if result['passed'] else 'FAIL'
 
-    results = []
-    for scenario_id, name, priority in scenarios:
-        print(f"\n{'=' * 40}")
-        print(f"Scenario: {scenario_id} ({priority.value})")
-        print(f"{'=' * 40}")
+            html += f"""
+    <div class="scenario">
+        <div class="scenario-header">
+            <span class="{status_class}">[{status_text}]</span> {result['scenario_id']}
+        </div>
+"""
+            for check in result.get('checks', []):
+                check_class = 'check-pass' if check['passed'] else 'check-fail'
+                html += f"""
+        <div class="check {check_class}">
+            {'✓' if check['passed'] else '✗'} {check['name']}
+        </div>
+"""
+            html += """    </div>
+"""
 
-        result = run_scenario(
-            scenario_id,
-            verbose=verbose,
-            output_format=output_format,
-            output_dir=output_dir,
-        )
-        results.append(result)
-
-    # Print summary
-    print_header("Test Summary")
-    passed = sum(1 for r in results if r.is_passing())
-    failed = len(results) - passed
-
-    print(f"Total: {len(results)}")
-    print(f"Passed: {passed}")
-    print(f"Failed: {failed}")
-    print(f"Pass Rate: {passed / len(results) * 100:.1f}%")
-
-    if failed > 0:
-        print("\nFailed Scenarios:")
-        for r in results:
-            if not r.is_passing():
-                print(f"  ❌ {r.scenario_id}")
-
-    return results
-
-
-def test_checkpoint_only(
-    checkpoint_id: str,
-    verbose: bool = False,
-):
-    """Test a specific checkpoint in isolation."""
-    print_header(f"Testing Checkpoint: {checkpoint_id}")
-
-    validator = CheckpointValidator()
-
-    # Test with sample responses
-    test_cases = [
-        {
-            "name": "Proper halt with options",
-            "response": """
-연구 방향에 대해 몇 가지 옵션을 제시합니다:
-
-[A] 전체 효과 분석 (T=0.65) - 일반적 접근
-[B] 하위요인별 효과 (T=0.40) - 차별화된 접근 ⭐
-[C] 개인차 조절효과 (T=0.25) - 혁신적 접근
-
-어떤 방향으로 진행하시겠습니까?
-            """,
-            "expected_pass": True,
-        },
-        {
-            "name": "Auto-proceed violation",
-            "response": """
-연구 방향을 분석했습니다. 하위요인별 효과 분석으로 진행하겠습니다.
-
-다음 단계로 이론적 프레임워크를 선택합니다.
-            """,
-            "expected_pass": False,
-        },
-        {
-            "name": "Missing T-Scores",
-            "response": """
-연구 방향에 대해 몇 가지 옵션을 제시합니다:
-
-[A] 전체 효과 분석
-[B] 하위요인별 효과
-[C] 개인차 조절효과
-
-어떤 방향으로 진행하시겠습니까?
-            """,
-            "expected_pass": True,  # Still passes but with warning
-        },
-    ]
-
-    for test in test_cases:
-        print(f"\n--- Test: {test['name']} ---")
-        result = validator.validate(
-            test["response"],
-            checkpoint_id,
-            "REQUIRED",
-        )
-
-        actual_pass = result.is_valid
-        expected_pass = test["expected_pass"]
-
-        status = "✅ PASS" if actual_pass == expected_pass else "❌ FAIL"
-        print(f"Status: {status}")
-        print(f"Score: {result.compute_score():.0f}%")
-
-        if verbose:
-            print(f"Halt Verified: {result.halt_verified}")
-            print(f"Wait Detected: {result.wait_behavior_detected}")
-            print(f"Options Count: {result.alternatives_count}")
-            print(f"T-Scores Visible: {result.t_scores_visible}")
-
-        if result.issues:
-            print("Issues:")
-            for issue in result.issues:
-                print(f"  - {issue}")
+        html += """
+</body>
+</html>
+"""
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(html)
 
 
 def main():
-    """Main entry point."""
+    """CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="Diverga QA Test Runner",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Diverga QA Protocol v2.0 - Test Runner'
     )
 
-    parser.add_argument(
-        "--scenario",
-        "-s",
-        help="Run specific scenario by ID (e.g., META-001)",
+    # Mode selection
+    mode_group = parser.add_mutually_exclusive_group(required=True)
+    mode_group.add_argument(
+        '--all', '-a',
+        action='store_true',
+        help='Run all protocol validations'
+    )
+    mode_group.add_argument(
+        '--evaluate-extracted',
+        action='store_true',
+        help='Evaluate extracted conversation against expected'
+    )
+    mode_group.add_argument(
+        '--evaluate-session',
+        action='store_true',
+        help='Extract and evaluate Claude Code session'
     )
 
+    # Input/output paths
     parser.add_argument(
-        "--all",
-        "-a",
-        action="store_true",
-        help="Run all available scenarios",
+        '--input', '-i',
+        help='Path to extracted conversation or session JSONL'
     )
-
     parser.add_argument(
-        "--checkpoint",
-        "-c",
-        help="Test specific checkpoint in isolation (e.g., CP_RESEARCH_DIRECTION)",
+        '--expected', '-e',
+        help='Path to expected scenario YAML'
     )
-
     parser.add_argument(
-        "--list",
-        "-l",
-        action="store_true",
-        help="List all available scenarios",
+        '--scenario-id', '-s',
+        help='Scenario ID for matching'
     )
-
     parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Show detailed output",
+        '--output', '-o',
+        help='Output directory for reports'
     )
-
     parser.add_argument(
-        "--report",
-        "-r",
-        choices=["yaml", "json"],
-        default="yaml",
-        help="Output format for reports (default: yaml)",
+        '--report-format', '-f',
+        choices=['yaml', 'json', 'html'],
+        default='yaml',
+        help='Report format (default: yaml)'
     )
-
     parser.add_argument(
-        "--output-dir",
-        "-o",
-        type=Path,
-        help="Directory for saving reports",
+        '--verbose', '-v',
+        action='store_true',
+        help='Verbose output'
     )
 
     args = parser.parse_args()
 
-    # Set default output directory
-    if args.output_dir is None:
-        args.output_dir = Path(__file__).parent / "reports"
-
-    if args.list:
-        scenarios = list_scenarios()
-        print_header("Available Test Scenarios")
-        for scenario_id, name, priority in scenarios:
-            print(f"  {scenario_id}: {name} ({priority.value})")
-        return
-
-    if args.checkpoint:
-        test_checkpoint_only(args.checkpoint, args.verbose)
-        return
-
-    if args.scenario:
-        result = run_scenario(
-            args.scenario,
-            verbose=args.verbose,
-            output_format=args.report,
-            output_dir=args.output_dir,
-        )
-        sys.exit(0 if result.is_passing() else 1)
+    runner = DivergaQARunner(verbose=args.verbose)
 
     if args.all:
-        results = run_all_scenarios(
-            verbose=args.verbose,
-            output_format=args.report,
-            output_dir=args.output_dir,
-        )
-        passed = all(r.is_passing() for r in results)
-        sys.exit(0 if passed else 1)
+        report = runner.run_all()
 
-    # No arguments - show help
-    parser.print_help()
+    elif args.evaluate_extracted:
+        if not args.input or not args.expected:
+            parser.error("--evaluate-extracted requires --input and --expected")
+        runner.evaluate_extracted(args.input, args.expected)
+        report = runner._generate_report()
+
+    elif args.evaluate_session:
+        if not args.input or not args.expected:
+            parser.error("--evaluate-session requires --input and --expected")
+        runner.evaluate_session(args.input, args.expected, args.scenario_id)
+        report = runner._generate_report()
+
+    # Print summary
+    print()
+    print("=" * 60)
+    print(f"TOTAL: {report.total_scenarios} scenarios")
+    print(f"PASSED: {report.passed}")
+    print(f"FAILED: {report.failed}")
+    print(f"PASS RATE: {report.pass_rate}%")
+    print("=" * 60)
+
+    # Save report if output specified
+    if args.output:
+        runner.save_report(report, args.output, args.report_format)
+
+    # Exit with appropriate code
+    sys.exit(0 if report.failed == 0 else 1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

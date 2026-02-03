@@ -1,25 +1,11 @@
 ---
-name: Diverga Research Coordinator
-description: Multi-agent system for social science research with VS methodology - 40 specialized agents
-version: 6.6.1
-author: Hosung You
-repository: https://github.com/HosungYou/Diverga
-triggers:
-  - research question
-  - theoretical framework
-  - meta-analysis
-  - systematic review
-  - phenomenology
-  - grounded theory
-  - mixed methods
-  - effect size
-  - IRB
-  - PRISMA
-  - literature review
-  - hypothesis
-  - qualitative
-  - quantitative
-  - methodology
+name: diverga
+description: |
+  Diverga Research Coordinator - 44 specialized agents for social science research.
+  VS methodology prevents mode collapse. Human checkpoints enforce human-in-the-loop decisions.
+  Triggers: research question, theoretical framework, meta-analysis, systematic review,
+  phenomenology, grounded theory, mixed methods, effect size, IRB, PRISMA, literature review.
+version: "6.9.0"
 ---
 
 # Diverga Research Coordinator v6.6.1

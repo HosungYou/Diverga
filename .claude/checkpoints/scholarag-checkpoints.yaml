@@ -1,0 +1,307 @@
+# ScholaRAG Checkpoints Configuration
+# Category I: Systematic Review Automation
+# Version: 1.0.0
+
+# =============================================================================
+# CHECKPOINT DEFINITIONS
+# =============================================================================
+
+checkpoints:
+  # -------------------------------------------------------------------------
+  # SCH_DATABASE_SELECTION - Database choice confirmation
+  # -------------------------------------------------------------------------
+  SCH_DATABASE_SELECTION:
+    level: REQUIRED  # 🔴
+    agent: I1-paper-retrieval-agent
+    stage: 2
+    description: >
+      Confirms which academic databases to query for paper retrieval.
+      User must explicitly approve database selection.
+
+    trigger_conditions:
+      - "Query strategy defined"
+      - "Boolean search strings ready"
+      - "Before executing fetch scripts"
+
+    presentation_format: |
+      🔴 CHECKPOINT: SCH_DATABASE_SELECTION
+
+      Available databases for your systematic review:
+
+      ✅ Open Access (recommended, free):
+      - Semantic Scholar (~40% PDF URLs)
+      - OpenAlex (~50% PDF URLs)
+      - arXiv (100% PDF access)
+
+      🔒 Institutional (requires API keys):
+      - Scopus (SCOPUS_API_KEY: {status})
+      - Web of Science (WOS_API_KEY: {status})
+
+      Which databases would you like to query?
+
+    required_response:
+      - explicit_selection: true
+      - minimum_databases: 1
+      - confirmation_phrase: ["yes", "proceed", "approved", "ok", "select"]
+
+    on_approval:
+      - action: "Execute 01_fetch_papers.py"
+      - action: "Execute 02_deduplicate.py"
+      - next_stage: 3
+
+    on_rejection:
+      - action: "Modify database selection"
+      - retry: true
+
+  # -------------------------------------------------------------------------
+  # SCH_SCREENING_CRITERIA - PRISMA screening criteria approval
+  # -------------------------------------------------------------------------
+  SCH_SCREENING_CRITERIA:
+    level: REQUIRED  # 🔴
+    agent: I2-screening-assistant
+    stage: 5
+    description: >
+      Confirms inclusion/exclusion criteria before AI-assisted PRISMA screening.
+      Critical checkpoint as it determines which papers enter the review.
+
+    trigger_conditions:
+      - "Papers retrieved and deduplicated"
+      - "Project type selected"
+      - "Before executing screening script"
+
+    presentation_format: |
+      🔴 CHECKPOINT: SCH_SCREENING_CRITERIA
+
+      AI-PRISMA 6-Dimension Screening Criteria
+
+      Project Type: {project_type}
+      Confidence Threshold: {threshold}%
+      Expected Output: {expected_papers}
+
+      Scoring Rubric:
+      1. DOMAIN (0-10): Target population/context relevance
+      2. INTERVENTION (0-10): Technology/tool focus
+      3. METHOD (0-5): Study design rigor
+      4. OUTCOMES (0-10): Measured results clarity
+      5. EXCLUSION (-20 to 0): Penalties for wrong domain/review
+      6. TITLE BONUS (0 or 10): Keywords in title
+
+      Total Score Range: -20 to 50 points
+
+      Decision Rules:
+      - score ≥ {threshold_score} → auto-include
+      - score < 0 → auto-exclude
+      - otherwise → human-review
+
+      LLM Provider: {llm_provider} (Est. cost: ${estimated_cost})
+
+      Do you approve these criteria?
+
+    required_response:
+      - explicit_approval: true
+      - confirmation_phrase: ["yes", "approved", "proceed", "looks good"]
+
+    on_approval:
+      - action: "Execute 03_screen_papers.py"
+      - next_stage: 6
+
+    on_rejection:
+      - action: "Modify screening criteria"
+      - options:
+        - "Adjust threshold"
+        - "Change project type"
+        - "Modify rubric weights"
+      - retry: true
+
+  # -------------------------------------------------------------------------
+  # SCH_RAG_READINESS - RAG system readiness confirmation
+  # -------------------------------------------------------------------------
+  SCH_RAG_READINESS:
+    level: RECOMMENDED  # 🟠
+    agent: I3-rag-builder
+    stage: 6
+    description: >
+      Confirms RAG system is ready for research queries after PDF download
+      and vector database construction.
+
+    trigger_conditions:
+      - "Papers screened"
+      - "PDFs downloaded"
+      - "Vector database built"
+
+    presentation_format: |
+      🟠 CHECKPOINT: SCH_RAG_READINESS
+
+      RAG Build Complete
+
+      PDF Download:
+      - Total papers: {total_papers}
+      - PDFs downloaded: {downloaded} ({download_rate}%)
+      - PDFs unavailable: {failed}
+
+      Vector Database:
+      - Total chunks: {total_chunks}
+      - Avg chunks/paper: {avg_chunks}
+      - Embedding model: {embedding_model}
+      - Database: ChromaDB
+
+      Storage:
+      - PDF size: {pdf_size}
+      - Vector DB size: {db_size}
+
+      Ready for research queries?
+
+    required_response:
+      - explicit_approval: false  # Can proceed without explicit approval
+      - default_action: "proceed"
+
+    on_approval:
+      - action: "Enable query interface"
+      - next_stage: 7
+
+    on_rejection:
+      - action: "Retry failed downloads"
+      - action: "Rebuild vector database"
+      - retry: true
+
+  # -------------------------------------------------------------------------
+  # SCH_PRISMA_GENERATION - PRISMA diagram generation (optional)
+  # -------------------------------------------------------------------------
+  SCH_PRISMA_GENERATION:
+    level: OPTIONAL  # 🟡
+    agent: I0-scholar-agent-orchestrator
+    stage: 7
+    description: >
+      Generates PRISMA 2020 flow diagram and statistics report.
+      Optional as user may want to customize diagram.
+
+    trigger_conditions:
+      - "RAG system built"
+      - "All statistics available"
+
+    presentation_format: |
+      🟡 CHECKPOINT: SCH_PRISMA_GENERATION
+
+      Ready to generate PRISMA 2020 documentation:
+
+      - PRISMA flow diagram (PNG + PDF)
+      - Statistics report (Markdown)
+      - JSON data export
+
+      Statistics Preview:
+      - Papers identified: {identified}
+      - After deduplication: {deduplicated}
+      - After screening: {screened}
+      - Included in review: {included}
+
+      Generate documentation?
+
+    required_response:
+      - explicit_approval: false
+      - default_action: "generate"
+
+    on_approval:
+      - action: "Execute 07_generate_prisma.py"
+      - output: "outputs/prisma_diagram.png"
+      - output: "outputs/statistics_report.md"
+
+    on_skip:
+      - action: "Skip diagram generation"
+      - message: "You can generate later with: python scripts/07_generate_prisma.py"
+
+# =============================================================================
+# CHECKPOINT STATE STORAGE
+# =============================================================================
+
+state_storage:
+  location: ".claude/state/scholarag-checkpoints.json"
+  format: |
+    {
+      "project_path": "/path/to/project",
+      "session_id": "uuid",
+      "checkpoints": [
+        {
+          "id": "SCH_DATABASE_SELECTION",
+          "timestamp": "2026-01-30T10:00:00Z",
+          "status": "approved",
+          "human_decision": "Selected: semantic_scholar, openalex, arxiv",
+          "agent": "I1-paper-retrieval-agent"
+        }
+      ],
+      "current_stage": 5,
+      "completed_stages": [1, 2, 3, 4]
+    }
+
+# =============================================================================
+# CHECKPOINT BEHAVIOR RULES
+# =============================================================================
+
+behavior_rules:
+  # REQUIRED checkpoints MUST stop and wait
+  REQUIRED:
+    - STOP: true
+    - WAIT_FOR_RESPONSE: true
+    - TIMEOUT: null  # No timeout, wait indefinitely
+    - AUTO_PROCEED: false
+
+  # RECOMMENDED checkpoints pause but can proceed
+  RECOMMENDED:
+    - STOP: true
+    - WAIT_FOR_RESPONSE: true
+    - TIMEOUT: 60  # seconds, then show default option
+    - AUTO_PROCEED: false
+
+  # OPTIONAL checkpoints ask but have defaults
+  OPTIONAL:
+    - STOP: false
+    - WAIT_FOR_RESPONSE: false
+    - TIMEOUT: 30  # seconds
+    - AUTO_PROCEED: true
+
+# =============================================================================
+# PARALLEL EXECUTION RULES
+# =============================================================================
+
+parallel_execution:
+  # These can run in parallel
+  parallel_groups:
+    - group: "retrieval"
+      agents: ["I1"]
+      condition: "After SCH_DATABASE_SELECTION"
+
+    - group: "screening"
+      agents: ["I2"]
+      condition: "After retrieval complete"
+
+    - group: "rag_build"
+      agents: ["I3"]
+      condition: "After screening complete"
+
+  # These must run sequentially
+  sequential_chains:
+    - chain: "main_pipeline"
+      sequence: ["I1", "I2", "I3"]
+      checkpoints: ["SCH_DATABASE_SELECTION", "SCH_SCREENING_CRITERIA", "SCH_RAG_READINESS"]
+
+# =============================================================================
+# INTEGRATION WITH DIVERGA
+# =============================================================================
+
+diverga_integration:
+  # Category I agents can invoke other Diverga agents
+  allowed_cross_invocations:
+    - from: "I1"
+      to: ["B1-systematic-literature-scout"]
+      purpose: "Advanced search strategy"
+
+    - from: "I2"
+      to: ["B2-evidence-quality-appraiser"]
+      purpose: "Quality assessment"
+
+    - from: "I3"
+      to: ["B5-parallel-document-processor"]
+      purpose: "Large PDF batch processing"
+
+    - from: "I0"
+      to: ["C5-meta-analysis-master"]
+      purpose: "Meta-analysis workflow"

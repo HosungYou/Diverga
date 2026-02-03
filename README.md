@@ -16,7 +16,7 @@
 
               ┌─────────────────────────────────────────────────┐
               │  Research Methodology AI Assistant for          │
-              │  Claude Code · 40 Specialized Agents · VS+HAVS  │
+              │  Claude Code · 44 Specialized Agents · VS+HAVS  │
               └─────────────────────────────────────────────────┘
 ```
 
@@ -27,7 +27,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Methodology](https://img.shields.io/badge/Powered_by-VS+HAVS-violet?style=for-the-badge&logo=academia&logoColor=white)](docs/methodology.md)
 [![Language](https://img.shields.io/badge/language-English%20%7C%20한국어-orange?style=for-the-badge)](docs/i18n/ko/README-ko.md)
-[![Agents](https://img.shields.io/badge/agents-40-purple?style=for-the-badge)](docs/AGENTS.md)
+[![Agents](https://img.shields.io/badge/agents-44-purple?style=for-the-badge)](docs/AGENTS.md)
 
 ```
          ╭──────────────────────────────────────────────────────────╮
@@ -46,7 +46,7 @@
 
 ## ✨ What is Diverga?
 
-**Diverga** is a research methodology assistant that transforms Claude Code into a 40-agent orchestra for social science research. Built on **Verbalized Sampling (VS)** and **HAVS** (Humanization-Adapted VS) methodologies, it prevents AI "mode collapse" — the tendency to recommend only safe, modal solutions.
+**Diverga** is a research methodology assistant that transforms Claude Code into a 44-agent orchestra for social science research. Built on **Verbalized Sampling (VS)** and **HAVS** (Humanization-Adapted VS) methodologies, it prevents AI "mode collapse" — the tendency to recommend only safe, modal solutions.
 
 <div align="center">
 
@@ -157,6 +157,8 @@ Diverga:
 | **📋 Decision Audit Trail** | Immutable, versioned decision history |
 | **📄 Research Documentation** | Auto-generate artifacts from schemas and templates |
 | **🔄 Migration Support** | Automatic v6.8 → v7.0 upgrade with rollback |
+| **🚀 Parallel Agent Execution** | Run multiple agents simultaneously via Task tool |
+| **🔬 Category I Agents** | ScholaRAG integration with I0-I3 for systematic reviews |
 
 ### Memory System Quick Start
 
@@ -303,13 +305,13 @@ Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 
 ---
 
-## 🏗️ Architecture (40 Agents in 8 Categories)
+## 🏗️ Architecture (44 Agents in 9 Categories)
 
 <div align="center">
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════╗
-║                         🎯 AGENT ECOSYSTEM (40 AGENTS)                        ║
+║                         🎯 AGENT ECOSYSTEM (44 AGENTS)                        ║
 ╠═══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                               ║
 ║   📐 Category A: Foundation (6)         🔍 Category B: Evidence (5)          ║
@@ -347,6 +349,11 @@ Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 ║   ◆ G4-preregistration-composer                                              ║
 ║   ◆ G5-academic-style-auditor                                                ║
 ║   ◆ G6-academic-style-humanizer 🆕 HAVS                                      ║
+║                                                                               ║
+║   🔬 Category I: Systematic Review (4)   [NEW - ScholaRAG Integration]       ║
+║   ────────────────────────────────────                                        ║
+║   ◆ I0-scholar-agent-orchestrator        ◆ I1-paper-retrieval-agent         ║
+║   ◆ I2-screening-assistant               ◆ I3-rag-builder                    ║
 ║                                                                               ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 ```
@@ -427,6 +434,14 @@ Diverga assigns **Typicality Scores (T-Score)** to all recommendations:
 | H1-ethnographic-research-advisor | Opus | Fieldwork, thick description |
 | H2-action-research-facilitator | Opus | PAR, CBPR cycles |
 
+#### Category I: Systematic Review Automation (4 Agents) [NEW v6.5]
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| I0-scholar-agent-orchestrator | Opus | ScholaRAG 7-stage pipeline orchestration |
+| I1-paper-retrieval-agent | Sonnet | Multi-database paper fetching |
+| I2-screening-assistant | Sonnet | AI-PRISMA screening with Groq |
+| I3-rag-builder | Haiku | Vector database construction |
+
 ---
 
 ## 🚀 Getting Started
@@ -477,6 +492,9 @@ The system will:
 
 | Version | Feature |
 |---------|---------|
+| **v6.7.0** | Systematic Review Automation - Category I agents (I0-I3) for PRISMA 2020 pipeline, 44 total agents |
+| **v6.6.3** | Codex SKILL.md Implementation - actual skill loading via `.codex/skills/`, QUANT-005 verified |
+| **v6.6.2** | Multi-CLI Compatibility Edition - unified install script, NPM package (@diverga/codex-setup) |
 | **v6.6.0** | Cross-Platform Edition - Codex CLI & OpenCode support, shared lib/ |
 | **v6.5.0** | Parallel Execution Edition - Task tool support, /agents/ directory |
 | **v6.4.0** | Plugin Marketplace - `/plugin marketplace add`, auto-trigger dispatch |
@@ -520,16 +538,16 @@ Mixed: "메타분석을 하려는데, can you help?"
 
 ---
 
-## 🌐 Cross-Platform Support (v6.6.1)
+## 🌐 Cross-Platform Support (v6.6.3)
 
-Diverga now works across **three AI coding platforms** with unified install scripts:
+Diverga now works across **three AI coding platforms** with a unified install script:
 
 | Platform | Status | One-Line Install |
 |----------|--------|------------------|
 | **Claude Code** | ✅ Full Support | `/plugin install diverga` |
-| **OpenAI Codex CLI** | ✅ Full Support | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh \| bash` |
-| **OpenCode** | ✅ Full Support | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-opencode.sh \| bash` |
-| **Auto-Detect All** | ✅ Universal | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install.sh \| bash` |
+| **OpenAI Codex CLI** | ✅ Full Support | `npx @diverga/codex-setup` or `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh \| bash -s -- --codex` |
+| **OpenCode** | ✅ Full Support | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh \| bash -s -- --opencode` |
+| **All CLIs (Auto-Detect)** | ✅ Universal | `curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh \| bash` |
 
 ### Architecture
 
@@ -550,10 +568,11 @@ Diverga/
 
 ### Codex CLI Quick Start
 
-> ⚠️ **Important**: Unlike Claude Code, Codex CLI installation runs in a **regular terminal**, not inside Codex CLI.
+> [!CAUTION]
+> **DO NOT run inside Codex CLI!** Unlike Claude Code, Codex CLI installation must run in a **regular terminal** (Terminal.app, iTerm, VS Code terminal, etc.). Running inside Codex CLI will cause interactive prompt failures.
 
 ```bash
-# Step 1: Install from regular terminal (NOT inside Codex CLI)
+# Step 1: Open a regular terminal (NOT Codex CLI!) and run:
 npx @diverga/codex-setup
 
 # Step 2: Start Codex CLI
@@ -567,9 +586,9 @@ codex
 **Installation Difference:**
 | Platform | Where to Install | Command |
 |----------|------------------|---------|
-| Claude Code | Inside Claude Code | `/plugin install diverga` |
-| Codex CLI | Regular terminal | `npx @diverga/codex-setup` |
-| OpenCode | Regular terminal | `curl ... \| bash` (see below) |
+| Claude Code | ✅ Inside Claude Code | `/plugin install diverga` |
+| Codex CLI | ⚠️ Regular terminal (**NOT** inside Codex!) | `npx @diverga/codex-setup` |
+| OpenCode | ⚠️ Regular terminal (**NOT** inside OpenCode!) | `curl ... \| bash` (see below) |
 
 ### OpenCode Quick Start
 
@@ -593,9 +612,9 @@ opencode
 
 | Tier | Claude Code | Codex CLI | OpenCode |
 |------|-------------|-----------|----------|
-| HIGH | opus | o3 / codex-mini | *provider 설정* |
-| MEDIUM | sonnet | gpt-4.1 | *provider 설정* |
-| LOW | haiku | gpt-4o-mini | *provider 설정* |
+| HIGH | opus | gpt-5.2-codex | *per provider* |
+| MEDIUM | sonnet | gpt-5.1-codex | *per provider* |
+| LOW | haiku | gpt-5.1-codex-mini | *per provider* |
 
 > **Note**: OpenCode is provider-agnostic (75+ models supported). Use `/connect` command to configure your preferred provider (Claude, OpenAI, Gemini, local models, etc.).
 
@@ -610,7 +629,7 @@ opencode
 | `Grep` | `grep` |
 | `Bash` | `shell` |
 
-All 40 agents work identically across all platforms with VS methodology and human checkpoints enforced.
+All 44 agents work identically across all platforms with VS methodology and human checkpoints enforced.
 
 ---
 
@@ -653,9 +672,9 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {6.6.1},
+  version = {6.7.0},
   url = {https://github.com/HosungYou/Diverga},
-  note = {40 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
+  note = {44 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Systematic Review Automation (Category I), Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
 }
 ```
 

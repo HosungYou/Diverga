@@ -1,6 +1,6 @@
 # Diverga
 
-**Version**: 6.5.2
+**Version**: 6.8.0
 **Author**: Hosung You
 **Repository**: https://github.com/HosungYou/Diverga
 **License**: MIT
@@ -9,10 +9,11 @@
 
 ## Description
 
-Diverga is an AI Research Assistant for the complete research lifecycle. 40 specialized agents support researchers from question formulation to publication, with context persistence and creative methodology guidance.
+Diverga is an AI Research Assistant for the complete research lifecycle. 44 specialized agents support researchers from question formulation to publication, with context persistence and creative methodology guidance.
 
 **Key Features:**
-- 40 specialized research agents across 8 categories
+- 44 specialized research agents across 9 categories
+- **Memory System for context persistence** (v6.8+)
 - **Parallel execution via Task tool** (v6.5+)
 - Auto-trigger based on conversation context
 - Human checkpoints for critical decisions
@@ -63,12 +64,13 @@ Do NOT add explicit `skills` key in marketplace.json.
 |-------|---------|-------------|
 | Setup | `/diverga:setup` | Initial configuration wizard |
 | Help | `/diverga:help` | Agent list and usage guide |
+| Memory | `/diverga:memory` | Context persistence for research lifecycle |
 | Meta-Analysis | `/diverga:meta-analysis` | Meta-analysis workflow (C5+C6+C7) |
 | PDF Extraction | `/diverga:pdf-extract` | Extract data from PDFs (C6) |
 
 ---
 
-## Agents (40 total)
+## Agents (44 total)
 
 ### Category A: Foundation (6 agents)
 
@@ -150,6 +152,15 @@ Do NOT add explicit `skills` key in marketplace.json.
 | H1-EthnographicResearchAdvisor | `diverga:h1` | Ethnographic research guidance | opus |
 | H2-ActionResearchFacilitator | `diverga:h2` | Action research facilitation | opus |
 
+### Category I: Systematic Review Automation (4 agents)
+
+| Agent | Command | Description | Model |
+|-------|---------|-------------|-------|
+| I0-ScholarAgentOrchestrator | `diverga:i0` | Pipeline coordination and stage management | opus |
+| I1-PaperRetrievalAgent | `diverga:i1` | Multi-database fetching (Semantic Scholar, OpenAlex, arXiv) | sonnet |
+| I2-ScreeningAssistant | `diverga:i2` | AI-PRISMA 6-dimension screening | sonnet |
+| I3-RAGBuilder | `diverga:i3` | Vector database construction (zero cost) | haiku |
+
 ---
 
 ## Auto-Trigger Keywords
@@ -203,9 +214,9 @@ Task(subagent_type="diverga:b2", model="sonnet", prompt="Quality appraisal...")
 ### Agent-Model Mapping
 
 ```
-opus:   A1, A2, A3, A5, B5, C1, C2, C3, C5, D4, E1, E2, E3, G6, H1, H2
-sonnet: A4, A6, B1, B2, C4, C6, C7, D1, D2, E5, F3, F4, G1, G2, G3, G4, G5
-haiku:  B3, B4, D3, E4, F1, F2, F5
+opus:   A1, A2, A3, A5, B5, C1, C2, C3, C5, D4, E1, E2, E3, G6, H1, H2, I0
+sonnet: A4, A6, B1, B2, C4, C6, C7, D1, D2, E5, F3, F4, G1, G2, G3, G4, G5, I1, I2
+haiku:  B3, B4, D3, E4, F1, F2, F5, I3
 ```
 
 ---
@@ -255,4 +266,4 @@ Configuration file: `~/.claude/plugins/diverga/config/diverga-config.json`
 
 ---
 
-*Version 6.4.0 - Plugin Marketplace Edition*
+*Version 6.8.0 - Memory System Edition*

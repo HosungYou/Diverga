@@ -1,19 +1,20 @@
 ---
 name: research-orchestrator
-version: 2.0.0
 description: |
-  Human-Centered Orchestrator for Research Coordinator v6.0
-  Manages 27 research agents with MANDATORY human checkpoints
+  Human-Centered Orchestrator for Research Coordinator v6.7.0
+  Manages 44 research agents across 9 categories (A-I) with MANDATORY human checkpoints
   No autonomous modes - all critical decisions require explicit human approval
+  Features: ScholaRAG Integration, Meta-Analysis System, Humanization Pipeline
+version: "6.9.0"
 ---
 
-# Research Orchestrator v2.0 (Human-Centered)
+# Research Orchestrator v2.7.0 (Human-Centered)
 
 **Core Principle**: 인간이 할 일은 인간이, AI는 인간 범위를 벗어난 작업 수행
 
 ## Purpose
 
-Research Coordinator의 27개 에이전트를 **체크포인트 중심**으로 관리합니다.
+Research Coordinator의 **44개 에이전트 (9개 카테고리)**를 **체크포인트 중심**으로 관리합니다.
 
 ## v2.0 Changes (Clean Slate)
 
@@ -60,10 +61,16 @@ Research Coordinator의 27개 에이전트를 **체크포인트 중심**으로 �
 
 ```python
 REQUIRED_CHECKPOINTS = [
+    # Core Research Checkpoints
     "CP_RESEARCH_DIRECTION",    # Research question finalized
     "CP_PARADIGM_SELECTION",    # Quantitative/Qualitative/Mixed
     "CP_THEORY_SELECTION",      # Theoretical framework chosen
     "CP_METHODOLOGY_APPROVAL",  # Design complete
+    "CP_META_GATE",             # Meta-analysis gate failure (C5)
+
+    # ScholaRAG Checkpoints (Category I)
+    "SCH_DATABASE_SELECTION",   # Database choice before retrieval (I1)
+    "SCH_SCREENING_CRITERIA",   # PRISMA criteria before screening (I2)
 ]
 
 # At each REQUIRED checkpoint:
@@ -80,9 +87,16 @@ def handle_required_checkpoint(checkpoint_id):
 
 ```python
 RECOMMENDED_CHECKPOINTS = [
+    # Core Research Checkpoints
     "CP_ANALYSIS_PLAN",         # Before analysis
     "CP_INTEGRATION_STRATEGY",  # Mixed methods integration
     "CP_QUALITY_REVIEW",        # Quality assessment results
+    "CP_HUMANIZATION_REVIEW",   # After content generation (G5)
+    "META_TIER3_REVIEW",        # Data completeness < 40% (C5)
+    "META_ANOMALY_REVIEW",      # |g| > 3.0 detected (C7)
+
+    # ScholaRAG Checkpoints (Category I)
+    "SCH_RAG_READINESS",        # RAG system ready for queries (I3)
 ]
 
 # At each RECOMMENDED checkpoint:
@@ -99,6 +113,9 @@ def handle_recommended_checkpoint(checkpoint_id):
 OPTIONAL_CHECKPOINTS = [
     "CP_VISUALIZATION_PREFERENCE",
     "CP_RENDERING_METHOD",
+    "CP_HUMANIZATION_VERIFY",   # Before final export (F5)
+    "META_PRETEST_CONFIRM",     # Ambiguous pre/post classification (C7)
+    "SCH_PRISMA_GENERATION",    # PRISMA diagram generation (I0)
 ]
 
 # At each OPTIONAL checkpoint:
@@ -142,41 +159,54 @@ Task(
 
 ---
 
-## Agent-Tier Quick Reference (27 Agents)
+## Agent-Tier Quick Reference (44 Agents)
 
 | Category | Agent ID | Name | Tier | Model |
 |----------|----------|------|------|-------|
-| **A: Foundation** | A1 | Research Question Refiner | HIGH | opus |
+| **A: Foundation (6)** | A1 | Research Question Refiner | HIGH | opus |
 | | A2 | Theoretical Framework Architect | HIGH | opus |
 | | A3 | Devil's Advocate | HIGH | opus |
 | | A4 | Research Ethics Advisor | MEDIUM | sonnet |
 | | A5 | Paradigm & Worldview Advisor | HIGH | opus |
-| **B: Evidence** | B1 | Literature Review Strategist | MEDIUM | sonnet |
+| | **A6** | **Conceptual Framework Visualizer** | MEDIUM | sonnet |
+| **B: Evidence (5)** | B1 | Literature Review Strategist | MEDIUM | sonnet |
 | | B2 | Evidence Quality Appraiser | MEDIUM | sonnet |
 | | B3 | Effect Size Extractor | LOW | haiku |
 | | B4 | Research Radar | LOW | haiku |
-| **C: Design** | C1 | Quantitative Design Consultant | HIGH | opus |
+| | **B5** | **Parallel Document Processor** | HIGH | opus |
+| **C: Design & Meta (7)** | C1 | Quantitative Design Consultant | HIGH | opus |
 | | C2 | Qualitative Design Consultant | HIGH | opus |
 | | C3 | Mixed Methods Design Consultant | HIGH | opus |
 | | C4 | Experimental Materials Developer | MEDIUM | sonnet |
-| **D: Collection** | D1 | Sampling Strategy Advisor | MEDIUM | sonnet |
+| | **C5** | **Meta-Analysis Master** | HIGH | opus |
+| | **C6** | **Data Integrity Guard** | MEDIUM | sonnet |
+| | **C7** | **Error Prevention Engine** | MEDIUM | sonnet |
+| **D: Collection (4)** | D1 | Sampling Strategy Advisor | MEDIUM | sonnet |
 | | D2 | Interview & Focus Group Specialist | MEDIUM | sonnet |
 | | D3 | Observation Protocol Designer | LOW | haiku |
 | | D4 | Measurement Instrument Developer | HIGH | opus |
-| **E: Analysis** | E1 | Quantitative Analysis Guide | HIGH | opus |
-| | E2 | Qualitative Coding Specialist | MEDIUM | sonnet |
+| **E: Analysis (5)** | E1 | Quantitative Analysis Guide | HIGH | opus |
+| | E2 | Qualitative Coding Specialist | HIGH | opus |
 | | E3 | Mixed Methods Integration Specialist | HIGH | opus |
 | | E4 | Analysis Code Generator | LOW | haiku |
-| **F: Quality** | F1 | Internal Consistency Checker | LOW | haiku |
+| | **E5** | **Sensitivity Analysis Designer** | MEDIUM | sonnet |
+| **F: Quality (5)** | F1 | Internal Consistency Checker | LOW | haiku |
 | | F2 | Checklist Manager | LOW | haiku |
 | | F3 | Reproducibility Auditor | MEDIUM | sonnet |
 | | F4 | Bias & Trustworthiness Detector | MEDIUM | sonnet |
-| **G: Publication** | G1 | Journal Matcher | MEDIUM | sonnet |
+| | **F5** | **Humanization Verifier** | LOW | haiku |
+| **G: Publication (6)** | G1 | Journal Matcher | MEDIUM | sonnet |
 | | G2 | Academic Communicator | MEDIUM | sonnet |
 | | G3 | Peer Review Strategist | HIGH | opus |
 | | G4 | Pre-registration Composer | MEDIUM | sonnet |
-| **H: Specialized** | H1 | Ethnographic Research Advisor | HIGH | opus |
+| | **G5** | **Academic Style Auditor** | MEDIUM | sonnet |
+| | **G6** | **Academic Style Humanizer** | HIGH | opus |
+| **H: Specialized (2)** | H1 | Ethnographic Research Advisor | HIGH | opus |
 | | H2 | Action Research Facilitator | HIGH | opus |
+| **I: ScholaRAG (4)** | **I0** | **Scholar Agent Orchestrator** | HIGH | opus |
+| | **I1** | **Paper Retrieval Agent** | MEDIUM | sonnet |
+| | **I2** | **Screening Assistant** | MEDIUM | sonnet |
+| | **I3** | **RAG Builder** | LOW | haiku |
 
 ---
 
@@ -265,11 +295,14 @@ checkpoint_skip_on_context: null
 
 ```yaml
 # KEPT - Still functional
-model_routing: enabled
-agent_specialization: enabled
+model_routing: enabled                    # HIGH/MEDIUM/LOW tier routing
+agent_specialization: enabled             # 44 agents across 9 categories
 parallel_execution: enabled_between_checkpoints_only
 context_persistence: enabled
 vs_methodology: enabled
+scholarag_integration: enabled            # Category I agents (I0-I3)
+meta_analysis_system: enabled             # C5/C6/C7 multi-gate validation
+humanization_pipeline: enabled            # G5/G6/F5 AI pattern detection
 ```
 
 ---

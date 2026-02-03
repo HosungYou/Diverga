@@ -1,0 +1,225 @@
+# Diverga Memory Lifecycle Hooks Configuration
+# For Claude Code / Codex Integration
+
+version: "1.0"
+name: "diverga-memory-hooks"
+description: "Automatic context persistence and checkpoint tracking for research agents"
+
+# Hook Definitions
+hooks:
+  # Session Start Hook
+  - id: "session_start"
+    name: "Session Start Context Loader"
+    description: "Auto-load project context and relevant memories at session start"
+    trigger: "session_start"
+    enabled: true
+    function: "hooks.on_session_start"
+    parameters:
+      project_path: "auto"  # Auto-detect from cwd
+      session_id: "auto"    # Auto-generate UUID
+    output:
+      type: "context_injection"
+      format: "markdown"
+      inject_to: "agent_prompt"
+
+  # Checkpoint Hook
+  - id: "checkpoint_reached"
+    name: "Checkpoint Decision Tracker"
+    description: "Save decisions and update project state when checkpoints are reached"
+    trigger: "checkpoint_reached"
+    enabled: true
+    function: "hooks.on_checkpoint_reached"
+    parameters:
+      checkpoint_id: "required"
+      stage: "required"
+      agent_id: "required"
+      decision_data: "required"
+      session_id: "auto"
+      t_score: "optional"
+    output:
+      type: "side_effect"
+      actions:
+        - "save_decision_to_memory"
+        - "update_project_state"
+        - "log_to_session"
+
+  # Session End Hook
+  - id: "session_end"
+    name: "Session Summary Generator"
+    description: "Generate session summary and consolidate memories"
+    trigger: "session_end"
+    enabled: true
+    function: "hooks.on_session_end"
+    parameters:
+      session_id: "required"
+      agents_used: "required"
+      decisions_made: "required"
+      auto_summarize: true
+    output:
+      type: "side_effect"
+      actions:
+        - "save_session_record"
+        - "consolidate_memories"
+        - "cleanup_session_state"
+
+# Checkpoint Registry
+# Map checkpoint IDs to stages and decision types
+checkpoints:
+  # Foundation (A-category agents)
+  - id: "CP_RESEARCH_DIRECTION"
+    stage: "foundation"
+    level: "required"
+    agents: ["diverga:a1"]
+    decision_type: "architecture"
+
+  - id: "CP_PARADIGM_SELECTION"
+    stage: "foundation"
+    level: "required"
+    agents: ["diverga:a5"]
+    decision_type: "architecture"
+
+  - id: "CP_THEORY_SELECTION"
+    stage: "foundation"
+    level: "required"
+    agents: ["diverga:a2"]
+    decision_type: "architecture"
+
+  # Design (C-category agents)
+  - id: "CP_METHODOLOGY_APPROVAL"
+    stage: "design"
+    level: "required"
+    agents: ["diverga:c1", "diverga:c2", "diverga:c3"]
+    decision_type: "design"
+
+  - id: "CP_SAMPLING_STRATEGY"
+    stage: "design"
+    level: "recommended"
+    agents: ["diverga:d1"]
+    decision_type: "design"
+
+  # Analysis (E-category agents)
+  - id: "CP_ANALYSIS_PLAN"
+    stage: "analysis"
+    level: "required"
+    agents: ["diverga:e1", "diverga:e2", "diverga:e3"]
+    decision_type: "implementation"
+
+  # Quality (F-category agents)
+  - id: "CP_QUALITY_REVIEW"
+    stage: "quality"
+    level: "recommended"
+    agents: ["diverga:f3", "diverga:f4"]
+    decision_type: "debugging"
+
+  # Communication (G-category agents)
+  - id: "CP_JOURNAL_SELECTION"
+    stage: "publication"
+    level: "optional"
+    agents: ["diverga:g1"]
+    decision_type: "design"
+
+  - id: "CP_HUMANIZATION_REVIEW"
+    stage: "publication"
+    level: "recommended"
+    agents: ["diverga:g5", "diverga:g6"]
+    decision_type: "refactoring"
+
+  # Systematic Review (I-category agents)
+  - id: "SCH_DATABASE_SELECTION"
+    stage: "systematic_review"
+    level: "required"
+    agents: ["diverga:i1"]
+    decision_type: "design"
+
+  - id: "SCH_SCREENING_CRITERIA"
+    stage: "systematic_review"
+    level: "required"
+    agents: ["diverga:i2"]
+    decision_type: "design"
+
+  - id: "SCH_RAG_READINESS"
+    stage: "systematic_review"
+    level: "recommended"
+    agents: ["diverga:i3"]
+    decision_type: "implementation"
+
+  - id: "SCH_QUALITY_GATES"
+    stage: "systematic_review"
+    level: "optional"
+    agents: ["diverga:i0"]
+    decision_type: "debugging"
+
+# Context Injection Settings
+context_injection:
+  enabled: true
+  max_recent_decisions: 5
+  max_relevant_memories: 3
+  max_active_sessions: 3
+  memory_types:
+    - "decision"
+    - "pattern"
+    - "learning"
+  format: "markdown"
+  template: |
+    ## Research Context (Auto-Loaded from Memory)
+
+    **Project**: {project_name}
+    **Research Question**: {research_question}
+    **Current Stage**: {current_stage}
+
+    ### Recent Decisions
+    {recent_decisions}
+
+    ### Relevant Context
+    {relevant_memories}
+
+    ---
+    Use this context. Do not re-ask for established information.
+
+# Session Management
+session_management:
+  auto_generate_id: true
+  id_format: "session-{timestamp}-{random}"
+  track_agents: true
+  track_checkpoints: true
+  auto_summarize: true
+  summarize_threshold: 3  # Minimum decisions for AI summary
+
+# Memory Consolidation
+consolidation:
+  enabled: true
+  trigger: "session_end"
+  similarity_threshold: 0.85
+  min_memories_for_consolidation: 10
+  preserve_priority: "high"
+
+# Integration with Claude Code
+claude_code:
+  enabled: true
+  api_version: "2024-01"
+  hooks_endpoint: ".claude/skills/memory/src/hooks.py"
+  initialization: |
+    from .claude.skills.memory.src.hooks import MemoryHooks
+    hooks = MemoryHooks()
+
+# Integration with Codex
+codex:
+  enabled: true
+  skill_path: ".codex/skills/memory"
+  hooks_module: "memory.hooks"
+  initialization: |
+    from memory.hooks import MemoryHooks
+    hooks = MemoryHooks()
+
+# Logging
+logging:
+  enabled: true
+  level: "INFO"
+  log_file: ".diverga/memory/hooks.log"
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Error Handling
+error_handling:
+  fail_silently: false
+  fallback_to_manual: true
+  notify_on_error: true

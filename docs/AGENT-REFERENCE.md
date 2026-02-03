@@ -1,6 +1,6 @@
-# Diverga Agent Reference (v6.0.1)
+# Diverga Agent Reference (v6.5)
 
-## Complete Agent Registry (33 Agents in 8 Categories)
+## Complete Agent Registry (44 Agents in 9 Categories)
 
 | ID | Agent | Category | Model | Checkpoint |
 |----|-------|----------|-------|------------|
@@ -37,6 +37,10 @@
 | G4 | preregistration-composer | Communication | Sonnet | 🟠 CP_PREREGISTRATION_APPROVAL |
 | H1 | ethnographic-research-advisor | Specialized | Opus | 🔴 CP_METHODOLOGY_APPROVAL |
 | H2 | action-research-facilitator | Specialized | Opus | 🔴 CP_METHODOLOGY_APPROVAL |
+| I0 | scholar-agent-orchestrator | Systematic Review | Opus | 🟡 SCH_PRISMA_GENERATION |
+| I1 | paper-retrieval-agent | Systematic Review | Sonnet | 🔴 SCH_DATABASE_SELECTION |
+| I2 | screening-assistant | Systematic Review | Sonnet | 🔴 SCH_SCREENING_CRITERIA |
+| I3 | rag-builder | Systematic Review | Haiku | 🟠 SCH_RAG_READINESS |
 
 ---
 
@@ -672,8 +676,114 @@ F2 (Mixed Methods Standards) → G1 (Journal)
 
 ---
 
+## Category I: Systematic Review Automation (4 Agents)
+
+ScholaRAG integration for PRISMA 2020 systematic literature review automation.
+
+### I0. Scholar Agent Orchestrator 🎼
+
+**Purpose**: Orchestrate complete ScholaRAG 7-stage PRISMA pipeline
+
+**Trigger Keywords**: systematic review, literature review automation, ScholaRAG, PRISMA pipeline
+
+**Core Functions**:
+- Coordinate I1→I2→I3 agent sequence
+- Manage human checkpoints at critical decisions
+- Execute ScholaRAG scripts automatically
+
+**Checkpoint**: 🟡 SCH_PRISMA_GENERATION (Optional)
+
+---
+
+### I1. Paper Retrieval Agent 📥
+
+**Purpose**: Multi-database paper retrieval with deduplication
+
+**Trigger Keywords**: fetch papers, Semantic Scholar, OpenAlex, arXiv, database search
+
+**Core Functions**:
+- Semantic Scholar API (40% open access PDFs)
+- OpenAlex API (50% open access)
+- arXiv API (100% PDF access)
+- DOI/title-based deduplication
+
+**Scripts Executed**:
+- `scripts/01_fetch_papers.py`
+- `scripts/02_deduplicate.py`
+
+**Checkpoint**: 🔴 SCH_DATABASE_SELECTION (Required)
+
+---
+
+### I2. Screening Assistant 🔬
+
+**Purpose**: AI-assisted PRISMA 6-dimension screening
+
+**Trigger Keywords**: screen papers, PRISMA screening, inclusion criteria, relevance
+
+**Core Functions**:
+- 6-dimension relevance scoring
+- Groq LLM integration (100x cost reduction)
+- knowledge_repository mode: 50% threshold → 5K-15K papers
+- systematic_review mode: 90% threshold → 50-300 papers
+
+**Scripts Executed**:
+- `scripts/03_screen_papers.py`
+
+**Checkpoint**: 🔴 SCH_SCREENING_CRITERIA (Required)
+
+---
+
+### I3. RAG Builder 🧱
+
+**Purpose**: Build vector database for literature synthesis
+
+**Trigger Keywords**: build RAG, ChromaDB, PDF embeddings, vector database
+
+**Core Functions**:
+- PDF download with retry logic
+- Local embeddings (all-MiniLM-L6-v2) - $0 cost
+- ChromaDB vector store
+- Token-based chunking (500 tokens)
+
+**Scripts Executed**:
+- `scripts/04_download_pdfs.py`
+- `scripts/05_build_rag.py`
+
+**Checkpoint**: 🟠 SCH_RAG_READINESS (Recommended)
+
+---
+
+## Systematic Review Workflow
+
+```
+I0 (Orchestrator)
+    │
+    ├── 🔴 SCH_DATABASE_SELECTION
+    │       ↓
+    │   I1 (Paper Retrieval)
+    │       → 01_fetch_papers.py
+    │       → 02_deduplicate.py
+    │
+    ├── 🔴 SCH_SCREENING_CRITERIA
+    │       ↓
+    │   I2 (Screening Assistant)
+    │       → 03_screen_papers.py
+    │
+    ├── 🟠 SCH_RAG_READINESS
+    │       ↓
+    │   I3 (RAG Builder)
+    │       → 04_download_pdfs.py
+    │       → 05_build_rag.py
+    │
+    └── 🟡 SCH_PRISMA_GENERATION
+            → 07_generate_prisma.py
+```
+
+---
+
 ## Version Information
 
-- **Version**: 6.0.1
-- **Last Updated**: 2026-01-25
+- **Version**: 6.5
+- **Last Updated**: 2026-01-30
 - **Repository**: https://github.com/HosungYou/Diverga

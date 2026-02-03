@@ -1,13 +1,13 @@
 # AGENTS.md
 
-> AI-readable documentation for Diverga v6.0.1 (Human-Centered Edition)
+> AI-readable documentation for Diverga v6.7.0 (Systematic Review Automation Edition)
 
 ## Project Overview
 
 **Diverga** is a Claude Code Skills-based AI research assistant system that breaks free from mode collapse through **Verbalized Sampling (VS) methodology**. It provides context-persistent support for the complete research lifecycle with a focus on **creative, defensible research choices** while ensuring **human decisions remain with humans**.
 
-**Version**: 6.0.1 (Human-Centered Edition)
-**Generated**: 2026-01-25
+**Version**: 6.7.0 (Systematic Review Automation Edition)
+**Generated**: 2026-01-31
 **Repository**: https://github.com/HosungYou/Diverga
 
 ---
@@ -32,8 +32,8 @@
 | **Iron Law** | "agent OR checkpoint" | ❌ REMOVED |
 | **OMC Autonomous Modes** | ralph/ultrawork/ecomode | ❌ REMOVED |
 | **Human Checkpoints** | Could be bypassed | ✅ MANDATORY |
-| **Agent Naming** | Numbered (01-21) | ✅ Category-based (A1-H2) |
-| **Agent Count** | 27 agents | ✅ 33 agents |
+| **Agent Naming** | Numbered (01-21) | ✅ Category-based (A1-I3) |
+| **Agent Count** | 27 agents | ✅ 44 agents (v6.7.0) |
 | **State Location** | `.omc/` | ✅ `.claude/` |
 
 ---
@@ -133,11 +133,11 @@ Location: `.claude/state/checkpoints.json`
 
 ---
 
-## Agent Registry (v6.0.1)
+## Agent Registry (v6.7.0)
 
-### 33 Specialized Research Agents in 8 Categories
+### 44 Specialized Research Agents in 9 Categories
 
-Diverga v6.0.1 uses **category-based naming** (A1-H2) for all agents, organized into 8 functional categories.
+Diverga v6.7.0 uses **category-based naming** (A1-I3) for all agents, organized into 9 functional categories.
 
 ---
 
@@ -158,9 +158,9 @@ Establishes theoretical and ethical foundations for research projects.
 
 ---
 
-### Category B: Evidence (4 agents)
+### Category B: Evidence (5 agents)
 
-Systematic evidence gathering, synthesis, and quality appraisal.
+Systematic evidence gathering, synthesis, quality appraisal, and parallel document processing.
 
 | ID | Agent | Purpose | Tier | Model |
 |----|-------|---------|------|-------|
@@ -168,8 +168,9 @@ Systematic evidence gathering, synthesis, and quality appraisal.
 | B2 | evidence-quality-appraiser | Risk of Bias (RoB), GRADE assessment | MEDIUM | sonnet |
 | B3 | effect-size-extractor | Calculate/convert effect sizes | LOW | haiku |
 | B4 | research-radar | Monitor new publications, trend alerts | LOW | haiku |
+| **B5** | **parallel-document-processor** | **High-throughput PDF/document reading with distributed workload** | **HIGH** | **opus** |
 
-**Paradigm Coverage**: Quantitative (B3), Qualitative (B1 meta-synthesis), Mixed (all)
+**Paradigm Coverage**: Quantitative (B3), Qualitative (B1 meta-synthesis), Mixed (all), **Document Processing (B5)**
 
 ---
 
@@ -261,9 +262,9 @@ Paradigm-appropriate analytical strategies and implementation.
 
 ---
 
-### Category F: Quality (4 agents)
+### Category F: Quality (5 agents)
 
-Methodological rigor, reproducibility, and bias mitigation.
+Methodological rigor, reproducibility, bias mitigation, and humanization verification.
 
 | ID | Agent | Purpose | Tier | Model |
 |----|-------|---------|------|-------|
@@ -271,14 +272,15 @@ Methodological rigor, reproducibility, and bias mitigation.
 | F2 | checklist-manager | PRISMA, CONSORT, COREQ standards | LOW | haiku |
 | F3 | reproducibility-auditor | Open Science Framework (OSF) | MEDIUM | sonnet |
 | F4 | bias-trustworthiness-detector | Bias detection, trustworthiness | MEDIUM | sonnet |
+| **F5** | **humanization-verifier** | **Verify transformation integrity, citation/statistics preservation** | **LOW** | **haiku** |
 
-**Paradigm Coverage**: All paradigms (F4 adapts to paradigm)
+**Paradigm Coverage**: All paradigms (F4 adapts to paradigm), **Humanization (F5)**
 
 ---
 
-### Category G: Communication (4 agents)
+### Category G: Communication (6 agents)
 
-Academic writing, dissemination, and peer review response.
+Academic writing, dissemination, peer review response, and humanization pipeline.
 
 | ID | Agent | Purpose | Tier | Model | Checkpoint |
 |----|-------|---------|------|-------|------------|
@@ -286,8 +288,10 @@ Academic writing, dissemination, and peer review response.
 | G2 | academic-communicator | Plain language, audience adaptation | MEDIUM | sonnet | - |
 | G3 | peer-review-strategist | Response to reviewers, rebuttals | HIGH | opus | 🟠 CP_RESPONSE_APPROVAL |
 | G4 | preregistration-composer | OSF, AsPredicted registration | MEDIUM | sonnet | 🟠 CP_PREREGISTRATION_APPROVAL |
+| **G5** | **academic-style-auditor** | **AI pattern detection (24 categories), probability scoring** | **MEDIUM** | **sonnet** | 🟠 CP_HUMANIZATION_REVIEW |
+| **G6** | **academic-style-humanizer** | **Transform AI patterns to natural academic prose** | **HIGH** | **opus** | 🟡 CP_HUMANIZATION_VERIFY |
 
-**Paradigm Coverage**: All paradigms
+**Paradigm Coverage**: All paradigms, **Humanization Pipeline (G5 → G6 → F5)**
 
 ---
 
@@ -304,13 +308,76 @@ Advanced qualitative and participatory research methodologies.
 
 ---
 
-## Model Routing (v6.0.1)
+### Category I: Systematic Review Automation (4 agents) - NEW v6.5
+
+ScholaRAG integration for automated PRISMA 2020 systematic literature reviews.
+
+| ID | Agent | Purpose | Tier | Model | Checkpoint |
+|----|-------|---------|------|-------|------------|
+| **I0** | **scholar-agent-orchestrator** | **Pipeline coordination, checkpoint management** | **HIGH** | **opus** | **🔴 All SCH_* checkpoints** |
+| I1 | paper-retrieval-agent | Multi-database paper fetching (SS, OA, arXiv) | MEDIUM | sonnet | 🔴 SCH_DATABASE_SELECTION |
+| I2 | screening-assistant | AI-PRISMA 6-dimension screening (Groq LLM) | MEDIUM | sonnet | 🔴 SCH_SCREENING_CRITERIA |
+| I3 | rag-builder | Vector database construction (local, $0 cost) | LOW | haiku | 🟠 SCH_RAG_READINESS |
+
+**Paradigm Coverage**: Systematic Review, Meta-Analysis
+
+#### Category I ScholaRAG System (v6.5 New)
+
+Integrates ScholaRAG systematic review automation into Diverga:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│           CATEGORY I: SCHOLARAG INTEGRATION                  │
+├─────────────────────────────────────────────────────────────┤
+│ I0-ScholarAgentOrchestrator (Conductor - DECISION AUTHORITY)│
+│   └─ Pipeline coordination (7 stages)                       │
+│   └─ Checkpoint enforcement (4 checkpoints)                 │
+│   └─ Cost optimization (Groq → 100x cheaper)               │
+│                                                             │
+│ I1-PaperRetrievalAgent (Service Provider)                   │
+│   └─ Semantic Scholar, OpenAlex, arXiv                      │
+│   └─ Scopus, Web of Science (institutional)                 │
+│   └─ Rate limiting, deduplication                           │
+│                                                             │
+│ I2-ScreeningAssistant (Service Provider)                    │
+│   └─ AI-PRISMA 6-dimension scoring                          │
+│   └─ Groq LLM (100x cheaper than Claude)                    │
+│   └─ knowledge_repository (50%) / systematic_review (90%)   │
+│                                                             │
+│ I3-RAGBuilder (Service Provider)                            │
+│   └─ PDF download with retry                                │
+│   └─ Token-based chunking (tiktoken)                        │
+│   └─ Local embeddings + ChromaDB ($0 cost)                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**New Checkpoints**:
+| Checkpoint | Level | When |
+|------------|-------|------|
+| `SCH_DATABASE_SELECTION` | 🔴 | Database choice before retrieval |
+| `SCH_SCREENING_CRITERIA` | 🔴 | PRISMA criteria before screening |
+| `SCH_RAG_READINESS` | 🟠 | RAG system ready for queries |
+| `SCH_PRISMA_GENERATION` | 🟡 | PRISMA diagram generation |
+
+**Cost Optimization**:
+| Task | Provider | Cost/100 papers |
+|------|----------|-----------------|
+| Screening | Groq (llama-3.3-70b) | $0.01 |
+| RAG Queries | Groq | $0.02 |
+| Embeddings | Local (MiniLM) | $0 |
+| **Total 500-paper review** | **Mixed** | **~$0.07** |
+
+---
+
+## Model Routing (v6.7.0)
 
 | Tier | Model | Count | Agents |
 |------|-------|-------|--------|
-| HIGH | Opus | 14 | A1, A2, A3, A5, C1, C2, C3, D4, E1, E2, E3, G3, H1, H2 |
-| MEDIUM | Sonnet | 13 | A4, A6, B1, B2, C4, D1, D2, E5, F3, F4, G1, G2, G4 |
-| LOW | Haiku | 6 | B3, B4, D3, E4, F1, F2 |
+| HIGH | Opus | 17 | A1, A2, A3, A5, **B5**, C1, C2, C3, **C5**, D4, E1, E2, E3, G3, **G6**, H1, H2, **I0** |
+| MEDIUM | Sonnet | 18 | A4, A6, B1, B2, C4, **C6**, **C7**, D1, D2, E5, F3, F4, G1, G2, G4, **G5**, **I1**, **I2** |
+| LOW | Haiku | 9 | B3, B4, D3, E4, F1, F2, **F5**, **I3** |
+
+**Total: 44 agents** (40 core + 4 Category I)
 
 ### Temperature Settings by Category
 
@@ -554,6 +621,7 @@ project:
 | quality appraisal, RoB, GRADE | 질 평가, 편향 위험 | B2 |
 | effect size, Cohen's d | 효과크기 | B3 |
 | publication alerts, trends | 출판 알림, 동향 | B4 |
+| **batch PDF, parallel processing, multiple PDFs** | **PDF 일괄 처리, 병렬 처리** | **B5** |
 
 ### Category C: Design
 
@@ -591,6 +659,7 @@ project:
 | CONSORT, COREQ, checklist | 체크리스트, 보고 기준 | F2 |
 | reproducibility, OSF | 재현성, 오픈사이언스 | F3 |
 | bias, trustworthiness | 편향, 신뢰성 | F4 |
+| **humanization verify, AI text check** | **휴먼화 검증, AI 텍스트 확인** | **F5** |
 
 ### Category G: Communication
 
@@ -600,6 +669,8 @@ project:
 | plain language, infographic | 쉬운 언어 | G2 |
 | reviewer, peer review | 리뷰어, 동료평가 | G3 |
 | pre-registration, OSF | 사전등록 | G4 |
+| **AI pattern, check AI writing, style audit** | **AI 패턴, AI 글쓰기 검토** | **G5** |
+| **humanize, humanization, natural writing** | **휴먼화, 자연스러운 글쓰기** | **G6** |
 
 ### Category H: Specialized
 
@@ -607,6 +678,15 @@ project:
 |----------|--------|-------|
 | ethnography, fieldwork | 민족지학, 현장연구 | H1 |
 | action research, PAR, CBPR | 실행연구, 참여적 연구 | H2 |
+
+### Category I: Systematic Review Automation (NEW v6.5+)
+
+| Keywords | Korean | Agent |
+|----------|--------|-------|
+| systematic review, PRISMA, ScholaRAG | 체계적 문헌고찰, 프리즈마, 스콜라랙 | I0 |
+| fetch papers, retrieve papers, database search | 논문 수집, 데이터베이스 검색 | I1 |
+| screen papers, inclusion criteria, AI screening | 논문 스크리닝, 포함 기준 | I2 |
+| build RAG, vector database, PDF download | RAG 구축, PDF 다운로드 | I3 |
 
 ---
 
@@ -625,11 +705,16 @@ project:
 
 ## Version History
 
-- **v6.0.1**: Agent restructuring - 33 agents with category-based naming (A1-H2)
+- **v6.7.0**: Systematic Review Automation - Category I enhanced, 44 total agents, all documentation synced
+- **v6.5.0**: ScholaRAG Integration - Category I agents (I0-I3), Groq LLM support
+- **v6.3.0**: Meta-Analysis Agent System (C5/C6/C7) - Multi-gate validation, Hedges' g calculation
+- **v6.2.0**: Parallel Document Processing (B5) - High-throughput PDF processing
+- **v6.1.0**: Humanization Pipeline (G5/G6/F5) - AI pattern detection and transformation
+- **v6.0.1**: Agent restructuring - Category-based naming (A1-H2)
 - **v6.0.0**: Clean Slate - Removed Sisyphus/OMC modes, mandatory checkpoints
 - **v5.0.0**: Sisyphus protocol, paradigm detection, 27 agents
 - **v4.0.0**: Context persistence, pipeline templates
 
 ---
 
-*This file enables AI assistants to understand Diverga v6.0.1's architecture and operate effectively within its human-centered design.*
+*This file enables AI assistants to understand Diverga v6.7.0's architecture and operate effectively within its human-centered design.*

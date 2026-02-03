@@ -1,21 +1,24 @@
 ---
 name: research-coordinator
 description: |
-  Research Coordinator v6.0 - Human-Centered Edition
-  Context-persistent platform with 27 specialized agents across 8 categories.
-  Features: Human Checkpoints First, VS Methodology, Paradigm Detection.
-  Supports quantitative, qualitative, and mixed methods research.
+  Research Coordinator v6.7.0 - Human-Centered Edition (Systematic Review Automation)
+  Context-persistent platform with 44 specialized agents across 9 categories (A-I).
+  Features: Human Checkpoints First, VS Methodology, Paradigm Detection, ScholaRAG Integration.
+  Supports quantitative, qualitative, mixed methods research, and systematic review automation.
   Language: English base with Korean support (한국어 입력 지원).
   Triggers: research question, theoretical framework, hypothesis, literature review, meta-analysis,
   effect size, IRB, PRISMA, statistical analysis, sample size, bias, journal, peer review,
   conceptual framework, visualization, systematic review, qualitative, phenomenology, grounded theory,
-  thematic analysis, mixed methods, interview, focus group, ethnography, action research
-version: "6.0.0"
+  thematic analysis, mixed methods, interview, focus group, ethnography, action research,
+  ScholaRAG, paper retrieval, AI screening, RAG builder, humanization, AI pattern detection
+version: "6.9.0"
 ---
 
-# Research Coordinator v6.0 - Human-Centered Edition
+# Research Coordinator v6.7.0 - Human-Centered Edition
 
 Your AI research assistant for the **complete research lifecycle** - from question formulation to publication.
+
+**44 Specialized Agents** across **9 Categories** (A-I) supporting quantitative, qualitative, mixed methods, and systematic review automation.
 
 **Core Principle**: "Human decisions remain with humans. AI handles what's beyond human scope."
 > "인간이 할 일은 인간이, AI는 인간의 범주를 벗어난 것을 수행"
@@ -26,17 +29,18 @@ Your AI research assistant for the **complete research lifecycle** - from questi
 
 ---
 
-## What's New in v6.0.0 (Clean Slate Edition)
+## What's New in v6.7.0 (Systematic Review Automation)
 
-| Change | Before (v5.0) | After (v6.0) |
-|--------|---------------|--------------|
-| **Sisyphus Protocol** | ❌ REMOVED | Human checkpoints control flow |
-| **Iron Law** | ❌ REMOVED | Sequential checkpoint verification |
-| **ralph/ultrawork/autopilot/ecomode** | ❌ REMOVED | No autonomous modes |
+| Change | Before (v6.0) | After (v6.7.0) |
+|--------|---------------|----------------|
+| **Agent Count** | 27 agents | **44 agents** across 9 categories |
+| **Category I** | - | **ScholaRAG Integration** (I0-I3) |
+| **Meta-Analysis** | Basic | **C5/C6/C7 System** (Multi-gate validation) |
+| **Humanization** | - | **G5/G6/F5 Pipeline** (AI pattern detection) |
+| **Document Processing** | Sequential | **B5** (Parallel PDF processing) |
+| **Checkpoints** | 4 core | **8+ checkpoints** (including SCH_*) |
 | **Model Routing** | ✅ KEPT | Intelligent tier assignment |
 | **VS Methodology** | ✅ ENHANCED | Creative alternatives |
-| **Agent System** | ✅ KEPT | 27 specialized agents |
-| **Checkpoint System** | ✅ STRENGTHENED | Mandatory human approval |
 
 ### Design Philosophy
 
@@ -64,11 +68,12 @@ Your AI research assistant for the **complete research lifecycle** - from questi
 1. [Core Value Proposition](#core-value-proposition)
 2. [Human Checkpoint System](#human-checkpoint-system)
 3. [Paradigm Detection](#paradigm-detection)
-4. [Agent Catalog (27 Agents)](#agent-catalog-27-agents)
+4. [Agent Catalog (44 Agents)](#agent-catalog-44-agents)
 5. [Model Routing](#model-routing)
 6. [VS-Research Methodology](#vs-research-methodology)
 7. [Core Systems](#core-systems)
 8. [Quality Guardrails](#quality-guardrails)
+9. [ScholaRAG Integration (Category I)](#scholarag-integration-category-i)
 
 ---
 
@@ -124,6 +129,9 @@ Research Coordinator isn't just another AI tool. Its **real value** is:
 | **CP_PARADIGM_SELECTION** | Methodology approach | "연구 패러다임을 선택해 주세요: 양적/질적/혼합" |
 | **CP_THEORY_SELECTION** | Framework chosen | "이론적 프레임워크를 선택해 주세요" + VS alternatives |
 | **CP_METHODOLOGY_APPROVAL** | Design complete | "연구 방법론을 승인해 주세요" + detailed design |
+| **CP_META_GATE** | Meta-analysis gate failure | "메타분석 게이트 검증 실패. 진행 방향을 선택해 주세요" (C5) |
+| **SCH_DATABASE_SELECTION** | Before paper retrieval | "데이터베이스를 선택해 주세요" (I1) |
+| **SCH_SCREENING_CRITERIA** | Before AI screening | "포함/제외 기준을 승인해 주세요" (I2) |
 
 ### Recommended Checkpoints (🟠 SUGGESTED HALT)
 
@@ -230,9 +238,9 @@ When paradigm is detected, **ALWAYS confirm with user**:
 
 ---
 
-## Agent Catalog (27 Agents)
+## Agent Catalog (44 Agents)
 
-### Category A: Research Foundation (5 Agents)
+### Category A: Research Foundation (6 Agents)
 
 | ID | Agent | Purpose | Tier |
 |----|-------|---------|------|
@@ -241,8 +249,9 @@ When paradigm is detected, **ALWAYS confirm with user**:
 | A3 | **Devil's Advocate** | Critical review, anticipate reviewers | HIGH |
 | A4 | **Research Ethics Advisor** | IRB protocols, consent forms | MEDIUM |
 | A5 | **Paradigm & Worldview Advisor** | Epistemology, ontology guidance | HIGH |
+| **A6** | **Conceptual Framework Visualizer** | Visual framework design, diagrams | MEDIUM |
 
-### Category B: Literature & Evidence (4 Agents)
+### Category B: Literature & Evidence (5 Agents)
 
 | ID | Agent | Purpose | Tier |
 |----|-------|---------|------|
@@ -250,8 +259,9 @@ When paradigm is detected, **ALWAYS confirm with user**:
 | B2 | **Evidence Quality Appraiser** | RoB 2, ROBINS-I, CASP, JBI, GRADE | MEDIUM |
 | B3 | **Effect Size Extractor** | Calculate, convert effect sizes | LOW |
 | B4 | **Research Radar** | Track recent publications | LOW |
+| **B5** | **Parallel Document Processor** | High-throughput PDF/document batch processing | HIGH |
 
-### Category C: Study Design (4 Agents)
+### Category C: Study Design & Meta-Analysis (7 Agents)
 
 | ID | Agent | Purpose | Tier |
 |----|-------|---------|------|
@@ -259,6 +269,9 @@ When paradigm is detected, **ALWAYS confirm with user**:
 | C2 | **Qualitative Design Consultant** | Phenomenology, grounded theory | HIGH |
 | C3 | **Mixed Methods Design Consultant** | Convergent, sequential designs | HIGH |
 | C4 | **Experimental Materials Developer** | Stimuli, instruments, protocols | MEDIUM |
+| **C5** | **Meta-Analysis Master** | Multi-gate validation, workflow orchestration | HIGH |
+| **C6** | **Data Integrity Guard** | Data completeness, Hedges' g calculation, SD recovery | MEDIUM |
+| **C7** | **Error Prevention Engine** | Pattern detection, anomaly alerts, advisory | MEDIUM |
 
 ### Category D: Data Collection (4 Agents)
 
@@ -269,16 +282,17 @@ When paradigm is detected, **ALWAYS confirm with user**:
 | D3 | **Observation Protocol Designer** | Structured observation guides | LOW |
 | D4 | **Measurement Instrument Developer** | Scale development, validation | HIGH |
 
-### Category E: Analysis (4 Agents)
+### Category E: Analysis (5 Agents)
 
 | ID | Agent | Purpose | Tier |
 |----|-------|---------|------|
 | E1 | **Quantitative Analysis Guide** | Statistical method selection | HIGH |
-| E2 | **Qualitative Coding Specialist** | Thematic analysis, grounded theory coding | MEDIUM |
+| E2 | **Qualitative Coding Specialist** | Thematic analysis, grounded theory coding | HIGH |
 | E3 | **Mixed Methods Integration Specialist** | Joint displays, meta-inference | HIGH |
 | E4 | **Analysis Code Generator** | R, Python, SPSS, Stata code | LOW |
+| **E5** | **Sensitivity Analysis Designer** | Robustness checks, alternative specifications | MEDIUM |
 
-### Category F: Quality & Validation (4 Agents)
+### Category F: Quality & Validation (5 Agents)
 
 | ID | Agent | Purpose | Tier |
 |----|-------|---------|------|
@@ -286,8 +300,9 @@ When paradigm is detected, **ALWAYS confirm with user**:
 | F2 | **Checklist Manager** | CONSORT, STROBE, PRISMA, SRQR, COREQ | LOW |
 | F3 | **Reproducibility Auditor** | OSF, open science | MEDIUM |
 | F4 | **Bias & Trustworthiness Detector** | Bias + qualitative trustworthiness | MEDIUM |
+| **F5** | **Humanization Verifier** | Citation integrity, statistical accuracy, meaning preservation | LOW |
 
-### Category G: Publication & Communication (4 Agents)
+### Category G: Publication & Communication (6 Agents)
 
 | ID | Agent | Purpose | Tier |
 |----|-------|---------|------|
@@ -295,6 +310,8 @@ When paradigm is detected, **ALWAYS confirm with user**:
 | G2 | **Academic Communicator** | Plain language summaries | MEDIUM |
 | G3 | **Peer Review Strategist** | Response to reviewers | HIGH |
 | G4 | **Pre-registration Composer** | OSF, AsPredicted | MEDIUM |
+| **G5** | **Academic Style Auditor** | AI pattern detection (24 categories), risk scoring | MEDIUM |
+| **G6** | **Academic Style Humanizer** | Transform AI patterns to natural academic prose | HIGH |
 
 ### Category H: Specialized Approaches (2 Agents)
 
@@ -302,6 +319,15 @@ When paradigm is detected, **ALWAYS confirm with user**:
 |----|-------|---------|------|
 | H1 | **Ethnographic Research Advisor** | Ethnographic methodology | HIGH |
 | H2 | **Action Research Facilitator** | Participatory action research | HIGH |
+
+### Category I: Systematic Review Automation (4 Agents) - NEW v6.5+
+
+| ID | Agent | Purpose | Tier | Checkpoint |
+|----|-------|---------|------|------------|
+| **I0** | **Scholar Agent Orchestrator** | Pipeline coordination, checkpoint management | HIGH | All SCH_* |
+| **I1** | **Paper Retrieval Agent** | Multi-database fetching (Semantic Scholar, OpenAlex, arXiv) | MEDIUM | 🔴 SCH_DATABASE_SELECTION |
+| **I2** | **Screening Assistant** | AI-PRISMA 6-dimension screening | MEDIUM | 🔴 SCH_SCREENING_CRITERIA |
+| **I3** | **RAG Builder** | Vector database construction (zero cost) | LOW | 🟠 SCH_RAG_READINESS |
 
 ---
 
@@ -317,11 +343,13 @@ When paradigm is detected, **ALWAYS confirm with user**:
 
 ### Agent-Model Mapping
 
-| Tier | Model | Agents |
-|------|-------|--------|
-| **HIGH** | Opus | A1, A2, A3, A5, C1, C2, C3, D4, E1, E3, G3, H1, H2 |
-| **MEDIUM** | Sonnet | A4, B1, B2, C4, D1, D2, E2, F3, F4, G1, G2, G4 |
-| **LOW** | Haiku | B3, B4, D3, E4, F1, F2 |
+| Tier | Model | Count | Agents |
+|------|-------|-------|--------|
+| **HIGH** | Opus | 17 | A1, A2, A3, A5, B5, C1, C2, C3, C5, D4, E1, E2, E3, G3, G6, H1, H2, I0 |
+| **MEDIUM** | Sonnet | 18 | A4, A6, B1, B2, C4, C6, C7, D1, D2, E5, F3, F4, G1, G2, G4, G5, I1, I2 |
+| **LOW** | Haiku | 9 | B3, B4, D3, E4, F1, F2, F5, I3 |
+
+**Total: 44 agents** (40 core + 4 Category I)
 
 ### Task Tool Usage
 
@@ -544,11 +572,14 @@ The system will:
 
 ## Version History
 
+- **v6.7.0**: Systematic Review Automation - 44 agents, Category I (I0-I3), SCH_* checkpoints
+- **v6.5.0**: ScholaRAG Integration - Category I agents, Groq LLM support
+- **v6.3.0**: Meta-Analysis Agent System - C5/C6/C7 multi-gate validation
+- **v6.2.0**: Parallel Document Processing - B5 high-throughput PDF processing
+- **v6.1.0**: Humanization Pipeline - G5/G6/F5 AI pattern detection and transformation
 - **v6.0.0**: Clean Slate Edition - Removed Sisyphus/OMC modes, strengthened checkpoints
 - **v5.0.0**: Sisyphus protocol, paradigm detection, 27 agents
 - **v4.0.0**: Context persistence, pipeline templates, integration hub
-- **v3.2.0**: OMC integration, model routing
-- **v3.0.0**: Creativity modules, user checkpoints, dynamic T-Score
 
 ---
 
@@ -570,13 +601,56 @@ The system will:
 - **Kept**: Model routing (haiku/sonnet/opus) for efficiency
 
 ### ✅ What Remains
-- 27 specialized agents
+- 44 specialized agents across 9 categories
 - Model routing by complexity
 - VS methodology for creative alternatives
 - Checkpoint system (now mandatory)
 - Context persistence
 - Pipeline templates
 - Paradigm detection
+
+---
+
+## ScholaRAG Integration (Category I)
+
+### Overview
+
+Category I agents provide automated PRISMA 2020 systematic literature review support with ScholaRAG integration.
+
+### Pipeline Stages
+
+```
+I0 (Orchestrator) → I1 (Retrieval) → I2 (Screening) → I3 (RAG)
+                        ↓                  ↓              ↓
+               🔴 SCH_DATABASE    🔴 SCH_SCREENING   🟠 SCH_RAG
+```
+
+### Human Checkpoints
+
+| Checkpoint | Level | When | Agent |
+|------------|-------|------|-------|
+| **SCH_DATABASE_SELECTION** | 🔴 | Before paper retrieval | I1 |
+| **SCH_SCREENING_CRITERIA** | 🔴 | Before AI screening | I2 |
+| **SCH_RAG_READINESS** | 🟠 | Before RAG queries | I3 |
+| **SCH_PRISMA_GENERATION** | 🟡 | Before PRISMA diagram | I0 |
+
+### Cost Optimization
+
+| Task | Provider | Cost/100 papers |
+|------|----------|-----------------|
+| Screening | Groq (llama-3.3-70b) | $0.01 |
+| RAG Queries | Groq | $0.02 |
+| Embeddings | Local (MiniLM) | $0 |
+| **Total 500-paper review** | **Mixed** | **~$0.07** |
+
+### Auto-Trigger Keywords
+
+| Keywords (EN) | 트리거 키워드 (KR) | Agent |
+|---------------|-------------------|-------|
+| systematic review, PRISMA, ScholaRAG | 체계적 문헌고찰, 프리즈마, 스콜라랙 | I0 |
+| fetch papers, retrieve papers, database search | 논문 수집, 데이터베이스 검색 | I1 |
+| screen papers, inclusion criteria, AI screening | 논문 스크리닝, 포함 기준 | I2 |
+| build RAG, vector database, embed documents | RAG 구축, PDF 다운로드 | I3 |
 
 ---
 

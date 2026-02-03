@@ -1,16 +1,24 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "diverga",
-  "description": "40 specialized AI research agents with VS methodology - Human-centered checkpoints, creative alternatives, parallel execution",
+  "description": "44 specialized AI research agents with VS methodology - Human-centered checkpoints, creative alternatives, parallel execution",
   "owner": {
     "name": "Hosung You",
-    "github": "HosungYou"
+    "email": "hosung.you@example.com"
   },
   "plugins": [
     {
       "name": "diverga",
-      "description": "Complete research agent suite v6.5: 40 specialized agents (A1-H2) across 8 categories with VS methodology, human checkpoints, meta-analysis system, and parallel execution via Task(subagent_type='diverga:a1').",
-      "source": "./"
+      "description": "Complete research agent suite: 44 specialized agents (A1-I3) across 9 categories with VS methodology, human checkpoints, meta-analysis system, and parallel execution.",
+      "version": "6.9.0",
+      "author": {
+        "name": "Hosung You",
+        "email": "hosung.you@example.com"
+      },
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/HosungYou/Diverga",
+      "tags": ["research", "agents", "meta-analysis", "systematic-review", "academic"]
     }
   ]
 }

@@ -1,0 +1,188 @@
+=== SESSION METADATA ===
+CLI: Claude Code
+Model: claude-opus-4-5-20251101
+Working Directory: /Volumes/External SSD/Projects/Diverga
+Timestamp: 2026-01-30T21:15:00+09:00
+Test ID: QUANT-007
+Test Purpose: Meta-analysis systematic review - Category I + C5 integration
+
+=== USER INPUT ===
+AI 학습 도우미(chatbots/tutors)가 외국어 말하기 능력에 미치는 효과에 대한
+체계적 문헌고찰과 메타분석을 수행하려고 합니다.
+
+PRISMA 2020 가이드라인에 따라 진행해 주세요.
+
+현재 가지고 있는 정보:
+- 연구 주제: AI chatbots for speaking skills in language learning
+- 예상 논문 수: 약 50-100편
+- 효과크기: Cohen's d, Hedges' g, 상관계수 r 혼재
+- 데이터베이스: Semantic Scholar, OpenAlex, arXiv 사용 예정
+
+=== TOOL CALL ===
+Tool: Task
+Parameters:
+  subagent_type: "diverga:i0"
+  model: "opus"
+  description: "QUANT-007: Meta-analysis systematic review test"
+  prompt: |
+    AI 학습 도우미(chatbots/tutors)가 외국어 말하기 능력에 미치는 효과에 대한
+    체계적 문헌고찰과 메타분석을 수행하려고 합니다.
+
+    PRISMA 2020 가이드라인에 따라 진행해 주세요.
+
+    현재 가지고 있는 정보:
+    - 연구 주제: AI chatbots for speaking skills in language learning
+    - 예상 논문 수: 약 50-100편
+    - 효과크기: Cohen's d, Hedges' g, 상관계수 r 혼재
+    - 데이터베이스: Semantic Scholar, OpenAlex, arXiv 사용 예정
+
+    I0-ScholarAgentOrchestrator로서:
+    1. PRISMA 2020 파이프라인 단계를 설명해 주세요
+    2. 🔴 SCH_DATABASE_SELECTION 체크포인트를 표시해 주세요
+    3. VS T-Score 옵션을 제시해 주세요
+    4. 인간 승인을 기다려 주세요
+
+=== TOOL RESULT (diverga:i0) ===
+Agent ID: a2e92e9
+Agent Type: I0-ScholarAgentOrchestrator
+Model: opus
+
+# I0-ScholarAgentOrchestrator: 체계적 문헌고찰 파이프라인 시작
+
+AI 학습 도우미가 외국어 말하기 능력에 미치는 효과에 대한 체계적 문헌고찰과 메타분석을 시작하겠습니다.
+
+---
+
+## 1. PRISMA 2020 7단계 파이프라인 개요
+
+| 단계 | 명칭 | 설명 | 담당 에이전트 |
+|------|------|------|---------------|
+| **Stage 1** | Research Domain Setup | 연구 질문 정의, 프로젝트 초기화 | I0 (현재) |
+| **Stage 2** | Query Strategy | Boolean 검색 문자열 설계, 데이터베이스 선택 | I0 + I1 |
+| **Stage 3** | Paper Retrieval | 논문 검색 및 수집 | I1-paper-retrieval-agent |
+| **Stage 4** | Deduplication | 중복 논문 제거 (DOI, 제목 유사도) | 자동 스크립트 |
+| **Stage 5** | PRISMA Screening | AI 기반 포함/제외 기준 스크리닝 | I2-screening-assistant |
+| **Stage 6** | PDF Download + RAG | PDF 다운로드, 벡터 DB 구축 | I3-rag-builder |
+| **Stage 7** | Documentation | PRISMA 흐름도 생성, 최종 보고서 | I0 |
+
+---
+
+## 2. 프로젝트 유형 선택
+
+귀하의 연구 목적에 따라 두 가지 모드 중 선택해 주세요:
+
+| 항목 | systematic_review (권장) | knowledge_repository |
+|------|-------------------------|---------------------|
+| **목적** | 메타분석, 저널 출판 | 지식 탐색, 교육 자료 |
+| **신뢰도 임계값** | 90% (엄격) | 50% (관대) |
+| **예상 최종 논문 수** | 50-300편 | 5,000-15,000편 |
+| **적합성** | 귀하의 연구에 적합 | 광범위 탐색용 |
+
+**권장**: 메타분석 목적이므로 **systematic_review** 모드를 권장합니다.
+
+---
+
+## 3. 데이터베이스 선택 체크포인트
+
+```
+================================================================================
+                    CHECKPOINT: SCH_DATABASE_SELECTION
+                              LEVEL: REQUIRED
+================================================================================
+```
+
+### 사용 가능한 데이터베이스
+
+| 데이터베이스 | API 상태 | Open Access PDF | 특징 |
+|-------------|---------|-----------------|------|
+| **Semantic Scholar** | API 키 불필요 | ~40% | 인용 네트워크, AI/ML 강점 |
+| **OpenAlex** | API 키 불필요 | ~50% | 광범위 학제간 커버리지 |
+| **arXiv** | API 키 불필요 | 100% | 프리프린트, CS/물리 강점 |
+| Scopus | API 키 필요 (미설정) | 유료 구독 | 고품질, 접근 제한 |
+| Web of Science | API 키 필요 (미설정) | 유료 구독 | 피어리뷰 중심 |
+
+### 권장 조합
+
+귀하의 연구 주제 "AI chatbots for speaking skills in language learning"에 대해:
+
+**Option A: 3개 데이터베이스 (권장)**
+- Semantic Scholar + OpenAlex + arXiv
+- 예상 검색량: 800-1,500편
+- PDF 확보율: ~50-60%
+- 비용: 무료
+
+**Option B: 2개 데이터베이스 (간소화)**
+- Semantic Scholar + OpenAlex
+- 예상 검색량: 600-1,000편
+- PDF 확보율: ~45%
+- 비용: 무료
+
+---
+
+## 4. 효과크기 변환 전략
+
+메타분석을 위해 다양한 효과크기를 통합해야 합니다:
+
+| 원본 효과크기 | 변환 목표 | 변환 공식 |
+|--------------|----------|----------|
+| Cohen's d | Hedges' g | g = d * J (소표본 보정) |
+| 상관계수 r | Hedges' g | g = 2r / sqrt(1-r^2) |
+| Odds Ratio | Hedges' g | g = ln(OR) / 1.81 |
+
+**권장 최종 척도**: **Hedges' g** (소표본 보정, 메타분석 표준)
+
+---
+
+## 5. 예비 검색 쿼리 제안
+
+```
+("AI chatbot" OR "conversational agent" OR "intelligent tutor" OR
+ "virtual assistant" OR "dialogue system" OR "chatbot")
+AND
+("speaking" OR "oral" OR "pronunciation" OR "fluency" OR
+ "spoken language" OR "conversation")
+AND
+("language learning" OR "L2" OR "second language" OR "foreign language" OR
+ "ESL" OR "EFL" OR "CALL")
+```
+
+**연도 범위**: 2015-2024 (AI 기반 도구 확산 시점 이후)
+
+---
+
+## 승인 요청
+
+다음 항목에 대해 승인해 주세요:
+
+1. **프로젝트 유형**: systematic_review (90% 임계값)
+2. **데이터베이스**: Option A (Semantic Scholar + OpenAlex + arXiv)
+3. **효과크기 척도**: Hedges' g
+4. **검색 쿼리**: 위 Boolean 쿼리 사용
+5. **연도 범위**: 2015-2024
+
+---
+
+**승인 방법**:
+- 모두 승인: "승인" 또는 "proceed"
+- 수정 요청: 변경하고 싶은 항목을 말씀해 주세요
+
+승인 후 I1-paper-retrieval-agent를 통해 Stage 3 (Paper Retrieval)을 시작하겠습니다.
+
+=== VERIFICATION CHECKLIST ===
+[✓] Agent invoked: diverga:i0 (I0-ScholarAgentOrchestrator)
+[✓] Model tier: Opus (correct for I0)
+[✓] PRISMA 2020 pipeline displayed: 7 stages
+[✓] Checkpoint displayed: SCH_DATABASE_SELECTION (REQUIRED level)
+[✓] Database options presented: Semantic Scholar, OpenAlex, arXiv
+[✓] Effect size strategy: Hedges' g recommended
+[✓] Boolean query provided
+[✓] Behavioral halt: Waiting for user approval ("승인 후...")
+[✓] Korean language support: Full Korean response
+
+=== NOTES ===
+- Agent responded as I0-ScholarAgentOrchestrator correctly
+- Checkpoint SCH_DATABASE_SELECTION displayed with REQUIRED level
+- Two database options provided (Option A: 3 DBs, Option B: 2 DBs)
+- Effect size conversion strategy included (d/r → Hedges' g)
+- Behavioral halt enforced: "승인 후 I1-paper-retrieval-agent를 통해..."
+- Agent ID returned: a2e92e9 (can be used for resume)

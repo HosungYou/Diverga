@@ -93,9 +93,49 @@ node ~/.codex/diverga/.codex/diverga-codex.cjs tscore
 node ~/.codex/diverga/.codex/diverga-codex.cjs vs
 ```
 
+### ⚠️ Important: Enable AGENTS.md in Codex Sessions
+
+For Diverga agents to work in Codex CLI sessions, you must configure AGENTS.md loading:
+
+**Option 1: Project-level (Recommended)**
+
+Create or edit `codex.json` in your project root:
+
+```json
+{
+  "agents": ".codex/AGENTS.md"
+}
+```
+
+**Option 2: Global Configuration**
+
+Edit `~/.codex/config.json`:
+
+```json
+{
+  "agents": "~/.codex/diverga/.codex/AGENTS.md"
+}
+```
+
+**Option 3: Command-line Flag**
+
+```bash
+codex --agents-file .codex/AGENTS.md
+```
+
+### Verify Installation
+
+```bash
+# Check if AGENTS.md exists
+cat ~/.codex/diverga/.codex/AGENTS.md | head -20
+
+# Test in Codex CLI
+codex "List all Diverga agents available"
+```
+
 ### In Codex Sessions
 
-Diverga agents are triggered by keywords:
+Once configured, Diverga agents are triggered by keywords:
 
 ```
 "Help me refine my research question"  → A1-research-question-refiner
@@ -210,4 +250,4 @@ Diverga will:
 
 ---
 
-*Diverga v6.6.1 - Where creativity meets rigor*
+*Diverga v6.6.2 - Where creativity meets rigor*
