@@ -101,6 +101,7 @@ class MemoryDatabase:
                     project_name TEXT,
                     tags TEXT,  -- JSON array
                     embedding BLOB,  -- Future: vector embeddings
+                    external_id TEXT UNIQUE,  -- v8.0: External ID for YAML sync (e.g., dec-001)
 
                     -- Lifecycle
                     status TEXT NOT NULL DEFAULT 'active' CHECK(status IN (
@@ -143,6 +144,10 @@ class MemoryDatabase:
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_memories_session
                 ON memories(session_id)
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_memories_external_id
+                ON memories(external_id)
             """)
 
             # Full-text search index (FTS5)
@@ -192,7 +197,8 @@ class MemoryDatabase:
         session_id: Optional[str] = None,
         project_name: Optional[str] = None,
         tags: Optional[List[str]] = None,
-        embedding: Optional[bytes] = None
+        embedding: Optional[bytes] = None,
+        external_id: Optional[str] = None
     ) -> int:
         """
         Store a new memory.
@@ -209,6 +215,7 @@ class MemoryDatabase:
             project_name: Associated project name
             tags: List of tags for categorization
             embedding: Optional vector embedding (bytes)
+            external_id: Optional external ID for YAML sync (e.g., dec-001)
 
         Returns:
             Memory ID (integer primary key)
@@ -233,12 +240,12 @@ class MemoryDatabase:
                 INSERT INTO memories (
                     memory_type, namespace, title, content, summary,
                     priority, agent_id, session_id, project_name,
-                    tags, embedding, content_hash
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    tags, embedding, content_hash, external_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 memory_type, namespace, title, content, summary,
                 priority, agent_id, session_id, project_name,
-                tags_json, embedding, content_hash
+                tags_json, embedding, content_hash, external_id
             ))
             return cursor.lastrowid
 
@@ -257,6 +264,28 @@ class MemoryDatabase:
             cursor.execute("""
                 SELECT * FROM memories WHERE id = ? AND status = 'active'
             """, (memory_id,))
+            row = cursor.fetchone()
+
+            if row is None:
+                return None
+
+            return self._row_to_dict(row)
+
+    def get_memory_by_external_id(self, external_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieve a memory by external ID (for YAML sync).
+
+        Args:
+            external_id: External ID (e.g., dec-001)
+
+        Returns:
+            Dictionary with memory fields, or None if not found
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM memories WHERE external_id = ? AND status = 'active'
+            """, (external_id,))
             row = cursor.fetchone()
 
             if row is None:

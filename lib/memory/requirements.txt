@@ -1,2 +1,6 @@
+# Diverga Memory System v8.0 - Core Dependencies
 pyyaml>=6.0
-pytest>=7.0  # For testing
+pytest>=7.0       # For testing
+numpy>=1.24.0     # Vector operations fallback (lightweight)
+
+# Optional: For embeddings, install requirements-embeddings.txt

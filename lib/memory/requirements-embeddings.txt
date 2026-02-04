@@ -1,0 +1,9 @@
+# Diverga Memory System v8.0 - Optional Embedding Dependencies
+# Install with: pip install -r requirements-embeddings.txt
+# OR: diverga setup --embeddings
+
+# NOTE: sentence-transformers downloads ~500MB of models on first use
+sentence-transformers>=2.2.0
+
+# If you want to use a specific model, you can pre-download:
+# python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"

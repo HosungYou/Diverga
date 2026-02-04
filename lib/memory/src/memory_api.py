@@ -1,11 +1,18 @@
 """
-Diverga Memory System v7.0 - Unified API
+Diverga Memory System v8.0 - Unified API
 ========================================
 
 Main facade providing simplified access to all memory system features.
 
+v8.0 Changes:
+- MemoryAPI ↔ MemoryDatabase connection (CODEX Critical fix)
+- Optional DB layer for search/indexing
+- Project auto-detection and setup UI routing
+- SyncDAO for YAML → DB synchronization
+- DocGenerator for researcher-friendly Markdown
+
 Author: Diverga Project
-Version: 7.0.0
+Version: 8.0.0
 """
 
 from __future__ import annotations
@@ -26,6 +33,8 @@ try:
     from .artifact_generator import ArtifactGenerator, ResearchSchema
     from .archive import ArchiveManager
     from .templates import TemplateEngine
+    from .database import MemoryDatabase
+    from .sync_dao import SyncDAO
 except ImportError:
     from fs_state import FilesystemState
     from decision_log import DecisionLog
@@ -38,21 +47,81 @@ except ImportError:
     from artifact_generator import ArtifactGenerator, ResearchSchema
     from archive import ArchiveManager
     from templates import TemplateEngine
+    from database import MemoryDatabase
+    from sync_dao import SyncDAO
+
+import yaml
 
 
 class MemoryAPI:
     """
-    Unified API for Diverga Memory System v7.0
-    
+    Unified API for Diverga Memory System v8.0
+
     Provides simplified access to all memory system features.
+
+    v8.0 Features:
+    - Optional DB layer for search/indexing
+    - Project auto-detection (new vs existing)
+    - YAML → DB synchronization via SyncDAO
+    - Researcher-friendly document generation
     """
 
-    VERSION = "7.0.0"
+    VERSION = "8.0.0"
 
-    def __init__(self, project_root: Optional[Path] = None):
-        """Initialize Memory API with project root."""
+    def __init__(
+        self,
+        project_root: Optional[Path] = None,
+        enable_db: Optional[bool] = None,
+        auto_detect: bool = True
+    ):
+        """
+        Initialize Memory API with project root.
+
+        Args:
+            project_root: Root directory of the research project
+            enable_db: Explicitly enable/disable DB. None = auto-detect from config
+            auto_detect: If True, detect existing project and auto-load
+        """
         self.project_root = Path(project_root) if project_root else Path.cwd()
+        self._initialized = False
 
+        # DB layer (optional)
+        self._db: Optional[MemoryDatabase] = None
+        self._sync_dao: Optional[SyncDAO] = None
+
+        # Project auto-detection
+        if auto_detect and self._detect_existing_project():
+            # Existing project → auto-load
+            self._load_existing_project(enable_db)
+            self._initialized = True
+        elif auto_detect:
+            # New project → needs setup
+            # Don't initialize modules yet - wait for setup
+            self._initialized = False
+        else:
+            # Manual initialization (legacy behavior)
+            self._load_existing_project(enable_db)
+            self._initialized = True
+
+        # Track current session
+        self._current_session_id: Optional[str] = None
+
+    def _detect_existing_project(self) -> bool:
+        """
+        Detect if this is an existing Diverga project.
+
+        Returns:
+            True if .research/project-state.yaml exists
+        """
+        return (self.project_root / ".research" / "project-state.yaml").exists()
+
+    def _load_existing_project(self, enable_db: Optional[bool] = None) -> None:
+        """
+        Load existing project modules.
+
+        Args:
+            enable_db: Explicitly enable/disable DB
+        """
         # Initialize core modules
         self.fs_state = FilesystemState(self.project_root)
         self.decision_log = DecisionLog(self.project_root)
@@ -71,8 +140,144 @@ class MemoryAPI:
         # Initialize archive manager
         self.archive_manager = ArchiveManager(self.project_root)
 
-        # Track current session
-        self._current_session_id: Optional[str] = None
+        # Initialize DB if enabled
+        if enable_db is True or (enable_db is None and self._has_db_config()):
+            self._init_db()
+
+    def _has_db_config(self) -> bool:
+        """
+        Check if DB is configured in project-state.yaml.
+
+        Returns:
+            True if db_path is set in metadata
+        """
+        state_file = self.project_root / ".research" / "project-state.yaml"
+        if not state_file.exists():
+            return False
+        try:
+            with open(state_file, 'r', encoding='utf-8') as f:
+                state = yaml.safe_load(f) or {}
+            return 'db_path' in state.get('metadata', {})
+        except Exception:
+            return False
+
+    def _get_db_path(self) -> Path:
+        """
+        Get database path from config or default.
+
+        Returns:
+            Path to SQLite database file
+        """
+        state_file = self.project_root / ".research" / "project-state.yaml"
+        if state_file.exists():
+            try:
+                with open(state_file, 'r', encoding='utf-8') as f:
+                    state = yaml.safe_load(f) or {}
+                    db_path = state.get('metadata', {}).get('db_path')
+                    if db_path:
+                        return Path(db_path)
+            except Exception:
+                pass
+
+        # Default path: user home
+        default_path = Path.home() / ".diverga" / "memory.db"
+        default_path.parent.mkdir(parents=True, exist_ok=True)
+        return default_path
+
+    def _init_db(self) -> None:
+        """Initialize database connection and SyncDAO."""
+        db_path = self._get_db_path()
+        self._db = MemoryDatabase(str(db_path))
+        self._sync_dao = SyncDAO(self._db)
+
+    @property
+    def db(self) -> Optional[MemoryDatabase]:
+        """
+        Get database instance (optional).
+
+        Returns:
+            MemoryDatabase or None if not enabled
+        """
+        return self._db
+
+    def needs_setup(self) -> bool:
+        """
+        Check if project needs setup wizard.
+
+        Returns:
+            True if new project needing setup
+        """
+        return not self._initialized
+
+    def enable_db(self, db_path: Optional[Path] = None) -> bool:
+        """
+        Enable database for this project.
+
+        Args:
+            db_path: Custom database path (optional)
+
+        Returns:
+            True if DB enabled successfully
+        """
+        try:
+            # Set db_path in project-state.yaml
+            state_file = self.project_root / ".research" / "project-state.yaml"
+            state = {}
+            if state_file.exists():
+                with open(state_file, 'r', encoding='utf-8') as f:
+                    state = yaml.safe_load(f) or {}
+
+            if 'metadata' not in state:
+                state['metadata'] = {}
+
+            actual_path = db_path or self._get_db_path()
+            state['metadata']['db_path'] = str(actual_path)
+
+            state_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(state_file, 'w', encoding='utf-8') as f:
+                yaml.dump(state, f, allow_unicode=True, default_flow_style=False)
+
+            # Initialize DB
+            self._db = MemoryDatabase(str(actual_path))
+            self._sync_dao = SyncDAO(self._db)
+
+            return True
+        except Exception as e:
+            print(f"Error enabling DB: {e}")
+            return False
+
+    def sync_to_db(self) -> Dict:
+        """
+        Synchronize YAML data to database.
+
+        Returns:
+            Dict with sync results
+
+        Raises:
+            RuntimeError: If DB not enabled
+        """
+        if not self._sync_dao:
+            raise RuntimeError("DB not enabled. Run 'diverga setup --db' or enable_db() first.")
+
+        decision_log = self.project_root / ".research" / "decision-log.yaml"
+        return self._sync_dao.sync_decisions(decision_log, self.project_root)
+
+    def get_sync_status(self) -> Dict:
+        """
+        Get synchronization status.
+
+        Returns:
+            Dict with sync status info
+        """
+        if not self._sync_dao:
+            return {
+                "db_enabled": False,
+                "message": "DB not enabled"
+            }
+
+        status = self._sync_dao.get_sync_status(self.project_root)
+        status["db_enabled"] = True
+        return status
 
     # === Context Layer 1 ===
     def should_load_context(self, message: str) -> bool:
