@@ -4,7 +4,7 @@ description: |
   Meta-Analysis Master - Multi-gate validation and workflow orchestration for meta-analysis.
   Owns gate progression decisions, coordinates C6/C7/B2/B3 agents.
   Triggers: meta-analysis, pooled effect, heterogeneity, forest plot, funnel plot, Hedges g
-version: "6.9.0"
+version: "7.0.0"
 ---
 
 # C5-MetaAnalysisMaster

@@ -5,7 +5,7 @@ description: |
   Light VS applied: Modal sensitivity approach awareness + extended analysis strategy presentation
   Use when: testing robustness, validating conclusions, exploring analytical decisions
   Triggers: sensitivity analysis, robustness, specification curve, analytical decisions
-version: "6.9.0"
+version: "7.0.0"
 ---
 
 # Sensitivity Analysis Designer

@@ -5,7 +5,7 @@ description: |
   VS methodology prevents mode collapse. Human checkpoints enforce human-in-the-loop decisions.
   Triggers: research question, theoretical framework, meta-analysis, systematic review,
   phenomenology, grounded theory, mixed methods, effect size, IRB, PRISMA, literature review.
-version: "6.9.0"
+version: "7.0.0"
 ---
 
 # Diverga Research Coordinator v6.6.1

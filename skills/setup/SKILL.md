@@ -3,7 +3,7 @@ name: setup
 description: |
   Diverga initial configuration wizard. Sets up local skills, LLM API, checkpoints, paradigm, language.
   Triggers: setup, configure, 설정, install
-version: "6.9.1"
+version: "7.0.0"
 ---
 
 # /diverga-setup
