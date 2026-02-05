@@ -4,6 +4,339 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [8.0.0] - 2026-02-04 (Project Visibility & HUD Enhancement)
+
+### Overview
+
+**Diverga v8.0** - Project Visibility Enhancement with independent HUD, simplified setup, natural language project initialization, and auto-generated research documentation.
+
+This release introduces major improvements to researcher experience:
+- **File Structure Redesign**: `.research/` for system files, `docs/` for researcher-visible documentation
+- **Independent HUD**: Standalone statusline display completely separate from oh-my-claudecode
+- **Simplified Setup**: 3-step wizard (down from 9 steps)
+- **Natural Language Start**: "I want to conduct a systematic review on AI" → auto-initialize project
+
+### New Features
+
+#### 1. File Structure Redesign
+
+| Directory | Purpose | Visibility |
+|-----------|---------|------------|
+| `.research/` | System files (state, decisions, checkpoints) | Hidden |
+| `docs/` | Researcher documentation (auto-generated) | Visible |
+
+**New docs/ structure (7 files)**:
+
+```
+docs/
+├── PROJECT_STATUS.md       # Progress overview with visual indicators
+├── DECISION_LOG.md         # Human-readable decision history
+├── RESEARCH_AUDIT.md       # IRB/reproducibility audit trail
+├── METHODOLOGY.md          # Research design summary (NEW)
+├── TIMELINE.md             # Milestones and deadlines (NEW)
+├── REFERENCES.md           # Key papers and frameworks (NEW)
+└── README.md               # Project overview (NEW)
+```
+
+**Auto-synchronization**: When decisions are made or checkpoints completed, `docs/` files update automatically.
+
+#### 2. Independent Diverga HUD
+
+Completely independent statusline display for research progress - no oh-my-claudecode dependency.
+
+**HUD Presets**:
+
+| Preset | Display | Use Case |
+|--------|---------|----------|
+| `research` (default) | Stage, Checkpoints, Memory | Daily research |
+| `checkpoint` | Detailed checkpoint status | Decision sessions |
+| `memory` | Memory health focus | Debugging |
+| `minimal` | Stage only | Clean interface |
+
+**Display Examples**:
+
+```
+research:   🔬 AI-Ethics-HR │ Stage: foundation │ ●●○○○○○○○○○ (2/11) │ 🧠 95%
+checkpoint: 🔬 AI-Ethics-HR │ Stage: foundation
+            Checkpoints: ●●○○○○○○○○○ (2/11)
+             ✅ CP_RESEARCH_DIRECTION │ ✅ CP_PARADIGM_SELECTION
+             🔴 CP_SCOPE_DEFINITION (pending)
+minimal:    🔬 AI-Ethics-HR │ foundation
+```
+
+**StatusLine Integration**:
+
+```json
+// ~/.claude/settings.json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node ~/.claude/hud/diverga-hud.mjs"
+  }
+}
+```
+
+#### 3. Simplified Setup (3 Steps)
+
+| Step | Content | Changes from v7.0 |
+|------|---------|-------------------|
+| 1 | Welcome + Project Detection | Same |
+| 2 | Checkpoint Level + HUD + Language | Combined 6 steps into 1 |
+| 3 | Apply & Complete | Same |
+
+**Removed**:
+- LLM selection (Claude Code already authenticated)
+- API key configuration (not needed)
+- Paradigm selection (auto-detect or ask during research)
+
+**New Options**:
+- HUD enable/disable
+- HUD preset selection
+
+#### 4. Natural Language Project Initialization
+
+**Detection Patterns**:
+
+| Language | Patterns |
+|----------|----------|
+| English | "systematic review on/about {topic}", "meta-analysis on {topic}", "literature review about {topic}" |
+| Korean | "체계적 문헌고찰", "체계적 리뷰", "메타분석", "메타 분석", "문헌고찰" |
+
+**Research Types Detected**:
+- `systematic_review` (체계적 문헌고찰)
+- `meta_analysis` (메타분석)
+- `literature_review` (문헌고찰)
+- `experimental` (실험연구)
+- `qualitative` (질적연구)
+- `mixed_methods` (혼합연구)
+
+**Flow**:
+```
+User: "I want to conduct a systematic review on AI in education"
+        │
+        ▼
+  Intent Detection (confidence: 0.9)
+        │
+        ▼
+  Confirmation Prompt (bilingual)
+        │
+   [Yes] → Auto-create .research/ and docs/
+   [No]  → Continue as normal conversation
+```
+
+#### 5. Project Detection & Loading
+
+**Session Start Behavior**:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Session Start                                                    │
+│        │                                                        │
+│        ▼                                                        │
+│ .research/ exists?                                              │
+│        │                                                        │
+│   YES ─┼─ NO                                                    │
+│        │     │                                                  │
+│        ▼     ▼                                                  │
+│ Auto-load    Research intent detected?                          │
+│ Show banner       │                                             │
+│        │     YES ─┼─ NO                                         │
+│        │          │     │                                       │
+│        ▼          ▼     ▼                                       │
+│ Continue      Initialize  Normal                                │
+│ project       prompt      conversation                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Project Load Banner**:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ ✅ 프로젝트 로드됨: AI-Ethics-HR                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ 🔬 Stage: foundation │ ●●○○○○○○○○○ (2/11) │ 🧠 100%             │
+│                                                                 │
+│ 마지막 세션: 2026-02-04                                         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### New Files
+
+#### HUD System (`lib/hud/`)
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `colors.ts` | ANSI color utilities, HUD_COLORS palette | ~80 |
+| `state.ts` | HUD state management, STAGES definition | ~180 |
+| `presets.ts` | 4 preset configurations (research, checkpoint, memory, minimal) | ~120 |
+| `core.ts` | HUDRenderer class, rendering logic | ~200 |
+| `index.ts` | Main exports, DivergaHUD facade | ~50 |
+
+#### HUD Wrapper (`~/.claude/hud/`)
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `diverga-hud.mjs` | Standalone Node.js statusLine script | ~250 |
+
+#### Memory System Extensions (`lib/memory/src/`)
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `intent_detector.py` | Natural language research intent detection | ~430 |
+| `project_initializer.py` | Auto-project initialization from intent | ~440 |
+
+#### Skill Definition (`skills/hud/`)
+
+| File | Purpose |
+|------|---------|
+| `SKILL.md` | HUD skill definition for Claude Code |
+
+### Modified Files
+
+| File | Changes |
+|------|---------|
+| `lib/memory/src/doc_generator.py` | Extended from 3 to 7 docs, added STAGES, progress bar, timestamp helpers |
+| `lib/memory/src/memory_api.py` | Added HUD integration, docs sync, intent detection, project init methods |
+| `skills/setup/SKILL.md` | Simplified from 9 steps to 3, removed LLM selection, added HUD |
+| `CLAUDE.md` | Updated to v8.0, added v8.0 Key Features section |
+
+### API Reference
+
+**New MemoryAPI Methods**:
+
+```python
+from lib.memory import MemoryAPI
+
+memory = MemoryAPI(project_root=Path("."))
+
+# HUD Integration
+memory.refresh_hud()                    # Update HUD cache
+
+# Documentation Sync
+memory.sync_docs()                      # Sync all docs
+memory.sync_doc("PROJECT_STATUS.md")    # Sync single doc
+
+# Intent Detection
+result = memory.detect_research_intent("I want to do a meta-analysis")
+# Returns: {"is_research": True, "type": "meta_analysis", "topic": ..., "confidence": 0.9}
+
+# Project Initialization
+memory.should_init_project("systematic review on AI")  # (True, IntentResult)
+memory.initialize_from_message("systematic review on AI in education")
+memory.get_load_banner()                # Formatted project banner
+
+# Auto-sync Hooks (internal)
+memory._on_state_change()               # Triggered on state updates
+memory._on_decision_added(decision_id)  # Triggered after add_decision()
+memory._on_checkpoint_completed(cp_id)  # Triggered after record_checkpoint()
+```
+
+**Intent Detector Functions**:
+
+```python
+from lib.memory.src.intent_detector import (
+    detect_intent,           # Full intent detection
+    should_initialize_project,  # Check if should init
+    get_suggested_prompt,    # Confirmation prompt
+    ResearchType,           # Enum of research types
+    IntentResult            # Detection result dataclass
+)
+
+result = detect_intent("체계적 문헌고찰을 하고 싶어요")
+# IntentResult(is_research_intent=True, research_type=ResearchType.SYSTEMATIC_REVIEW,
+#              topic=None, confidence=0.9, paradigm="quantitative", ...)
+```
+
+**Project Initializer Functions**:
+
+```python
+from lib.memory.src.project_initializer import (
+    initialize_project,      # Explicit initialization
+    initialize_from_intent,  # Initialize from IntentResult
+    is_project_initialized,  # Check if already initialized
+    get_project_banner       # Get load banner
+)
+
+results = initialize_project(
+    project_name="AI-Education-Review",
+    research_question="How does AI improve learning outcomes?",
+    paradigm="quantitative",
+    hud_enabled=True
+)
+# Creates: .research/, docs/, all state files
+```
+
+### CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `/diverga-hud status` | Show HUD status |
+| `/diverga-hud preset <name>` | Change preset (research, checkpoint, memory, minimal) |
+| `/diverga-hud enable` | Enable HUD |
+| `/diverga-hud disable` | Disable HUD |
+| `/diverga-hud setup` | Setup HUD statusline |
+
+### Breaking Changes
+
+- **Setup wizard simplified**: `/diverga-setup` now has 3 steps instead of 9
+- **LLM selection removed**: No longer asks for LLM provider (uses Claude Code's model)
+- **API key configuration removed**: Not needed in Claude Code context
+
+### Migration Guide
+
+v7.0 → v8.0 migration is **automatic**:
+
+1. Existing `.research/` directories are preserved
+2. `docs/` directory created automatically on first state change
+3. HUD can be enabled via `/diverga-hud setup`
+4. No manual migration required
+
+**To enable v8.0 features on existing project**:
+
+```bash
+# Enable HUD (optional)
+/diverga-hud setup
+
+# Generate docs/ files
+# (Automatic on next decision or checkpoint)
+```
+
+### Technical Details
+
+**HUD System**:
+- TypeScript source in `lib/hud/`
+- Pure Node.js runtime script (`~/.claude/hud/diverga-hud.mjs`)
+- No external dependencies
+- YAML parsing for project state
+
+**Intent Detection**:
+- Bilingual support (English + Korean)
+- Regex-based pattern matching
+- Confidence scoring (0.0 - 1.0)
+- Topic extraction from context
+
+**Project State Files**:
+
+| File | Format | Purpose |
+|------|--------|---------|
+| `.research/project-state.yaml` | YAML | Project metadata |
+| `.research/decision-log.yaml` | YAML | Decision history |
+| `.research/checkpoints.yaml` | YAML | Checkpoint states |
+| `.research/hud-state.json` | JSON | HUD configuration |
+
+### Verification
+
+```
+✅ Intent detector tested: "systematic review on AI" → Type: systematic_review, Confidence: 0.9
+✅ HUD files exist: colors.ts, state.ts, presets.ts, core.ts, index.ts
+✅ HUD wrapper exists: ~/.claude/hud/diverga-hud.mjs
+✅ Doc generator has 7 files: PROJECT_STATUS, DECISION_LOG, RESEARCH_AUDIT, METHODOLOGY, TIMELINE, REFERENCES, README
+✅ Memory API has new methods: refresh_hud, sync_docs, detect_research_intent, initialize_from_message
+✅ Setup skill simplified: 3 steps, HUD option added
+```
+
+---
+
 ## [7.0.0] - 2026-02-03 (Memory System Global Deployment)
 
 ### Overview

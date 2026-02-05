@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Avoids generic ethics checklists, delivers research-specific ethical analysis
   Use when: checking ethical considerations, preparing IRB submissions, reviewing consent procedures
   Triggers: ethics, IRB, consent, informed consent, privacy, vulnerable populations
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Research Ethics Advisor

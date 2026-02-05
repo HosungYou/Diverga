@@ -3,7 +3,7 @@ name: diverga-memory
 description: |
   Diverga Memory System v7.0 - Context-persistent research support
   with checkpoint auto-trigger and cross-session continuity.
-version: "7.0.0"
+version: "8.0.0"
 triggers:
   - memory
   - remember

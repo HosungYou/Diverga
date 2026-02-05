@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Avoids automatic tool application, delivers research-specific evaluation strategies
   Use when: appraising study quality, assessing risk of bias, grading evidence
   Triggers: quality appraisal, RoB, GRADE, Newcastle-Ottawa, risk of bias, methodological quality
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Evidence Quality Appraiser

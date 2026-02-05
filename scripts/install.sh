@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 REPO_URL="https://github.com/HosungYou/Diverga.git"
-VERSION="6.6.1"
+VERSION="8.0.0"
 
 # Print banner
 print_banner() {
@@ -166,11 +166,71 @@ install_claude_code() {
     cp "$src_dir/CLAUDE.md" "$dest_dir/" 2>/dev/null || true
     cp "$src_dir/AGENTS.md" "$dest_dir/" 2>/dev/null || true
 
+    # === HUD Auto-Setup (v8.0 New Feature) ===
+    log_info "Setting up Diverga HUD..."
+
+    # 1. Install HUD script
+    mkdir -p "$HOME/.claude/hud"
+    if [ -f "$src_dir/dist/hud/diverga-hud.mjs" ]; then
+        cp "$src_dir/dist/hud/diverga-hud.mjs" "$HOME/.claude/hud/"
+        chmod +x "$HOME/.claude/hud/diverga-hud.mjs"
+        log_success "HUD script installed: ~/.claude/hud/diverga-hud.mjs"
+    else
+        log_warn "HUD script not found in distribution"
+    fi
+
+    # 2. Configure settings.json for statusLine
+    local settings_file="$HOME/.claude/settings.json"
+    if [ -f "$settings_file" ]; then
+        # Check if statusLine already configured
+        if ! grep -q "statusLine" "$settings_file"; then
+            # Add statusLine using jq if available
+            if command -v jq &> /dev/null; then
+                jq '. + {"statusLine": {"type": "command", "command": "node ~/.claude/hud/diverga-hud.mjs"}}' "$settings_file" > "${settings_file}.tmp" && mv "${settings_file}.tmp" "$settings_file"
+                log_success "HUD statusLine configured in settings.json"
+            else
+                log_warn "jq not found. Add manually to ~/.claude/settings.json:"
+                echo '    "statusLine": {"type": "command", "command": "node ~/.claude/hud/diverga-hud.mjs"}'
+            fi
+        else
+            log_info "statusLine already configured in settings.json"
+        fi
+    else
+        # Create settings.json with statusLine
+        cat > "$settings_file" << 'SETTINGS_EOF'
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node ~/.claude/hud/diverga-hud.mjs"
+  }
+}
+SETTINGS_EOF
+        log_success "Created settings.json with HUD statusLine"
+    fi
+
+    # 3. Create local skill symlinks
+    log_info "Creating skill symlinks..."
+    mkdir -p "$HOME/.claude/skills"
+    local count=0
+    for skill_dir in "$src_dir/skills/"*/; do
+        if [ -d "$skill_dir" ]; then
+            skill_name=$(basename "$skill_dir")
+            target="$HOME/.claude/skills/diverga-${skill_name}"
+            [ -L "$target" ] && rm "$target"
+            ln -sf "$skill_dir" "$target"
+            ((count++))
+        fi
+    done
+    log_success "Created $count skill symlinks"
+
     log_success "Claude Code installation complete: $dest_dir"
     echo ""
-    echo "  Alternatively, use the plugin marketplace:"
-    echo "    /plugin marketplace add https://github.com/HosungYou/Diverga"
-    echo "    /plugin install diverga"
+    echo -e "${CYAN}  🔬 Diverga HUD is now active!${NC}"
+    echo "  Restart Claude Code to see the statusline."
+    echo ""
+    echo "  Quick Start:"
+    echo "    \"I want to conduct a systematic review on AI in education\""
+    echo "    /diverga-help"
     echo ""
 }
 

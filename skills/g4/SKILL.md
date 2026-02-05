@@ -5,7 +5,7 @@ description: |
   Light VS applied: Avoids formal registration + ensures practical research transparency
   Use when: creating preregistration documents, planning confirmatory research, writing registered reports
   Triggers: preregistration, registered report, OSF, AsPredicted, research plan registration
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Preregistration Composer

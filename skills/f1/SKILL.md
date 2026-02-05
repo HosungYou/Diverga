@@ -5,7 +5,7 @@ description: |
   Light VS applied: Avoids superficial checking + deep logical coherence analysis
   Use when: reviewing manuscripts, checking consistency, verifying numbers
   Triggers: consistency check, coherence, logical flow, number verification, terminology consistency
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Internal Consistency Checker

@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Modal question avoidance, alternatives presentation, differentiated RQ recommendation
   Use when: refining research ideas, formulating research questions, clarifying scope
   Triggers: research question, 연구 질문, PICO, SPIDER, research idea
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Research Question Refiner

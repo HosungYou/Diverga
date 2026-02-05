@@ -11,7 +11,7 @@ description: |
   conceptual framework, visualization, systematic review, qualitative, phenomenology, grounded theory,
   thematic analysis, mixed methods, interview, focus group, ethnography, action research,
   ScholaRAG, paper retrieval, AI screening, RAG builder, humanization, AI pattern detection
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Research Coordinator v6.7.0 - Human-Centered Edition

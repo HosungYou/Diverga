@@ -1,192 +1,169 @@
 ---
 name: setup
 description: |
-  Diverga initial configuration wizard. Sets up local skills, LLM API, checkpoints, paradigm, language.
+  Diverga v8.0 initial configuration wizard. Simplified 3-step setup.
+  Sets up checkpoints, HUD, and language preferences.
   Triggers: setup, configure, 설정, install
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # /diverga-setup
 
-**Version**: 2.0.0
+**Version**: 8.0.0
 **Trigger**: `/diverga-setup` or `/diverga:setup`
 
 ## Description
 
-Initial configuration wizard for Diverga. Installs local skill symlinks, sets up LLM API, human checkpoints, research paradigm, and language preferences.
+Simplified 3-step configuration wizard for Diverga v8.0.
+
+**Changes from v7.0**:
+- Removed LLM selection (Claude Code is already authenticated)
+- Removed API key configuration (not needed)
+- Added HUD configuration
+- Simplified to 3 steps (was 9)
 
 ## Workflow
 
 When user invokes `/diverga-setup`, execute this interactive wizard:
 
-### Step 1: Welcome Message
+### Step 1: Welcome + Project Detection
+
+First, detect if there's an existing `.research/` directory:
+
+```bash
+# Check for existing project
+if [[ -d ".research" ]]; then
+  echo "✅ Existing Diverga project detected"
+  PROJECT_EXISTS="true"
+else
+  echo "📁 New project setup"
+  PROJECT_EXISTS="false"
+fi
+```
+
+Display welcome message:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                    Welcome to Diverga v6.9.1                     ║
+║                    Welcome to Diverga v8.0                       ║
 ║         AI Research Assistant for the Complete Lifecycle         ║
-╠══════════════════════════════════════════════════════════════════╣
-║  44 specialized agents across 9 categories (A-I)                 ║
-║  Human-centered design with mandatory checkpoints                ║
-║  Verbalized Sampling (VS) methodology for creative alternatives  ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-Let's configure Diverga for your research environment.
+프로젝트 확인 중...
+→ [Existing project detected / New project setup]
 ```
 
-### Step 2: Local Skills Installation (NEW in v6.9.1)
-
-**Purpose**: Create symlinks in `~/.claude/skills/` for reliable skill discovery.
-
-Use AskUserQuestion tool:
-
-```
-question: "Install local skill symlinks for reliable /diverga-xxx access?"
-header: "Skills"
-options:
-  - label: "Yes, install symlinks (Recommended)"
-    description: "Creates 51 symlinks in ~/.claude/skills/. Enables /diverga-help, /diverga-memory, etc."
-  - label: "No, skip installation"
-    description: "Use plugin system only. /diverga:xxx format (may require restart)."
-```
-
-If user selects "Yes", execute:
-
-```bash
-# Detect Diverga installation path
-DIVERGA_PATH=""
-if [[ -d "$HOME/.claude/plugins/cache/diverga/diverga/6.9.0/skills" ]]; then
-  DIVERGA_PATH="$HOME/.claude/plugins/cache/diverga/diverga/6.9.0/skills"
-elif [[ -d "./skills" ]]; then
-  DIVERGA_PATH="$(pwd)/skills"
-fi
-
-if [[ -z "$DIVERGA_PATH" ]]; then
-  echo "❌ Diverga skills not found. Please clone the repository first."
-  exit 1
-fi
-
-# Create symlinks
-mkdir -p ~/.claude/skills
-count=0
-for skill_dir in "$DIVERGA_PATH"/*/; do
-  skill_name=$(basename "$skill_dir")
-  target="$HOME/.claude/skills/diverga-${skill_name}"
-  if [[ -L "$target" ]]; then
-    rm "$target"  # Remove existing symlink
-  fi
-  ln -sf "$skill_dir" "$target"
-  ((count++))
-done
-
-echo "✅ Created $count local skill symlinks in ~/.claude/skills/"
-echo ""
-echo "Available commands:"
-echo "  /diverga-help     - View all agents"
-echo "  /diverga-memory   - Memory system"
-echo "  /diverga-a1       - Research Question Refiner"
-echo "  /diverga-c5       - Meta-Analysis Master"
-```
-
-Display result:
-
+If existing project:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                 Local Skills Installation                        │
+│ ✅ 기존 프로젝트 감지됨                                          │
 ├─────────────────────────────────────────────────────────────────┤
-│ ✅ Created 51 symlinks in ~/.claude/skills/                     │
-│                                                                  │
-│ Skill Access Methods:                                            │
-│ ├── /diverga-help   (hyphen) → Always works                     │
-│ └── /diverga:help   (colon)  → Requires plugin load             │
-│                                                                  │
-│ Recommendation: Use hyphen prefix for reliability                │
+│ Project: [project_name]                                         │
+│ Stage: [current_stage]                                          │
+│ Last updated: [timestamp]                                       │
+│                                                                 │
+│ 설정을 업데이트하시겠습니까?                                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Step 3: LLM API Selection
+### Step 2: Settings (Single Screen)
 
-Use AskUserQuestion tool:
+Use AskUserQuestion tool with multiple questions:
 
-```
-question: "Which LLM provider would you like to use?"
-header: "LLM API"
-options:
-  - label: "Anthropic Claude (Recommended)"
-    description: "Best for academic writing and research. Requires ANTHROPIC_API_KEY."
-  - label: "OpenAI GPT"
-    description: "General purpose. Requires OPENAI_API_KEY."
-  - label: "Groq (Free tier available)"
-    description: "Fast inference, free tier. Requires GROQ_API_KEY."
-  - label: "Local (Ollama)"
-    description: "Privacy-focused, no API key needed. Requires Ollama installed."
-```
-
-### Step 4: Human Checkpoint Configuration
-
-Use AskUserQuestion tool:
+**Question 1: Checkpoint Level**
 
 ```
-question: "Enable human checkpoints for critical research decisions?"
+question: "🚦 체크포인트 레벨을 선택하세요"
 header: "Checkpoints"
+multiSelect: false
 options:
-  - label: "Yes, enable checkpoints (Recommended)"
-    description: "AI stops at paradigm selection, methodology approval, and data validation."
-  - label: "Minimal checkpoints"
-    description: "Only CP_PARADIGM and CP_METHODOLOGY required."
-  - label: "No checkpoints"
-    description: "Fully autonomous mode. Not recommended for research."
+  - label: "Full (권장)"
+    description: "모든 11개 체크포인트 활성화. AI가 모든 중요 결정에서 멈추고 확인을 요청합니다."
+  - label: "Minimal"
+    description: "패러다임 & 방법론 체크포인트만. 빠른 진행, 핵심 결정만 확인."
+  - label: "Off"
+    description: "자율 모드. 체크포인트 없이 진행. 연구에 권장하지 않음."
 ```
 
-### Step 5: Default Research Paradigm
-
-Use AskUserQuestion tool:
+**Question 2: HUD Display**
 
 ```
-question: "What is your default research paradigm?"
-header: "Paradigm"
+question: "📊 HUD 표시를 활성화하시겠습니까?"
+header: "HUD"
+multiSelect: false
 options:
-  - label: "Auto-detect (Recommended)"
-    description: "Diverga detects paradigm from conversation context."
-  - label: "Quantitative"
-    description: "Experimental, survey, meta-analysis research."
-  - label: "Qualitative"
-    description: "Phenomenology, grounded theory, ethnography."
-  - label: "Mixed Methods"
-    description: "Sequential, convergent, or embedded designs."
+  - label: "활성화 (권장)"
+    description: "터미널 하단에 연구 진행 상태를 항상 표시합니다."
+  - label: "비활성화"
+    description: "깔끔한 인터페이스. HUD 없이 진행합니다."
 ```
 
-### Step 6: Language Preference
-
-Use AskUserQuestion tool:
+**Question 3: Language**
 
 ```
-question: "Preferred language for Diverga responses?"
+question: "🌐 응답 언어를 선택하세요"
 header: "Language"
+multiSelect: false
 options:
-  - label: "Auto (match user input)"
-    description: "Responds in the same language as your input."
+  - label: "Auto (입력에 맞춤)"
+    description: "사용자 입력 언어에 맞춰 응답합니다."
   - label: "English"
-    description: "Always respond in English."
-  - label: "한국어 (Korean)"
-    description: "Always respond in Korean."
+    description: "항상 영어로 응답합니다."
+  - label: "한국어"
+    description: "항상 한국어로 응답합니다."
 ```
 
-### Step 7: Generate Configuration
+### Step 3: Apply Configuration
 
-After collecting all preferences, generate `~/.claude/plugins/diverga/config/diverga-config.json`:
+After collecting preferences:
 
+1. **Create config directory**:
+```bash
+mkdir -p ~/.claude/plugins/diverga/config
+mkdir -p .research
+```
+
+2. **Install local skill symlinks** (if not already done):
+```bash
+DIVERGA_PATH=""
+if [[ -d "$HOME/.claude/plugins/cache/diverga" ]]; then
+  DIVERGA_PATH=$(find "$HOME/.claude/plugins/cache/diverga" -type d -name "skills" | head -1)
+elif [[ -d "/Volumes/External SSD/Projects/Diverga/skills" ]]; then
+  DIVERGA_PATH="/Volumes/External SSD/Projects/Diverga/skills"
+elif [[ -d "./Diverga/skills" ]]; then
+  DIVERGA_PATH="$(pwd)/Diverga/skills"
+fi
+
+if [[ -n "$DIVERGA_PATH" ]]; then
+  mkdir -p ~/.claude/skills
+  count=0
+  for skill_dir in "$DIVERGA_PATH"/*/; do
+    skill_name=$(basename "$skill_dir")
+    target="$HOME/.claude/skills/diverga-${skill_name}"
+    [[ -L "$target" ]] && rm "$target"
+    ln -sf "$skill_dir" "$target"
+    ((count++))
+  done
+  echo "✅ Created $count local skill symlinks"
+fi
+```
+
+3. **Generate configuration file**:
+
+`~/.claude/plugins/diverga/config/diverga-config.json`:
 ```json
 {
-  "version": "6.4.0",
-  "llm_provider": "<selected_provider>",
-  "llm_api_key_env": "<API_KEY_ENV_VAR>",
+  "version": "8.0.0",
   "human_checkpoints": {
+    "level": "<full|minimal|off>",
     "enabled": true,
-    "required": ["CP_PARADIGM", "CP_METHODOLOGY"],
-    "optional": ["CP_THEORY", "CP_DATA_VALIDATION"]
+    "required": ["CP_PARADIGM_SELECTION", "CP_METHODOLOGY_APPROVAL"],
+    "optional": ["CP_THEORY_SELECTION", "CP_VARIABLE_DEFINITION"]
   },
-  "default_paradigm": "auto",
+  "hud": {
+    "enabled": true,
+    "preset": "research"
+  },
   "language": "auto",
   "model_routing": {
     "high": "opus",
@@ -196,76 +173,192 @@ After collecting all preferences, generate `~/.claude/plugins/diverga/config/div
 }
 ```
 
-### Step 8: Verification
-
+4. **Initialize HUD state** (if HUD enabled):
 ```bash
-# Create config directory
-mkdir -p ~/.claude/plugins/diverga/config
-
-# Write config file
-cat > ~/.claude/plugins/diverga/config/diverga-config.json << 'EOF'
-{config_json}
+# Create HUD state file
+cat > .research/hud-state.json << 'EOF'
+{
+  "version": "1.0.0",
+  "enabled": true,
+  "preset": "research",
+  "last_updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "cache": {
+    "project_name": "",
+    "current_stage": "foundation",
+    "checkpoints_completed": 0,
+    "checkpoints_total": 11,
+    "memory_health": 100
+  }
+}
 EOF
-
-# Verify installation
-echo "✅ Diverga configuration saved!"
 ```
 
-### Step 9: Completion Message
+5. **Setup HUD statusline** (if HUD enabled):
+
+**IMPORTANT**: When user selects "활성화 (권장)" for HUD, automatically configure statusLine:
+
+```bash
+mkdir -p ~/.claude/hud
+
+# Copy HUD script from Diverga installation
+DIVERGA_HUD_SRC=""
+if [[ -f "/Volumes/External SSD/Projects/Diverga/dist/hud/diverga-hud.mjs" ]]; then
+  DIVERGA_HUD_SRC="/Volumes/External SSD/Projects/Diverga/dist/hud/diverga-hud.mjs"
+elif [[ -f "$HOME/.claude/plugins/cache/diverga/dist/hud/diverga-hud.mjs" ]]; then
+  DIVERGA_HUD_SRC="$HOME/.claude/plugins/cache/diverga/dist/hud/diverga-hud.mjs"
+elif [[ -f "./Diverga/dist/hud/diverga-hud.mjs" ]]; then
+  DIVERGA_HUD_SRC="$(pwd)/Diverga/dist/hud/diverga-hud.mjs"
+fi
+
+# Copy or create HUD script
+if [[ -n "$DIVERGA_HUD_SRC" ]]; then
+  cp "$DIVERGA_HUD_SRC" ~/.claude/hud/diverga-hud.mjs
+  chmod +x ~/.claude/hud/diverga-hud.mjs
+  echo "✅ HUD script installed"
+elif [[ ! -f ~/.claude/hud/diverga-hud.mjs ]]; then
+  echo "⚠️ HUD script not found. Run /diverga-hud setup to install."
+fi
+
+# AUTO-CONFIGURE settings.json statusLine
+SETTINGS_FILE="$HOME/.claude/settings.json"
+if [[ -f "$SETTINGS_FILE" ]]; then
+  # Check if statusLine already configured
+  if ! grep -q "statusLine" "$SETTINGS_FILE"; then
+    # Add statusLine configuration using jq or manual edit
+    if command -v jq &> /dev/null; then
+      jq '. + {"statusLine": {"type": "command", "command": "node ~/.claude/hud/diverga-hud.mjs"}}' "$SETTINGS_FILE" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "$SETTINGS_FILE"
+      echo "✅ HUD statusLine configured in settings.json"
+    else
+      echo "⚠️ jq not found. Please add manually to settings.json:"
+      echo '  "statusLine": {"type": "command", "command": "node ~/.claude/hud/diverga-hud.mjs"}'
+    fi
+  else
+    echo "✅ statusLine already configured"
+  fi
+else
+  # Create settings.json with statusLine
+  cat > "$SETTINGS_FILE" << 'SETTINGS_EOF'
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node ~/.claude/hud/diverga-hud.mjs"
+  }
+}
+SETTINGS_EOF
+  echo "✅ Created settings.json with HUD statusLine"
+fi
+
+echo ""
+echo "🔄 HUD가 활성화되었습니다. Claude Code를 재시작하면 statusLine이 표시됩니다."
+```
+
+6. **Display completion message**:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                   Diverga Setup Complete! ✅                     ║
+║                   Diverga 설정 완료! ✅                          ║
 ╠══════════════════════════════════════════════════════════════════╣
-║  ✅ Local skills installed (51 symlinks)                         ║
-║  ✅ Configuration saved to diverga-config.json                   ║
+║  설정이 저장되었습니다.                                          ║
 ║                                                                  ║
-║  Quick Commands (use hyphen prefix):                             ║
-║  • /diverga-help     - View all 44 agents                       ║
-║  • /diverga-a1       - Research Question Refiner                ║
-║  • /diverga-c5       - Meta-Analysis Master                     ║
-║  • /diverga-memory   - Memory System                            ║
+║  📁 Config: ~/.claude/plugins/diverga/config/diverga-config.json ║
+║  📁 Project: .research/                                          ║
 ║                                                                  ║
-║  Auto-Trigger Keywords:                                          ║
-║  • "research question" → diverga-a1                             ║
-║  • "meta-analysis"     → diverga-c5                             ║
-║  • "systematic review" → diverga-i0                             ║
+║  시작하려면:                                                     ║
+║  • "AI 윤리에 대한 체계적 문헌고찰을 하고 싶어요"                 ║
+║  • "메타분석 연구를 시작할게요: [주제]"                          ║
+║                                                                  ║
+║  명령어:                                                         ║
+║  • /diverga-status  - 프로젝트 상태                              ║
+║  • /diverga-hud     - HUD 설정                                   ║
+║  • /diverga-help    - 전체 도움말                                ║
 ╚══════════════════════════════════════════════════════════════════╝
+```
 
-Start by saying: "I want to conduct a systematic review on [topic]"
+## Checkpoint Levels
+
+| Level | Checkpoints | Description |
+|-------|-------------|-------------|
+| **Full** | 11 | All checkpoints active. AI stops at every critical decision. |
+| **Minimal** | 2 | CP_PARADIGM_SELECTION + CP_METHODOLOGY_APPROVAL only. |
+| **Off** | 0 | No checkpoints. Not recommended for research. |
+
+## Configuration File Schema
+
+```json
+{
+  "version": "8.0.0",
+  "human_checkpoints": {
+    "level": "full",
+    "enabled": true,
+    "required": [
+      "CP_RESEARCH_DIRECTION",
+      "CP_PARADIGM_SELECTION",
+      "CP_SCOPE_DEFINITION",
+      "CP_THEORY_SELECTION",
+      "CP_VARIABLE_DEFINITION",
+      "CP_METHODOLOGY_APPROVAL",
+      "CP_DATABASE_SELECTION",
+      "CP_SCREENING_CRITERIA",
+      "CP_ANALYSIS_PLAN",
+      "CP_QUALITY_GATES",
+      "CP_PUBLICATION_READY"
+    ],
+    "optional": []
+  },
+  "hud": {
+    "enabled": true,
+    "preset": "research"
+  },
+  "language": "auto",
+  "model_routing": {
+    "high": "opus",
+    "medium": "sonnet",
+    "low": "haiku"
+  }
+}
 ```
 
 ## Error Handling
 
-### Missing API Key
-
-If selected provider's API key is not set:
+### No Write Permission
 
 ```
-⚠️  ANTHROPIC_API_KEY not found in environment.
+❌ 설정 파일을 저장할 수 없습니다.
 
-Please set it:
-  export ANTHROPIC_API_KEY="your-key-here"
-
-Or add to your shell profile (~/.zshrc or ~/.bashrc).
+권한을 확인해주세요:
+  ls -la ~/.claude/plugins/diverga/config/
 ```
 
-### Ollama Not Installed
+### Existing Configuration
 
-If Local (Ollama) selected but not installed:
+If config exists, ask before overwriting:
 
 ```
-⚠️  Ollama not detected.
-
-Install from: https://ollama.ai/download
-
-After installation, run:
-  ollama pull llama3.2
+question: "기존 설정이 있습니다. 덮어쓰시겠습니까?"
+header: "Config"
+options:
+  - label: "예, 새 설정으로 교체"
+    description: "기존 설정을 백업하고 새 설정을 적용합니다."
+  - label: "아니요, 유지"
+    description: "기존 설정을 유지합니다."
 ```
 
-## Implementation Notes
+## Migration from v7.0
 
-- Config file location: `~/.claude/plugins/diverga/config/diverga-config.json`
-- All user selections saved immediately
-- Re-running `/diverga:setup` overwrites existing config
-- API keys should be in environment variables, not config file
+If `diverga-config.json` exists with v7.0 format:
+
+1. Backup existing config to `diverga-config.v7.backup.json`
+2. Migrate settings:
+   - `llm_provider` → removed (not needed in v8.0)
+   - `llm_api_key_env` → removed
+   - `human_checkpoints` → kept, add `level` field
+   - `default_paradigm` → kept in project-state.yaml
+   - `language` → kept
+   - `model_routing` → kept
+
+## Notes
+
+- **LLM Selection Removed**: Claude Code already provides authenticated access to Claude models. No API key configuration needed.
+- **HUD Integration**: New in v8.0. Provides statusline display of research progress.
+- **Simplified Flow**: 3 steps instead of 9. Faster setup experience.
+- **Project Detection**: Automatically detects existing `.research/` directory.

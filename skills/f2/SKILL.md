@@ -5,7 +5,7 @@ description: |
   Light VS applied: Avoids mechanical checking + research-specific guideline application
   Use when: checking reporting guidelines, preparing submissions, ensuring compliance
   Triggers: checklist, PRISMA, CONSORT, STROBE, COREQ, reporting guidelines
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Checklist Manager

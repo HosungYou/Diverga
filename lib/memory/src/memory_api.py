@@ -10,6 +10,9 @@ v8.0 Changes:
 - Project auto-detection and setup UI routing
 - SyncDAO for YAML → DB synchronization
 - DocGenerator for researcher-friendly Markdown
+- HUD integration (refresh cache on state changes)
+- Intent detection for natural language project initialization
+- Automatic docs/ synchronization
 
 Author: Diverga Project
 Version: 8.0.0
@@ -35,6 +38,14 @@ try:
     from .templates import TemplateEngine
     from .database import MemoryDatabase
     from .sync_dao import SyncDAO
+    from .doc_generator import DocGenerator
+    from .intent_detector import detect_intent, should_initialize_project, get_suggested_prompt
+    from .project_initializer import (
+        ProjectInitializer,
+        initialize_from_intent,
+        is_project_initialized,
+        get_project_banner
+    )
 except ImportError:
     from fs_state import FilesystemState
     from decision_log import DecisionLog
@@ -49,6 +60,14 @@ except ImportError:
     from templates import TemplateEngine
     from database import MemoryDatabase
     from sync_dao import SyncDAO
+    from doc_generator import DocGenerator
+    from intent_detector import detect_intent, should_initialize_project, get_suggested_prompt
+    from project_initializer import (
+        ProjectInitializer,
+        initialize_from_intent,
+        is_project_initialized,
+        get_project_banner
+    )
 
 import yaml
 
@@ -455,6 +474,9 @@ class MemoryAPI:
             )
             if self._current_session_id:
                 self.session_hooks.record_checkpoint(checkpoint_id)
+
+            # v8.0: Trigger docs sync and HUD refresh
+            self._on_checkpoint_completed(checkpoint_id)
         except Exception as e:
             print(f"Warning: Failed to record checkpoint: {e}")
 
@@ -468,7 +490,7 @@ class MemoryAPI:
             return []
 
     # === Decision Management ===
-    def add_decision(self, checkpoint: str, selected: str, rationale: str, 
+    def add_decision(self, checkpoint: str, selected: str, rationale: str,
                      alternatives: Optional[List[Dict]] = None) -> str:
         """Add new decision, return decision_id."""
         try:
@@ -493,6 +515,9 @@ class MemoryAPI:
 
             if self._current_session_id:
                 self.session_hooks.record_decision(decision_id)
+
+            # v8.0: Trigger docs sync and HUD refresh
+            self._on_decision_added(decision_id)
 
             return decision_id
         except Exception as e:
@@ -583,6 +608,238 @@ class MemoryAPI:
             "status": "not_implemented",
             "message": "Migration feature coming in v7.1"
         }
+
+    # === HUD Integration (v8.0) ===
+    def refresh_hud(self) -> bool:
+        """
+        Refresh HUD cache from current project state.
+
+        Returns:
+            True if successful
+        """
+        try:
+            import json
+            hud_state_path = self.project_root / ".research" / "hud-state.json"
+
+            if not hud_state_path.exists():
+                return False
+
+            # Load current HUD state
+            with open(hud_state_path, 'r', encoding='utf-8') as f:
+                hud_state = json.load(f)
+
+            # Update cache from project state
+            project_state = self.get_project_state()
+            checkpoints_path = self.project_root / ".research" / "checkpoints.yaml"
+
+            checkpoints_completed = 0
+            if checkpoints_path.exists():
+                with open(checkpoints_path, 'r', encoding='utf-8') as f:
+                    checkpoints = yaml.safe_load(f) or {}
+                    completed = checkpoints.get('completed', [])
+                    checkpoints_completed = len(completed) if isinstance(completed, list) else 0
+
+            hud_state['cache'] = {
+                'project_name': project_state.get('project_name', project_state.get('name', '')),
+                'current_stage': project_state.get('current_stage', 'foundation'),
+                'checkpoints_completed': checkpoints_completed,
+                'checkpoints_total': 16,  # Standard checkpoint count
+                'memory_health': self._calculate_memory_health()
+            }
+
+            from datetime import datetime
+            hud_state['last_updated'] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+            # Save updated state
+            with open(hud_state_path, 'w', encoding='utf-8') as f:
+                json.dump(hud_state, f, indent=2)
+
+            return True
+        except Exception as e:
+            print(f"Warning: Failed to refresh HUD: {e}")
+            return False
+
+    def _calculate_memory_health(self) -> int:
+        """Calculate memory health percentage."""
+        try:
+            decision_log_path = self.project_root / ".research" / "decision-log.yaml"
+            health = 100
+
+            if decision_log_path.exists():
+                size_mb = decision_log_path.stat().st_size / (1024 * 1024)
+                if size_mb > 5:
+                    health -= 20
+                elif size_mb > 2:
+                    health -= 10
+
+            sessions_dir = self.project_root / ".research" / "sessions"
+            if sessions_dir.exists():
+                session_count = len(list(sessions_dir.glob("*.yaml")))
+                if session_count > 50:
+                    health -= 15
+                elif session_count > 20:
+                    health -= 5
+
+            return max(0, health)
+        except Exception:
+            return 100
+
+    # === Docs Sync (v8.0) ===
+    def sync_docs(self) -> Dict[str, bool]:
+        """
+        Synchronize docs/ directory with current project state.
+
+        Returns:
+            Dict mapping filename to success status
+        """
+        try:
+            generator = DocGenerator(self.project_root)
+            return generator.generate_all()
+        except Exception as e:
+            print(f"Error: Failed to sync docs: {e}")
+            return {}
+
+    def sync_doc(self, filename: str) -> bool:
+        """
+        Sync a single doc file.
+
+        Args:
+            filename: Name of the file (e.g., "PROJECT_STATUS.md")
+
+        Returns:
+            True if successful
+        """
+        try:
+            generator = DocGenerator(self.project_root)
+
+            method_map = {
+                "PROJECT_STATUS.md": generator.update_project_status,
+                "DECISION_LOG.md": generator.update_decision_log,
+                "RESEARCH_AUDIT.md": generator.update_audit_trail,
+                "METHODOLOGY.md": generator.update_methodology,
+                "TIMELINE.md": generator.update_timeline,
+                "REFERENCES.md": generator.update_references,
+            }
+
+            if filename in method_map:
+                return method_map[filename]()
+            return False
+        except Exception as e:
+            print(f"Error: Failed to sync {filename}: {e}")
+            return False
+
+    # === Intent Detection (v8.0) ===
+    def detect_research_intent(self, message: str) -> Dict[str, Any]:
+        """
+        Detect research intent from user message.
+
+        Args:
+            message: User message text
+
+        Returns:
+            Dict with intent detection results
+        """
+        try:
+            intent = detect_intent(message)
+            return {
+                'is_research_intent': intent.is_research_intent,
+                'research_type': intent.research_type.value,
+                'topic': intent.topic,
+                'confidence': intent.confidence,
+                'paradigm': intent.paradigm,
+                'language': intent.additional_context.get('language', 'en')
+            }
+        except Exception as e:
+            print(f"Error detecting intent: {e}")
+            return {
+                'is_research_intent': False,
+                'research_type': 'unknown',
+                'topic': None,
+                'confidence': 0.0,
+                'paradigm': None,
+                'language': 'en'
+            }
+
+    def should_init_project(self, message: str) -> tuple:
+        """
+        Check if message suggests initializing a new project.
+
+        Args:
+            message: User message text
+
+        Returns:
+            Tuple of (should_init: bool, suggested_prompt: str)
+        """
+        try:
+            should_init, intent = should_initialize_project(message)
+            if should_init and intent:
+                prompt = get_suggested_prompt(intent)
+                return (True, prompt)
+            return (False, "")
+        except Exception as e:
+            print(f"Error checking init: {e}")
+            return (False, "")
+
+    def initialize_from_message(self, message: str) -> Dict[str, Any]:
+        """
+        Initialize project from natural language message.
+
+        Args:
+            message: User message describing research intent
+
+        Returns:
+            Dict with initialization results
+        """
+        try:
+            intent = detect_intent(message)
+            initializer = ProjectInitializer(self.project_root)
+            result = initializer.initialize(intent=intent)
+
+            # Refresh HUD after initialization
+            if result['success']:
+                self.refresh_hud()
+
+            return result
+        except Exception as e:
+            return {
+                'success': False,
+                'errors': [str(e)]
+            }
+
+    def get_load_banner(self) -> str:
+        """
+        Get project load banner for display.
+
+        Returns formatted banner when loading an existing project.
+        """
+        try:
+            return get_project_banner(str(self.project_root))
+        except Exception:
+            return ""
+
+    # === State Change Hooks (v8.0) ===
+    def _on_state_change(self) -> None:
+        """Hook called when project state changes."""
+        # Refresh HUD
+        self.refresh_hud()
+        # Sync status doc
+        self.sync_doc("PROJECT_STATUS.md")
+
+    def _on_decision_added(self, decision_id: str) -> None:
+        """Hook called when a decision is added."""
+        # Refresh HUD
+        self.refresh_hud()
+        # Sync decision log doc
+        self.sync_doc("DECISION_LOG.md")
+        self.sync_doc("RESEARCH_AUDIT.md")
+
+    def _on_checkpoint_completed(self, checkpoint_id: str) -> None:
+        """Hook called when a checkpoint is completed."""
+        # Refresh HUD
+        self.refresh_hud()
+        # Sync docs
+        self.sync_doc("PROJECT_STATUS.md")
+        self.sync_doc("DECISION_LOG.md")
 
     # === Utility ===
     def get_version(self) -> str:

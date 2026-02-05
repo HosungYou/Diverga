@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Avoids overused phenomenology, proposes context-optimal qualitative strategies
   Use when: selecting qualitative research design, planning phenomenology/grounded theory/case study
   Triggers: phenomenology, 현상학, grounded theory, 근거이론, case study, 사례연구, narrative inquiry, ethnography, qualitative design
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # Qualitative Design Consultant (C2)

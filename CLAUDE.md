@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v7.0.0 (Memory System Global Deployment)
+# Diverga v8.0.0 (Project Visibility & HUD Enhancement)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v8.0.0**: Project Visibility Enhancement - Independent HUD, simplified setup, natural language project start, docs/ auto-generation
 **v7.0.0**: Memory System - 3-layer context, checkpoint auto-trigger, cross-session persistence
 **v6.9.2**: Marketplace Cache Fix - Fixed cache sync issue, comprehensive troubleshooting guide
 **v6.9.1**: Plugin Discovery Fix - Added version field to SKILL.md, removed orphaned directories, local symlinks
@@ -13,6 +14,26 @@
 **v6.6.2**: Multi-CLI Compatibility - unified install script, NPM package (@diverga/codex-setup)
 **v6.5.0**: Parallel execution via Task tool - `Task(subagent_type="diverga:a1", ...)`
 **v6.4**: Plugin Marketplace Registration - Install via `/plugin marketplace add`
+
+## v8.0 Key Features
+
+### 1. File Structure Redesign
+- `.research/` = System files (hidden)
+- `docs/` = Researcher-visible documentation (auto-generated)
+
+### 2. Independent HUD Statusline
+- Completely independent of oh-my-claudecode
+- Shows project name, stage, checkpoint progress, memory health
+- Multiple presets: research, checkpoint, memory, minimal
+
+### 3. Simplified Setup (3 Steps)
+- Removed LLM selection (Claude Code already authenticated)
+- Checkpoint level + HUD + Language in single screen
+- Auto-project detection
+
+### 4. Natural Language Project Start
+- "I want to conduct a systematic review on AI in education" → auto-detect & initialize
+- Works in English and Korean
 
 AI Research Assistant for the Complete Research Lifecycle - from question formulation to publication.
 

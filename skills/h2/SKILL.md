@@ -3,7 +3,7 @@ name: h2
 description: |
   Agent H2 - Action Research Facilitator - Participatory and transformative research design.
   Covers action research cycles, stakeholder collaboration, and change documentation.
-version: "7.0.0"
+version: "8.0.0"
 ---
 
 # H2-ActionResearchFacilitator
