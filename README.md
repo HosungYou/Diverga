@@ -474,7 +474,7 @@ cd Diverga
 **Direct Commands**:
 ```
 /diverga:setup          # Configuration wizard
-/diverga:help           # Show all 40 agents
+/diverga:help           # Show all 44 agents
 /diverga:meta-analysis  # Start meta-analysis workflow
 diverga:c5              # Invoke specific agent
 ```
@@ -639,7 +639,7 @@ All 44 agents work identically across all platforms with VS methodology and huma
 |----------|-------------|
 | [CLAUDE.md](CLAUDE.md) | Full system documentation |
 | [PLUGIN.md](PLUGIN.md) | Plugin marketplace definition |
-| [AGENTS.md](AGENTS.md) | 40 agents detailed reference |
+| [AGENTS.md](AGENTS.md) | 44 agents detailed reference |
 | [Agent Orchestration Guide](docs/AGENT-ORCHESTRATION-GUIDE.md) | Comprehensive multi-agent pipelines (EN) |
 | [에이전트 오케스트레이션 가이드](docs/AGENT-ORCHESTRATION-GUIDE-ko.md) | 종합 멀티에이전트 파이프라인 (KO) |
 | [B5 Parallel Processing](docs/B5-PARALLEL-PROCESSING.md) | v6.2 parallel document processing |
@@ -672,7 +672,7 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {6.7.0},
+  version = {8.0.1},
   url = {https://github.com/HosungYou/Diverga},
   note = {44 agents with VS Methodology, Human-Centered Design, Meta-Analysis System, Humanization Pipeline, Systematic Review Automation (Category I), Plugin Marketplace, Parallel Execution, and Cross-Platform Support (Claude Code, Codex CLI, OpenCode). Prevents mode collapse through Verbalized Sampling (arXiv:2510.01171)}
 }

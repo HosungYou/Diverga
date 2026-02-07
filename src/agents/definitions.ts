@@ -1,7 +1,7 @@
 /**
  * Diverga Agent Runtime - Agent Definitions
  *
- * Registry of all 40 research agents for the Diverga system.
+ * Registry of all 44 research agents for the Diverga system.
  * Prompts are dynamically loaded from SKILL.md files (Source of Truth).
  *
  * This module provides:
@@ -86,6 +86,12 @@ export const AGENT_MAPPINGS: AgentIdMapping[] = [
   // Category H: Specialized Approaches (2 agents)
   { shortId: 'h1', fullId: 'diverga:h1', directoryName: 'H1-ethnographic-research-advisor' },
   { shortId: 'h2', fullId: 'diverga:h2', directoryName: 'H2-action-research-facilitator' },
+
+  // Category I: Systematic Review Automation (4 agents)
+  { shortId: 'i0', fullId: 'diverga:i0', directoryName: 'I0-scholar-agent-orchestrator' },
+  { shortId: 'i1', fullId: 'diverga:i1', directoryName: 'I1-paper-retrieval-agent' },
+  { shortId: 'i2', fullId: 'diverga:i2', directoryName: 'I2-screening-assistant' },
+  { shortId: 'i3', fullId: 'diverga:i3', directoryName: 'I3-rag-builder' },
 ];
 
 // ============================================================
@@ -821,6 +827,78 @@ const AGENT_CONFIGS: Record<string, AgentStaticConfig> = {
     creativityModules: [],
     category: 'H',
     categoryName: 'Specialized Approaches',
+  },
+
+  // ============================================================
+  // CATEGORY I: SYSTEMATIC REVIEW AUTOMATION (4 agents)
+  // ============================================================
+
+  'i0': {
+    displayName: 'ScholaRAG Pipeline Orchestrator',
+    description: 'ScholaRAG Pipeline Orchestrator - Coordinates systematic literature review automation.',
+    model: 'opus',
+    tier: 'HIGH',
+    tools: ['Read', 'Glob', 'Grep', 'Bash', 'Task'],
+    icon: '🔬',
+    vsLevel: 'Enhanced',
+    vsPhases: [0, 1, 2, 4],
+    triggers: ['systematic review', 'PRISMA', 'ScholaRAG', '체계적 문헌고찰', '프리즈마', '스콜라랙'],
+    paradigmAffinity: ['quantitative', 'qualitative', 'mixed'],
+    checkpoints: ['SCH_DATABASE_SELECTION', 'SCH_SCREENING_CRITERIA', 'SCH_RAG_READINESS', 'SCH_PRISMA_GENERATION'],
+    creativityModules: ['forced-analogy', 'semantic-distance'],
+    category: 'I',
+    categoryName: 'Systematic Review Automation',
+  },
+
+  'i1': {
+    displayName: 'Paper Retrieval Agent',
+    description: 'Paper Retrieval Agent - Multi-database paper fetching from Semantic Scholar, OpenAlex, arXiv.',
+    model: 'sonnet',
+    tier: 'MEDIUM',
+    tools: ['Read', 'Glob', 'Grep', 'Bash', 'WebFetch'],
+    icon: '📄',
+    vsLevel: 'Light',
+    vsPhases: [0, 1, 4],
+    triggers: ['fetch papers', 'retrieve papers', 'database search', '논문 수집', '데이터베이스 검색'],
+    paradigmAffinity: ['quantitative', 'qualitative', 'mixed'],
+    checkpoints: ['SCH_DATABASE_SELECTION'],
+    creativityModules: [],
+    category: 'I',
+    categoryName: 'Systematic Review Automation',
+  },
+
+  'i2': {
+    displayName: 'Screening Assistant',
+    description: 'Screening Assistant - AI-PRISMA 6-dimension screening with Groq LLM (100x cheaper).',
+    model: 'sonnet',
+    tier: 'MEDIUM',
+    tools: ['Read', 'Glob', 'Grep', 'Bash'],
+    icon: '🔍',
+    vsLevel: 'Light',
+    vsPhases: [0, 1, 4],
+    triggers: ['screen papers', 'inclusion criteria', 'AI screening', '논문 스크리닝', '포함 기준'],
+    paradigmAffinity: ['quantitative', 'qualitative', 'mixed'],
+    checkpoints: ['SCH_SCREENING_CRITERIA'],
+    creativityModules: [],
+    category: 'I',
+    categoryName: 'Systematic Review Automation',
+  },
+
+  'i3': {
+    displayName: 'RAG Builder',
+    description: 'RAG Builder - Vector database construction with local embeddings (zero cost).',
+    model: 'haiku',
+    tier: 'LOW',
+    tools: ['Read', 'Glob', 'Grep', 'Bash'],
+    icon: '🗄️',
+    vsLevel: 'Light',
+    vsPhases: [0, 1, 4],
+    triggers: ['build RAG', 'vector database', 'PDF download', 'RAG 구축', 'PDF 다운로드'],
+    paradigmAffinity: ['quantitative', 'qualitative', 'mixed'],
+    checkpoints: ['SCH_RAG_READINESS'],
+    creativityModules: [],
+    category: 'I',
+    categoryName: 'Systematic Review Automation',
   },
 };
 

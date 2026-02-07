@@ -52,7 +52,7 @@ ${colors.dim}    ─────────────────────
  */
 export const PLUGIN_CONFIG = {
   name: 'diverga',
-  version: '6.6.1',
+  version: '8.0.1',
   description: 'Research Coordinator - Multi-agent system for social science research',
 };
 
@@ -61,7 +61,7 @@ export const PLUGIN_CONFIG = {
  */
 export function initialize(context: PluginContext): Plugin {
   console.log(BANNER);
-  console.log(`${colors.bright}    Research Coordinator for OpenCode${colors.reset}  │  ${colors.green}v${PLUGIN_CONFIG.version}${colors.reset}  │  ${colors.cyan}40 Agents${colors.reset}`);
+  console.log(`${colors.bright}    Research Coordinator for OpenCode${colors.reset}  │  ${colors.green}v${PLUGIN_CONFIG.version}${colors.reset}  │  ${colors.cyan}44 Agents${colors.reset}`);
   console.log(`${colors.dim}    Powered by VS (Verbalized Sampling) Methodology${colors.reset}\n`);
 
   // Load research context if exists

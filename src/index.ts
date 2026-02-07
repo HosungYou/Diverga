@@ -26,7 +26,7 @@
 export * from './agents/index.js';
 
 // Package info
-export const VERSION = '6.5.0';
+export const VERSION = '8.0.1';
 export const PACKAGE_NAME = 'diverga';
 
 /**
@@ -56,43 +56,46 @@ export const diverga = {
   version: VERSION,
 
   /**
-   * Get all 40 agent definitions
+   * Get all 44 agent definitions
    */
   get agents() {
-    // Dynamic import to avoid circular deps
-    const { getAgentDefinitions } = require('./agents/definitions.js');
-    return getAgentDefinitions();
+    // Use dynamic import to avoid circular deps
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return (async () => {
+      const { getAgentDefinitions } = await import('./agents/definitions.js');
+      return getAgentDefinitions();
+    })();
   },
 
   /**
    * Get agent by short ID (a1, b1, etc.)
    */
-  agent(id: string) {
-    const { getAgent } = require('./agents/definitions.js');
+  async agent(id: string) {
+    const { getAgent } = await import('./agents/definitions.js');
     return getAgent(id);
   },
 
   /**
    * Find agent by trigger keyword
    */
-  find(keyword: string) {
-    const { findAgentByTrigger } = require('./agents/definitions.js');
+  async find(keyword: string) {
+    const { findAgentByTrigger } = await import('./agents/definitions.js');
     return findAgentByTrigger(keyword);
   },
 
   /**
-   * Get agents by category (A-H)
+   * Get agents by category (A-I)
    */
-  category(cat: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H') {
-    const { getAgentsByCategory } = require('./agents/definitions.js');
+  async category(cat: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I') {
+    const { getAgentsByCategory } = await import('./agents/definitions.js');
     return getAgentsByCategory(cat);
   },
 
   /**
    * Get agents by tier
    */
-  tier(t: 'HIGH' | 'MEDIUM' | 'LOW') {
-    const { getAgentsByTier } = require('./agents/definitions.js');
+  async tier(t: 'HIGH' | 'MEDIUM' | 'LOW') {
+    const { getAgentsByTier } = await import('./agents/definitions.js');
     return getAgentsByTier(t);
   },
 };

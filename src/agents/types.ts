@@ -10,9 +10,9 @@ export type VSLevel = 'Full' | 'Enhanced' | 'Light';
 export type TierLevel = 'HIGH' | 'MEDIUM' | 'LOW';
 
 /**
- * Category identifiers for the 8 agent categories
+ * Category identifiers for the 9 agent categories
  */
-export type CategoryId = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H';
+export type CategoryId = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I';
 
 /**
  * Category metadata
@@ -75,7 +75,7 @@ export interface AgentConfig {
  * Extended metadata for research agents
  */
 export interface AgentMetadata {
-  /** Category (A-H) */
+  /** Category (A-I) */
   category: CategoryId;
 
   /** Category name */
@@ -159,6 +159,7 @@ export const CATEGORIES: Record<CategoryId, CategoryInfo> = {
   F: { id: 'F', name: 'Quality & Validation', description: 'Quality assurance' },
   G: { id: 'G', name: 'Publication & Communication', description: 'Research dissemination' },
   H: { id: 'H', name: 'Specialized Approaches', description: 'Specialized methodologies' },
+  I: { id: 'I', name: 'Systematic Review Automation', description: 'Automated systematic literature review pipeline' },
 };
 
 /**
@@ -182,4 +183,5 @@ export const CATEGORY_TOOLS: Record<CategoryId, string[]> = {
   F: ['Read', 'Glob', 'Grep'],
   G: ['Read', 'Glob', 'Grep', 'Edit', 'Write', 'WebSearch'],
   H: ['Read', 'Glob', 'Grep', 'Edit', 'Write', 'WebSearch'],
+  I: ['Read', 'Glob', 'Grep', 'Bash', 'Task'],
 };

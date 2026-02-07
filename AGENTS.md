@@ -33,7 +33,7 @@
 | **OMC Autonomous Modes** | ralph/ultrawork/ecomode | ❌ REMOVED |
 | **Human Checkpoints** | Could be bypassed | ✅ MANDATORY |
 | **Agent Naming** | Numbered (01-21) | ✅ Category-based (A1-I3) |
-| **Agent Count** | 27 agents | ✅ 44 agents (v6.7.0) |
+| **Agent Count** | 27 agents | ✅ 44 agents (v8.0.1) |
 | **State Location** | `.omc/` | ✅ `.claude/` |
 
 ---
@@ -50,11 +50,15 @@ Diverga/
 │   │   │   └── SKILL.md                   # Main entry point
 │   │   ├── research-orchestrator/         # Agent orchestration
 │   │   │   └── SKILL.md
-│   │   └── research-agents/               # 33 specialized agents
+│   │   └── research-agents/               # 44 specialized agents
 │   │       ├── A1-research-question-refiner/
 │   │       ├── A2-theoretical-framework-architect/
 │   │       ├── ...
-│   │       └── H2-action-research-facilitator/
+│   │       ├── H2-action-research-facilitator/
+│   │       ├── I0-scholar-agent-orchestrator/
+│   │       ├── I1-paper-retrieval-agent/
+│   │       ├── I2-screening-assistant/
+│   │       └── I3-rag-builder/
 │   ├── config/
 │   │   └── research-coordinator-routing.yaml
 │   ├── checkpoints/
@@ -133,11 +137,11 @@ Location: `.claude/state/checkpoints.json`
 
 ---
 
-## Agent Registry (v6.7.0)
+## Agent Registry (v8.0.1)
 
 ### 44 Specialized Research Agents in 9 Categories
 
-Diverga v6.7.0 uses **category-based naming** (A1-I3) for all agents, organized into 9 functional categories.
+Diverga v8.0.1 uses **category-based naming** (A1-I3) for all agents, organized into 9 functional categories.
 
 ---
 
@@ -369,7 +373,7 @@ Integrates ScholaRAG systematic review automation into Diverga:
 
 ---
 
-## Model Routing (v6.7.0)
+## Model Routing (v8.0.1)
 
 | Tier | Model | Count | Agents |
 |------|-------|-------|--------|
@@ -717,4 +721,4 @@ project:
 
 ---
 
-*This file enables AI assistants to understand Diverga v6.7.0's architecture and operate effectively within its human-centered design.*
+*This file enables AI assistants to understand Diverga v8.0.1's architecture and operate effectively within its human-centered design.*

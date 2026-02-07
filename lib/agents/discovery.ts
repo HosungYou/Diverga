@@ -93,7 +93,7 @@ export function discoverAgents(customPath?: string): AgentRegistry {
   }
 
   return {
-    version: '6.0.0',
+    version: '8.0.1',
     lastUpdated: new Date().toISOString().split('T')[0],
     totalAgents: agents.size,
     agents,

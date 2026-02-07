@@ -4,6 +4,60 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [8.0.1-patch3] - 2026-02-07 (8-Dimension Diagnostic Sweep & Deep Fix)
+
+### Overview
+
+Comprehensive 8-dimension diagnostic sweep using multi-agent parallel analysis (version audit, agent definitions audit, build/TS diagnostics, code quality review, security review, architecture review, documentation consistency, test coverage analysis). Found and fixed 16+ issues across the entire codebase.
+
+### Critical Fixes
+
+- **fix(types)**: Added Category I ('I') to `CategoryId` union type, `CATEGORIES` record, and `CATEGORY_TOOLS` record in `src/agents/types.ts`
+- **fix(definitions)**: Registered I0-I3 agents in `AGENT_MAPPINGS` and `AGENT_CONFIGS` in `src/agents/definitions.ts` (40→44 agents)
+- **fix(index)**: Updated VERSION from '6.5.0' to '8.0.1', converted CJS `require()` to ESM `import()`, added category 'I' support in `src/index.ts`
+
+### Version Synchronization (8 additional files)
+
+| File | Old Version | New Version |
+|------|-------------|-------------|
+| `lib/index.ts` | 6.0.0 | 8.0.1 |
+| `lib/agents/discovery.ts` | 6.0.0 | 8.0.1 |
+| `packages/codex-setup/src/index.ts` | 6.6.1 | 8.0.1 |
+| `.opencode/plugins/diverga/index.ts` | 6.6.1 | 8.0.1 |
+| `.opencode/plugins/diverga/hooks/context-manager.ts` | 6.0.0 | 8.0.1 |
+
+### Library Fixes (lib/)
+
+- **fix(lib/types)**: Added Category I to `CATEGORIES` in `lib/agents/types.ts`
+- **fix(lib/parser)**: Updated regex from `[A-H]` to `[A-I]` in `lib/agents/parser.ts` to recognize Category I agents
+- **fix(lib/index)**: Converted CJS `require()` to async ESM `import()` in `initializeDiverga()`
+
+### Documentation Fixes
+
+- **fix(AGENTS.md)**: Updated version references from v6.7.0 to v8.0.1 in section headers
+- **fix(.codex/AGENTS.md)**: Updated agent count to 44, added Category I section with I0-I3
+- **fix(README.md)**: Updated agent count from 40 to 44, BibTeX version from 6.7.0 to 8.0.1
+- **fix(.opencode)**: Updated agent count from 40 to 44
+- **fix(lib/memory)**: Updated IMPLEMENTATION_SUMMARY.md agent count from 40 to 44
+
+### Diagnostic Findings (Advisory)
+
+| Dimension | Agent | Key Finding |
+|-----------|-------|-------------|
+| Architecture | arch-reviewer (opus) | Dual registry (src/ vs lib/) confirmed; lib/ is legacy |
+| Security | security-reviewer (opus) | 5 findings, overall LOW risk; path traversal in prompt-loader |
+| Code Quality | code-reviewer (opus) | 12 issues; dead code in src/, fragile YAML parser |
+| Test Coverage | qa-tester (sonnet) | 168 tests, zero TypeScript test coverage |
+
+### Verification
+
+- `tsc --noEmit`: 0 errors
+- Stale version grep (6.0.0/6.5.0/6.6.1): 0 matches in source
+- Stale agent count grep (40/33 agents): 0 matches
+- 14 files changed, 137 insertions, 40 deletions
+
+---
+
 ## [8.0.1] - 2026-02-05 (Installation Bug Fixes)
 
 ### Bug Fixes

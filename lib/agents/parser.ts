@@ -117,7 +117,7 @@ function parseSimpleYaml(yaml: string): FrontMatter {
  * e.g., "A1-research-question-refiner" -> "A1"
  */
 export function extractAgentId(dirName: string): AgentId {
-  const match = dirName.match(/^([A-H]\d+)/i);
+  const match = dirName.match(/^([A-I]\d+)/i);
   return match ? match[1].toUpperCase() : dirName;
 }
 

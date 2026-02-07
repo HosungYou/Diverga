@@ -84,8 +84,8 @@ export type { CreativityLevel } from './tscore/reference';
 /**
  * Initialize Diverga library with default paths
  */
-export function initializeDiverga() {
-  const { discoverAgents, DEFAULT_PATHS } = require('./agents/discovery');
+export async function initializeDiverga() {
+  const { discoverAgents, DEFAULT_PATHS } = await import('./agents/discovery.js');
   const registry = discoverAgents(DEFAULT_PATHS.userSkills);
 
   console.log(`Diverga initialized with ${registry.totalAgents} agents`);
@@ -95,7 +95,7 @@ export function initializeDiverga() {
 /**
  * Get library version
  */
-export const VERSION = '6.0.0';
+export const VERSION = '8.0.1';
 
 /**
  * Platform adapters configuration

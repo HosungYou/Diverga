@@ -4,6 +4,7 @@
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v8.0.1-patch3**: 8-Dimension Diagnostic Sweep - Category I registration fix, version sync, lib/ fixes
 **v8.0.1**: Installation Bug Fixes - Fixed install script path corruption, skills copy instead of symlink
 **v8.0.0**: Project Visibility Enhancement - Independent HUD, simplified setup, natural language project start, docs/ auto-generation
 **v7.0.0**: Memory System - 3-layer context, checkpoint auto-trigger, cross-session persistence

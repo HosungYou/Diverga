@@ -168,6 +168,7 @@ export const CATEGORIES = {
   F: 'Quality & Validation',
   G: 'Publication & Communication',
   H: 'Specialized Approaches',
+  I: 'Systematic Review Automation',
 } as const;
 
 export type CategoryCode = keyof typeof CATEGORIES;

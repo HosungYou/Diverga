@@ -206,7 +206,7 @@ All agents with `diverga:` prefix automatically receive context:
 - `diverga:g1` through `diverga:g6` (Communication)
 - `diverga:h1` through `diverga:h2` (Specialized)
 
-Total: 40 agents supported
+Total: 44 agents supported
 
 ## Error Handling
 
