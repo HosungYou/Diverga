@@ -1,13 +1,13 @@
 # AGENTS.md
 
-> AI-readable documentation for Diverga v8.1.0 (Checkpoint Enforcement Strengthening)
+> AI-readable documentation for Diverga v8.3.0 (Cross-Platform Migration)
 
 ## Project Overview
 
 **Diverga** is a Claude Code Skills-based AI research assistant system that breaks free from mode collapse through **Verbalized Sampling (VS) methodology**. It provides context-persistent support for the complete research lifecycle with a focus on **creative, defensible research choices** while ensuring **human decisions remain with humans**.
 
-**Version**: 8.1.0 (Checkpoint Enforcement Strengthening)
-**Generated**: 2026-01-31
+**Version**: 8.3.0 (Cross-Platform Migration)
+**Generated**: 2026-02-12
 **Repository**: https://github.com/HosungYou/Diverga
 
 ---
@@ -33,7 +33,7 @@
 | **OMC Autonomous Modes** | ralph/ultrawork/ecomode | REMOVED |
 | **Human Checkpoints** | Could be bypassed | MANDATORY |
 | **Agent Naming** | Numbered (01-21) | Category-based (A1-I3) |
-| **Agent Count** | 27 agents | 44 agents (v8.1.0) |
+| **Agent Count** | 27 agents | 44 agents (v8.3.0) |
 | **State Location** | `.omc/` | `.claude/` |
 
 ---
@@ -137,11 +137,11 @@ Location: `.research/checkpoints.yaml` (v8.2+), `.research/decision-log.yaml`
 
 ---
 
-## Agent Registry (v8.1.0)
+## Agent Registry (v8.3.0)
 
 ### 44 Specialized Research Agents in 9 Categories
 
-Diverga v8.1.0 uses **category-based naming** (A1-I3) for all agents, organized into 9 functional categories.
+Diverga v8.3.0 uses **category-based naming** (A1-I3) for all agents, organized into 9 functional categories.
 
 ---
 
@@ -373,7 +373,7 @@ Systematic review automation pipeline:
 
 ---
 
-## Model Routing (v8.1.0)
+## Model Routing (v8.3.0)
 
 | Tier | Model | Count | Agents |
 |------|-------|-------|--------|
@@ -721,4 +721,4 @@ project:
 
 ---
 
-*This file enables AI assistants to understand Diverga v8.1.0's architecture and operate effectively within its human-centered design.*
+*This file enables AI assistants to understand Diverga v8.3.0's architecture and operate effectively within its human-centered design.*

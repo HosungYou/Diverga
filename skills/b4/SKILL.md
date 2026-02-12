@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Avoids simple keyword tracking, delivers strategic research monitoring
   Use when: tracking new publications, monitoring research trends, staying updated
   Triggers: latest research, trends, new publications, recent papers, research developments
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # Research Radar

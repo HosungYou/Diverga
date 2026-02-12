@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/main/schema.json",
   "name": "diverga",
-  "version": "8.1.0",
+  "version": "8.3.0",
   "description": "Diverga Research Coordinator - Multi-agent system for social science research",
   "author": "Hosung You",
   "repository": "https://github.com/HosungYou/Diverga",
@@ -242,7 +242,7 @@
     "G3": {
       "keywords": ["peer review", "reviewer response", "revision", "리뷰어 응답"],
       "autoActivate": true,
-      "model": "sonnet"
+      "model": "opus"
     },
     "G4": {
       "keywords": ["preregistration", "OSF", "pre-register", "사전등록"],
@@ -268,21 +268,41 @@
       "keywords": ["action research", "participatory", "practitioner", "실행연구"],
       "autoActivate": true,
       "model": "opus"
+    },
+    "I0": {
+      "keywords": ["systematic review", "PRISMA", "literature review automation", "체계적 문헌고찰", "프리즈마"],
+      "autoActivate": true,
+      "model": "opus"
+    },
+    "I1": {
+      "keywords": ["fetch papers", "retrieve papers", "database search", "논문 수집", "데이터베이스 검색"],
+      "autoActivate": true,
+      "model": "sonnet"
+    },
+    "I2": {
+      "keywords": ["screen papers", "PRISMA screening", "inclusion criteria", "논문 스크리닝", "선별"],
+      "autoActivate": true,
+      "model": "sonnet"
+    },
+    "I3": {
+      "keywords": ["build RAG", "vector database", "embed documents", "RAG 구축", "벡터 DB"],
+      "autoActivate": true,
+      "model": "haiku"
     }
   },
 
   "modelRouting": {
     "HIGH": {
       "model": "opus",
-      "agents": ["A1", "A2", "A3", "A5", "B5", "C1", "C2", "C3", "C5", "D4", "E1", "E2", "E3", "G6", "H1", "H2"]
+      "agents": ["A1", "A2", "A3", "A5", "B5", "C1", "C2", "C3", "C5", "D4", "E1", "E2", "E3", "G3", "G6", "H1", "H2", "I0"]
     },
     "MEDIUM": {
       "model": "sonnet",
-      "agents": ["A4", "A6", "B1", "B2", "C4", "C6", "C7", "D1", "D2", "E5", "F3", "F4", "G1", "G2", "G3", "G4", "G5"]
+      "agents": ["A4", "A6", "B1", "B2", "C4", "C6", "C7", "D1", "D2", "E5", "F3", "F4", "G1", "G2", "G4", "G5", "I1", "I2"]
     },
     "LOW": {
       "model": "haiku",
-      "agents": ["B3", "B4", "D3", "E4", "F1", "F2", "F5"]
+      "agents": ["B3", "B4", "D3", "E4", "F1", "F2", "F5", "I3"]
     }
   },
 
@@ -293,7 +313,9 @@
       "CP_THEORY_SELECTION",
       "CP_METHODOLOGY_APPROVAL",
       "CP_VS_001",
-      "CP_VS_003"
+      "CP_VS_003",
+      "SCH_DATABASE_SELECTION",
+      "SCH_SCREENING_CRITERIA"
     ],
     "recommended": [
       "CP_ANALYSIS_PLAN",
@@ -302,7 +324,8 @@
       "CP_SCREENING_CRITERIA",
       "CP_SAMPLING_STRATEGY",
       "CP_CODING_APPROACH",
-      "CP_THEME_VALIDATION"
+      "CP_THEME_VALIDATION",
+      "SCH_RAG_READINESS"
     ],
     "optional": [
       "CP_VISUALIZATION_PREFERENCE",

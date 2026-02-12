@@ -1,6 +1,6 @@
 # Diverga
 
-**Version**: 8.1.0
+**Version**: 8.3.0
 **Author**: Hosung You
 **Repository**: https://github.com/HosungYou/Diverga
 **License**: MIT
@@ -22,7 +22,7 @@ Diverga is an AI Research Assistant for the complete research lifecycle. 44 spec
 
 ---
 
-## Directory Structure (v8.1.0)
+## Directory Structure (v8.3.0)
 
 ```
 diverga/
@@ -227,7 +227,7 @@ Configuration file: `~/.claude/plugins/diverga/config/diverga-config.json`
 
 ```json
 {
-  "version": "8.1.0",
+  "version": "8.3.0",
   "human_checkpoints": {
     "enabled": true,
     "required": ["CP_PARADIGM", "CP_METHODOLOGY"]
@@ -263,4 +263,4 @@ Configuration file: `~/.claude/plugins/diverga/config/diverga-config.json`
 
 ---
 
-*Version 8.1.0 - Project Visibility & HUD Enhancement*
+*Version 8.3.0 - Cross-Platform Migration*

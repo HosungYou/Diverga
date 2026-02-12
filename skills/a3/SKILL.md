@@ -5,7 +5,7 @@ description: |
   Full VS 5-Phase process: Avoid predictable criticism, generate creative alternative explanations
   Use when: reviewing research design, anticipating reviewer criticism, stress-testing assumptions
   Triggers: criticism, weakness, reviewer 2, alternative explanation, rebuttal, 비판, 약점
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

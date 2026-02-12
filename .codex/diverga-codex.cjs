@@ -10,6 +10,7 @@
  *   diverga-codex agent <id> - Show agent details
  *   diverga-codex context    - Show current research context
  *   diverga-codex checkpoint - Show checkpoint status
+ *   diverga-codex prereq     - Show agent prerequisite map
  */
 
 const fs = require('fs');
@@ -44,7 +45,7 @@ ${colors.dim}    ─────────────────────
 
 // Configuration
 const CONFIG = {
-  version: '6.6.1',
+  version: '8.3.0',
   registryPath: path.join(__dirname, 'agents', 'index.json'),
   contextPath: path.join(process.cwd(), '.research', 'project-state.yaml'),
   skillsPath: path.join(process.env.HOME || '~', '.claude', 'skills', 'research-agents'),
@@ -52,16 +53,16 @@ const CONFIG = {
 
 // Model mapping
 const MODEL_MAP = {
-  HIGH: 'o1',
-  MEDIUM: 'gpt-4',
-  LOW: 'gpt-3.5-turbo',
+  HIGH: 'gpt-5.3-codex',
+  MEDIUM: 'gpt-5.2-codex',
+  LOW: 'gpt-5.1-codex-mini',
 };
 
 // Agent registry (embedded for standalone use)
 const AGENT_REGISTRY = {
   'A1': { name: 'Research Question Refiner', tier: 'MEDIUM', icon: '🔬', category: 'A - Research Foundation' },
   'A2': { name: 'Theoretical Framework Architect', tier: 'HIGH', icon: '🏛️', category: 'A - Research Foundation' },
-  'A3': { name: "Devil's Advocate", tier: 'MEDIUM', icon: '😈', category: 'A - Research Foundation' },
+  'A3': { name: "Devil's Advocate", tier: 'HIGH', icon: '😈', category: 'A - Research Foundation' },
   'A4': { name: 'Research Ethics Advisor', tier: 'MEDIUM', icon: '⚖️', category: 'A - Research Foundation' },
   'A5': { name: 'Paradigm & Worldview Advisor', tier: 'HIGH', icon: '🌍', category: 'A - Research Foundation' },
   'A6': { name: 'Conceptual Framework Visualizer', tier: 'HIGH', icon: '🎨', category: 'A - Research Foundation' },
@@ -69,7 +70,7 @@ const AGENT_REGISTRY = {
   'B2': { name: 'Evidence Quality Appraiser', tier: 'MEDIUM', icon: '🔍', category: 'B - Literature & Evidence' },
   'B3': { name: 'Effect Size Extractor', tier: 'LOW', icon: '📊', category: 'B - Literature & Evidence' },
   'B4': { name: 'Research Radar', tier: 'LOW', icon: '📡', category: 'B - Literature & Evidence' },
-  'B5': { name: 'Parallel Document Processor', tier: 'MEDIUM', icon: '📄', category: 'B - Literature & Evidence' },
+  'B5': { name: 'Parallel Document Processor', tier: 'HIGH', icon: '📄', category: 'B - Literature & Evidence' },
   'C1': { name: 'Quantitative Design Consultant', tier: 'HIGH', icon: '📈', category: 'C - Study Design' },
   'C2': { name: 'Qualitative Design Consultant', tier: 'HIGH', icon: '🎙️', category: 'C - Study Design' },
   'C3': { name: 'Mixed Methods Design Consultant', tier: 'HIGH', icon: '🔀', category: 'C - Study Design' },
@@ -90,15 +91,19 @@ const AGENT_REGISTRY = {
   'F2': { name: 'Checklist Manager', tier: 'LOW', icon: '📋', category: 'F - Quality & Validation' },
   'F3': { name: 'Reproducibility Auditor', tier: 'MEDIUM', icon: '🔄', category: 'F - Quality & Validation' },
   'F4': { name: 'Bias & Trustworthiness Detector', tier: 'MEDIUM', icon: '⚠️', category: 'F - Quality & Validation' },
-  'F5': { name: 'Humanization Verifier', tier: 'MEDIUM', icon: '👤', category: 'F - Quality & Validation' },
+  'F5': { name: 'Humanization Verifier', tier: 'LOW', icon: '👤', category: 'F - Quality & Validation' },
   'G1': { name: 'Journal Matcher', tier: 'MEDIUM', icon: '📰', category: 'G - Publication' },
   'G2': { name: 'Academic Communicator', tier: 'MEDIUM', icon: '✍️', category: 'G - Publication' },
   'G3': { name: 'Peer Review Strategist', tier: 'HIGH', icon: '👥', category: 'G - Publication' },
   'G4': { name: 'Pre-registration Composer', tier: 'MEDIUM', icon: '📝', category: 'G - Publication' },
   'G5': { name: 'Academic Style Auditor', tier: 'MEDIUM', icon: '📖', category: 'G - Publication' },
-  'G6': { name: 'Academic Style Humanizer', tier: 'MEDIUM', icon: '🖊️', category: 'G - Publication' },
+  'G6': { name: 'Academic Style Humanizer', tier: 'HIGH', icon: '🖊️', category: 'G - Publication' },
   'H1': { name: 'Ethnographic Research Advisor', tier: 'HIGH', icon: '🌐', category: 'H - Specialized' },
   'H2': { name: 'Action Research Facilitator', tier: 'HIGH', icon: '🎬', category: 'H - Specialized' },
+  'I0': { name: 'Review Pipeline Orchestrator', tier: 'HIGH', icon: '📚', category: 'I - Systematic Review' },
+  'I1': { name: 'Paper Retrieval Agent', tier: 'MEDIUM', icon: '📄', category: 'I - Systematic Review' },
+  'I2': { name: 'Screening Assistant', tier: 'MEDIUM', icon: '🔍', category: 'I - Systematic Review' },
+  'I3': { name: 'RAG Builder', tier: 'LOW', icon: '🗃️', category: 'I - Systematic Review' },
 };
 
 // Visual width helper - accounts for emoji being 2 columns wide in terminals
@@ -129,7 +134,7 @@ function visualPadEnd(str, targetWidth) {
 const commands = {
   help() {
     console.log(BANNER);
-    console.log(`${colors.bright}    Research Coordinator for Codex CLI${colors.reset}  │  ${colors.green}v${CONFIG.version}${colors.reset}  │  ${colors.cyan}40 Agents${colors.reset}
+    console.log(`${colors.bright}    Research Coordinator for Codex CLI${colors.reset}  │  ${colors.green}v${CONFIG.version}${colors.reset}  │  ${colors.cyan}44 Agents${colors.reset}
     ${colors.dim}Powered by VS (Verbalized Sampling) Methodology${colors.reset}
 
 ${colors.bright}Usage:${colors.reset} diverga-codex <command> [options]
@@ -140,6 +145,7 @@ ${colors.bright}Commands:${colors.reset}
   ${colors.green}agent${colors.reset} <id>         Show details for a specific agent (e.g., A1, B2)
   ${colors.green}context${colors.reset}            Show current research project context
   ${colors.green}checkpoint${colors.reset}         Show checkpoint status
+  ${colors.green}prereq${colors.reset}             Show agent prerequisite map
   ${colors.green}tscore${colors.reset}             Display T-Score reference table
   ${colors.green}vs${colors.reset}                 Explain VS methodology
 
@@ -178,14 +184,16 @@ ${colors.dim}Documentation: https://github.com/HosungYou/Diverga${colors.reset}
 ${colors.green}✓ Setup Complete!${colors.reset}
 
 ${colors.bright}Quick Start:${colors.reset}
-  ${colors.dim}$${colors.reset} diverga-codex list          ${colors.dim}# View all 40 agents${colors.reset}
+  ${colors.dim}$${colors.reset} diverga-codex list          ${colors.dim}# View all 44 agents${colors.reset}
   ${colors.dim}$${colors.reset} diverga-codex agent A1      ${colors.dim}# Get agent details${colors.reset}
   ${colors.dim}$${colors.reset} diverga-codex tscore        ${colors.dim}# T-Score reference${colors.reset}
+  ${colors.dim}$${colors.reset} diverga-codex prereq        ${colors.dim}# Agent prerequisites${colors.reset}
 
 ${colors.bright}In Codex sessions, use keywords to trigger agents:${colors.reset}
   ${colors.cyan}"research question"${colors.reset}  → A1-ResearchQuestionRefiner
   ${colors.cyan}"meta-analysis"${colors.reset}      → C5-MetaAnalysisMaster
   ${colors.cyan}"theoretical framework"${colors.reset} → A2-TheoreticalFrameworkArchitect
+  ${colors.cyan}"systematic review"${colors.reset}  → I0-ReviewPipelineOrchestrator
 
 ${colors.dim}Documentation: https://github.com/HosungYou/Diverga${colors.reset}
 `);
@@ -193,7 +201,7 @@ ${colors.dim}Documentation: https://github.com/HosungYou/Diverga${colors.reset}
 
   list() {
     console.log(BANNER);
-    console.log(`${colors.bright}    Agent Catalog${colors.reset}  │  ${colors.cyan}40 Specialized Research Agents${colors.reset}
+    console.log(`${colors.bright}    Agent Catalog${colors.reset}  │  ${colors.cyan}44 Specialized Research Agents${colors.reset}
     ${colors.dim}────────────────────────────────────────────────────────${colors.reset}
 `);
 
@@ -215,7 +223,7 @@ ${colors.dim}Documentation: https://github.com/HosungYou/Diverga${colors.reset}
     }
 
     console.log(`\n${colors.dim}────────────────────────────────────────────────────────${colors.reset}`);
-    console.log(`${colors.bright}Total:${colors.reset} ${colors.cyan}${Object.keys(AGENT_REGISTRY).length}${colors.reset} agents  │  ${colors.red}HIGH${colors.reset}=o1  ${colors.yellow}MEDIUM${colors.reset}=gpt-4  ${colors.green}LOW${colors.reset}=gpt-3.5`);
+    console.log(`${colors.bright}Total:${colors.reset} ${colors.cyan}${Object.keys(AGENT_REGISTRY).length}${colors.reset} agents  │  ${colors.red}HIGH${colors.reset}=gpt-5.3-codex  ${colors.yellow}MEDIUM${colors.reset}=gpt-5.2-codex  ${colors.green}LOW${colors.reset}=gpt-5.1-codex-mini`);
   },
 
   agent(id) {
@@ -295,6 +303,12 @@ OPTIONAL CHECKPOINTS (🟡 DEFAULTS AVAILABLE)
   CP_VISUALIZATION_PREFERENCE  Before visuals
   CP_SEARCH_STRATEGY           Database selection
   CP_WRITING_STYLE             Before writing
+
+SYSTEMATIC REVIEW CHECKPOINTS (🔴/🟠 SCH_*)
+─────────────────────────────────────────
+  SCH_DATABASE_SELECTION   Database selection for systematic review
+  SCH_SCREENING_CRITERIA   Inclusion/exclusion criteria for screening
+  SCH_RAG_READINESS        Vector database ready for queries
 `);
   },
 
@@ -322,6 +336,31 @@ Creativity Levels:
   Balanced (T ≥ 0.3)     - Differentiated + defensible
   Innovative (T ≥ 0.2)   - High contribution potential
   Extreme (T < 0.2)      - Maximum creativity
+`);
+  },
+
+  prereq() {
+    console.log(`
+╔═══════════════════════════════════════════════════════════════╗
+║               Agent Prerequisite Map                         ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Entry Points (no prerequisites):
+  A1, A4, A5, B3, B4, B5, G3, I0, I1
+
+CP_RESEARCH_DIRECTION required:
+  A2, A3, A6, B1, B2, C1*, C2*, C3*
+
+CP_PARADIGM_SELECTION required:
+  A5→, C1*, C2*, C3*, H1, H2
+
+CP_METHODOLOGY_APPROVAL required:
+  C5*, C6, C7, D1, D2, D4, E1, E2, E3, E5
+
+* Also requires other checkpoints
+
+SCH_DATABASE_SELECTION required: I2
+SCH_SCREENING_CRITERIA required: I3
 `);
   },
 

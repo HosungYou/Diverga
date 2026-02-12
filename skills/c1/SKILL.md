@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Avoids obvious experimental designs, proposes context-optimal quantitative strategies
   Use when: selecting quantitative research design, planning experimental/survey methodology, power analysis
   Triggers: RCT, quasi-experimental, experimental design, survey design, power analysis, sample size, factorial design
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

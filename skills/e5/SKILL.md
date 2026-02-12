@@ -5,7 +5,7 @@ description: |
   Light VS applied: Modal sensitivity approach awareness + extended analysis strategy presentation
   Use when: testing robustness, validating conclusions, exploring analytical decisions
   Triggers: sensitivity analysis, robustness, specification curve, analytical decisions
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

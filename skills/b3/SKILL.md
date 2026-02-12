@@ -5,7 +5,7 @@ description: |
   Enhanced VS 3-Phase process: Avoids simple conversions, delivers context-appropriate effect size selection
   Use when: extracting effect sizes, converting statistics, preparing meta-analysis data
   Triggers: effect size, Cohen's d, Hedges' g, correlation, conversion, meta-analysis data
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # Effect Size Extractor

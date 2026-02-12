@@ -4,12 +4,12 @@ description: |
   Diverga v8.0 initial configuration wizard. Simplified 2-step setup.
   Sets up checkpoints and HUD preferences.
   Triggers: setup, configure, 설정, install
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # /diverga:setup
 
-**Version**: 8.1.0
+**Version**: 8.3.0
 **Trigger**: `/diverga:setup`
 
 ## Description
@@ -24,8 +24,8 @@ When user invokes `/diverga:setup`, execute this interactive wizard:
 ### Step 0: Project Detection
 
 Check for existing project:
-- If `.research/` exists → "Existing project detected. Upgrade to v8.1.0?"
-- If `config/diverga-config.json` exists with older version → "Upgrade from vX.Y.Z to v8.2.0?"
+- If `.research/` exists → "Existing project detected. Upgrade to v8.3.0?"
+- If `config/diverga-config.json` exists with older version → "Upgrade from vX.Y.Z to v8.3.0?"
 - Otherwise → "New project setup"
 
 ### Step 1: Welcome + Checkpoint Level
@@ -34,7 +34,7 @@ Display welcome message, then ask checkpoint level using AskUserQuestion:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                    Welcome to Diverga v8.1.0                    ║
+║                    Welcome to Diverga v8.3.0                    ║
 ║         AI Research Assistant for the Complete Lifecycle         ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
@@ -71,7 +71,7 @@ After collecting all preferences, generate `config/diverga-config.json`:
 
 ```json
 {
-  "version": "8.2.0",
+  "version": "8.3.0",
   "human_checkpoints": {
     "enabled": true,
     "level": "<full|minimal|off>",
@@ -95,7 +95,7 @@ Display completion:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                   Diverga v8.1.0 Setup Complete!                ║
+║                   Diverga v8.3.0 Setup Complete!                ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Configuration saved to: config/diverga-config.json             ║
 ║                                                                  ║

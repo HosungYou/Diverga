@@ -8,7 +8,7 @@ description: |
   Triggers: statistical analysis, ANOVA, regression, t-test, power analysis, assumption checking, effect size,
   thematic analysis, grounded theory, content analysis, narrative analysis, NVivo, ATLAS.ti,
   coding, qualitative data, interview analysis, focus group analysis
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

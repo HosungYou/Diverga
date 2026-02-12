@@ -4,12 +4,12 @@ description: |
   System diagnostics and health checks for Diverga plugin.
   OpenClaw-style Check-Report-Fix pattern with 5-layer diagnostics.
   Triggers: /diverga:doctor, diverga doctor, system check, diagnose, 진단
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # Diverga Doctor
 
-**Version**: 8.1.0
+**Version**: 8.3.0
 **Trigger**: `/diverga:doctor`
 
 ## Description
@@ -37,7 +37,7 @@ When user invokes `/diverga:doctor`, execute all 5 diagnostic layers sequentiall
 **Report format:**
 ```
 PLUGIN HEALTH
-  Registration:    [PASS - diverga@diverga v8.1.0 | FAIL - not found in installed_plugins.json]
+  Registration:    [PASS - diverga@diverga v8.3.0 | FAIL - not found in installed_plugins.json]
   Config file:     [PASS - valid JSON | FAIL - missing or invalid]
   Config fields:   [PASS - all required fields present | WARN - missing: field1, field2]
 ```
@@ -75,7 +75,7 @@ SKILL SYNC
 
 **Deep validation of diverga-config.json:**
 - Read `/Users/hosung/.claude/plugins/diverga/config/diverga-config.json`
-- Check `version` field matches "8.2.0"
+- Check `version` field matches "8.3.0"
 - Check `human_checkpoints` object exists and has `enabled` (boolean) and `required` (array)
 - Check `language` is one of: "en", "ko", "auto"
 - Check `model_routing` has `high`, `medium`, `low` keys if present
@@ -83,14 +83,14 @@ SKILL SYNC
 **Report format:**
 ```
 CONFIG VALIDITY
-  Version field:   [PASS - 8.1.0 | WARN - version mismatch: found X.Y.Z]
+  Version field:   [PASS - 8.3.0 | WARN - version mismatch: found X.Y.Z]
   Checkpoints:     [PASS - configured | FAIL - missing or malformed]
   Language:        [PASS - "en" | WARN - unexpected value: "XX"]
   Model routing:   [PASS - configured | SKIP - not set (using defaults)]
 ```
 
 **Fix if issues found:**
-- Version mismatch: "Config version X.Y.Z doesn't match plugin 8.2.0. Run: /diverga:setup to update"
+- Version mismatch: "Config version X.Y.Z doesn't match plugin 8.3.0. Run: /diverga:setup to update"
 - Checkpoints malformed: "Run: /diverga:setup to reconfigure checkpoints"
 
 ### Layer 4: API Keys
@@ -153,7 +153,7 @@ After all 5 layers, display overall status:
 
 ```
 ══════════════════════════════════════════════
-DIVERGA SYSTEM DIAGNOSTICS v8.1.0
+DIVERGA SYSTEM DIAGNOSTICS v8.3.0
 ══════════════════════════════════════════════
 
 [Layer 1-5 results as shown above]

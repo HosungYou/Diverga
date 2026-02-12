@@ -5,7 +5,7 @@ description: |
   Light VS applied: Avoids template-based writing + audience-specific message design
   Use when: writing abstracts, creating summaries, communicating research to different audiences
   Triggers: abstract, plain language, press release, summary, general audience, communication
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # Academic Communicator

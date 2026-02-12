@@ -1,14 +1,14 @@
 # Codex CLI Skill System: Technical Documentation
 
-**Version**: 6.6.2
-**Last Updated**: 2026-01-30
+**Version**: 8.3.0
+**Last Updated**: 2026-02-12
 **Status**: Verified Working
 
 ---
 
 ## Executive Summary
 
-Diverga v6.6.2 introduces full **Codex CLI compatibility** through the SKILL.md-based skill loading system. This document explains:
+Diverga v8.3.0 provides full **Codex CLI compatibility** through the SKILL.md-based skill loading system. Each of the 44 agents is represented as an individual skill file. This document explains:
 
 1. How Codex CLI discovers and loads skills
 2. Why AGENTS.md alone is insufficient
@@ -81,144 +81,304 @@ metadata:
 
 ---
 
-## Diverga Solution: .codex/skills/ Directory
+## Diverga Solution: Individual SKILL.md Files
 
-### Structure Created
+### Structure (44 Agents + Utilities)
+
+Each Diverga agent has its own individual skill directory:
 
 ```
 .codex/
 └── skills/
-    ├── research-coordinator/
-    │   └── SKILL.md         # Main coordinator (40 agents)
-    ├── meta-analysis/
-    │   └── SKILL.md         # C5-MetaAnalysisMaster agent
-    └── checkpoint-system/
-        └── SKILL.md         # Human checkpoint enforcement
+    ├── diverga-a1/SKILL.md      # A1-ResearchQuestionRefiner
+    ├── diverga-a2/SKILL.md      # A2-TheoreticalFrameworkArchitect
+    ├── diverga-a3/SKILL.md      # A3-DevilsAdvocate
+    ├── diverga-a4/SKILL.md      # A4-ResearchEthicsAdvisor
+    ├── diverga-a5/SKILL.md      # A5-ParadigmWorldviewAdvisor
+    ├── diverga-a6/SKILL.md      # A6-ConceptualFrameworkVisualizer
+    ├── diverga-b1/SKILL.md      # B1-SystematicLiteratureScout
+    ├── diverga-b2/SKILL.md      # B2-EvidenceQualityAppraiser
+    ├── diverga-b3/SKILL.md      # B3-EffectSizeExtractor
+    ├── diverga-b4/SKILL.md      # B4-ResearchRadar
+    ├── diverga-b5/SKILL.md      # B5-ParallelDocumentProcessor
+    ├── diverga-c1/SKILL.md      # C1-QuantitativeDesignConsultant
+    ├── diverga-c2/SKILL.md      # C2-QualitativeDesignConsultant
+    ├── diverga-c3/SKILL.md      # C3-MixedMethodsDesignConsultant
+    ├── diverga-c4/SKILL.md      # C4-ExperimentalMaterialsDeveloper
+    ├── diverga-c5/SKILL.md      # C5-MetaAnalysisMaster
+    ├── diverga-c6/SKILL.md      # C6-DataIntegrityGuard
+    ├── diverga-c7/SKILL.md      # C7-ErrorPreventionEngine
+    ├── diverga-d1/SKILL.md      # D1-SamplingStrategyAdvisor
+    ├── diverga-d2/SKILL.md      # D2-InterviewFocusGroupSpecialist
+    ├── diverga-d3/SKILL.md      # D3-ObservationProtocolDesigner
+    ├── diverga-d4/SKILL.md      # D4-MeasurementInstrumentDeveloper
+    ├── diverga-e1/SKILL.md      # E1-QuantitativeAnalysisGuide
+    ├── diverga-e2/SKILL.md      # E2-QualitativeCodingSpecialist
+    ├── diverga-e3/SKILL.md      # E3-MixedMethodsIntegration
+    ├── diverga-e4/SKILL.md      # E4-AnalysisCodeGenerator
+    ├── diverga-e5/SKILL.md      # E5-SensitivityAnalysisDesigner
+    ├── diverga-f1/SKILL.md      # F1-InternalConsistencyChecker
+    ├── diverga-f2/SKILL.md      # F2-ChecklistManager
+    ├── diverga-f3/SKILL.md      # F3-ReproducibilityAuditor
+    ├── diverga-f4/SKILL.md      # F4-BiasTrustworthinessDetector
+    ├── diverga-f5/SKILL.md      # F5-HumanizationVerifier
+    ├── diverga-g1/SKILL.md      # G1-JournalMatcher
+    ├── diverga-g2/SKILL.md      # G2-AcademicCommunicator
+    ├── diverga-g3/SKILL.md      # G3-PeerReviewStrategist
+    ├── diverga-g4/SKILL.md      # G4-PreregistrationComposer
+    ├── diverga-g5/SKILL.md      # G5-AcademicStyleAuditor
+    ├── diverga-g6/SKILL.md      # G6-AcademicStyleHumanizer
+    ├── diverga-h1/SKILL.md      # H1-EthnographicResearchAdvisor
+    ├── diverga-h2/SKILL.md      # H2-ActionResearchFacilitator
+    ├── diverga-i0/SKILL.md      # I0-ReviewPipelineOrchestrator
+    ├── diverga-i1/SKILL.md      # I1-PaperRetrievalAgent
+    ├── diverga-i2/SKILL.md      # I2-ScreeningAssistant
+    ├── diverga-i3/SKILL.md      # I3-RAGBuilder
+    ├── diverga-setup/SKILL.md   # Setup wizard
+    ├── diverga-memory/SKILL.md  # Memory system
+    └── diverga-help/SKILL.md    # Help guide
 ```
 
 ### Skill Definitions
 
-#### research-coordinator/SKILL.md
+#### Example: diverga-a1/SKILL.md
 
 ```yaml
 ---
-name: research-coordinator
-description: AI research assistant with 40 specialized agents, VS methodology,
-             and human checkpoints. Triggers on meta-analysis, systematic review,
-             research question, theoretical framework, literature review, PRISMA,
-             qualitative, phenomenology, grounded theory, mixed methods, effect size
+name: diverga-a1
+description: Research question refinement agent. Helps formulate clear, answerable
+             research questions with VS methodology. Triggers on research question,
+             RQ, refine question, 연구 질문, 연구문제
 metadata:
-  short-description: Diverga Research Coordinator v6.6.2
-  version: 6.6.2
+  short-description: A1-ResearchQuestionRefiner
+  version: 8.3.0
 ---
 ```
 
-#### meta-analysis/SKILL.md
+#### Example: diverga-c5/SKILL.md
 
 ```yaml
 ---
-name: meta-analysis
+name: diverga-c5
 description: Meta-analysis specialist for effect size extraction, heterogeneity
              analysis, and PRISMA workflow. Triggers on meta-analysis, effect size,
-             Hedges g, Cohen d, I-squared, heterogeneity, forest plot, funnel plot
+             Hedges g, Cohen d, I-squared, heterogeneity, forest plot, funnel plot,
+             메타분석, 효과크기
 metadata:
   short-description: C5-MetaAnalysisMaster Agent
-  version: 6.6.2
+  version: 8.3.0
 ---
 ```
 
-#### checkpoint-system/SKILL.md
+#### Example: diverga-i0/SKILL.md (Category I - New)
 
 ```yaml
 ---
-name: checkpoint-system
-description: Human checkpoint enforcement for research decisions. Ensures AI stops
-             at critical decision points and waits for human approval. Use when
-             research direction, methodology, or analysis decisions are needed.
+name: diverga-i0
+description: Systematic review pipeline orchestrator for PRISMA 2020 automation.
+             Coordinates I1-I3 agents for paper retrieval, screening, and RAG building.
+             Triggers on systematic review, PRISMA, literature review automation,
+             체계적 문헌고찰, 프리즈마, 문헌고찰 자동화
 metadata:
-  short-description: Human Checkpoint Enforcement
-  version: 6.6.2
+  short-description: I0-ReviewPipelineOrchestrator
+  version: 8.3.0
 ---
+```
+
+#### Example: diverga-i1/SKILL.md (Category I - New)
+
+```yaml
+---
+name: diverga-i1
+description: Paper retrieval agent for multi-database fetching from Semantic Scholar,
+             OpenAlex, and arXiv. Triggers on fetch papers, retrieve papers,
+             database search, 논문 수집, 논문 검색, 데이터베이스 검색
+metadata:
+  short-description: I1-PaperRetrievalAgent
+  version: 8.3.0
+---
+```
+
+#### Example: diverga-i2/SKILL.md (Category I - New)
+
+```yaml
+---
+name: diverga-i2
+description: PRISMA 2020 screening assistant with AI-assisted 6-dimension screening.
+             Triggers on screen papers, PRISMA screening, inclusion criteria,
+             논문 스크리닝, 선별, 포함 기준
+metadata:
+  short-description: I2-ScreeningAssistant
+  version: 8.3.0
+---
+```
+
+#### Example: diverga-i3/SKILL.md (Category I - New)
+
+```yaml
+---
+name: diverga-i3
+description: RAG builder for vector database construction and document indexing.
+             Zero-cost local embedding pipeline. Triggers on build RAG,
+             vector database, embed documents, RAG 구축, 벡터 DB, 문서 임베딩
+metadata:
+  short-description: I3-RAGBuilder
+  version: 8.3.0
+---
+```
+
+#### Utility Skills
+
+```yaml
+# diverga-setup/SKILL.md
+---
+name: diverga-setup
+description: Diverga setup wizard. Configure checkpoint levels, HUD settings,
+             and project initialization. Triggers on setup, configure, initialize
+metadata:
+  short-description: Diverga Setup Wizard
+  version: 8.3.0
+---
+
+# diverga-memory/SKILL.md
+---
+name: diverga-memory
+description: Diverga memory system for persistent research context. Search,
+             status, context, history, and export commands. Triggers on memory,
+             context, recall, session, 기억, 맥락
+metadata:
+  short-description: Diverga Memory System
+  version: 8.3.0
+---
+
+# diverga-help/SKILL.md
+---
+name: diverga-help
+description: Diverga help guide. Shows available agents, commands, and usage
+             instructions. Triggers on help, guide, documentation
+metadata:
+  short-description: Diverga Help Guide
+  version: 8.3.0
+---
+```
+
+### Prerequisite Checking
+
+Each agent skill file includes prerequisite instructions that reference `.research/decision-log.yaml`. When an agent activates on Codex CLI, the model should:
+
+1. Read `.research/decision-log.yaml` for prior checkpoint decisions
+2. Verify all prerequisite checkpoints for the agent are approved
+3. If prerequisites are missing, display the checkpoint prompt before proceeding
+4. Record new decisions to `.research/decision-log.yaml`
+
+Example prerequisite block in a SKILL.md:
+
+```markdown
+## Prerequisites
+
+Before executing this agent, verify the following checkpoints are approved
+in `.research/decision-log.yaml`:
+
+- CP_RESEARCH_DIRECTION (required)
+- CP_METHODOLOGY_APPROVAL (required)
+
+If any prerequisite is missing, stop and ask the user to make that decision first.
 ```
 
 ---
 
-## Verification: QUANT-005 Test Results
+## Verification
 
-### Test Scenario
+### Agent Count Verification
+
+```bash
+# Verify all 44 agent skills are installed
+ls ~/.codex/skills/diverga-[a-i]*/SKILL.md | wc -l
+# Expected: 44
+
+# Verify utility skills
+ls ~/.codex/skills/diverga-{setup,memory,help}/SKILL.md | wc -l
+# Expected: 3
+
+# Total skill files
+ls ~/.codex/skills/diverga-*/SKILL.md | wc -l
+# Expected: 47 (44 agents + 3 utilities)
+```
+
+### Category Verification
+
+| Category | Agent Range | Count | Verified |
+|----------|-------------|-------|----------|
+| A: Foundation | a1-a6 | 6 | `ls ~/.codex/skills/diverga-a*/SKILL.md \| wc -l` |
+| B: Evidence | b1-b5 | 5 | `ls ~/.codex/skills/diverga-b*/SKILL.md \| wc -l` |
+| C: Design & Meta-Analysis | c1-c7 | 7 | `ls ~/.codex/skills/diverga-c*/SKILL.md \| wc -l` |
+| D: Data Collection | d1-d4 | 4 | `ls ~/.codex/skills/diverga-d*/SKILL.md \| wc -l` |
+| E: Analysis | e1-e5 | 5 | `ls ~/.codex/skills/diverga-e*/SKILL.md \| wc -l` |
+| F: Quality | f1-f5 | 5 | `ls ~/.codex/skills/diverga-f*/SKILL.md \| wc -l` |
+| G: Communication | g1-g6 | 6 | `ls ~/.codex/skills/diverga-g*/SKILL.md \| wc -l` |
+| H: Specialized | h1-h2 | 2 | `ls ~/.codex/skills/diverga-h*/SKILL.md \| wc -l` |
+| I: Systematic Review | i0-i3 | 4 | `ls ~/.codex/skills/diverga-i*/SKILL.md \| wc -l` |
+| **Total** | | **44** | |
+
+### QUANT-005 Test Results
 
 The QUANT-005 test verified that Codex CLI properly:
 1. Discovers skills from `.codex/skills/`
 2. Activates skills based on trigger keywords
-3. Displays checkpoint markers (🔴/🟠/🟡)
+3. Displays checkpoint markers
 4. Presents VS T-Score options
 5. Supports Korean language
 
-### Turn 1 Results
+#### Turn 1 Results
 
 **User Query**: "AI 튜터링 시스템이 학생 성취도에 미치는 효과에 대한 메타분석을 수행하려고 합니다."
 
 **Codex Response**:
 ```
-✅ meta-analysis 스킬(C5-MetaAnalysisMaster) 사용 — 효과크기 통일 체크포인트 진행
+meta-analysis 스킬(C5-MetaAnalysisMaster) 사용 -- 효과크기 통일 체크포인트 진행
 
-🔴 CHECKPOINT: CP_EFFECT_SIZE_SELECTION
+CHECKPOINT: CP_EFFECT_SIZE_SELECTION
 효과크기 지표 옵션입니다:
 
 [A] Cohen's d (T=0.65) - 가장 일반적
-[B] Hedges' g (T=0.40) - 소표본 편향 보정, 메타분석 표준 ⭐
-[C] Glass's Δ (T=0.25) - 대조군 SD만 사용
+[B] Hedges' g (T=0.40) - 소표본 편향 보정, 메타분석 표준
+[C] Glass's Delta (T=0.25) - 대조군 SD만 사용
 
 어떤 지표로 통일하시겠습니까?
 ```
 
-### Turn 2 Results
-
-**User Query**: "Hedges' g를 사용하겠습니다. F통계량에서 Hedges' g로 어떻게 변환하나요?"
-
-**Codex Response**:
-```
-✅ C5-MetaAnalysisMaster 활성화됨
-- 다단계 게이트 검증 시스템
-- 효과크기 변환 및 계산
-- PRISMA 2020 워크플로우
-
-F에서 Hedges' g 변환은 **설계와 df**가 중요합니다...
-
-**1) 두 독립집단 비교 (df1=1, t‑test와 동치)**
-- t = √F
-- d = t × √(1/n1 + 1/n2)
-- J = 1 − 3/(4·df − 1), df = n1 + n2 − 2
-- g = J × d
-```
-
-### Verification Summary
+#### Verification Summary
 
 | Verification Point | QUANT-004 (No SKILL.md) | QUANT-005 (With SKILL.md) |
 |--------------------|-------------------------|---------------------------|
-| Skill activation message | ❌ Not present | ✅ "✅ meta-analysis 스킬 사용" |
-| Checkpoint marker | ❌ Not present | ✅ "🔴 CHECKPOINT: CP_EFFECT_SIZE_SELECTION" |
-| VS T-Score options | ❌ Not present | ✅ [A] T=0.65, [B] T=0.40 ⭐, [C] T=0.25 |
-| Behavioral halt | ❌ Continued without asking | ✅ "어떤 지표로 통일하시겠습니까?" |
-| Korean language | ✅ Supported | ✅ Supported |
+| Skill activation message | Not present | "meta-analysis 스킬 사용" |
+| Checkpoint marker | Not present | "CHECKPOINT: CP_EFFECT_SIZE_SELECTION" |
+| VS T-Score options | Not present | [A] T=0.65, [B] T=0.40, [C] T=0.25 |
+| Behavioral halt | Continued without asking | "어떤 지표로 통일하시겠습니까?" |
+| Korean language | Supported | Supported |
 
 ---
 
 ## Claude Code vs Codex CLI: Feature Comparison
 
-### Capability Matrix
+### Capability Matrix (v8.3.0)
 
 | Feature | Claude Code | Codex CLI |
 |---------|-------------|-----------|
-| **Skill Loading** | Native plugin system | SKILL.md files |
-| **Task Tool** | ✅ Full support | ❌ Not available |
-| **AskUserQuestion Tool** | ✅ Clickable UI | ❌ Text-only |
-| **Checkpoint Enforcement** | ✅ Tool-level blocking | ⚠️ Behavioral only |
-| **Agent Dispatch** | ✅ `Task(subagent_type="diverga:a1")` | ❌ Main model handles all |
-| **Parallel Agents** | ✅ Multiple Task calls | ❌ Sequential only |
-| **Context Persistence** | ✅ Full session context | ✅ Session context |
-| **VS Methodology** | ✅ T-Score options | ✅ T-Score options |
-| **Korean Support** | ✅ Full | ✅ Full |
+| **Skill Loading** | Native plugin system | SKILL.md files (44 individual skills) |
+| **Task Tool** | Full support (parallel agents) | Not available |
+| **AskUserQuestion Tool** | Clickable UI | Text-only |
+| **MCP Checkpoints** | 7 MCP tools for runtime enforcement | Behavioral only |
+| **Checkpoint Enforcement** | Tool-level blocking (cannot bypass) | Behavioral (model should wait) |
+| **Agent Dispatch** | `Task(subagent_type="diverga:a1")` | Main model follows skill instructions |
+| **Parallel Agents** | Multiple Task calls simultaneously | Sequential only |
+| **Model Routing** | opus/sonnet/haiku per agent | gpt-5.3-codex/gpt-5.2-codex/gpt-5.1-codex-mini (session model) |
+| **Prerequisite Gate** | MCP `diverga_check_prerequisites()` | Manual `.research/decision-log.yaml` check |
+| **Memory System** | 3-layer auto-loading | Manual file reading |
+| **Context Persistence** | Full session context + MCP state | Session context + file-based state |
+| **VS Methodology** | T-Score options | T-Score options |
+| **Korean Support** | Full | Full |
+| **Category I (ScholaRAG)** | Full with SCH_* MCP checkpoints | Behavioral SCH_* checkpoints |
 
 ### What This Means
 
@@ -228,6 +388,7 @@ F에서 Hedges' g 변환은 **설계와 df**가 중요합니다...
 | **Agent Execution** | Dedicated agent instances | Main model follows instructions |
 | **User Interaction** | Rich UI components | Plain text prompts |
 | **Reliability** | Tool-enforced behavior | Prompt-guided behavior |
+| **Prerequisite Verification** | Automated via MCP | Manual via file reading |
 
 ---
 
@@ -237,10 +398,12 @@ F에서 Hedges' g 변환은 **설계와 df**가 중요합니다...
 
 **Use Claude Code** when you need:
 - Tool-level checkpoint enforcement (cannot bypass)
-- 40 specialized agents via Task tool
+- 44 specialized agents via Task tool
 - AskUserQuestion with clickable options
 - Parallel agent execution
+- MCP runtime checkpoint verification
 - Highest reliability research workflows
+- Category I systematic review automation with SCH_* checkpoints
 
 ### For Basic Research Assistance
 
@@ -250,6 +413,7 @@ F에서 Hedges' g 변환은 **설계와 df**가 중요합니다...
 - Methodology consultation
 - VS methodology (creative alternatives)
 - Korean language support
+- Individual agent consultations
 
 ### Installation Guide
 
@@ -261,17 +425,19 @@ F에서 Hedges' g 변환은 **설계와 df**가 중요합니다...
 /plugin install diverga
 ```
 
-#### Codex CLI (Basic Support)
+#### Codex CLI
 
 ```bash
-# Option 1: NPM package (recommended)
-npx @diverga/codex-setup
-
-# Option 2: Shell script
+# Option 1: Install script (recommended)
 curl -fsSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh | bash -s -- --codex
 
+# Option 2: NPM package
+npx @diverga/codex-setup
+
 # Option 3: Manual
-# Copy .codex/skills/ to your project or ~/.codex/skills/
+# Copy individual skill directories to ~/.codex/skills/
+git clone https://github.com/HosungYou/Diverga.git
+cp -r Diverga/.codex/skills/diverga-* ~/.codex/skills/
 ```
 
 ---
@@ -282,26 +448,30 @@ curl -fsSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/inst
 
 **Tool-Level Checkpoint (Claude Code)**:
 ```
-System: 🔴 CHECKPOINT triggered
-→ Claude Code UI blocks further input
-→ User MUST click option to continue
-→ Impossible to bypass without user action
+System: CHECKPOINT triggered via MCP
+-> Claude Code UI blocks further input
+-> User MUST click option to continue
+-> Impossible to bypass without user action
+-> Decision auto-recorded to .research/decision-log.yaml
 ```
 
 **Behavioral Checkpoint (Codex CLI)**:
 ```
-Model: 🔴 CHECKPOINT displayed
-→ Model asks "어떤 방향으로 진행하시겠습니까?"
-→ Model SHOULD wait for response
-→ Technically model could continue (rare, but possible)
+Model: CHECKPOINT displayed in text
+-> Model asks "어떤 방향으로 진행하시겠습니까?"
+-> Model SHOULD wait for response
+-> Technically model could continue (rare, but possible)
+-> Model should write decision to .research/decision-log.yaml
 ```
 
 ### SKILL.md Best Practices
 
 1. **Keep description under 500 characters** - Codex truncates longer descriptions
 2. **Include all trigger keywords** - These determine when skill activates
-3. **Use clear activation messages** - "✅ Skill 활성화됨" helps users confirm loading
+3. **Use clear activation messages** - Help users confirm skill loading
 4. **Provide behavioral instructions** - Clear "DO" and "DON'T" sections
+5. **Include prerequisite checks** - Reference `.research/decision-log.yaml` for gate verification
+6. **One agent per skill file** - Individual files for each of the 44 agents
 
 ---
 
@@ -309,14 +479,15 @@ Model: 🔴 CHECKPOINT displayed
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 6.6.2 | 2026-01-30 | Initial Codex SKILL.md implementation |
-| - | - | QUANT-005 verification complete |
-| - | - | Documentation created |
+| 8.3.0 | 2026-02-12 | Updated to 44 agents (added Category I: I0-I3), individual skill files per agent, prerequisite checking via `.research/decision-log.yaml`, model mapping updated to gpt-5.3-codex/gpt-5.2-codex/gpt-5.1-codex-mini |
+| 6.6.2 | 2026-01-30 | Initial Codex SKILL.md implementation with 3 bundled skills, QUANT-005 verification complete |
 
 ---
 
 ## Related Documents
 
 - [README.md](../README.md) - Main Diverga documentation
-- [CHANGELOG.md](../CHANGELOG.md) - Version history
+- [CHANGELOG.md](CHANGELOG.md) - Version history
+- [CROSS-PLATFORM-GUIDE.md](CROSS-PLATFORM-GUIDE.md) - Multi-platform installation and usage
+- [PLATFORM-LIMITATIONS.md](PLATFORM-LIMITATIONS.md) - Feature portability analysis
 - [qa/protocol/test_quant_005.yaml](../qa/protocol/test_quant_005.yaml) - Test protocol

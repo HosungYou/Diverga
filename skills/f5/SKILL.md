@@ -5,7 +5,7 @@ description: |
   Validates that humanization preserves meaning, citations, and academic standards
   Use when: after G6 transformation, before final export, for quality assurance
   Triggers: verify humanization, check transformation, validate changes
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # Humanization Verifier

@@ -3,7 +3,7 @@ name: h1
 description: |
   Agent H1 - Ethnographic Research Advisor - Field-based cultural research design.
   Covers fieldwork planning, participant observation, thick description, and reflexivity.
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

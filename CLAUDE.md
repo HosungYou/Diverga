@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v8.2.0 (Checkpoint Enforcement Strengthening)
+# Diverga v8.3.0 (Cross-Platform Migration)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v8.3.0**: Cross-Platform Migration - GPT-5.3-Codex model routing, 47 individual Codex CLI SKILL.md files, updated install script, cross-platform documentation
 **v8.2.0**: MCP Runtime Checkpoint Enforcement - MCP server (7 tools), SKILL.md simplification (675 lines saved), state path unification, Priority Context
 **v8.1.0**: Checkpoint Enforcement Strengthening - Mandatory AskUserQuestion at all checkpoints, Agent Prerequisite Map, multi-agent coordination
 **v8.0.1-patch3**: 8-Dimension Diagnostic Sweep - Category I registration fix, version sync, lib/ fixes
@@ -819,6 +820,7 @@ The Memory System automatically captures context at critical lifecycle events:
 
 ## Version History
 
+- **v8.3.0**: Cross-Platform Migration - GPT-5.3-Codex model routing, 47 individual Codex CLI SKILL.md files, updated install script, cross-platform documentation
 - **v8.2.0**: MCP Runtime Checkpoint Enforcement - MCP server (7 tools), SKILL.md simplification (675 lines saved), state path unification (.research/), Priority Context, lib/memory removed
 - **v8.1.0**: Checkpoint Enforcement Strengthening - Mandatory AskUserQuestion, Agent Prerequisite Map, multi-agent coordination
 - **v8.0.1**: Installation Bug Fixes - Fixed install script path corruption, skills copy instead of symlink

@@ -4,7 +4,7 @@ description: |
   Data Integrity Guard - Data completeness validation, Hedges g calculation, SD recovery.
   Service provider to C5, handles extraction from PDFs and data validation.
   Triggers: data extraction, PDF extract, data completeness, SD recovery, Hedges g calculation
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

@@ -5,7 +5,7 @@ description: |
   Manages 44 research agents across 9 categories (A-I) with MANDATORY human checkpoints
   No autonomous modes - all critical decisions require explicit human approval
   Features: Systematic Review Automation, Meta-Analysis System, Humanization Pipeline
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 # Research Orchestrator v2.7.0 (Human-Centered)

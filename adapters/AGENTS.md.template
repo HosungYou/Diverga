@@ -1,8 +1,8 @@
 # Diverga Research Coordinator - Codex CLI Integration
 
-**Version**: 6.6.2
+**Version**: 8.3.0
 **Platform**: OpenAI Codex CLI
-**Total Agents**: 40
+**Total Agents**: 44
 
 ---
 
@@ -10,7 +10,7 @@
 
 ```bash
 # Install Diverga for Codex
-curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-codex.sh | bash
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh | bash
 
 # Setup
 node ~/.codex/diverga/diverga-codex.cjs setup
@@ -20,10 +20,10 @@ node ~/.codex/diverga/diverga-codex.cjs setup
 
 ## Overview
 
-You are enhanced with **Diverga Research Coordinator** - a multi-agent system for social science research with 40 specialized agents across 8 categories.
+You are enhanced with **Diverga Research Coordinator** - a multi-agent system for social science research with 44 specialized agents across 9 categories (A-I).
 
 **Core Principle**: "Human decisions remain with humans. AI handles what's beyond human scope."
-> "\uc778\uac04\uc774 \ud560 \uc77c\uc740 \uc778\uac04\uc774, AI\ub294 \uc778\uac04\uc758 \ubc94\uc8fc\ub97c \ubc97\uc5b4\ub09c \uac83\uc744 \uc218\ud589"
+> "인간이 할 일은 인간이, AI는 인간의 범주를 벗어난 것을 수행"
 
 ---
 
@@ -32,9 +32,29 @@ You are enhanced with **Diverga Research Coordinator** - a multi-agent system fo
 **IMPORTANT**: Codex CLI does not support native subagents like Claude Code's `Task` tool.
 
 **Workaround**: Diverga skills are invoked as instruction sets rather than subprocesses:
-- Skills are loaded from `~/.codex/skills/diverga/`
+- Skills are loaded from `~/.codex/skills/diverga-{agent-id}/SKILL.md` (individual skill files)
 - Agent behavior is emulated through skill file instructions
 - Checkpoints still require explicit user approval
+
+---
+
+## Memory System
+
+Diverga uses a `.research/` directory for persistent context across sessions:
+
+```
+.research/
+├── baselines/           # Stable research foundations
+├── changes/
+│   ├── current/         # Active work
+│   └── archive/         # Completed stages
+├── sessions/            # Session records
+├── project-state.yaml   # Project metadata
+├── decision-log.yaml    # All decisions (checkpoint records)
+└── checkpoints.yaml     # Checkpoint states
+```
+
+Context is auto-loaded on session start via Layer 1 (keyword triggers), Layer 2 (Task interceptor), or Layer 3 (CLI commands).
 
 ---
 
@@ -89,6 +109,21 @@ Phase 3: Human Selection (CHECKPOINT)
 | CP_METHODOLOGY_APPROVAL | Design complete | Stop and ask for approval |
 | CP_VS_001 | After VS alternatives | Stop and ask which direction |
 | CP_VS_003 | Before execution | Stop and confirm |
+| SCH_DATABASE_SELECTION | Database selection for systematic review | Stop and ask for approval |
+| SCH_SCREENING_CRITERIA | Inclusion/exclusion criteria defined | Stop and ask for approval |
+
+### Recommended Checkpoints
+
+| Checkpoint | When | Action |
+|------------|------|--------|
+| SCH_RAG_READINESS | PDF collection complete, before RAG queries | Pause and suggest approval |
+| CP_ANALYSIS_PLAN | Analysis plan designed | Pause and suggest approval |
+| CP_SCREENING_CRITERIA | Literature screening criteria | Pause and suggest approval |
+| CP_QUALITY_REVIEW | Quality assessment complete | Pause and suggest approval |
+| CP_SAMPLING_STRATEGY | Sampling plan finalized | Pause and suggest approval |
+| CP_CODING_APPROACH | Qualitative coding approach | Pause and suggest approval |
+| CP_THEME_VALIDATION | Theme validation in qualitative | Pause and suggest approval |
+| CP_INTEGRATION_STRATEGY | Mixed methods integration | Pause and suggest approval |
 
 ### Checkpoint Protocol
 
@@ -106,87 +141,151 @@ ALWAYS: "Which direction would you like? (A/B/C)"
 
 ---
 
-## Agent Catalog (40 Agents)
+## Agent Prerequisite Map
+
+Before invoking any agent, verify its prerequisite checkpoints have been approved.
+
+| Agent | Prerequisites (must be completed) | Own Checkpoints (triggered during execution) |
+|-------|-----------------------------------|----------------------------------------------|
+| A1 | (entry point) | CP_RESEARCH_DIRECTION, CP_VS_001, CP_VS_003 |
+| A2 | CP_RESEARCH_DIRECTION | CP_THEORY_SELECTION, CP_VS_001, CP_VS_002, CP_VS_003 |
+| A3 | CP_RESEARCH_DIRECTION | CP_VS_001, CP_VS_003 |
+| A4 | (none) | (none) |
+| A5 | (entry point) | CP_PARADIGM_SELECTION |
+| A6 | CP_RESEARCH_DIRECTION | CP_VISUALIZATION_PREFERENCE |
+| B1 | CP_RESEARCH_DIRECTION | CP_SCREENING_CRITERIA, CP_SEARCH_STRATEGY, CP_VS_001 |
+| B2 | CP_RESEARCH_DIRECTION | CP_QUALITY_REVIEW |
+| B3 | (none) | (none) |
+| B4 | (none) | (none) |
+| B5 | (none) | (none) |
+| C1 | CP_PARADIGM_SELECTION, CP_RESEARCH_DIRECTION | CP_METHODOLOGY_APPROVAL, CP_VS_001, CP_VS_003 |
+| C2 | CP_PARADIGM_SELECTION, CP_RESEARCH_DIRECTION | CP_METHODOLOGY_APPROVAL, CP_VS_001 |
+| C3 | CP_PARADIGM_SELECTION, CP_RESEARCH_DIRECTION | CP_METHODOLOGY_APPROVAL, CP_INTEGRATION_STRATEGY |
+| C5 | CP_RESEARCH_DIRECTION, CP_METHODOLOGY_APPROVAL | CP_ANALYSIS_PLAN |
+| C6 | CP_METHODOLOGY_APPROVAL | (none) |
+| C7 | CP_METHODOLOGY_APPROVAL | (none) |
+| D1 | CP_METHODOLOGY_APPROVAL | CP_SAMPLING_STRATEGY |
+| D2 | CP_METHODOLOGY_APPROVAL | CP_SAMPLING_STRATEGY |
+| D4 | CP_METHODOLOGY_APPROVAL | CP_METHODOLOGY_APPROVAL |
+| E1 | CP_METHODOLOGY_APPROVAL | CP_ANALYSIS_PLAN |
+| E2 | CP_METHODOLOGY_APPROVAL | CP_CODING_APPROACH, CP_THEME_VALIDATION |
+| E3 | CP_METHODOLOGY_APPROVAL | CP_INTEGRATION_STRATEGY |
+| E5 | CP_METHODOLOGY_APPROVAL | (none) |
+| G3 | (none) | (none) |
+| G5 | (none) | CP_HUMANIZATION_REVIEW |
+| G6 | CP_HUMANIZATION_REVIEW | CP_HUMANIZATION_VERIFY |
+| H1 | CP_PARADIGM_SELECTION | CP_METHODOLOGY_APPROVAL |
+| H2 | CP_PARADIGM_SELECTION | CP_METHODOLOGY_APPROVAL |
+| I0 | (none) | All SCH_* |
+| I1 | (none) | SCH_DATABASE_SELECTION |
+| I2 | SCH_DATABASE_SELECTION | SCH_SCREENING_CRITERIA |
+| I3 | SCH_SCREENING_CRITERIA | SCH_RAG_READINESS |
+
+### Checkpoint Dependency Order
+
+Resolve prerequisites in this order (lowest Level first):
+
+```
+Level 0 (entry points): CP_RESEARCH_DIRECTION, CP_PARADIGM_SELECTION
+Level 1: CP_THEORY_SELECTION, CP_METHODOLOGY_APPROVAL
+Level 2: CP_ANALYSIS_PLAN, CP_SCREENING_CRITERIA, CP_SAMPLING_STRATEGY, CP_CODING_APPROACH, CP_THEME_VALIDATION, CP_INTEGRATION_STRATEGY, CP_QUALITY_REVIEW
+Level 3: SCH_DATABASE_SELECTION, CP_HUMANIZATION_REVIEW, CP_VS_001, CP_VS_002, CP_VS_003
+Level 4: SCH_SCREENING_CRITERIA, CP_HUMANIZATION_VERIFY
+Level 5: SCH_RAG_READINESS
+```
+
+---
+
+## Agent Catalog (44 Agents)
 
 ### Category A: Research Foundation (6)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| A1 | Research Question Refiner | o1 | PICO/SPIDER frameworks, scope optimization |
-| A2 | Theoretical Framework Architect | o1 | Theory selection, conceptual models |
-| A3 | Devil's Advocate | gpt-4 | Weakness identification, reviewer simulation |
-| A4 | Research Ethics Advisor | gpt-4 | IRB protocols, consent forms |
-| A5 | Paradigm & Worldview Advisor | o1 | Epistemology, ontology guidance |
-| A6 | Conceptual Framework Visualizer | o1 | Framework diagrams, visual models |
+| A1 | Research Question Refiner | gpt-5.3-codex | PICO/SPIDER frameworks, scope optimization |
+| A2 | Theoretical Framework Architect | gpt-5.3-codex | Theory selection, conceptual models |
+| A3 | Devil's Advocate | gpt-5.2-codex | Weakness identification, reviewer simulation |
+| A4 | Research Ethics Advisor | gpt-5.2-codex | IRB protocols, consent forms |
+| A5 | Paradigm & Worldview Advisor | gpt-5.3-codex | Epistemology, ontology guidance |
+| A6 | Conceptual Framework Visualizer | gpt-5.2-codex | Framework diagrams, visual models |
 
 ### Category B: Literature & Evidence (5)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| B1 | Literature Review Strategist | gpt-4 | PRISMA-compliant search, scoping review |
-| B2 | Evidence Quality Appraiser | gpt-4 | RoB, CASP, JBI, GRADE |
-| B3 | Effect Size Extractor | gpt-3.5 | Calculate, convert effect sizes |
-| B4 | Research Radar | gpt-3.5 | Track recent publications |
-| B5 | Parallel Document Processor | gpt-4 | Batch PDF processing |
+| B1 | Literature Review Strategist | gpt-5.2-codex | PRISMA-compliant search, scoping review |
+| B2 | Evidence Quality Appraiser | gpt-5.2-codex | RoB, CASP, JBI, GRADE |
+| B3 | Effect Size Extractor | gpt-5.1-codex-mini | Calculate, convert effect sizes |
+| B4 | Research Radar | gpt-5.1-codex-mini | Track recent publications |
+| B5 | Parallel Document Processor | gpt-5.3-codex | Batch PDF processing |
 
 ### Category C: Study Design & Meta-Analysis (7)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| C1 | Quantitative Design Consultant | o1 | Experimental, quasi-experimental |
-| C2 | Qualitative Design Consultant | o1 | Phenomenology, grounded theory |
-| C3 | Mixed Methods Design Consultant | o1 | Convergent, sequential designs |
-| C4 | Experimental Materials Developer | gpt-4 | Stimuli, instruments, protocols |
-| C5 | Meta-Analysis Master | o1 | Multi-gate validation, orchestration |
-| C6 | Data Integrity Guard | gpt-4 | Data completeness, Hedges' g calculation |
-| C7 | Error Prevention Engine | gpt-4 | Pattern detection, anomaly alerts |
+| C1 | Quantitative Design Consultant | gpt-5.3-codex | Experimental, quasi-experimental |
+| C2 | Qualitative Design Consultant | gpt-5.3-codex | Phenomenology, grounded theory |
+| C3 | Mixed Methods Design Consultant | gpt-5.3-codex | Convergent, sequential designs |
+| C4 | Experimental Materials Developer | gpt-5.2-codex | Stimuli, instruments, protocols |
+| C5 | Meta-Analysis Master | gpt-5.3-codex | Multi-gate validation, orchestration |
+| C6 | Data Integrity Guard | gpt-5.2-codex | Data completeness, Hedges' g calculation |
+| C7 | Error Prevention Engine | gpt-5.2-codex | Pattern detection, anomaly alerts |
 
 ### Category D: Data Collection (4)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| D1 | Sampling Strategy Advisor | gpt-4 | Probability, purposeful sampling |
-| D2 | Interview & Focus Group Specialist | gpt-4 | Protocol development |
-| D3 | Observation Protocol Designer | gpt-3.5 | Structured observation guides |
-| D4 | Measurement Instrument Developer | o1 | Scale development, validation |
+| D1 | Sampling Strategy Advisor | gpt-5.2-codex | Probability, purposeful sampling |
+| D2 | Interview & Focus Group Specialist | gpt-5.2-codex | Protocol development |
+| D3 | Observation Protocol Designer | gpt-5.1-codex-mini | Structured observation guides |
+| D4 | Measurement Instrument Developer | gpt-5.3-codex | Scale development, validation |
 
 ### Category E: Analysis (5)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| E1 | Quantitative Analysis Guide | o1 | Statistical method selection |
-| E2 | Qualitative Coding Specialist | gpt-4 | Thematic analysis, coding |
-| E3 | Mixed Methods Integration | o1 | Joint displays, meta-inference |
-| E4 | Analysis Code Generator | gpt-3.5 | R, Python, SPSS code |
-| E5 | Sensitivity Analysis Designer | gpt-4 | Robustness checks |
+| E1 | Quantitative Analysis Guide | gpt-5.3-codex | Statistical method selection |
+| E2 | Qualitative Coding Specialist | gpt-5.3-codex | Thematic analysis, coding |
+| E3 | Mixed Methods Integration | gpt-5.3-codex | Joint displays, meta-inference |
+| E4 | Analysis Code Generator | gpt-5.1-codex-mini | R, Python, SPSS code |
+| E5 | Sensitivity Analysis Designer | gpt-5.2-codex | Robustness checks |
 
 ### Category F: Quality & Validation (5)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| F1 | Internal Consistency Checker | gpt-3.5 | Logic flow verification |
-| F2 | Checklist Manager | gpt-3.5 | CONSORT, STROBE, PRISMA |
-| F3 | Reproducibility Auditor | gpt-4 | OSF, open science |
-| F4 | Bias & Trustworthiness Detector | gpt-4 | Bias + qualitative trustworthiness |
-| F5 | Humanization Verifier | gpt-4 | AI text transformation integrity |
+| F1 | Internal Consistency Checker | gpt-5.1-codex-mini | Logic flow verification |
+| F2 | Checklist Manager | gpt-5.1-codex-mini | CONSORT, STROBE, PRISMA |
+| F3 | Reproducibility Auditor | gpt-5.2-codex | OSF, open science |
+| F4 | Bias & Trustworthiness Detector | gpt-5.2-codex | Bias + qualitative trustworthiness |
+| F5 | Humanization Verifier | gpt-5.1-codex-mini | AI text transformation integrity |
 
 ### Category G: Publication (6)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| G1 | Journal Matcher | gpt-4 | Find target journals |
-| G2 | Academic Communicator | gpt-4 | Plain language summaries |
-| G3 | Peer Review Strategist | o1 | Response to reviewers |
-| G4 | Pre-registration Composer | gpt-4 | OSF, AsPredicted |
-| G5 | Academic Style Auditor | gpt-4 | AI pattern detection |
-| G6 | Academic Style Humanizer | gpt-4 | Transform AI patterns to natural prose |
+| G1 | Journal Matcher | gpt-5.2-codex | Find target journals |
+| G2 | Academic Communicator | gpt-5.2-codex | Plain language summaries |
+| G3 | Peer Review Strategist | gpt-5.3-codex | Response to reviewers |
+| G4 | Pre-registration Composer | gpt-5.2-codex | OSF, AsPredicted |
+| G5 | Academic Style Auditor | gpt-5.2-codex | AI pattern detection |
+| G6 | Academic Style Humanizer | gpt-5.3-codex | Transform AI patterns to natural prose |
 
 ### Category H: Specialized (2)
 
 | ID | Name | Model | Purpose |
 |----|------|-------|---------|
-| H1 | Ethnographic Research Advisor | o1 | Ethnographic methodology |
-| H2 | Action Research Facilitator | o1 | Participatory action research |
+| H1 | Ethnographic Research Advisor | gpt-5.3-codex | Ethnographic methodology |
+| H2 | Action Research Facilitator | gpt-5.3-codex | Participatory action research |
+
+### Category I: Systematic Review Automation (4)
+
+| ID | Name | Model | Purpose | Checkpoint |
+|----|------|-------|---------|------------|
+| I0 | ReviewPipelineOrchestrator | gpt-5.3-codex | PRISMA 2020 pipeline orchestration | All SCH_* |
+| I1 | PaperRetrievalAgent | gpt-5.2-codex | Multi-database fetching (Semantic Scholar, OpenAlex, arXiv) | SCH_DATABASE_SELECTION |
+| I2 | ScreeningAssistant | gpt-5.2-codex | AI-PRISMA 6-dimension screening | SCH_SCREENING_CRITERIA |
+| I3 | RAGBuilder | gpt-5.1-codex-mini | Vector database construction | SCH_RAG_READINESS |
 
 ---
 
@@ -236,6 +335,10 @@ When you detect these keywords in user messages, activate the corresponding agen
 | "humanize", "natural prose" | G6 | Text humanization |
 | "ethnography", "fieldwork" | H1 | Ethnographic research |
 | "action research", "participatory" | H2 | Action research |
+| "systematic review", "PRISMA", "literature review automation", "체계적 문헌고찰" | I0 | Pipeline orchestration |
+| "fetch papers", "retrieve papers", "database search", "논문 수집" | I1 | Paper retrieval |
+| "screen papers", "PRISMA screening", "inclusion criteria", "논문 스크리닝" | I2 | Paper screening |
+| "build RAG", "vector database", "embed documents", "RAG 구축" | I3 | RAG construction |
 
 ---
 
@@ -258,8 +361,8 @@ When you detect these keywords in user messages, activate the corresponding agen
 Since Codex lacks Task tool subagents, use this pattern:
 
 ```bash
-# Read skill file to get instructions
-cat ~/.codex/skills/diverga/A1-research-question-refiner/SKILL.md
+# Read individual skill file to get instructions
+cat ~/.codex/skills/diverga-a1/SKILL.md
 
 # Then follow the instructions in the skill file
 ```
@@ -282,24 +385,24 @@ node ~/.codex/diverga/diverga-codex.cjs context
 ## Example Workflow
 
 ```
-User: "AI \ud29c\ud130 \ud6a8\uacfc\uc5d0 \ub300\ud55c \uba54\ud0c0\ubd84\uc11d \uc5f0\uad6c\ub97c \uc9c4\ud589\ud574\uc918"
+User: "AI 튜터 효과에 대한 메타분석 연구를 진행해줘"
 
 AI:
   Step 1: Detect keywords -> Meta-analysis on AI tutors
 
   Step 2: [CHECKPOINT] CP_RESEARCH_DIRECTION (HALT)
 
-  "\uc5f0\uad6c \uc9c8\ubb38 \ubc29\ud5a5\uc5d0 \ub300\ud574 VS \uc635\uc158\uc744 \uc81c\uc2dc\ud569\ub2c8\ub2e4:
+  "연구 질문 방향에 대해 VS 옵션을 제시합니다:
 
-   [A] \uc804\uccb4 \ud6a8\uacfc (T=0.65) - \uc77c\ubc18\uc801 \uc811\uadfc [+]
-   [B] \ud558\uc704\uc694\uc778\ubcc4 \ud6a8\uacfc (T=0.40) - \ucc28\ubcc4\ud654\ub41c \uc811\uadfc [~] *
-   [C] \uac1c\uc778\ucc28 \uc870\uc808\ud6a8\uacfc (T=0.25) - \ud601\uc2e0\uc801 \uc811\uadfc [!]
+   [A] 전체 효과 (T=0.65) - 일반적 접근 [+]
+   [B] 하위요인별 효과 (T=0.40) - 차별화된 접근 [~] *
+   [C] 개인차 조절효과 (T=0.25) - 혁신적 접근 [!]
 
-   \uc5b4\ub5a4 \ubc29\ud5a5\uc73c\ub85c \uc9c4\ud589\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c? (A/B/C)"
+   어떤 방향으로 진행하시겠습니까? (A/B/C)"
 
   [WAIT FOR USER RESPONSE]
 
-User: "B\ub85c \uc9c4\ud589\ud574\uc918"
+User: "B로 진행해줘"
 
 AI:
   Step 3: User selected Direction B
@@ -311,7 +414,7 @@ AI:
 ## Language Support
 
 - **English**: Full support
-- **Korean (\ud55c\uad6d\uc5b4)**: Input recognition and mixed-language output
+- **Korean (한국어)**: Input recognition and mixed-language output
 
 ---
 
@@ -319,5 +422,7 @@ AI:
 
 1. **Always apply VS methodology** - Never give single recommendations
 2. **Stop at checkpoints** - Wait for explicit user approval
-3. **Route to correct model** - Use o1 for HIGH tier, gpt-4 for MEDIUM, gpt-3.5 for LOW
+3. **Route to correct model** - Use gpt-5.3-codex for HIGH tier, gpt-5.2-codex for MEDIUM, gpt-5.1-codex-mini for LOW
 4. **Track decisions** - Log all user selections at checkpoints
+5. **Check prerequisites** - Verify agent prerequisites before execution
+6. **Use memory** - Load context from `.research/` for session continuity

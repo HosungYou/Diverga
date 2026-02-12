@@ -22,7 +22,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 REPO_URL="https://github.com/HosungYou/Diverga.git"
-VERSION="6.6.2"
+VERSION="8.3.0"
 
 # Parse arguments
 INSTALL_CLAUDE=false
@@ -70,6 +70,14 @@ echo "       Diverga Multi-CLI Installer v${VERSION}"
 echo "       Multi-agent Research Coordinator"
 echo "================================================================"
 echo -e "${NC}"
+
+# Check Node.js version
+if command -v node &> /dev/null; then
+    NODE_VER=$(node -v | sed 's/v//' | cut -d. -f1)
+    if [ "$NODE_VER" -lt 18 ]; then
+        echo -e "${YELLOW}[WARN]${NC} Node.js >= 18 recommended (found v$(node -v))"
+    fi
+fi
 
 # Clone repository
 echo -e "${BLUE}[INFO]${NC} Cloning Diverga repository..."
@@ -130,9 +138,11 @@ if [ "$INSTALL_CODEX" = true ]; then
         cp -r "$TMP_DIR/.codex/"* "$CODEX_DEST/" 2>/dev/null || true
     fi
 
-    # Copy skills for Codex
-    if [ -d "$TMP_DIR/skills/research-agents" ]; then
-        cp -r "$TMP_DIR/skills/research-agents/"* "$CODEX_SKILLS/" 2>/dev/null || true
+    # Copy individual Codex skills (44 agents + utilities)
+    if [ -d "$TMP_DIR/.codex/skills" ]; then
+        cp -r "$TMP_DIR/.codex/skills/"* "$CODEX_SKILLS/" 2>/dev/null || true
+        SKILL_COUNT=$(ls -1d "$CODEX_SKILLS"/diverga-* 2>/dev/null | wc -l)
+        echo -e "${GREEN}[+]${NC} Codex Skills: $CODEX_SKILLS ($SKILL_COUNT skills)"
     fi
 
     # Copy adapter template
@@ -196,6 +206,15 @@ if [ "$INSTALL_OPENCODE" = true ]; then
 fi
 
 # ============================================================
+# Initialize .research/ directory for state management
+# ============================================================
+RESEARCH_DIR="$(pwd)/.research"
+if [ ! -d "$RESEARCH_DIR" ]; then
+    mkdir -p "$RESEARCH_DIR/checkpoints" "$RESEARCH_DIR/changes/current" "$RESEARCH_DIR/changes/archive" "$RESEARCH_DIR/sessions"
+    echo -e "${GREEN}[+]${NC} Research state directory initialized: $RESEARCH_DIR"
+fi
+
+# ============================================================
 # Cleanup and Summary
 # ============================================================
 rm -rf "$TMP_DIR"
@@ -220,7 +239,7 @@ if [ "$INSTALL_CLAUDE" = true ]; then
     echo ""
     echo "  Claude Code:"
     echo "    claude \"Help me design a research study\""
-    echo "    # Uses Task(subagent_type=\"diverga:a1\", ...)"
+    echo "    # Uses 44 specialized agents across 9 categories"
 fi
 
 if [ "$INSTALL_CODEX" = true ]; then
@@ -235,6 +254,17 @@ if [ "$INSTALL_OPENCODE" = true ]; then
     echo "  OpenCode:"
     echo "    opencode \"diverga:list\""
     echo "    opencode \"diverga:agent A1\""
+fi
+
+# Verification
+echo ""
+echo -e "${BLUE}Verification:${NC}"
+if [ "$INSTALL_CODEX" = true ]; then
+    if [ -f "$CODEX_DEST/diverga-codex.cjs" ]; then
+        echo -e "  ${GREEN}[+]${NC} Codex CLI helper: OK"
+    else
+        echo -e "  ${RED}[-]${NC} Codex CLI helper: Missing"
+    fi
 fi
 
 echo ""

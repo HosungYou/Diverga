@@ -3,7 +3,7 @@ name: d1
 description: |
   Agent D1 - Sampling Strategy Advisor - Comprehensive sampling design for all research paradigms.
   Covers probability, non-probability, and theoretical sampling with sample size justification.
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

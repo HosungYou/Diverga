@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/main/schema.json",
   "name": "diverga",
-  "version": "8.1.0",
+  "version": "8.3.0",
   "description": "Diverga Research Coordinator - Multi-agent system for social science research",
   "author": "Diverga Team",
   "repository": "https://github.com/HosungYou/Diverga",

@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 REPO_URL="https://github.com/HosungYou/Diverga.git"
-VERSION="8.1.0"
+VERSION="8.3.0"
 
 # Print banner
 print_banner() {

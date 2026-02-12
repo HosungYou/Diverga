@@ -20,7 +20,7 @@
               └─────────────────────────────────────────────────┘
 ```
 
-[![Version](https://img.shields.io/badge/version-8.2.0-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
+[![Version](https://img.shields.io/badge/version-8.3.0-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-FF6B00?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code)
 [![Codex CLI](https://img.shields.io/badge/Codex_CLI-Support-412991?style=for-the-badge&logo=openai&logoColor=white)](docs/DESIGN_SYSTEM.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-Plugin-0969da?style=for-the-badge&logo=github&logoColor=white)](docs/DESIGN_SYSTEM.md)
@@ -105,13 +105,31 @@ Diverga auto-detects context and activates the right agents.
 
 ---
 
-## v8.2.0 — MCP Runtime Checkpoint Enforcement
+## v8.3.0 — Cross-Platform Migration
+
+**Released**: 2026-02-12
+
+### What's New in v8.3.0
+
+**Cross-Platform Migration** — GPT-5.3-Codex model routing, 47 individual Codex CLI SKILL.md files, updated install script, cross-platform documentation.
+
+## v8.3.0 — Cross-Platform Migration
 
 ### Core Principle
 
 > **"Human decisions remain with humans. AI handles what's beyond human scope."**
 
-### What's New in v8.2.0
+### What's New in v8.3.0
+
+| Feature | Description |
+|---------|-------------|
+| **47 Individual Codex Skills** | Granular `.codex/skills/diverga-*/` files for all 44 agents + 3 utilities |
+| **GPT-5.3-Codex Routing** | Latest OpenAI agentic models across HIGH/MEDIUM/LOW tiers |
+| **Cross-Platform Parity** | Codex CLI ~40% → ~75%, OpenCode ~20% → ~70% compatibility |
+| **AGENTS.md v8.3.0** | Full Agent Prerequisite Map, Checkpoint Dependency Order, SCH_* checkpoints |
+| **Platform Documentation** | CROSS-PLATFORM-GUIDE.md, PLATFORM-LIMITATIONS.md with workarounds |
+
+### What Was in v8.2.0
 
 | Feature | Description |
 |---------|-------------|
@@ -469,6 +487,7 @@ done
 
 | Version | Date | Feature |
 |---------|------|---------|
+| **v8.3.0** | 2026-02-12 | Cross-platform migration, 47 Codex CLI skills, GPT-5.3-Codex routing, ~75% Codex parity |
 | **v8.2.0** | 2026-02-12 | MCP runtime checkpoint enforcement, SKILL.md simplification, Priority Context |
 | **v8.1.0** | 2026-02-10 | Checkpoint enforcement strengthening, Agent Prerequisite Map |
 | **v8.0.0** | 2026-02-05 | Independent HUD, simplified setup, natural language project start |
@@ -490,7 +509,9 @@ See [CHANGELOG](docs/CHANGELOG.md) for full history.
 | [CLAUDE.md](CLAUDE.md) | Full system documentation |
 | [AGENTS.md](AGENTS.md) | 44 agents detailed reference |
 | [CHANGELOG](docs/CHANGELOG.md) | Version history |
-| [Release Notes v8.2.0](docs/releases/v8.2.0.md) | Latest release details |
+| [Release Notes v8.3.0](docs/RELEASE-NOTES-v8.3.0.md) | Latest release details |
+| [Cross-Platform Guide](docs/CROSS-PLATFORM-GUIDE.md) | Claude Code, Codex CLI, OpenCode comparison |
+| [Platform Limitations](docs/PLATFORM-LIMITATIONS.md) | Detailed limitation specs with workarounds |
 | [Diagnostic Report](docs/DIAGNOSTIC-REPORT-2026-02-12.md) | Architecture diagnosis and upgrade report |
 | [Agent Orchestration Guide](docs/AGENT-ORCHESTRATION-GUIDE.md) | Multi-agent pipelines |
 | [VS Methodology](docs/VS-METHODOLOGY.md) | Deep dive into Verbalized Sampling |
@@ -520,7 +541,7 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {8.2.0},
+  version = {8.3.0},
   url = {https://github.com/HosungYou/Diverga},
   note = {44 agents with VS methodology, MCP-enforced human checkpoints,
           meta-analysis system, humanization pipeline (HAVS),

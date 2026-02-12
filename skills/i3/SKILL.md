@@ -5,7 +5,7 @@ description: |
   Handles PDF download, text extraction, chunking, and vector database creation
   Use when: building RAG, creating vector database, downloading PDFs, embedding documents
   Triggers: build RAG, create vector database, download PDFs, embed documents
-version: "8.2.0"
+version: "8.3.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

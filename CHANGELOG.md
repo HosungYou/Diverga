@@ -4,6 +4,124 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [8.3.0] - 2026-02-12 (Cross-Platform Migration)
+
+### Overview
+
+**Diverga v8.3.0** - Cross-platform migration release bringing Codex CLI and OpenCode support up to parity with Claude Code v8.2.0 feature set. Introduces 47 individual skill files, GPT-5.3-Codex model routing, and comprehensive cross-platform documentation.
+
+### Key Highlights
+
+- **47 individual SKILL.md files** for Codex CLI (44 agents + 3 utilities)
+- **GPT-5.3-Codex model routing** across all tiers (HIGH/MEDIUM/LOW)
+- **44 total agents** (Category I: ScholaRAG agents added in v6.7)
+- **Cross-platform compatibility improved**: Codex CLI ~40% → ~75%, OpenCode ~20% → ~70%
+- **No breaking changes** for Claude Code users
+
+### Platform Compatibility
+
+| Platform | v8.2.0 | v8.3.0 | Improvement |
+|----------|--------|--------|-------------|
+| Claude Code | 100% | 100% | - |
+| Codex CLI | ~40% | **~75%** | +35% |
+| OpenCode | ~20% | **~70%** | +50% |
+
+### New Features
+
+- **feat(codex-cli)**: 47 individual skill files in `.codex/skills/diverga-*/`
+  - 44 agent skills (A1-I3) + 3 utility skills (setup, memory, help)
+  - YAML frontmatter with name, description (<500 chars), metadata
+  - Codex CLI Degraded Mode instructions per skill
+  - Text-based checkpoint protocol (replaces MCP runtime)
+  - Tool mapping tables (Claude Code → Codex CLI)
+  - Bilingual triggers (English + Korean)
+
+- **feat(models)**: GPT-5.3-Codex model routing
+  - HIGH tier: o3 → `gpt-5.3-codex` (most capable agentic coding model)
+  - MEDIUM tier: gpt-4.1 → `gpt-5.2-codex`
+  - LOW tier: gpt-4.1-mini → `gpt-5.1-codex-mini`
+
+- **feat(templates)**: AGENTS.md.template v8.3.0 rewrite
+  - 40 → 44 agents (Category I: I0-I3 ScholaRAG agents)
+  - Full Agent Prerequisite Map
+  - Checkpoint Dependency Order (Level 0-5)
+  - SCH_* checkpoints for systematic review automation
+  - Memory system reference (.research/ directory)
+
+- **feat(opencode)**: oh-my-opencode.template.json v8.3.0
+  - I0-I3 triggers with EN+KR keywords
+  - Model routing for all 44 agents
+  - SCH_* checkpoints in required/recommended sections
+
+### CLI Tool Updates
+
+- **feat(diverga-codex.cjs)**: v6.6.1 → v8.3.0
+  - 44 agents (was 40), 9 categories (was 8)
+  - New `prereq` command showing Agent Prerequisite Map
+  - SCH_* checkpoints added
+  - Fixed agent tier assignments (A3→HIGH, B5→HIGH, F5→LOW, G6→HIGH)
+
+- **feat(install-multi-cli.sh)**: v6.6.2 → v8.3.0
+  - Copies individual `.codex/skills/` directories
+  - `.research/` directory initialization
+  - Node.js >= 18 version check
+  - Post-install verification
+
+### New Documentation
+
+| File | Description |
+|------|-------------|
+| `docs/RELEASE-NOTES-v8.3.0.md` | Comprehensive release notes |
+| `docs/CROSS-PLATFORM-GUIDE.md` | Unified guide for all platforms |
+| `docs/PLATFORM-LIMITATIONS.md` | Detailed limitation specs with workarounds |
+
+### Updated Documentation
+
+| File | Changes |
+|------|---------|
+| `docs/CODEX-SKILL-SYSTEM.md` | v6.6.2 → v8.3.0, individual skills, GPT-5.3-Codex |
+| `adapters/README.md` | Cross-platform compatibility table |
+| `CLAUDE.md` | Research Coordinator v8.3.0 integration |
+
+### Known Limitations (Codex CLI / OpenCode)
+
+- No parallel agent execution (sequential only)
+- No MCP runtime checkpoints (text-based behavioral enforcement)
+- No AskUserQuestion structured UI (text prompts)
+- No HUD statusline
+- Single model session (no per-agent model isolation)
+
+### Migration Guide
+
+v8.2.0 → v8.3.0 migration:
+
+**Claude Code users** (no breaking changes):
+- Optional: Update AGENTS.md with `cp AGENTS.md.template AGENTS.md`
+- All existing workflows continue to work
+
+**Codex CLI users** (new platform support):
+```bash
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh | bash -s -- --codex
+```
+
+**OpenCode users** (new platform support):
+```bash
+curl -sSL https://raw.githubusercontent.com/HosungYou/Diverga/main/scripts/install-multi-cli.sh | bash -s -- --opencode
+```
+
+### File Summary
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| New Codex Skills | 47 | `.codex/skills/diverga-*/SKILL.md` |
+| Updated Templates | 3 | AGENTS.md.template, oh-my-opencode.template.json, claude-settings |
+| Updated CLI Tools | 2 | diverga-codex.cjs, install-multi-cli.sh |
+| New Documentation | 3 | RELEASE-NOTES-v8.3.0.md, CROSS-PLATFORM-GUIDE.md, PLATFORM-LIMITATIONS.md |
+| Updated Documentation | 3 | CODEX-SKILL-SYSTEM.md, adapters/README.md, CLAUDE.md |
+| **Total** | **58+** | |
+
+---
+
 ## [8.1.0] - 2026-02-09 (Checkpoint Enforcement Strengthening)
 
 ### Overview
