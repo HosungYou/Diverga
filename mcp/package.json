@@ -10,7 +10,9 @@
   },
   "scripts": {
     "start": "node checkpoint-server.js",
-    "test": "node --test test/checkpoint-server.test.js"
+    "test": "node --test test/checkpoint-server.test.js",
+    "test:sqlite": "node --test test/sqlite-state-v9.test.js",
+    "test:all": "node --test test/*.test.js"
   },
   "license": "MIT"
 }
