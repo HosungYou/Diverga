@@ -4,6 +4,114 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [9.0.0] - 2026-02-16 (Architecture — SQLite + MCP Server Split)
+
+### Overview
+
+**Diverga v9.0.0** — Major architecture release replacing the monolithic checkpoint server with a modular 3-server architecture backed by SQLite for ACID-safe parallel agent execution.
+
+### Key Highlights
+
+- **MCP server 3-split**: Monolithic `checkpoint-server.js` (7 tools) → modular `diverga-server.js` (16 tools) across checkpoint, memory, and comm servers
+- **SQLite backend**: WAL-mode SQLite as primary store for parallel-safe operations (YAML/JSON preserved as default for backward compatibility)
+- **Dual backend**: `DIVERGA_BACKEND=sqlite` env var enables SQLite; default remains YAML for seamless v8.x upgrade
+- **Auto-migration**: First SQLite startup auto-imports existing YAML/JSON data (checkpoints, decisions, project state, priority context, agents, messages)
+- **Agent messaging**: 6 new comm tools for inter-agent communication (register, list, send, mailbox, acknowledge, broadcast)
+- **464 tests**: Comprehensive TDD coverage across 9 test suites
+
+### Architecture
+
+```
+Layer 3: diverga-server.js ──→ tool-registry.js (16 tools)
+              │
+Layer 2: checkpoint-server    memory-server     comm-server
+              │                    │                  │
+         ┌────┴────┐         ┌────┴────┐        ┌────┴────┐
+         │  YAML   │         │  YAML   │        │  JSON   │
+         │(default)│         │(default)│        │(default)│
+         └─────────┘         └─────────┘        └─────────┘
+              │                    │                  │
+         ┌────┴────────────────────┴──────────────────┴────┐
+         │           sqlite-servers.js (WAL mode)          │
+         │     DIVERGA_BACKEND=sqlite activates this       │
+         └─────────────────────────────────────────────────┘
+
+Layer 1: sqlite-state.js    messaging.js    constants.js  utils.js
+```
+
+### New MCP Tools (16 total, up from 7)
+
+| Category | Tool | Description |
+|----------|------|-------------|
+| **Checkpoint** (3) | `diverga_check_prerequisites` | Verify agent prerequisites |
+| | `diverga_mark_checkpoint` | Record checkpoint decision |
+| | `diverga_checkpoint_status` | Full checkpoint overview |
+| **Memory** (7) | `diverga_project_status` | Read project state |
+| | `diverga_project_update` | Update project state (deep merge) |
+| | `diverga_decision_add` | Record research decision |
+| | `diverga_decision_list` | List/filter decisions |
+| | `diverga_priority_read` | Read priority context |
+| | `diverga_priority_write` | Write priority context |
+| | `diverga_export_yaml` | Export all state as YAML |
+| **Comm** (6) | `diverga_agent_register` | Register agent for messaging |
+| | `diverga_agent_list` | List registered agents |
+| | `diverga_message_send` | Send agent-to-agent message |
+| | `diverga_message_mailbox` | Read agent inbox |
+| | `diverga_message_acknowledge` | Acknowledge message |
+| | `diverga_message_broadcast` | Broadcast to all agents |
+
+### New Files
+
+| File | Purpose |
+|------|---------|
+| `mcp/diverga-server.js` | Unified MCP entry point (replaces checkpoint-server.js) |
+| `mcp/lib/tool-registry.js` | Tool definitions + dispatch routing |
+| `mcp/lib/sqlite-servers.js` | SQLite-backed server factory + migration |
+| `mcp/lib/sqlite-state.js` | SQLite state store (checkpoints, decisions, state) |
+| `mcp/lib/messaging.js` | SQLite messaging (channels, progress, relays) |
+| `mcp/lib/constants.js` | Shared CHECKPOINT_LEVELS |
+| `mcp/lib/utils.js` | Shared deepMerge utility |
+| `mcp/servers/checkpoint-server.js` | Checkpoint + prerequisites (YAML) |
+| `mcp/servers/memory-server.js` | Project state + decisions (YAML) |
+| `mcp/servers/comm-server.js` | Agent messaging (JSON) |
+
+### Test Coverage
+
+| Suite | Tests | Description |
+|-------|-------|-------------|
+| sqlite-state-v9 | 48 | SQLite state store |
+| messaging-v9 | 45 | Agent messaging |
+| checkpoint-server-v9 | 37 | Checkpoint server |
+| memory-server-v9 | 55 | Memory server |
+| comm-server-v9 | 85 | Comm server |
+| tool-registry-v9 | 43 | Tool registration |
+| sqlite-servers-v9 | 72 | SQLite backend + migration |
+| integration-v9 | 23 | End-to-end (both backends) |
+| checkpoint-server (legacy) | 56 | v8 backward compatibility |
+| **Total** | **464** | **All passing** |
+
+### Migration Guide
+
+v8.5.0 → v9.0.0:
+
+**Default (YAML backend — no changes needed)**:
+- `.mcp.json` updated to point to `diverga-server.js` (automatic via plugin update)
+- All 7 existing tool names preserved; 9 new tools available
+- Existing YAML/JSON files continue working as before
+
+**SQLite backend (opt-in)**:
+```bash
+export DIVERGA_BACKEND=sqlite
+# First run auto-migrates existing YAML/JSON → SQLite
+# DB stored at .research/diverga.db
+```
+
+### Breaking Changes
+
+None. Default YAML backend is fully backward-compatible with v8.x.
+
+---
+
 ## [8.5.0] - 2026-02-15 (Developer Experience & Agent Teams Pilot)
 
 ### Overview
