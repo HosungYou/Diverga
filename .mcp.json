@@ -2,7 +2,7 @@
   "mcpServers": {
     "diverga": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/checkpoint-server.js"]
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/diverga-server.js"]
     }
   }
 }
