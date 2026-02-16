@@ -7,7 +7,7 @@ description: |
   Triggers: qualitative coding, thematic analysis, coding, 질적 코딩, 주제 분석, codebook, NVivo, ATLAS.ti
 metadata:
   short-description: E2-QualitativeCodingSpecialist
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # E2 - Qualitative Coding Specialist

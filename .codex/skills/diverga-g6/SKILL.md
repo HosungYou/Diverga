@@ -8,7 +8,7 @@ description: |
   휴먼화, 자연스러운 글쓰기
 metadata:
   short-description: G6-AcademicStyleHumanizer
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # G6-AcademicStyleHumanizer

@@ -8,7 +8,7 @@ description: |
   AI 패턴, AI 글쓰기 검토
 metadata:
   short-description: G5-AcademicStyleAuditor
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # G5-AcademicStyleAuditor

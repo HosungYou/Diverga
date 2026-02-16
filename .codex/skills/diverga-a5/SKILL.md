@@ -7,7 +7,7 @@ description: |
   Triggers: paradigm, ontology, epistemology, worldview, 패러다임, 세계관, philosophical foundations, 철학적 기초
 metadata:
   short-description: A5-ParadigmWorldviewAdvisor
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # A5 - Paradigm & Worldview Advisor

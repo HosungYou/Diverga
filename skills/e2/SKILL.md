@@ -3,7 +3,7 @@ name: e2
 description: |
   Agent E2 - Qualitative Coding Specialist - Systematic coding and theme development.
   Covers codebook development, coding strategies, saturation assessment, and CAQDAS guidance.
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

@@ -7,7 +7,7 @@ description: |
   Triggers: RCT, quasi-experimental, experimental design, survey design, 양적 연구 설계, 실험 설계, power analysis
 metadata:
   short-description: C1-QuantitativeDesignConsultant
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # C1 - Quantitative Design Consultant

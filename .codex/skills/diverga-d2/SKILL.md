@@ -7,7 +7,7 @@ description: |
   Triggers: interview, focus group, interview protocol, 인터뷰, 면담, 포커스 그룹, probing, transcription
 metadata:
   short-description: D2-InterviewFocusGroupSpecialist
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # D2 - Interview & Focus Group Specialist

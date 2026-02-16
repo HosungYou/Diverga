@@ -7,7 +7,7 @@ description: |
   Triggers: sensitivity analysis, robustness, specification curve, 민감도 분석, 강건성 검증, analytical decisions
 metadata:
   short-description: E5-SensitivityAnalysisDesigner
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # E5 - Sensitivity Analysis Designer

@@ -7,7 +7,7 @@ description: |
   Triggers: theoretical framework, theory, conceptual model, 이론적 프레임워크, 이론적 틀, hypothesis derivation
 metadata:
   short-description: A2-TheoreticalFrameworkArchitect
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # A2 - Theoretical Framework Architect

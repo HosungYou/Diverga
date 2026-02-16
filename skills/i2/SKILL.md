@@ -5,7 +5,7 @@ description: |
   Supports two project types with different confidence thresholds
   Use when: screening papers, PRISMA screening, inclusion/exclusion criteria
   Triggers: screen papers, PRISMA screening, inclusion criteria, exclusion criteria, AI screening
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

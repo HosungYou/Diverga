@@ -7,7 +7,7 @@ description: |
   Triggers: data extraction, PDF extract, data completeness, SD recovery, 데이터 추출, 자료 추출, Hedges g calculation
 metadata:
   short-description: C6-DataIntegrityGuard
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # C6 - Data Integrity Guard

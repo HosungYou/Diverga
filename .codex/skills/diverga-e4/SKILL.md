@@ -7,7 +7,7 @@ description: |
   Triggers: R code, Python code, SPSS, Stata, analysis script, R 코드, Python 코드, 분석 코드, code generation
 metadata:
   short-description: E4-AnalysisCodeGenerator
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # E4 - Analysis Code Generator

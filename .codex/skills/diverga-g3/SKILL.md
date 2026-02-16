@@ -8,7 +8,7 @@ description: |
   동료 심사, 리뷰어 응답, 수정
 metadata:
   short-description: G3-PeerReviewStrategist
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # G3-PeerReviewStrategist

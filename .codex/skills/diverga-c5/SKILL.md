@@ -7,7 +7,7 @@ description: |
   Triggers: meta-analysis, pooled effect, heterogeneity, forest plot, funnel plot, 메타분석, 메타 분석, Hedges g
 metadata:
   short-description: C5-MetaAnalysisMaster
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # C5 - Meta-Analysis Master

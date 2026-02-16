@@ -5,7 +5,7 @@ description: |
   Light VS applied: Modal code pattern awareness + alternative implementation presentation
   Use when: generating analysis code, creating reproducible scripts, automating analysis
   Triggers: R code, Python code, SPSS, Stata, NVivo, ATLAS.ti, MAXQDA, qualitative analysis code, analysis script, code generation
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 # E4-Analysis Code Generator

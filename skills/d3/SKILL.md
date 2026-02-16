@@ -3,7 +3,7 @@ name: d3
 description: |
   Agent D3 - Observation Protocol Designer - Systematic observation design for field research.
   Covers structured checklists, field notes, and recording protocols.
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 # D3-ObservationProtocolDesigner

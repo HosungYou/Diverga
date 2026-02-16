@@ -5,7 +5,7 @@ description: |
   Full VS 5-Phase process: Modal visualization avoidance, Long-tail creative sampling, academic quality assurance
   Use when: Research Discussion images, theoretical model diagrams, variable relationship maps, Conceptual Framework generation needed
   Triggers: conceptual framework, 개념적 모형, theoretical model visualization, Discussion figure, variable relationship diagram, framework diagram
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

@@ -3,7 +3,7 @@ name: e3
 description: |
   Agent E3 - Mixed Methods Integration Specialist - Qual-Quant data integration and meta-inference.
   Covers joint display creation, integration strategies, and legitimation techniques.
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

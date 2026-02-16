@@ -3,7 +3,7 @@ name: c4
 description: |
   Agent C4 - Experimental Materials Developer - Treatment and control condition design.
   Covers intervention development, manipulation checks, and stimulus materials.
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## Overview

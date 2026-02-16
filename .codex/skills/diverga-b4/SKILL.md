@@ -7,7 +7,7 @@ description: |
   Triggers: latest research, trends, new publications, recent papers, 연구 동향, 트렌드, research developments
 metadata:
   short-description: B4-ResearchRadar
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # B4 - Research Radar

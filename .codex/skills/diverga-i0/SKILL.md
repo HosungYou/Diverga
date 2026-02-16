@@ -8,7 +8,7 @@ description: |
   체계적 문헌고찰, 프리즈마, 문헌고찰 자동화
 metadata:
   short-description: I0-PipelineOrchestrator
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # I0-ReviewPipelineOrchestrator

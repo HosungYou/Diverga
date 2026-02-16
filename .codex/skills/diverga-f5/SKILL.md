@@ -8,7 +8,7 @@ description: |
   휴먼화 검증, AI 텍스트 확인
 metadata:
   short-description: F5-HumanizationVerifier
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # F5-HumanizationVerifier

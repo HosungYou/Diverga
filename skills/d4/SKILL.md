@@ -3,7 +3,7 @@ name: d4
 description: |
   Agent D4 - Measurement Instrument Developer - Scale construction and psychometric validation.
   Covers item development, validity evidence, and reliability testing for social science research.
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

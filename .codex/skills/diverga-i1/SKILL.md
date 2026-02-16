@@ -8,7 +8,7 @@ description: |
   논문 수집, 논문 검색, 데이터베이스 검색
 metadata:
   short-description: I1-PaperRetrieval
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # I1-PaperRetrievalAgent

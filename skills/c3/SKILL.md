@@ -11,7 +11,7 @@ description: |
   - Embedded (QUAN(qual)): Secondary strand addresses different question
   - Multiphase: Long-term projects with iterative phases
   - Morse notation interpretation and recommendation
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

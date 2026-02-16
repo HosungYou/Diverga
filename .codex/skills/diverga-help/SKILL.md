@@ -6,7 +6,7 @@ description: |
   Triggers: help, guide, how to use, agents list, 도움말
 metadata:
   short-description: Help-Guide
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # Diverga Help Guide (Codex CLI)

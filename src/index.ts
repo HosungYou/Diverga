@@ -1,5 +1,5 @@
 /**
- * Diverga Agent Runtime v8.5.0
+ * Diverga Agent Runtime v9.0.0
  *
  * Independent Agent Runtime for Diverga Research Agents.
  * Enables parallel execution via Task(subagent_type="diverga:a1") etc.
@@ -26,7 +26,7 @@
 export * from './agents/index.js';
 
 // Package info
-export const VERSION = '8.5.0';
+export const VERSION = '9.0.0';
 export const PACKAGE_NAME = 'diverga';
 
 /**

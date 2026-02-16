@@ -8,7 +8,7 @@ description: |
   저널 매칭, 투고처, 학술지
 metadata:
   short-description: G1-JournalMatcher
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # G1-JournalMatcher

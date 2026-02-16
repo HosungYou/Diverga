@@ -6,7 +6,7 @@ description: |
   Prevents memory/context overflow errors from processing large documents sequentially
   Use when: processing multiple PDFs, large document collections, systematic review data extraction
   Triggers: batch PDF, parallel reading, multiple documents, large files, document extraction
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 # B5-Parallel Document Processor

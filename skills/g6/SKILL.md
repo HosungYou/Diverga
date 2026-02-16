@@ -5,7 +5,7 @@ description: |
   Applies transformations from G5 analysis to create natural academic prose
   Use when: humanizing AI-generated drafts, preparing manuscripts, improving writing naturalness
   Triggers: humanize, transform, make natural, remove AI patterns, improve style
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

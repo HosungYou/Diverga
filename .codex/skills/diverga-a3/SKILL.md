@@ -7,7 +7,7 @@ description: |
   Triggers: criticism, weakness, reviewer 2, alternative explanation, rebuttal, 비판, 약점, counterargument
 metadata:
   short-description: A3-DevilsAdvocate
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # A3 - Devil's Advocate

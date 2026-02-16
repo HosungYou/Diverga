@@ -7,7 +7,7 @@ description: |
   Triggers: sampling, sample size, G*Power, 표집, 표본 크기, 샘플링, probability sampling, purposive sampling
 metadata:
   short-description: D1-SamplingStrategyAdvisor
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # D1 - Sampling Strategy Advisor

@@ -1,6 +1,6 @@
 {
   "name": "diverga",
-  "version": "8.5.0",
+  "version": "9.0.0",
   "description": "Diverga Agent Runtime - 44 specialized AI research agents with VS-Research methodology",
   "type": "module",
   "main": "dist/index.js",

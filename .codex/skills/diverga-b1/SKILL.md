@@ -7,7 +7,7 @@ description: |
   Triggers: literature review, PRISMA, systematic review, scoping review, meta-synthesis, 체계적 문헌고찰, 문헌 검색
 metadata:
   short-description: B1-LiteratureReviewStrategist
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # B1 - Literature Review Strategist

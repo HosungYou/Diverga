@@ -4,7 +4,7 @@ description: |
   Error Prevention Engine - Pattern detection, anomaly alerts, error prevention for meta-analysis.
   Advisory role to C5, provides warnings and recommendations.
   Triggers: error prevention, validation, data check, anomaly detection, pattern detection
-version: "8.5.0"
+version: "9.0.0"
 ---
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)

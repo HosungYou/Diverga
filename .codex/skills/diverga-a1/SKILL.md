@@ -7,7 +7,7 @@ description: |
   Triggers: research question, RQ, refine question, 연구 질문, 연구문제, PICO, SPIDER, research idea
 metadata:
   short-description: A1-ResearchQuestionRefiner
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # A1 - Research Question Refiner

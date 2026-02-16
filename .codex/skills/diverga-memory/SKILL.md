@@ -8,7 +8,7 @@ description: |
   기억, 맥락, 세션, 체크포인트
 metadata:
   short-description: Memory-System
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # Diverga Memory System (Codex CLI)

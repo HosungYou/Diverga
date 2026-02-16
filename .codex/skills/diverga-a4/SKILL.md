@@ -7,7 +7,7 @@ description: |
   Triggers: ethics, IRB, consent, informed consent, privacy, 연구 윤리, 동의서, vulnerable populations
 metadata:
   short-description: A4-ResearchEthicsAdvisor
-  version: 8.5.0
+  version: 9.0.0
 ---
 
 # A4 - Research Ethics Advisor
