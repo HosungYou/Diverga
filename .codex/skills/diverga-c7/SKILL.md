@@ -7,7 +7,7 @@ description: |
   Triggers: error prevention, validation, data check, anomaly detection, 오류 방지, 검증, 데이터 확인, pattern detection
 metadata:
   short-description: C7-ErrorPreventionEngine
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # C7 - Error Prevention Engine

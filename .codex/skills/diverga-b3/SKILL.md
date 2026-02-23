@@ -7,7 +7,7 @@ description: |
   Triggers: effect size, Cohen's d, Hedges' g, correlation, 효과크기, 효과 크기 추출, meta-analysis data
 metadata:
   short-description: B3-EffectSizeExtractor
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # B3 - Effect Size Extractor

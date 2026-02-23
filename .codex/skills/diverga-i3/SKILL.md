@@ -8,7 +8,7 @@ description: |
   RAG 구축, 벡터 DB, 문서 임베딩
 metadata:
   short-description: I3-RAGBuilder
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # I3-RAGBuilder

@@ -8,7 +8,7 @@ description: |
   사전등록, OSF
 metadata:
   short-description: G4-PreregistrationComposer
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # G4-PreregistrationComposer

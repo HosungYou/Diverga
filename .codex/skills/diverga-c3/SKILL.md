@@ -7,7 +7,7 @@ description: |
   Triggers: mixed methods, sequential design, convergent, 혼합방법, 혼합 연구, 통합 설계, Morse notation
 metadata:
   short-description: C3-MixedMethodsDesignConsultant
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # C3 - Mixed Methods Design Consultant

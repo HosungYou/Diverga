@@ -7,7 +7,7 @@ description: |
   Triggers: intervention materials, experimental materials, 중재 자료, 실험 자료 개발, manipulation check, stimulus
 metadata:
   short-description: C4-ExperimentalMaterialsDeveloper
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # C4 - Experimental Materials Developer

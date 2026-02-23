@@ -8,7 +8,7 @@ description: |
   실행연구, 참여적 연구
 metadata:
   short-description: H2-ActionResearchFacilitator
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # H2-ActionResearchFacilitator

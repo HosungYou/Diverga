@@ -8,7 +8,7 @@ description: |
   편향 탐지, 신뢰성
 metadata:
   short-description: F4-BiasDetector
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # F4-BiasTrustworthinessDetector

@@ -7,7 +7,7 @@ description: |
   Triggers: conceptual framework, 개념적 모형, framework diagram, variable relationship diagram, Discussion figure
 metadata:
   short-description: A6-ConceptualFrameworkVisualizer
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # A6 - Conceptual Framework Visualizer

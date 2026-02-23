@@ -7,7 +7,7 @@ description: |
   Triggers: mixed methods integration, joint display, 혼합방법 통합, 통합 분석, meta-inference, legitimation
 metadata:
   short-description: E3-MixedMethodsIntegration
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # E3 - Mixed Methods Integration Specialist

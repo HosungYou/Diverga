@@ -8,7 +8,7 @@ description: |
   체크리스트, 보고 지침
 metadata:
   short-description: F2-ChecklistManager
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # F2-ChecklistManager

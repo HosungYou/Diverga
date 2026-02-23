@@ -8,7 +8,7 @@ description: |
   일관성 검토, 내적 일관성
 metadata:
   short-description: F1-ConsistencyChecker
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # F1-InternalConsistencyChecker

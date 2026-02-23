@@ -7,7 +7,7 @@ description: |
   Triggers: phenomenology, grounded theory, case study, narrative inquiry, ethnography, 현상학, 근거이론, 사례연구, qualitative design
 metadata:
   short-description: C2-QualitativeDesignConsultant
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # C2 - Qualitative Design Consultant

@@ -7,7 +7,7 @@ description: |
   Triggers: setup, configure, install, first-time setup, 설정
 metadata:
   short-description: Setup-Wizard
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # Diverga Setup Wizard (Codex CLI)

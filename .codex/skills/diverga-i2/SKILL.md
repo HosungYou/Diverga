@@ -8,7 +8,7 @@ description: |
   논문 스크리닝, 선별, 포함 기준
 metadata:
   short-description: I2-ScreeningAssistant
-  version: 9.0.0
+  version: 10.3.0
 ---
 
 # I2-ScreeningAssistant
