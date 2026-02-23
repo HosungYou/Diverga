@@ -9,7 +9,7 @@
 **v8.4.0**: Researcher Visibility & Pipeline Safety - Dual directory structure (`.research/` system + `research/` public), auto-migration, SCH_API_KEY_VALIDATION checkpoint, validateApiKeys() utility
 **v8.3.0**: Cross-Platform Migration - GPT-5.3-Codex model routing, 47 individual Codex CLI SKILL.md files, updated install script, cross-platform documentation
 **v8.2.0**: MCP Runtime Checkpoint Enforcement - MCP server (7 tools), SKILL.md simplification (675 lines saved), state path unification, Priority Context
-**v8.1.0**: Checkpoint Enforcement Strengthening - Mandatory AskUserQuestion at all checkpoints, Agent Prerequisite Map, multi-agent coordination
+**v8.1.0**: Checkpoint Enforcement Strengthening + Humanization Pipeline v2.0 - Mandatory AskUserQuestion at all checkpoints, Agent Prerequisite Map, multi-agent coordination; Multi-pass iterative pipeline, structural detection (S7-S10), quantitative metrics (burstiness CV, MTLD), section-aware mode escalation. Reference: https://github.com/HosungYou/humanizer
 **v8.0.1-patch3**: 8-Dimension Diagnostic Sweep - Category I registration fix, version sync, lib/ fixes
 **v8.0.1**: Installation Bug Fixes - Fixed install script path corruption, skills copy instead of symlink
 **v8.0.0**: Project Visibility Enhancement - Independent HUD, simplified setup, natural language project start, docs/ auto-generation
@@ -459,9 +459,9 @@ Based on V7 GenAI meta-analysis lessons learned:
 
 | Agent | Purpose | Model |
 |-------|---------|-------|
-| **G5-AcademicStyleAuditor** | AI pattern detection (24 categories) | Sonnet |
-| **G6-AcademicStyleHumanizer** | Transform AI patterns to natural prose | Opus |
-| **F5-HumanizationVerifier** | Verify transformation integrity | Haiku |
+| **G5-AcademicStyleAuditor v2.0** | AI pattern detection (24+4 categories) + quantitative metrics | Sonnet |
+| **G6-AcademicStyleHumanizer v2.0** | Transform AI patterns with structural Layer 3 | Opus |
+| **F5-HumanizationVerifier v2.0** | Verify integrity + burstiness + structural coherence | Haiku |
 
 ### New in v6.2: Parallel Document Processing
 
@@ -598,16 +598,22 @@ Shall we proceed with this paradigm?
 
 ---
 
-## Humanization Pipeline (v6.1 New Feature)
+## Humanization Pipeline (v2.0 — Multi-Pass Iterative Architecture)
 
 ### Overview
 
-Transform AI-generated academic text into natural, human-sounding prose while preserving scholarly integrity. Based on Wikipedia's AI Cleanup initiative's 24 pattern categories, adapted for academic writing.
+Transform AI-generated academic text into natural, human-sounding prose while preserving scholarly integrity. Based on Wikipedia's AI Cleanup initiative's 24+4 pattern categories (including S7-S10 structural patterns), adapted for academic writing. v2.0 replaces single-pass with multi-pass iterative pipeline featuring quantitative metrics (burstiness CV, MTLD) and section-aware mode escalation.
 
-### Pipeline Stages
+**Reference Documentation**: https://github.com/HosungYou/humanizer
+
+### Pipeline Stages (v2.0 Multi-Pass)
 
 ```
-Content Generation (G2/G3) → G5 Analysis → Checkpoint → G6 Transform → F5 Verify → Export
+Content Generation (G2/G3) --> G5 Analysis --> Checkpoint -->
+  Pass 1: G6 Vocab --> F5 Quick --> CP_PASS1_REVIEW -->
+  Pass 2: G6 Structural --> F5 Full --> CP_PASS2_REVIEW -->
+  [Pass 3 optional: G6 Polish --> F5 Full --> CP_FINAL_REVIEW] -->
+  Export
 ```
 
 ### Commands
@@ -615,25 +621,32 @@ Content Generation (G2/G3) → G5 Analysis → Checkpoint → G6 Transform → F
 | Command | Description |
 |---------|-------------|
 | `"Check AI patterns"` | Run G5 analysis, show pattern report |
-| `"Humanize my draft"` | Full pipeline with balanced mode |
+| `"Humanize my draft"` | Full multi-pass pipeline with balanced mode |
 | `"Humanize (conservative)"` | Minimal changes, high-risk only |
 | `"Humanize (aggressive)"` | Maximum naturalness |
+| `"Humanize to target: 30%"` | Target-based multi-pass pipeline |
+| `"Humanize (multi-pass)"` | Explicit multi-pass with all checkpoints |
+| `"Humanize (journal_safe)"` | Preset target: 30% |
+| `"Humanize (conference)"` | Preset target: 40% |
 | `"Export with humanization"` | Run pipeline before export |
 
 ### Transformation Modes
 
 | Mode | Target | Best For |
 |------|--------|----------|
-| **Conservative** | High-risk patterns only | Journal submissions |
-| **Balanced** ⭐ | High + medium-risk | Most academic writing |
-| **Aggressive** | All patterns | Blog posts, informal |
+| **Conservative** | High-risk patterns only (Layer 1-2) | Journal submissions |
+| **Balanced** ⭐ | High + medium-risk + structural (Layer 1-3) | Most academic writing |
+| **Aggressive** | All patterns + deep structural (Layer 1-3) | Blog posts, informal |
 
-### New Checkpoint
+### Checkpoints
 
 | Checkpoint | Level | When |
 |------------|-------|------|
-| CP_HUMANIZATION_REVIEW | 🟠 Recommended | After content generation |
-| CP_HUMANIZATION_VERIFY | 🟡 Optional | Before final export |
+| CP_HUMANIZATION_REVIEW | 🟠 Recommended | After G5 analysis, before transformation |
+| CP_PASS1_REVIEW | 🟠 Recommended | After vocabulary pass, before structural pass |
+| CP_PASS2_REVIEW | 🟠 Recommended | After structural pass, before optional polish |
+| CP_FINAL_REVIEW | 🟡 Optional | After polish pass, before export |
+| CP_HUMANIZATION_VERIFY | 🟡 Optional | Post-humanization verification review |
 
 ### Ethics Note
 
@@ -847,10 +860,11 @@ Meta-Analysis Pipeline:
     → diverga:c6 (extraction)
     → diverga:c7 (validation)
 
-Humanization Pipeline:
+Humanization Pipeline (v2.0 Multi-Pass):
   diverga:g5 (audit)
-    → diverga:g6 (humanize)
-    → diverga:f5 (verify)
+    → Pass 1: diverga:g6 (vocab) → diverga:g5 (rescan) → diverga:f5 (quick verify)
+    → Pass 2: diverga:g6 (structural) → diverga:g5 (rescan) → diverga:f5 (full verify)
+    → [Pass 3: diverga:g6 (polish) → diverga:g5 (audit) → diverga:f5 (full verify)]
 ```
 
 ### ⚠️ Parallel Execution Prerequisite Gate
@@ -924,7 +938,7 @@ The Memory System automatically captures context at critical lifecycle events:
 - **v8.4.0**: Researcher Visibility & Pipeline Safety - Dual directory structure (`.research/` system + `research/` public), auto-migration, SCH_API_KEY_VALIDATION checkpoint
 - **v8.3.0**: Cross-Platform Migration - GPT-5.3-Codex model routing, 47 individual Codex CLI SKILL.md files, updated install script, cross-platform documentation
 - **v8.2.0**: MCP Runtime Checkpoint Enforcement - MCP server (7 tools), SKILL.md simplification (675 lines saved), state path unification, Priority Context, lib/memory removed
-- **v8.1.0**: Checkpoint Enforcement Strengthening - Mandatory AskUserQuestion, Agent Prerequisite Map, multi-agent coordination
+- **v8.1.0**: Checkpoint Enforcement Strengthening + Humanization Pipeline v2.0 - Mandatory AskUserQuestion, Agent Prerequisite Map, multi-agent coordination; Multi-pass iterative pipeline (3-pass: vocab/structural/polish), structural detection (S7-S10), quantitative metrics (burstiness CV, MTLD), section-aware mode escalation, score target system, F5 v2.0 with burstiness/structural/coherence verification. Reference: https://github.com/HosungYou/humanizer
 - **v8.0.1**: Installation Bug Fixes - Fixed install script path corruption, skills copy instead of symlink
 - **v8.0.0**: Project Visibility Enhancement - Independent HUD statusline, simplified 3-step setup, natural language project start, docs/ auto-generation
 - **v7.0.0**: Memory System v2 - 3-layer context system, checkpoint auto-trigger, cross-session persistence, decision audit trail

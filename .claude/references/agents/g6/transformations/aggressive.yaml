@@ -2,7 +2,7 @@
 # Maximum naturalness, extensive changes
 # Best for: Blog posts, informal writing, social media summaries
 
-version: "1.0.0"
+version: "2.0.0"
 mode: "aggressive"
 description: |
   Maximum transformation for texts where naturalness is prioritized over
@@ -348,6 +348,113 @@ transformations:
       - "This study has limitations" → "Specifically, [limitation] may have..."
       - "Generalizability is limited" → explain why and how
 
+  # === STRUCTURAL PATTERNS (v2.0) ===
+
+  S7:
+    approach: "dissolve_all_enumeration"
+    description: "Dissolve ALL enumeration including 'two/three/four main X' framing"
+    aggressive_targets:
+      - "First,... Second,... Third,..." (all instances)
+      - "Three main findings:"
+      - "Four key contributions:"
+      - "Two important implications:"
+      - "five directions for future research"
+      - ALL ordinal markers in prose
+      - ALL "N main/key/important X" framing patterns
+    preserve_only:
+      - "Numbered procedural steps in Methods (actual sequence)"
+    example:
+      before: |
+        This study makes three contributions. First, it extends the
+        occupational identity threat framework. Second, it introduces
+        partisan identity as a moderator. Third, it provides evidence
+        for the awareness-concern link.
+      after: |
+        The occupational identity threat framework, until now confined to
+        within-firm dynamics, turns out to travel well to the national stage.
+        Partisan identity does not merely add noise -- it reshapes the entire
+        gradient. And the link between AI awareness and concern? It depends
+        on who is doing the worrying.
+
+  S8:
+    approach: "eliminate_all_repetitive_openers"
+    description: "Ensure ZERO consecutive paragraphs with similar opener patterns"
+    aggressive_targets:
+      - ANY two consecutive paragraphs with same syntactic opener
+      - "The [X]..." pattern repeated anywhere in same section
+      - "This [X]..." pattern repeated in adjacent paragraphs
+      - "Our [X]..." pattern repeated in adjacent paragraphs
+    strategies:
+      - "Start with a question"
+      - "Start with a 2-5 word declarative"
+      - "Start with a dependent clause"
+      - "Start with a concrete number or statistic"
+      - "Start with a contrast, concession, or surprising claim"
+      - "Start with a real-world scenario"
+
+  S9:
+    approach: "break_all_formulaic_structures"
+    description: "Break ALL formulaic section structures, not just Discussion"
+    aggressive_targets:
+      - "The present study examined..." (Discussion opener)
+      - "This study investigated..." (Discussion opener)
+      - "In conclusion, this study..." (Conclusion opener)
+      - "The purpose of this study was..." (any section)
+      - Predictable Discussion sequence: restate → compare → implications → limitations → future
+      - Predictable Conclusion: summary → implications → call to action
+    strategies:
+      - "Open Discussion with most surprising finding"
+      - "Open Discussion with a question the reader is asking"
+      - "Open Conclusion with the single most important takeaway"
+      - "Embed limitations within the argument rather than isolating them"
+      - "Weave future directions into the narrative"
+
+  S10:
+    approach: "full_narrative_hypothesis"
+    description: "Convert ALL hypothesis references to narrative throughout the paper"
+    aggressive_targets:
+      - "H1 was supported" → narrative with effect size
+      - "Hypothesis 2 was partially supported" → explain what worked and what did not
+      - "H3 was not supported" → discuss why with concrete numbers
+      - ALL mechanical H1/H2/H3 labeling in Results AND Discussion
+    strategies:
+      - "Group hypotheses thematically, not numerically"
+      - "Lead with the most interesting finding, not H1"
+      - "Use effect sizes as narrative anchors"
+      - "Frame non-findings as discoveries, not failures"
+      - "Eliminate H-labels from prose entirely (keep only in tables if needed)"
+    example:
+      before: |
+        H1 was supported: partisan identity predicted AI concern (p < .001).
+        H2 was partially supported: education had a significant but smaller effect.
+        H3 was not supported: age was not significant.
+      after: |
+        The partisan divide we predicted materialized clearly -- Republicans
+        were 14 percentage points more likely to express concern (AME = 0.14,
+        p < .001). Education mattered too, but less than we expected: each
+        additional degree raised concern by only 3 points. The real surprise
+        was age. It did nothing on its own. But pair it with AI awareness,
+        and the picture changed completely.
+
+# Burstiness Enhancement (v2.0)
+burstiness_enhancement:
+  description: "Aggressively vary sentence length to maximize CV"
+  target_cv: ">0.50"
+  strategies:
+    - "Insert 2-5 word declarative sentences at impact points"
+    - "Allow 1-2 complex sentences per section to reach 40-60 words"
+    - "Break medium-length sentences (15-25 words) into shorter or longer forms"
+    - "Use sentence fragments strategically for emphasis"
+    - "Vary paragraph length: alternate 2-sentence and 6-sentence paragraphs"
+  sentence_length_variation:
+    directive: "Insert minimum 3 short (<=5 word) sentences per section"
+    examples:
+      - "That gap is real."
+      - "Age alone did nothing."
+      - "The pattern held."
+      - "Not quite."
+      - "Here is why."
+
 # Preservation rules (still strict for critical elements)
 preservation:
   absolutely_preserve:
@@ -364,7 +471,7 @@ preservation:
 
 # Expected outcomes
 expected_changes:
-  ai_probability_reduction: "50-70%"
+  ai_probability_reduction: "60-80%"
   pattern_reduction: "80-95%"
   text_change_percentage: "30-50%"
   reading_flow_impact: "significantly improved"

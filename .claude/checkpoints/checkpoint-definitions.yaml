@@ -96,6 +96,73 @@ checkpoints:
     human_action: "Review and approve pre-registration"
     can_auto_proceed: false
 
+  # === HUMANIZATION PIPELINE CHECKPOINTS (v2.0) ===
+
+  CP_HUMANIZATION_REVIEW:
+    level: recommended
+    icon: "🟠"
+    description: "AI patterns detected — humanization mode selection"
+    applies_to: [G5-academic-style-auditor]
+    human_action: "Review AI pattern report and select humanization mode"
+    can_auto_proceed: false
+    options:
+      - "[A] Conservative — High-risk patterns only"
+      - "[B] Balanced ⭐ — Recommended"
+      - "[C] Aggressive — Maximum naturalness"
+      - "[D] View detailed report"
+      - "[E] Skip humanization"
+
+  CP_PASS1_REVIEW:
+    level: recommended
+    icon: "🟠"
+    description: "Vocabulary pass complete — review before structural pass"
+    applies_to: [G6-academic-style-humanizer]
+    human_action: "Review Pass 1 results and decide on structural pass"
+    can_auto_proceed: false
+    presents:
+      - "Score before/after Pass 1"
+      - "Patterns remaining"
+      - "Burstiness CV score"
+    options:
+      - "[A] Continue to structural pass"
+      - "[B] Accept current state"
+      - "[C] View detailed diff"
+
+  CP_PASS2_REVIEW:
+    level: recommended
+    icon: "🟠"
+    description: "Structural pass complete — review results"
+    applies_to: [G6-academic-style-humanizer]
+    human_action: "Review Pass 2 results"
+    can_auto_proceed: false
+    presents:
+      - "Score progression (original → Pass 1 → Pass 2)"
+      - "Structural metrics (burstiness CV, MTLD)"
+    options:
+      - "[A] Accept"
+      - "[B] One more polish pass"
+      - "[C] Manual review mode"
+
+  CP_FINAL_REVIEW:
+    level: optional
+    icon: "🟡"
+    description: "Final review before export"
+    applies_to: [F5-humanization-verifier]
+    human_action: "Final approval of humanized text"
+    default_if_skipped: "approve"
+    presents:
+      - "Complete score history"
+      - "Full diff report"
+      - "F5 verification summary"
+
+  CP_HUMANIZATION_VERIFY:
+    level: optional
+    icon: "🟡"
+    description: "Post-humanization verification review"
+    applies_to: [F5-humanization-verifier]
+    human_action: "Review verification results"
+    default_if_skipped: "approve_if_passed"
+
   # ============================================
   # OPTIONAL (🟡 Yellow) - Human can choose to review
   # ============================================

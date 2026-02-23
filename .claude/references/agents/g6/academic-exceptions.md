@@ -217,6 +217,42 @@ May adjust:
 
 ---
 
+## Structural Transformation Exceptions
+
+*v2.0: Added structural transformation exceptions for S7-S10 patterns*
+
+### IMRAD Structure (Methods)
+
+- **NEVER** restructure Methods section flow (preserve procedural sequence)
+- Enumerated steps in methodology MAY be kept if they describe actual procedural sequence
+- "Step 1... Step 2... Step 3..." in Methods = acceptable (not AI pattern, just standard procedure)
+- S7 (Enumeration Dissolution) is **exempt** in Methods sections
+- S9 (Discussion Architecture) does **not apply** to Methods -- formulaic structure is expected
+
+### Results Section
+
+- Hypothesis testing results may retain some structure when reporting >5 hypotheses
+- Convert checklist to narrative WHERE POSSIBLE, but preserve clarity for complex multi-hypothesis studies
+- "H1 was supported" should become narrative, BUT keep all test statistics verbatim
+- S10 (Hypothesis Narrative) applies with care: thematic grouping is preferred, but if the paper tests 8+ hypotheses, a hybrid approach (narrative for key findings, table for complete results) is acceptable
+- Table references ("Table 3 shows...") may be kept even if repetitive -- they serve a navigational function
+
+### Abstract
+
+- Word limits constrain structural transformation -- do not expand beyond journal limits
+- IMRAD structure in abstract is **REQUIRED by most journals** -- exempt from S9 (Discussion Architecture)
+- Enumeration in abstract may be acceptable ("Three contributions: ...") when word limits demand concision
+- S8 (Paragraph Opener Variation) has limited scope in abstracts (typically 1 paragraph)
+- Burstiness enhancement should be minimal in abstracts to preserve information density
+
+### Response Letters
+
+- Reviewer response letters may retain enumerated structure ("Regarding Comment 1...")
+- Point-by-point format is expected and should NOT be dissolved
+- S7 is **fully exempt** in response letters
+
+---
+
 ## Red Lines: What Makes Humanization Unethical
 
 ### DO NOT:

@@ -1,122 +1,313 @@
 ---
 name: humanization-pipeline
-version: "1.0.0"
+version: "2.0.0"
 description: |
-  Humanization Pipeline - Integrates AI pattern detection and transformation
-  into the Research Coordinator workflow. Connects G5 (Auditor), G6 (Humanizer),
-  and F5 (Verifier) with existing writing agents.
+  Humanization Pipeline v2.0 - Multi-pass iterative architecture integrating
+  AI pattern detection and transformation into the Research Coordinator workflow.
+  Connects G5 (Auditor), G6 (Humanizer), and F5 (Verifier) with existing
+  writing agents. Features 3-pass pipeline, section-aware mode escalation,
+  quantitative metrics (burstiness CV, MTLD), and human checkpoints between passes.
 ---
 
-# Humanization Pipeline
+# Humanization Pipeline v2.0
 
 ## Overview
 
 The Humanization Pipeline provides an optional but recommended step for all AI-generated academic text. It integrates seamlessly with existing Research Coordinator workflows to help researchers produce natural, authentic writing while maintaining academic integrity.
+
+**v2.0 upgrades**: Multi-pass iterative architecture replaces single-pass pipeline. Each pass targets a different transformation layer (vocabulary, structure, polish), with G5 re-scans between passes to measure progress and human checkpoints for score review.
+
+**Reference Documentation**: https://github.com/HosungYou/humanizer
 
 ---
 
 ## Pipeline Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         HUMANIZATION PIPELINE                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  STAGE 1: CONTENT GENERATION                                        │   │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │   │
-│  │  │     G2       │  │     G3       │  │  Auto-Doc    │              │   │
-│  │  │  Academic    │  │    Peer      │  │   System     │              │   │
-│  │  │ Communicator │  │   Review     │  │              │              │   │
-│  │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘              │   │
-│  │         │                 │                 │                       │   │
-│  │         └─────────────────┴─────────────────┘                       │   │
-│  │                           │                                         │   │
-│  │                           ▼                                         │   │
-│  └───────────────────────────┼─────────────────────────────────────────┘   │
-│                              │                                              │
-│  ┌───────────────────────────┼─────────────────────────────────────────┐   │
-│  │  STAGE 2: ANALYSIS        │                                         │   │
-│  │                           ▼                                         │   │
-│  │           ┌───────────────────────────────┐                        │   │
-│  │           │     G5-AcademicStyleAuditor   │                        │   │
-│  │           │  ┌─────────────────────────┐  │                        │   │
-│  │           │  │ • Pattern Detection     │  │                        │   │
-│  │           │  │ • Risk Classification   │  │                        │   │
-│  │           │  │ • AI Probability Score  │  │                        │   │
-│  │           │  │ • Recommendations       │  │                        │   │
-│  │           │  └─────────────────────────┘  │                        │   │
-│  │           └───────────────┬───────────────┘                        │   │
-│  │                           │                                         │   │
-│  │                           ▼                                         │   │
-│  │  ┌────────────────────────────────────────────────────────────┐    │   │
-│  │  │  🟠 CHECKPOINT: CP_HUMANIZATION_REVIEW                     │    │   │
-│  │  │                                                            │    │   │
-│  │  │  "AI patterns detected. Would you like to humanize?"       │    │   │
-│  │  │                                                            │    │   │
-│  │  │  [A] Conservative  [B] Balanced ⭐  [C] Aggressive         │    │   │
-│  │  │  [D] View Report   [E] Skip                                │    │   │
-│  │  └────────────────────────────────────────────────────────────┘    │   │
-│  └───────────────────────────┼─────────────────────────────────────────┘   │
-│                              │                                              │
-│                     ┌────────┴────────┐                                     │
-│                     │                 │                                     │
-│              User selects          User selects                             │
-│                mode                 "Skip"                                  │
-│                     │                 │                                     │
-│                     ▼                 │                                     │
-│  ┌───────────────────────────────────┐│                                     │
-│  │  STAGE 3: TRANSFORMATION         ││                                     │
-│  │           ▼                      ││                                     │
-│  │  ┌─────────────────────────────┐ ││                                     │
-│  │  │ G6-AcademicStyleHumanizer   │ ││                                     │
-│  │  │ ┌─────────────────────────┐ │ ││                                     │
-│  │  │ │ • Apply Transformations │ │ ││                                     │
-│  │  │ │ • Preserve Citations    │ │ ││                                     │
-│  │  │ │ • Maintain Integrity    │ │ ││                                     │
-│  │  │ │ • Generate Diff Report  │ │ ││                                     │
-│  │  │ └─────────────────────────┘ │ ││                                     │
-│  │  └─────────────┬───────────────┘ ││                                     │
-│  │                │                 ││                                     │
-│  └────────────────┼─────────────────┘│                                     │
-│                   │                  │                                      │
-│                   ▼                  │                                      │
-│  ┌───────────────────────────────────┼─────────────────────────────────┐   │
-│  │  STAGE 4: VERIFICATION           │                                  │   │
-│  │           ▼                      │                                  │   │
-│  │  ┌─────────────────────────────┐ │                                  │   │
-│  │  │  F5-HumanizationVerifier    │ │                                  │   │
-│  │  │  ┌───────────────────────┐  │ │                                  │   │
-│  │  │  │ • Re-run AI Detection │  │ │                                  │   │
-│  │  │  │ • Check Integrity     │  │ │                                  │   │
-│  │  │  │ • Verify Citations    │  │ │                                  │   │
-│  │  │  │ • Confirm Meaning     │  │ │                                  │   │
-│  │  │  └───────────────────────┘  │ │                                  │   │
-│  │  └─────────────┬───────────────┘ │                                  │   │
-│  │                │                 │                                  │   │
-│  │                ▼                 │                                  │   │
-│  │  ┌──────────────────────────────┐│                                  │   │
-│  │  │  🟡 CHECKPOINT (Optional)   ││                                  │   │
-│  │  │  CP_HUMANIZATION_VERIFY     ││                                  │   │
-│  │  │                             ││                                  │   │
-│  │  │  Review changes before      ││                                  │   │
-│  │  │  final export               ││                                  │   │
-│  │  └──────────────────────────────┘│                                  │   │
-│  └───────────────────────────────────┼─────────────────────────────────┘   │
-│                                      │                                      │
-│                                      ▼                                      │
-│  ┌───────────────────────────────────────────────────────────────────────┐ │
-│  │  STAGE 5: OUTPUT                                                      │ │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                │ │
-│  │  │   Word       │  │  PDF         │  │  Other       │                │ │
-│  │  │  Export      │  │ Export       │  │ Formats      │                │ │
-│  │  └──────────────┘  └──────────────┘  └──────────────┘                │ │
-│  │                                                                       │ │
-│  │  + Optional: AI Pattern Report Appendix                              │ │
-│  │  + Optional: Transformation Audit Trail                              │ │
-│  └───────────────────────────────────────────────────────────────────────┘ │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
++-----------------------------------------------------------------------------+
+|                     HUMANIZATION PIPELINE v2.0                               |
+|                     (Multi-Pass Iterative Architecture)                      |
++-----------------------------------------------------------------------------+
+|                                                                              |
+|  +-----------------------------------------------------------------------+  |
+|  |  STAGE 1: CONTENT GENERATION                                          |  |
+|  |  +----------------+  +----------------+  +----------------+           |  |
+|  |  |     G2         |  |     G3         |  |  Auto-Doc      |           |  |
+|  |  |  Academic      |  |    Peer        |  |   System       |           |  |
+|  |  | Communicator   |  |   Review       |  |                |           |  |
+|  |  +-------+--------+  +-------+--------+  +-------+--------+           |  |
+|  |          |                    |                    |                    |  |
+|  |          +--------------------+--------------------+                    |  |
+|  |                               |                                        |  |
+|  +-------------------------------+----------------------------------------+  |
+|                                  |                                           |
+|  +-------------------------------v----------------------------------------+  |
+|  |  STAGE 2: INITIAL ANALYSIS                                             |  |
+|  |                               v                                        |  |
+|  |           +----------------------------------+                         |  |
+|  |           |   G5-AcademicStyleAuditor v2.0   |                         |  |
+|  |           |  +----------------------------+  |                         |  |
+|  |           |  | - Pattern Detection (24+4) |  |                         |  |
+|  |           |  | - Quantitative Metrics      |  |                         |  |
+|  |           |  |   (Burstiness CV, MTLD)     |  |                         |  |
+|  |           |  | - Risk Classification       |  |                         |  |
+|  |           |  | - AI Probability Score      |  |                         |  |
+|  |           |  | - Section-Level Scores      |  |                         |  |
+|  |           |  +----------------------------+  |                         |  |
+|  |           +---------------+------------------+                         |  |
+|  |                           |                                            |  |
+|  |                           v                                            |  |
+|  |  +-------------------------------------------------------------+      |  |
+|  |  |  CHECKPOINT: CP_HUMANIZATION_REVIEW                          |      |  |
+|  |  |                                                              |      |  |
+|  |  |  "AI patterns detected. Would you like to humanize?"         |      |  |
+|  |  |                                                              |      |  |
+|  |  |  [A] Conservative  [B] Balanced (star)  [C] Aggressive       |      |  |
+|  |  |  [D] View Report   [E] Skip                                  |      |  |
+|  |  +-------------------------------------------------------------+      |  |
+|  +-------------------------------+----------------------------------------+  |
+|                                  |                                           |
+|                         +--------+--------+                                  |
+|                         |                 |                                  |
+|                  User selects          User selects                          |
+|                    mode                 "Skip"                               |
+|                         |                 |                                  |
+|                         v                 |                                  |
+|  +=======================================================================+  |
+|  ||  STAGE 3: MULTI-PASS TRANSFORMATION                                 ||  |
+|  ||                                                                      ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||  | PASS 1: VOCABULARY PASS (Conservative)                         | ||  |
+|  ||  |   G5 Scan (full) --> G6 (L1, M1, C1) --> F5 Quick Verify      | ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||                          |                                           ||  |
+|  ||                          v                                           ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||  | CP_PASS1_REVIEW                                                | ||  |
+|  ||  | "Score dropped from X% to Y%. Continue to structural pass?"    | ||  |
+|  ||  | [A] Continue  [B] Accept  [C] View diff                        | ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||                          |                                           ||  |
+|  ||                          v                                           ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||  | PASS 2: STRUCTURAL PASS (Balanced)                             | ||  |
+|  ||  |   G5 Scan (delta) --> G6 (S7-S10, CV enhancement)             | ||  |
+|  ||  |   --> F5 Full Verify                                           | ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||                          |                                           ||  |
+|  ||                          v                                           ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||  | CP_PASS2_REVIEW                                                | ||  |
+|  ||  | "Score now Z%. Target met?"                                    | ||  |
+|  ||  | [A] Accept  [B] One more pass  [C] Manual review               | ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||                          |                                           ||  |
+|  ||                     (if B selected)                                   ||  |
+|  ||                          v                                           ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||  | PASS 3 (Optional): POLISH PASS                                 | ||  |
+|  ||  |   G5 Scan (audit) --> G6 micro fixes --> F5 Full Verify        | ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||                          |                                           ||  |
+|  ||                          v                                           ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||  | CP_FINAL_REVIEW: Final approval                                | ||  |
+|  ||  +----------------------------------------------------------------+ ||  |
+|  ||                                                                      ||  |
+|  +=======================================================================+  |
+|                                  |                                           |
+|                                  v                                           |
+|  +-----------------------------------------------------------------------+  |
+|  |  STAGE 4: OUTPUT                                                       |  |
+|  |  +----------------+  +----------------+  +----------------+            |  |
+|  |  |   Word         |  |  PDF           |  |  Other         |            |  |
+|  |  |  Export         |  | Export         |  | Formats        |            |  |
+|  |  +----------------+  +----------------+  +----------------+            |  |
+|  |                                                                        |  |
+|  |  + Optional: AI Pattern Report Appendix                               |  |
+|  |  + Optional: Transformation Audit Trail                               |  |
+|  |  + Optional: Score Progression Report                                 |  |
+|  +-----------------------------------------------------------------------+  |
+|                                                                              |
++------------------------------------------------------------------------------+
+```
+
+---
+
+## Multi-Pass Architecture
+
+### Design Principles
+
+The multi-pass architecture replaces the v1.0 single-pass pipeline based on empirical evidence from humanizing two academic papers (Paper 1: TFSC, Paper 2: IJAIED). The single-pass approach required 3 manual rounds to achieve acceptable scores (80% -> 62% -> 31%). The multi-pass architecture automates this progression.
+
+### Pass Definitions
+
+**Pass 1: VOCABULARY PASS (Conservative)**
+- **Target**: Word-level and phrase-level AI patterns
+- **G5 Scan**: Full scan — establishes baseline score and identifies all patterns
+- **G6 Transformation**: L1 vocabulary (Tier 1 + Tier 2), M1 meta-commentary, C1 significance inflation
+- **F5 Verification**: Quick verify — citation integrity and statistical accuracy only
+- **Expected reduction**: 15-25 percentage points
+- **Checkpoint**: CP_PASS1_REVIEW — presents score before/after, patterns remaining, burstiness CV
+
+**Pass 2: STRUCTURAL PASS (Balanced)**
+- **Target**: Structural patterns and sentence-level rhythm
+- **G5 Scan**: Delta scan — measures improvement from Pass 1, identifies remaining structural patterns
+- **G6 Transformation**: S7 enumeration dissolution, S8 paragraph opener variation, S9 discussion architecture, S10 hypothesis narrative, burstiness CV enhancement
+- **F5 Verification**: Full verify — all 7 verification domains
+- **Expected reduction**: 10-20 additional percentage points
+- **Checkpoint**: CP_PASS2_REVIEW — presents score progression (original -> Pass 1 -> Pass 2), structural metrics (burstiness CV, MTLD)
+
+**Pass 3 (Optional): POLISH PASS**
+- **Target**: Remaining micro-patterns and fine-tuning
+- **G5 Scan**: Audit scan — comprehensive final check
+- **G6 Transformation**: Micro fixes only — remaining hedging, paragraph opener diversity, sentence length outliers
+- **F5 Verification**: Full verify — all 7 verification domains
+- **Expected reduction**: 5-10 additional percentage points
+- **Checkpoint**: CP_FINAL_REVIEW — presents complete score history, full diff report, F5 verification summary
+- **Trigger**: Only if score target not yet met after Pass 2
+
+### Pass Execution Rules
+
+```yaml
+max_passes: 3
+diminishing_returns_threshold: 5  # Stop if pass reduces less than 5 percentage points
+pass_3_trigger: "score_target_not_met OR user_requested"
+between_pass_rescan: true  # MANDATORY G5 re-scan between every pass
+checkpoint_between_passes: true  # Human checkpoint between every pass
+```
+
+---
+
+## Section-Aware Mode Escalation
+
+### Overview
+
+Instead of applying a single mode to the entire document, the pipeline automatically selects the appropriate transformation intensity per section based on G5 section-level scores.
+
+### Escalation Rules
+
+```yaml
+section_aware_escalation:
+  abstract:     conservative -> balanced (section_score > 50)
+  introduction: balanced -> balanced (no escalation)
+  methods:      conservative -> conservative (never escalate)
+  results:      conservative -> balanced (section_score > 60)
+  discussion:   balanced -> aggressive (section_score > 50)
+  conclusion:   balanced -> aggressive (section_score > 50)
+```
+
+### Rationale
+
+| Section | Default Mode | Escalation | Why |
+|---------|-------------|------------|-----|
+| Abstract | Conservative | To balanced at >50 | Highest scrutiny from reviewers; minimal changes preferred |
+| Introduction | Balanced | No escalation | Moderate changes acceptable; maintains author's framing |
+| Methods | Conservative | Never | Boilerplate expected; changes risk accuracy |
+| Results | Conservative | To balanced at >60 | Statistics must be preserved; only framing language changes |
+| Discussion | Balanced | To aggressive at >50 | Benefits most from structural transformation; author voice matters |
+| Conclusion | Balanced | To aggressive at >50 | Final impression matters; can tolerate more stylistic changes |
+
+### Override
+
+Users can override section-aware escalation with a global mode:
+```
+"Humanize my draft (force: conservative)"  # Conservative for all sections
+"Humanize my draft (force: aggressive)"    # Aggressive for all sections
+```
+
+---
+
+## Post-Transformation G5 Re-Scan
+
+### MANDATORY Rule
+
+**After every G6 transformation pass, G5 MUST re-scan the transformed text.** This is non-negotiable because G6 can introduce NEW AI patterns while fixing old ones (empirically observed during Round 3 humanization).
+
+### Re-Scan Protocol
+
+```yaml
+post_transformation_audit:
+  trigger: "After every G6 transformation pass"
+  agent: "G5-AcademicStyleAuditor"
+  scan_type:
+    after_pass_1: "delta"   # Compare to original, focus on changes
+    after_pass_2: "delta"   # Compare to Pass 1 output
+    after_pass_3: "full"    # Comprehensive audit of final output
+
+  checks:
+    - "No new HIGH-RISK patterns introduced"
+    - "No new pattern categories activated"
+    - "Overall score decreased (not increased)"
+    - "Burstiness CV did not decrease"
+    - "MTLD did not significantly decrease"
+
+  on_new_patterns_found:
+    action: "FLAG to user"
+    message: "G6 introduced {N} new patterns while removing {M}. Net change: {delta}"
+    options:
+      - "[A] Accept (net improvement)"
+      - "[B] Revert this pass"
+      - "[C] Target new patterns in next pass"
+
+  on_score_increase:
+    action: "WARN"
+    message: "Score INCREASED from {before}% to {after}%. Transformation may have introduced AI-typical structures."
+    options:
+      - "[A] Revert this pass"
+      - "[B] Continue anyway"
+```
+
+---
+
+## Score Target System
+
+### Overview
+
+Users can specify a target AI probability score instead of manually selecting modes. The pipeline automatically selects modes and runs passes until the target is met or the 3-pass limit is reached.
+
+### Configuration
+
+```yaml
+target_mode:
+  enabled: true
+  usage: '"Humanize to target: 30%"'
+  behavior:
+    - Run G5 to get baseline score
+    - Calculate required reduction
+    - Auto-select mode per section to meet target (using section-aware escalation)
+    - Run iterative passes until target met or 3-pass limit reached
+    - Report final score vs target
+
+  presets:
+    "journal_safe": 30    # Target for peer-reviewed journals
+    "conference": 40      # Target for conference papers
+    "working_paper": 50   # Target for working papers/preprints
+
+  commands:
+    - '"Humanize to target: 30%"'
+    - '"Humanize (journal_safe)"'
+    - '"Humanize (conference)"'
+    - '"Humanize (working_paper)"'
+```
+
+### Target Behavior
+
+```
+IF baseline_score <= target:
+    SKIP humanization ("Already below target")
+
+IF baseline_score - target <= 25:
+    PLAN: 1-2 passes (vocabulary may suffice)
+
+IF baseline_score - target > 25:
+    PLAN: 2-3 passes (structural transformation likely needed)
+
+AFTER each pass:
+    IF current_score <= target:
+        STOP ("Target met")
+    IF pass_reduction < 5:
+        STOP ("Diminishing returns — manual review recommended")
 ```
 
 ---
@@ -135,8 +326,8 @@ workflow:
   1. G2 generates content (abstract, summary, etc.)
   2. Auto-invoke G5 for pattern analysis
   3. Present CP_HUMANIZATION_REVIEW
-  4. If user approves → invoke G6
-  5. Verify with F5
+  4. If user approves -> invoke multi-pass pipeline
+  5. Run passes with inter-pass checkpoints
   6. Output final version
 
 commands:
@@ -158,6 +349,7 @@ special_rules:
   - Keep reviewer reference numbers
   - Maintain point-by-point structure
   - Focus on language/vocabulary patterns
+  - Limit to Pass 1 (vocabulary only) for response letters
 
 workflow:
   1. G3 generates response letter
@@ -179,14 +371,15 @@ workflow:
   1. Auto-doc prepares content
   2. G5 analyzes (section-aware)
   3. Checkpoint before export
-  4. If approved → G6 transforms
-  5. F5 verifies
+  4. If approved -> run multi-pass pipeline
+  5. F5 verifies after each pass
   6. Export with humanized content
 
 export_options:
   - "Export methods (with humanization)"
   - "Export manuscript (humanize: conservative)"
   - "Export draft (raw, no humanization)"
+  - "Export manuscript (humanize to target: 30%)"
 ```
 
 ---
@@ -201,10 +394,32 @@ export_options:
 humanization:
   enabled: true                    # Master switch
   default_mode: "balanced"         # conservative/balanced/aggressive
+  pipeline_version: "2.0"         # Multi-pass iterative pipeline
 
   auto_check: true                 # Auto-run G5 on exports
   show_checkpoint: true            # Show CP_HUMANIZATION_REVIEW
   require_verification: false      # Require F5 before export
+
+  # Multi-pass settings (v2.0)
+  multi_pass:
+    max_passes: 3
+    inter_pass_checkpoint: true    # Show checkpoint between passes
+    auto_stop_threshold: 5         # Stop if pass reduces < 5 percentage points
+    mandatory_rescan: true         # G5 re-scan after every pass
+
+  # Score target settings (v2.0)
+  score_target:
+    enabled: true
+    default_target: null           # No default — user specifies
+    presets:
+      journal_safe: 30
+      conference: 40
+      working_paper: 50
+
+  # Section-aware escalation (v2.0)
+  section_escalation:
+    enabled: true
+    allow_override: true           # Users can force global mode
 
   thresholds:
     skip_if_below: 20              # Skip if AI probability < 20%
@@ -214,6 +429,7 @@ humanization:
   reports:
     include_pattern_report: false  # Add to exports
     include_audit_trail: true      # Keep transformation log
+    include_score_progression: true # v2.0: Show score across passes
     save_original: true            # Keep pre-humanization version
 
   ethics:
@@ -228,23 +444,32 @@ sections:
   abstract:
     mode: "conservative"
     strict_preservation: true
+    escalation: "balanced at >50"
 
   methods:
     mode: "conservative"
     allow_boilerplate: true
+    escalation: "never"
 
   results:
     mode: "conservative"
     preserve_all_statistics: true
+    escalation: "balanced at >60"
 
   discussion:
     mode: "balanced"
     allow_more_changes: true
+    escalation: "aggressive at >50"
+
+  conclusion:
+    mode: "balanced"
+    escalation: "aggressive at >50"
 
   response_letter:
     mode: "balanced"
     preserve_gratitude: true
     preserve_structure: true
+    max_passes: 1  # Vocabulary pass only
 ```
 
 ---
@@ -255,102 +480,179 @@ sections:
 
 ```
 "Check AI patterns"
-→ Run G5 analysis only, show report
+-> Run G5 analysis only, show report
 
 "Quick AI check"
-→ Summary only (score + pattern count)
+-> Summary only (score + pattern count)
 
 "Detailed pattern analysis"
-→ Full G5 report with all patterns
+-> Full G5 report with all patterns (24+4 categories)
 
 "Show flagged vocabulary"
-→ List all AI-typical words found
+-> List all AI-typical words found
+
+"Show quantitative metrics"
+-> Display burstiness CV, MTLD, sentence length range, opener diversity
 ```
 
 ### Transformation Commands
 
 ```
 "Humanize my draft"
-→ Full pipeline with balanced mode
+-> Full multi-pass pipeline with balanced mode
 
 "Humanize (conservative)"
-→ Pipeline with conservative mode
+-> Pipeline with conservative mode
 
 "Humanize (aggressive)"
-→ Pipeline with aggressive mode
+-> Pipeline with aggressive mode
 
 "Humanize section: methods"
-→ Section-specific humanization
+-> Section-specific humanization
+
+"Humanize to target: 30%"
+-> Target-based multi-pass pipeline
+
+"Humanize (journal_safe)"
+-> Preset target: 30%
+
+"Humanize (conference)"
+-> Preset target: 40%
+
+"Humanize (working_paper)"
+-> Preset target: 50%
+
+"Humanize (multi-pass)"
+-> Explicit multi-pass with all checkpoints
 ```
 
 ### Export Commands
 
 ```
 "Export with humanization"
-→ Export after full pipeline
+-> Export after full pipeline
 
 "Export to Word (humanize: balanced)"
-→ Word export with balanced mode
+-> Word export with balanced mode
 
 "Export raw (no humanization)"
-→ Export without pipeline
+-> Export without pipeline
 
 "Export with AI report"
-→ Include pattern analysis in appendix
+-> Include pattern analysis in appendix
+
+"Export with score progression"
+-> Include pass-by-pass score report
 ```
 
 ### Utility Commands
 
 ```
 "Compare original and humanized"
-→ Side-by-side diff view
+-> Side-by-side diff view
 
 "Revert to original"
-→ Undo humanization
+-> Undo humanization
 
 "Show transformation log"
-→ View all changes made
+-> View all changes made
+
+"Show score progression"
+-> Display scores across all passes
 
 "Configure humanization"
-→ Adjust pipeline settings
+-> Adjust pipeline settings
 ```
 
 ---
 
 ## Checkpoints
 
-### CP_HUMANIZATION_REVIEW (🟠 Recommended)
+### CP_HUMANIZATION_REVIEW (Recommended)
 
 **When:** After G5 analysis, before transformation
 
 **Presents:**
 - AI probability score
 - Pattern summary (high/medium/low counts)
+- Quantitative metrics (burstiness CV, MTLD)
 - Recommended mode
 - User options
 
 **Options:**
 ```
 [A] Humanize (Conservative) - High-risk only
-[B] Humanize (Balanced) ⭐ - Recommended
+[B] Humanize (Balanced) (star) - Recommended
 [C] Humanize (Aggressive) - Maximum
 [D] View detailed report
 [E] Skip humanization
 ```
 
-### CP_HUMANIZATION_VERIFY (🟡 Optional)
+### CP_PASS1_REVIEW (Recommended)
 
-**When:** After G6 transformation, before export
+**When:** After Pass 1 (vocabulary), before Pass 2 (structural)
 
 **Presents:**
-- Before/after comparison
-- Change summary
-- New AI probability
-- Integrity verification
+- Score before/after Pass 1
+- Patterns remaining (by category)
+- Burstiness CV score
+- Estimated improvement from structural pass
+
+**Options:**
+```
+[A] Continue to structural pass
+[B] Accept current state
+[C] View detailed diff
+```
+
+### CP_PASS2_REVIEW (Recommended)
+
+**When:** After Pass 2 (structural), before optional Pass 3
+
+**Presents:**
+- Score progression (original -> Pass 1 -> Pass 2)
+- Structural metrics (burstiness CV, MTLD)
+- Remaining pattern count
+- Whether target is met (if target mode)
+
+**Options:**
+```
+[A] Accept
+[B] One more polish pass
+[C] Manual review mode
+```
+
+### CP_FINAL_REVIEW (Optional)
+
+**When:** After Pass 3 (polish), before export
+
+**Presents:**
+- Complete score history (all passes)
+- Full diff report (original vs final)
+- F5 verification summary
+- Target compliance (if target mode)
 
 **Options:**
 ```
 [A] Approve and export
+[B] Adjust specific changes
+[C] Revert to earlier pass
+[D] Revert to original
+```
+
+### CP_HUMANIZATION_VERIFY (Optional)
+
+**When:** After any pass completes, if user requests detailed review
+
+**Presents:**
+- Before/after comparison for the specific pass
+- Change summary
+- New AI probability
+- Integrity verification results
+
+**Options:**
+```
+[A] Approve and continue
 [B] Adjust specific changes
 [C] Try different mode
 [D] Revert to original
@@ -367,29 +669,80 @@ states:
     transitions: [analyzing]
 
   analyzing:
-    description: "G5 running pattern detection"
+    description: "G5 running pattern detection (initial scan)"
     agent: "G5-AcademicStyleAuditor"
     transitions: [awaiting_decision, idle]
 
   awaiting_decision:
     description: "Checkpoint presented, waiting for user"
     checkpoint: "CP_HUMANIZATION_REVIEW"
-    transitions: [transforming, idle]
+    transitions: [pass1_transforming, idle]
 
-  transforming:
-    description: "G6 applying transformations"
+  pass1_transforming:
+    description: "Pass 1: G6 applying vocabulary transformations"
     agent: "G6-AcademicStyleHumanizer"
-    transitions: [verifying]
+    pass: 1
+    layer: "vocabulary"
+    transitions: [pass1_rescanning]
 
-  verifying:
-    description: "F5 checking results"
+  pass1_rescanning:
+    description: "G5 re-scanning after Pass 1"
+    agent: "G5-AcademicStyleAuditor"
+    transitions: [pass1_verifying]
+
+  pass1_verifying:
+    description: "F5 quick verify after Pass 1"
     agent: "F5-HumanizationVerifier"
-    transitions: [awaiting_approval, complete]
+    transitions: [awaiting_pass1_review]
 
-  awaiting_approval:
-    description: "Optional verification checkpoint"
-    checkpoint: "CP_HUMANIZATION_VERIFY"
-    transitions: [complete, transforming, idle]
+  awaiting_pass1_review:
+    description: "Pass 1 complete, awaiting user decision"
+    checkpoint: "CP_PASS1_REVIEW"
+    transitions: [pass2_transforming, complete]
+
+  pass2_transforming:
+    description: "Pass 2: G6 applying structural transformations"
+    agent: "G6-AcademicStyleHumanizer"
+    pass: 2
+    layer: "structural"
+    transitions: [pass2_rescanning]
+
+  pass2_rescanning:
+    description: "G5 re-scanning after Pass 2"
+    agent: "G5-AcademicStyleAuditor"
+    transitions: [pass2_verifying]
+
+  pass2_verifying:
+    description: "F5 full verify after Pass 2"
+    agent: "F5-HumanizationVerifier"
+    transitions: [awaiting_pass2_review]
+
+  awaiting_pass2_review:
+    description: "Pass 2 complete, awaiting user decision"
+    checkpoint: "CP_PASS2_REVIEW"
+    transitions: [pass3_transforming, complete]
+
+  pass3_transforming:
+    description: "Pass 3: G6 applying polish transformations"
+    agent: "G6-AcademicStyleHumanizer"
+    pass: 3
+    layer: "polish"
+    transitions: [pass3_rescanning]
+
+  pass3_rescanning:
+    description: "G5 final audit scan after Pass 3"
+    agent: "G5-AcademicStyleAuditor"
+    transitions: [pass3_verifying]
+
+  pass3_verifying:
+    description: "F5 full verify after Pass 3"
+    agent: "F5-HumanizationVerifier"
+    transitions: [awaiting_final_review]
+
+  awaiting_final_review:
+    description: "Final review checkpoint"
+    checkpoint: "CP_FINAL_REVIEW"
+    transitions: [complete, pass2_transforming, idle]
 
   complete:
     description: "Pipeline finished, ready for export"
@@ -423,19 +776,32 @@ on_error:
     action: "SUGGEST"
     message: "Consider different mode for this section."
     offer_alternatives: true
+
+  score_increased:
+    action: "WARN"
+    message: "AI score increased after transformation. G6 may have introduced new patterns."
+    offer_revert: true
+
+  new_patterns_introduced:
+    action: "FLAG"
+    message: "G6 introduced new AI patterns while removing old ones."
+    present_net_change: true
 ```
 
 ### Recovery Options
 
 ```
 "Revert humanization"
-→ Return to original text
+-> Return to original text
+
+"Revert to Pass N"
+-> Return to output of specific pass
 
 "Undo last transformation"
-→ Undo most recent change
+-> Undo most recent change
 
 "Reset pipeline"
-→ Clear all state, start fresh
+-> Clear all state, start fresh
 ```
 
 ---
@@ -451,28 +817,62 @@ sessions:
   - session_id: "H001"
     timestamp: "2024-10-14T10:30:00Z"
     source: "G2-generated abstract"
+    pipeline_version: "2.0"
 
-    g5_analysis:
+    g5_initial_analysis:
       ai_probability: 67%
       patterns_detected: 18
       high_risk: 5
       medium_risk: 9
       low_risk: 4
+      burstiness_cv: 0.28
+      mtld: 52
 
     user_decision:
       checkpoint: "CP_HUMANIZATION_REVIEW"
       selected: "balanced"
+      target: 30
       timestamp: "2024-10-14T10:31:00Z"
 
-    g6_transformation:
-      mode: "balanced"
+    pass_1:
+      mode: "conservative"
+      layer: "vocabulary"
       changes_made: 12
-      preserved: ["all citations", "all statistics"]
+      g5_rescan:
+        ai_probability: 48%
+        new_patterns: 0
+        burstiness_cv: 0.30
+      f5_quick_verify:
+        citation_integrity: true
+        statistics_accuracy: true
+      user_decision:
+        checkpoint: "CP_PASS1_REVIEW"
+        selected: "continue"
 
-    f5_verification:
-      new_ai_probability: 28%
-      citation_integrity: true
-      meaning_preserved: true
+    pass_2:
+      mode: "balanced"
+      layer: "structural"
+      changes_made: 8
+      g5_rescan:
+        ai_probability: 28%
+        new_patterns: 1
+        burstiness_cv: 0.48
+        mtld: 74
+      f5_full_verify:
+        citation_integrity: true
+        statistics_accuracy: true
+        meaning_preserved: true
+        burstiness_check: "PASS"
+        structural_check: "PASS"
+      user_decision:
+        checkpoint: "CP_PASS2_REVIEW"
+        selected: "accept"
+
+    final:
+      ai_probability: 28%
+      total_passes: 2
+      target_met: true
+      preserved: ["all citations", "all statistics"]
 
     final_action: "exported_to_word"
 ```
@@ -485,15 +885,15 @@ sessions:
 
 | Situation | Recommended Mode |
 |-----------|------------------|
-| Journal submission (high-impact) | Conservative |
-| Journal submission (general) | Balanced |
-| Conference paper | Balanced |
-| Working paper | Balanced |
+| Journal submission (high-impact) | Conservative or target: 30% |
+| Journal submission (general) | Balanced or target: 30% |
+| Conference paper | Balanced or target: 40% |
+| Working paper | Balanced or target: 50% |
 | Thesis chapter | Conservative |
 | Grant proposal | Conservative |
 | Blog post | Aggressive |
 | Social media | Aggressive |
-| Response letter | Balanced |
+| Response letter | Balanced (Pass 1 only) |
 
 ### When to Skip Humanization
 
@@ -502,6 +902,15 @@ sessions:
 - Direct quotes or transcripts
 - Highly technical/formulaic sections
 - When author prefers original style
+
+### Multi-Pass vs Single-Pass
+
+| Situation | Approach |
+|-----------|----------|
+| Score > 60% | Multi-pass recommended (vocabulary + structural) |
+| Score 40-60% | 1-2 passes usually sufficient |
+| Score 20-40% | Single vocabulary pass may suffice |
+| Score < 20% | Skip humanization |
 
 ---
 
@@ -515,12 +924,12 @@ Stage 7 (Manuscript Preparation) enhanced:
 stage_7_enhanced:
   steps:
     - "Draft sections (IMRAD)"
-    - "Run G5 on each section"
-    - "Present humanization options"
-    - "Apply G6 if approved"
-    - "Verify with F5"
+    - "Run G5 on each section (section-aware scoring)"
+    - "Present humanization options with score targets"
+    - "Apply multi-pass pipeline if approved"
+    - "Verify with F5 after each pass"
     - "Create figures and tables"
-    - "Export to Word"
+    - "Export to Word with score progression report"
 ```
 
 ### Experimental Study Pipeline
@@ -531,7 +940,7 @@ Stage 6 (Manuscript & Dissemination) enhanced:
 stage_6_enhanced:
   steps:
     - "Write manuscript sections"
-    - "Humanization pipeline (optional)"
+    - "Humanization pipeline (optional, multi-pass)"
     - "Create figures"
     - "Prepare supplementary"
     - "Submit to journal"
@@ -546,3 +955,4 @@ stage_6_enhanced:
 - **F5 Agent**: `../research-agents/F5-humanization-verifier/SKILL.md`
 - **User Checkpoints**: `./user-checkpoints.md`
 - **Integration Hub**: `./integration-hub.md`
+- **Humanizer Documentation**: https://github.com/HosungYou/humanizer
