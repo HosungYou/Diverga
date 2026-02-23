@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v10.0.0 (Discourse-Level Detection & 4-Layer Humanization)
+# Diverga v10.1.0 (Humanize Orchestration Skill + Discourse-Level Detection)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v10.1.0**: `/diverga:humanize` Orchestration Skill — Multi-pass 4-layer pipeline orchestrator with mandatory AskUserQuestion checkpoints between every pass. Enforces sequential G5→G6→F5 execution with OMC autonomous mode defense. Supports conservative (L1-2), balanced (L1-3), aggressive (L1-4) modes. Pipeline v3.0 with CP_PASS1/2/3_REVIEW checkpoints.
 **v10.0.0**: Discourse-Level Detection & 4-Layer Humanization — G5/G6/F5 v3.0, 28 AI patterns across 7 domains (D1-D4 discourse patterns), 13 quantitative metrics, v3.0 composite scoring (6 components), Layer 4 DT1-DT4 discourse transformation, perturbation naturalization, 7 discipline profiles, section-conditional weights. Requires Humanizer MCP v3.0.0.
 **v9.2.1**: Zero-Setup MCP — All 4 MCP servers (diverga, humanizer, zotero, context7) auto-register via plugin `.mcp.json`. No manual settings.json needed. Uses uvx/npx/bundle strategy from oh-my-claudecode.
 **v9.2.0**: MCP Tool Integration — Humanizer server (4 tools), G5/G6/F5 MCP integration, 5 of 6 gaps resolved, 120 tests passing.
@@ -939,6 +940,7 @@ The Memory System automatically captures context at critical lifecycle events:
 
 ## Version History
 
+- **v10.1.0**: Humanize Orchestration Skill - `/diverga:humanize` multi-pass 4-layer pipeline orchestrator with mandatory AskUserQuestion checkpoints, OMC autonomous mode defense, CP_PASS1/2/3_REVIEW checkpoints, pipeline v3.0 reference upgrade
 - **v10.0.0**: Discourse-Level Detection & 4-Layer Humanization - G5/G6/F5 v3.0, 28 AI patterns (7 domains, D1-D4 discourse), 13 quantitative metrics, v3.0 composite scoring (6 components), Layer 4 DT1-DT4 discourse transformation, perturbation naturalization, 7 discipline profiles, section-conditional weights. Requires Humanizer MCP v3.0.0.
 - **v9.2.1**: Zero-Setup MCP - All 4 MCP servers auto-register via plugin .mcp.json
 - **v9.2.0**: MCP Tool Integration - Humanizer server (4 tools), G5/G6/F5 MCP integration

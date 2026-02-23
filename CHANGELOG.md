@@ -4,6 +4,32 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [10.1.0] - 2026-02-23 (Humanize Orchestration Skill)
+
+### Overview
+
+**Diverga v10.1.0** — Adds the `/diverga:humanize` orchestration skill that enforces the full multi-pass 4-layer pipeline with mandatory human checkpoints between every pass. Includes pipeline v3.0 reference document upgrade and checkpoint map updates.
+
+### New Features
+
+- **`/diverga:humanize` skill**: Multi-pass pipeline orchestrator (545 lines) that enforces:
+  - Sequential G5 → G6 → F5 execution within each pass
+  - Mandatory `AskUserQuestion` at CP_HUMANIZATION_REVIEW, CP_PASS1_REVIEW, CP_PASS2_REVIEW, CP_PASS3_REVIEW, CP_FINAL_REVIEW
+  - OMC autonomous mode defense (ignores ralph/ultrawork/autopilot hooks during checkpoints)
+  - Mode routing: conservative (Pass 1 only), balanced (Pass 1-2), aggressive (Pass 1-3)
+  - Section-aware mode escalation, diminishing returns detection, revert protocol
+  - Humanizer MCP v3.0 integration (5 tools, 13 metrics)
+
+### Updated Files
+
+| File | Changes |
+|------|---------|
+| `skills/humanize/SKILL.md` | **New** — Pipeline orchestration skill |
+| `mcp/agent-prerequisite-map.json` | Added CP_PASS1/2/3_REVIEW + CP_FINAL_REVIEW checkpoints |
+| `humanization-pipeline.md` | v2.0 → v3.0: Pass 3 (discourse DT1-DT4), Pass 4 (polish), 4-layer pipeline states, MCP v3.0 tool integration |
+
+---
+
 ## [10.0.0] - 2026-02-23 (Discourse-Level Detection & 4-Layer Humanization)
 
 ### Overview
