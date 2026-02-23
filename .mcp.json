@@ -3,6 +3,10 @@
     "diverga": {
       "command": "node",
       "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/diverga-server.js"]
+    },
+    "humanizer": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/HosungYou/humanizer.git", "humanizer-mcp"]
     }
   }
 }
