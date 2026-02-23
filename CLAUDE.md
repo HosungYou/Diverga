@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v9.0.0 (Architecture — SQLite + MCP Server Split)
+# Diverga v9.1.0 (Humanization Pipeline v2.0)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v9.1.0**: Humanization Pipeline v2.0 - Multi-pass iterative pipeline (vocab/structural/polish), S7-S10 structural detection, quantitative metrics (burstiness CV, MTLD), section-aware mode escalation, G5/G6/F5 v2.0, 84 TDD tests. Reference: https://github.com/HosungYou/humanizer
 **v9.0.0**: Architecture — MCP 3-server split (checkpoint/memory/comm, 16 tools), SQLite WAL backend, YAML→SQLite auto-migration, agent messaging (register/send/mailbox/broadcast), dual backend via `DIVERGA_BACKEND`
 **v8.5.0**: Agent Teams - Parallel agent execution via TeamCreate/TaskCreate/SendMessage, I0 Team Lead mode, 3x parallel database fetching
 **v8.4.0**: Researcher Visibility & Pipeline Safety - Dual directory structure (`.research/` system + `research/` public), auto-migration, SCH_API_KEY_VALIDATION checkpoint, validateApiKeys() utility
@@ -933,6 +934,7 @@ The Memory System automatically captures context at critical lifecycle events:
 
 ## Version History
 
+- **v9.1.0**: Humanization Pipeline v2.0 - Multi-pass iterative pipeline (vocab/structural/polish), S7-S10 structural detection, quantitative metrics (burstiness CV, MTLD), section-aware mode escalation, G5/G6/F5 v2.0, 84 TDD tests, SDD documentation. Reference: https://github.com/HosungYou/humanizer
 - **v9.0.0**: Architecture — MCP 3-server split (checkpoint/memory/comm, 16 tools), SQLite WAL backend, YAML→SQLite auto-migration, agent messaging, dual backend via `DIVERGA_BACKEND`
 - **v8.5.0**: Agent Teams — Parallel agent execution via TeamCreate/TaskCreate/SendMessage, I0 Team Lead mode, DX tooling (generate.js, sync-version.js, release.js, doctor.js), agents.json SSoT
 - **v8.4.0**: Researcher Visibility & Pipeline Safety - Dual directory structure (`.research/` system + `research/` public), auto-migration, SCH_API_KEY_VALIDATION checkpoint
