@@ -309,7 +309,17 @@
     },
     "g1": {
       "prerequisites": [],
-      "own_checkpoints": []
+      "own_checkpoints": [
+        {
+          "id": "CP_JOURNAL_PRIORITIES",
+          "level": "recommended"
+        },
+        {
+          "id": "CP_JOURNAL_SELECTION",
+          "level": "recommended"
+        }
+      ],
+      "entry_point": true
     },
     "g2": {
       "prerequisites": [],
@@ -421,6 +431,8 @@
   "dependency_order": {
     "level_0": [
       "CP_HUMANIZATION_REVIEW",
+      "CP_JOURNAL_PRIORITIES",
+      "CP_JOURNAL_SELECTION",
       "CP_PARADIGM_SELECTION",
       "CP_RESEARCH_DIRECTION",
       "SCH_API_KEY_VALIDATION",
@@ -473,6 +485,8 @@
     "CP_CODING_APPROACH": "recommended",
     "CP_THEME_VALIDATION": "recommended",
     "CP_HUMANIZATION_REVIEW": "recommended",
+    "CP_JOURNAL_PRIORITIES": "recommended",
+    "CP_JOURNAL_SELECTION": "recommended",
     "CP_PASS1_REVIEW": "recommended",
     "CP_PASS2_REVIEW": "recommended",
     "CP_PASS3_REVIEW": "recommended",

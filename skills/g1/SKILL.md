@@ -1,11 +1,12 @@
 ---
 name: g1
 description: |
-  VS-Enhanced Journal Matcher - Prevents Mode Collapse with differentiated submission strategy
+  VS-Enhanced Journal Matcher with Journal Intelligence MCP — Real-time journal data pipeline
+  with checkpoint-based human decisions. Uses OpenAlex + Crossref APIs for live metrics.
   Light VS applied: Avoids IF-centric recommendations + multi-dimensional matching strategy
   Use when: selecting target journals, planning submissions, comparing publication options
   Triggers: journal, submission, impact factor, academic journal, publication, submit
-version: "9.0.0"
+version: "10.3.0"
 ---
 
 # Journal Matcher
@@ -15,14 +16,127 @@ version: "9.0.0"
 **VS Level**: Light (Modal Awareness)
 **Tier**: Core
 **Icon**: 📝
+**Version**: 10.0.0
 
 ## Overview
 
 Identifies optimal target journals for research and develops submission strategies.
-Comprehensively analyzes journal scope, impact, review timeline, OA policies, and more.
+Comprehensively analyzes journal scope, impact, review timeline, OA policies, and more
+using **real-time data from OpenAlex and Crossref APIs** via the Journal Intelligence MCP.
 
 Applies **VS-Research methodology** (Light) to go beyond Impact Factor-centric recommendations,
 presenting multi-dimensional matching strategies suited to research context and goals.
+
+## MCP Prerequisites
+
+This agent uses the **Journal Intelligence MCP** (journal-server.js) for real-time data.
+
+| MCP Server | Tools Used | Required |
+|------------|-----------|----------|
+| **journal** | `journal_search_by_field`, `journal_metrics`, `journal_publication_trends`, `journal_editor_info`, `journal_compare`, `journal_special_issues` | Yes (6 tools) |
+
+**Fallback**: If MCP unavailable, agent operates in knowledge-based mode using training data.
+
+### MCP Integration
+
+| Tool | When Used | Pipeline Stage |
+|------|-----------|---------------|
+| `journal_search_by_field` | Initial journal discovery | Stage 1 |
+| `journal_metrics` | Detailed metrics for candidates | Stage 1-2 |
+| `journal_publication_trends` | Trend analysis for top journals | Stage 3 |
+| `journal_editor_info` | Reviewer suggestion support | Stage 3 |
+| `journal_compare` | Side-by-side comparison table | Stage 3 |
+| `journal_special_issues` | Special issue opportunities | Stage 3 |
+
+### Natural Language Routing
+
+| User Query | Tool(s) Called |
+|-----------|---------------|
+| "Find journals for educational technology research" | `journal_search_by_field(field="educational technology")` |
+| "What's the h-index of Computers & Education?" | `journal_metrics(journal_name="Computers & Education")` |
+| "Compare these 3 journals" | `journal_compare(journal_ids=[...])` |
+| "Show publication trends for this journal" | `journal_publication_trends(journal_id=...)` |
+| "Who publishes most in this journal?" | `journal_editor_info(journal_id=...)` |
+| "Any special issues on AI in education?" | `journal_special_issues(field="AI in education", ...)` |
+
+## Pipeline Flow
+
+```
+User request (research abstract + field)
+  │
+  ▼
+Stage 1: G1 analyzes research field/methodology
+  │
+  ├── journal_search_by_field(field) ─┐
+  └── journal_metrics(candidates)  ───┘  [parallel MCP calls]
+  │
+  ▼
+🟠 CP_JOURNAL_PRIORITIES [AskUserQuestion]
+  "연구 분야: {field}. 저널 선택 우선순위를 선택하세요"
+  [Impact Factor 우선] [출판 속도 우선] [OA 우선] [Scope Fit 우선] [균형 추천]
+  │
+  ▼
+Stage 2: Re-rank journals by user's priority
+  │
+  ├── journal_compare(top_5) ──────────────┐
+  └── journal_publication_trends(top_3) ───┘  [parallel MCP calls]
+  │
+  ▼
+🟠 CP_JOURNAL_SELECTION [AskUserQuestion]
+  "추천 저널 (실시간 데이터):"
+  Table: IF, h-index, Scope Fit, Review Speed, OA
+  [1순위 저널 선택] [여러 저널 동시 투고 전략] [더 많은 저널 검색] [다른 분야로 재검색]
+  │
+  ▼
+Stage 3: Generate detailed strategy for selected journal(s)
+  │
+  ├── journal_editor_info(selected) ──────┐
+  └── journal_special_issues(selected) ───┘  [parallel MCP calls]
+  │
+  ▼
+Output: Report + Cover letter template + Sequential submission plan
+```
+
+## Checkpoints
+
+| Checkpoint | Level | When | Options |
+|------------|-------|------|---------|
+| CP_JOURNAL_PRIORITIES | 🟠 Recommended | After initial search, before ranking | Impact Factor / Speed / OA / Scope Fit / Balanced |
+| CP_JOURNAL_SELECTION | 🟠 Recommended | After comparison, before strategy generation | Select journal / Multi-submit / More search / Re-search |
+
+### CP_JOURNAL_PRIORITIES
+
+```yaml
+question: "연구 분야: {field}. 저널 선택 우선순위를 선택하세요 / Select your journal priority"
+header: "Journal Priorities"
+options:
+  - label: "Impact Factor 우선"
+    description: "높은 IF/h-index 저널 중심 추천"
+  - label: "출판 속도 우선"
+    description: "빠른 리뷰/출판 프로세스 중심"
+  - label: "OA 우선"
+    description: "오픈 액세스 저널 + 낮은 APC 중심"
+  - label: "Scope Fit 우선"
+    description: "연구 주제와의 적합도 최우선"
+  - label: "균형 추천"
+    description: "모든 기준을 균형 있게 고려"
+```
+
+### CP_JOURNAL_SELECTION
+
+```yaml
+question: "추천 저널 목록입니다. 어떻게 진행하시겠습니까? / Select your preferred journal strategy"
+header: "Journal Selection"
+options:
+  - label: "1순위 저널 선택"
+    description: "가장 적합한 저널 1개에 대한 상세 전략 생성"
+  - label: "여러 저널 동시 투고 전략"
+    description: "순차적 투고 계획 (1순위 → 2순위 → 3순위)"
+  - label: "더 많은 저널 검색"
+    description: "다른 조건으로 추가 검색"
+  - label: "다른 분야로 재검색"
+    description: "연구 분야를 변경하여 다시 검색"
+```
 
 ## VS Modal Awareness (Light)
 
@@ -46,30 +160,30 @@ presenting multi-dimensional matching strategies suited to research context and 
 
 ## Core Functions
 
-1. **Scope Matching**
+1. **Scope Matching** (MCP-enhanced)
    - Research topic and journal scope fit
-   - Recent publication trend analysis
-   - Special Issue information
+   - Recent publication trend analysis via `journal_publication_trends`
+   - Special Issue information via `journal_special_issues`
 
-2. **Impact Analysis**
-   - Impact Factor, CiteScore
-   - h-index, SNIP, SJR
-   - Within-field ranking
+2. **Impact Analysis** (MCP-enhanced)
+   - h-index, cited_by_count, works_count via `journal_metrics`
+   - 2yr_mean_citedness (proxy for Impact Factor)
+   - Within-field ranking via `journal_search_by_field`
 
 3. **Practical Information**
-   - Average review time
-   - Acceptance/rejection rate
-   - Publication cost (APC)
+   - Average review time (knowledge-based)
+   - Acceptance/rejection rate (knowledge-based)
+   - Publication cost (APC) via `journal_metrics`
 
-4. **OA Policy**
-   - Gold/Green OA options
-   - Institutional agreements
-   - Preprint policy
+4. **OA Policy** (MCP-enhanced)
+   - is_oa status via `journal_metrics`
+   - Homepage URL for policy lookup
+   - Preprint policy (knowledge-based)
 
-5. **Submission Strategy**
+5. **Submission Strategy** (MCP-enhanced)
    - Sequential submission plan
    - Cover letter points
-   - Reviewer suggestions/exclusions
+   - Reviewer suggestions via `journal_editor_info`
 
 ## Journal Tier Classification
 
@@ -104,6 +218,7 @@ Optional:
 - Field: [Academic field]
 - Study Type: [Empirical/Theoretical/Review/Meta-analysis]
 - Analysis Date: [Date]
+- Data Source: OpenAlex + Crossref (real-time)
 
 ---
 
@@ -126,13 +241,15 @@ Optional:
 | Item | Information |
 |------|-------------|
 | Publisher | [Publisher name] |
-| Impact Factor (2024) | [X.XXX] |
-| CiteScore | [X.X] |
-| Field Ranking | Q1 in [Field] (X/XX) |
+| h-index | [X] (OpenAlex) |
+| 2yr Mean Citedness | [X.XX] (proxy for IF) |
+| Cited By Count | [X,XXX] |
+| Works Count | [X,XXX] |
 | Scope Fit | ⭐⭐⭐⭐⭐ (5/5) |
 | Average Review Time | [X] weeks (Initial → Decision) |
 | Estimated Acceptance Rate | ~XX% |
-| OA Options | Gold (APC: $X,XXX) / Hybrid |
+| OA Status | [Yes/No] |
+| APC | $X,XXX (if applicable) |
 | Preprint Policy | Allowed/Not allowed |
 
 **Fit Analysis**:
@@ -142,7 +259,7 @@ Optional:
 
 **Submission Strategy**:
 - Cover letter emphasis: [Points]
-- Suggested reviewers: [Field/Names]
+- Suggested reviewers: [From journal_editor_info data]
 - Exclude reviewers: [If applicable, with reason]
 
 ---
@@ -157,19 +274,31 @@ Optional:
 
 ---
 
-### 3. Journal Comparison Table
+### 3. Journal Comparison Table (from journal_compare)
 
 | Criterion | [Journal 1] | [Journal 2] | [Journal 3] |
 |-----------|-------------|-------------|-------------|
-| Impact Factor | X.XXX | X.XXX | X.XXX |
+| h-index | X | X | X |
+| 2yr Mean Citedness | X.XX | X.XX | X.XX |
+| Works Count | X,XXX | X,XXX | X,XXX |
 | Scope Fit | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
 | Review Speed | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Acceptance Rate | ~X% | ~X% | ~X% |
-| OA Cost | $X,XXX | $X,XXX | Free |
+| OA Status | Yes/No | Yes/No | Yes/No |
+| APC | $X,XXX | $X,XXX | Free |
 
 ---
 
-### 4. Sequential Submission Plan
+### 4. Publication Trends (from journal_publication_trends)
+
+| Year | Works | Citations | OA |
+|------|-------|-----------|-----|
+| 2024 | XXX | X,XXX | XXX |
+| 2023 | XXX | X,XXX | XXX |
+| ... | ... | ... | ... |
+
+---
+
+### 5. Sequential Submission Plan
 
 ```
 Submission Strategy Timeline
@@ -201,7 +330,7 @@ Submission Strategy Timeline
 
 ---
 
-### 5. Cover Letter Template
+### 6. Cover Letter Template
 
 ```
 Dear Editor,
@@ -223,7 +352,7 @@ We confirm that this manuscript has not been published
 elsewhere and is not under consideration by another journal.
 
 Suggested reviewers:
-1. [Name], [Affiliation] - [Reason]
+1. [Name], [Affiliation] - [Reason] (from journal_editor_info data)
 2. [Name], [Affiliation] - [Reason]
 
 Thank you for your consideration.
@@ -234,28 +363,29 @@ Sincerely,
 
 ---
 
-### 6. Additional Considerations
+### 7. Additional Considerations
 
 #### Open Access Options
-| Journal | OA Type | APC | Institutional Agreement |
-|---------|---------|-----|------------------------|
-| [Journal 1] | Hybrid | $X,XXX | Check needed |
-| [Journal 2] | Gold | $X,XXX | None |
-| [Journal 3] | Green | Free | N/A |
+| Journal | OA Status | APC | Institutional Agreement |
+|---------|-----------|-----|------------------------|
+| [Journal 1] | [Yes/No] | $X,XXX | Check needed |
+| [Journal 2] | [Yes/No] | $X,XXX | None |
+| [Journal 3] | [Yes/No] | Free | N/A |
 
 #### Preprint Strategy
 - ✅ Recommended: [Journal] allows preprints
 - Recommended server: [arXiv/SSRN/OSF Preprints]
 - Timing: Just before or after submission
 
-#### Special Issue Opportunities
-- [Journal]: "[Topic]" Special Issue (Deadline: [Date])
+#### Special Issue Opportunities (from journal_special_issues)
+- [Journal]: "[Topic]" (Recent themed publications found)
 ```
 
 ## Prompt Template
 
 ```
-You are an academic publishing strategy expert.
+You are an academic publishing strategy expert with access to real-time journal data
+via the Journal Intelligence MCP (OpenAlex + Crossref APIs).
 
 Please recommend suitable journals for the following research:
 
@@ -264,32 +394,17 @@ Please recommend suitable journals for the following research:
 [Priorities]: {priorities}
 [Study Type]: {study_type}
 
-Tasks to perform:
-1. Research characteristics analysis
-   - Subject area
-   - Methodological approach
-   - Contribution type (theoretical/empirical/methodological)
-   - Potential impact
-
-2. Journal recommendations (5-10)
-   For each journal:
-   - Journal name, publisher
-   - Impact Factor / h-index
-   - Scope fit (1-5)
-   - Average review time
-   - Estimated acceptance rate
-   - OA options and APC
-   - Recent similar paper publications
-
-3. Journal-specific submission strategy
-   - Cover letter emphasis points
-   - Potential reviewer suggestions
-   - Reviewers to avoid
-
-4. Sequential submission plan
-   - 1st submission: [Journal]
-   - On rejection, 2nd: [Journal]
-   - 3rd and beyond: [Journals]
+Pipeline:
+1. Call journal_search_by_field(field) for initial candidates
+2. Call journal_metrics for top candidates (parallel)
+3. Present CP_JOURNAL_PRIORITIES checkpoint
+4. Re-rank by user's priority
+5. Call journal_compare(top_5) + journal_publication_trends(top_3) (parallel)
+6. Present CP_JOURNAL_SELECTION checkpoint
+7. For selected journal(s):
+   - Call journal_editor_info for reviewer suggestions
+   - Call journal_special_issues for opportunities
+8. Generate full report with cover letter template
 ```
 
 ## Field-Specific Major Journals (Examples)
@@ -339,3 +454,5 @@ Tasks to perform:
 - Scimago Journal & Country Rank
 - DOAJ (Directory of Open Access Journals)
 - Sherpa Romeo (OA policies)
+- OpenAlex API: https://docs.openalex.org/
+- Crossref API: https://api.crossref.org/

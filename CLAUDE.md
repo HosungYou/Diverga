@@ -1,9 +1,11 @@
 # CLAUDE.md
 
-# Diverga v10.1.1 (Typographic Enforcement + Zotero Removal)
+# Diverga v10.3.0 (Journal Intelligence MCP + G1 Pipeline)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v10.3.0**: Journal Intelligence MCP — New `journal-server.js` MCP server with 6 tools (OpenAlex + Crossref APIs) for real-time journal data. G1 Journal Matcher overhauled with checkpoint-based pipeline (CP_JOURNAL_PRIORITIES + CP_JOURNAL_SELECTION). Setup wizard adds OpenAlex email configuration (Step 2). 4 MCP servers total.
+**v10.2.0**: Humanization Pipeline v3.1 — Rich Checkpoint v2.0 (section-level scores, 6 options per checkpoint), Balanced (Fast) mode (merged L1-3 pass), G5+F5 parallel execution, target score auto-stop, section-selective humanization. `/diverga:humanize` v1.1.0.
 **v10.1.1**: Typographic Character Enforcement — Unicode em dash (—), en dash (–), smart quotes (" " ' ') mandated across G6 output and F5 verification. ASCII `--` is a FAIL condition. Zotero MCP removed from `.mcp.json`.
 **v10.1.0**: `/diverga:humanize` Orchestration Skill — Multi-pass 4-layer pipeline orchestrator with mandatory AskUserQuestion checkpoints between every pass. Enforces sequential G5→G6→F5 execution with OMC autonomous mode defense. Supports conservative (L1-2), balanced (L1-3), aggressive (L1-4) modes. Pipeline v3.0 with CP_PASS1/2/3_REVIEW checkpoints.
 **v10.0.0**: Discourse-Level Detection & 4-Layer Humanization — G5/G6/F5 v3.0, 28 AI patterns across 7 domains (D1-D4 discourse patterns), 13 quantitative metrics, v3.0 composite scoring (6 components), Layer 4 DT1-DT4 discourse transformation, perturbation naturalization, 7 discipline profiles, section-conditional weights. Requires Humanizer MCP v3.0.0.
@@ -342,6 +344,7 @@ With `DIVERGA_BACKEND=sqlite`, state uses SQLite WAL mode for ACID-safe parallel
 | E2 | CP_METHODOLOGY_APPROVAL | 🟠 CP_CODING_APPROACH, 🟠 CP_THEME_VALIDATION |
 | E3 | CP_METHODOLOGY_APPROVAL | 🟠 CP_INTEGRATION_STRATEGY |
 | E5 | CP_METHODOLOGY_APPROVAL | (없음) |
+| G1 | (진입점) | 🟠 CP_JOURNAL_PRIORITIES, 🟠 CP_JOURNAL_SELECTION |
 | G3 | (없음) | (없음) |
 | G5 | (없음) | 🟠 CP_HUMANIZATION_REVIEW |
 | G6 | CP_HUMANIZATION_REVIEW | 🟡 CP_HUMANIZATION_VERIFY |
@@ -357,7 +360,7 @@ With `DIVERGA_BACKEND=sqlite`, state uses SQLite WAL mode for ACID-safe parallel
 전제조건 해결 순서 (낮은 Level부터):
 
 ```
-Level 0 (진입점): CP_RESEARCH_DIRECTION, CP_PARADIGM_SELECTION
+Level 0 (진입점): CP_RESEARCH_DIRECTION, CP_PARADIGM_SELECTION, CP_JOURNAL_PRIORITIES, CP_JOURNAL_SELECTION
 Level 1: CP_THEORY_SELECTION, CP_METHODOLOGY_APPROVAL
 Level 2: CP_ANALYSIS_PLAN, CP_SCREENING_CRITERIA, CP_SAMPLING_STRATEGY, CP_CODING_APPROACH, CP_THEME_VALIDATION, CP_INTEGRATION_STRATEGY, CP_QUALITY_REVIEW
 Level 3: SCH_DATABASE_SELECTION, SCH_API_KEY_VALIDATION, CP_HUMANIZATION_REVIEW, CP_VS_001, CP_VS_002, CP_VS_003
@@ -372,6 +375,7 @@ Level 5: SCH_RAG_READINESS
 | System | Purpose | Location |
 |--------|---------|----------|
 | MCP Server | Runtime checkpoint enforcement + state + messaging (16 tools) | `mcp/diverga-server.js` |
+| Journal MCP | Real-time journal data from OpenAlex + Crossref (6 tools) | `mcp/journal-server.js` |
 | Project State | Context persistence | `research/project-state.yaml` |
 | Decision Log | Human decisions | `research/decision-log.yaml` |
 | Research Coordinator | Main skill definition | `.claude/skills/research-coordinator/SKILL.md` |
@@ -379,11 +383,11 @@ Level 5: SCH_RAG_READINESS
 
 ---
 
-## MCP Server Architecture (v9.0)
+## MCP Server Architecture (v10.3.0)
 
 ### Overview
 
-Diverga v9.0 replaced the monolithic `checkpoint-server.js` (7 tools) with a modular 3-server architecture providing 16 tools via `diverga-server.js` and `tool-registry.js`.
+Diverga provides 22 MCP tools across 2 server processes: `diverga-server.js` (16 tools for checkpoint/memory/comm) and `journal-server.js` (6 tools for journal intelligence). Plus 2 external MCP servers (humanizer, context7) for a total of 4 MCP servers.
 
 ```
 diverga-server.js ──→ tool-registry.js (16 tools)
@@ -427,6 +431,51 @@ First SQLite startup auto-migrates existing YAML/JSON data (checkpoints, decisio
 | | `diverga_message_mailbox` | Read agent inbox |
 | | `diverga_message_acknowledge` | Acknowledge message receipt |
 | | `diverga_message_broadcast` | Broadcast to all agents |
+
+### Journal Intelligence MCP (v10.3.0)
+
+New standalone MCP server (`journal-server.js`) providing real-time journal data for G1 Journal Matcher.
+
+```
+journal-server.js ──→ 6 tools
+      │
+      ├── OpenAlex API (primary) ── journal search, metrics, trends, authors, compare
+      └── Crossref API (secondary) ── special issues, recent publications
+```
+
+**Email Configuration** (OpenAlex polite pool):
+1. `OPENALEX_EMAIL` env var (highest priority)
+2. `.omc/config.json` → `openalex_email` field
+3. No email → works but slower rate limit
+
+#### 6 Journal MCP Tools
+
+| Tool | API | Description |
+|------|-----|-------------|
+| `journal_search_by_field` | OpenAlex | Search journals by research field, sorted by citations |
+| `journal_metrics` | OpenAlex | Detailed metrics (h-index, citations, works, OA, APC) |
+| `journal_publication_trends` | OpenAlex | Works/citations per year for last N years |
+| `journal_editor_info` | OpenAlex | Top authors by publication count in journal |
+| `journal_compare` | OpenAlex | Compare 2-5 journals side by side |
+| `journal_special_issues` | Crossref | Recent themed publications and special issue content |
+
+### G1 Journal Matcher Pipeline (v10.3.0)
+
+G1 now operates as a checkpoint-based pipeline with MCP integration:
+
+```
+User request → journal_search_by_field + journal_metrics [parallel]
+  → 🟠 CP_JOURNAL_PRIORITIES (user selects: IF/Speed/OA/Scope/Balanced)
+  → Re-rank → journal_compare + journal_publication_trends [parallel]
+  → 🟠 CP_JOURNAL_SELECTION (user selects journal or strategy)
+  → journal_editor_info + journal_special_issues [parallel]
+  → Report + Cover letter + Sequential submission plan
+```
+
+| Checkpoint | Level | Options |
+|------------|-------|---------|
+| CP_JOURNAL_PRIORITIES | 🟠 Recommended | IF / Speed / OA / Scope Fit / Balanced |
+| CP_JOURNAL_SELECTION | 🟠 Recommended | Select journal / Multi-submit / More search / Re-search |
 
 ---
 
@@ -604,7 +653,7 @@ Shall we proceed with this paradigm?
 
 ---
 
-## Humanization Pipeline (v2.0 — Multi-Pass Iterative Architecture)
+## Humanization Pipeline (v3.1 — Multi-Pass Iterative Architecture)
 
 ### Overview
 
@@ -643,6 +692,7 @@ Content Generation (G2/G3) --> G5 Analysis --> Checkpoint -->
 |------|--------|--------|----------|
 | **Conservative** | High-risk patterns only | Layer 1-2 (vocabulary + phrase) | Journal submissions |
 | **Balanced** | High + medium + structural | Layer 1-3 (+ structure) | Most academic writing |
+| **Balanced (Fast)** | Same as Balanced, merged pass | Layer 1-3 (single G6 call) | Same quality, fewer steps |
 | **Aggressive** | All patterns + discourse | Layer 1-4 (+ discourse DT1-DT4) | Maximum naturalness |
 
 ### Checkpoints
@@ -650,8 +700,9 @@ Content Generation (G2/G3) --> G5 Analysis --> Checkpoint -->
 | Checkpoint | Level | When |
 |------------|-------|------|
 | CP_HUMANIZATION_REVIEW | 🟠 Recommended | After G5 analysis, before transformation |
-| CP_PASS1_REVIEW | 🟠 Recommended | After vocabulary pass, before structural pass |
-| CP_PASS2_REVIEW | 🟠 Recommended | After structural pass, before optional polish |
+| CP_PASS1_REVIEW | 🟠 Recommended | After vocabulary pass, before structural pass (Rich Checkpoint v2.0) |
+| CP_PASS2_REVIEW | 🟠 Recommended | After structural pass, before discourse pass (Rich Checkpoint v2.0) |
+| CP_PASS3_REVIEW | 🟠 Recommended | After discourse pass, before optional polish (Rich Checkpoint v2.0) |
 | CP_FINAL_REVIEW | 🟡 Optional | After polish pass, before export |
 | CP_HUMANIZATION_VERIFY | 🟡 Optional | Post-humanization verification review |
 
@@ -663,6 +714,22 @@ All G6 output MUST use proper Unicode typographic characters:
 - **Smart quotes**: " " ' ' (U+201C/D, U+2018/9), NEVER straight quotes `"` `'`
 
 F5 verification MUST flag any remaining `--` as a **FAIL condition**.
+
+### Parallel G5+F5 Execution (v3.1)
+
+After each G6 transform, G5 rescan and F5 verify run **in parallel** since both are read-only operations on the same G6 output. This saves latency on every pass without risk to data integrity.
+
+```
+G6 transform → [G5 rescan ‖ F5 verify] → Checkpoint
+```
+
+### Section-Selective Humanization (v3.1)
+
+The pipeline supports the `sections` parameter to transform only specific manuscript sections (e.g., `["discussion", "conclusion"]`). Non-selected sections pass through unchanged. Users can modify section selection at any Rich Checkpoint.
+
+### Target Score Auto-Stop (v3.1)
+
+Users set a `target_score` (default: 30%) at STAGE 0. When the score reaches the target, the pipeline auto-recommends "Accept" at the next checkpoint. Users can always override and continue.
 
 ### Ethics Note
 
@@ -950,6 +1017,8 @@ The Memory System automatically captures context at critical lifecycle events:
 
 ## Version History
 
+- **v10.3.0**: Journal Intelligence MCP — New `journal-server.js` (6 tools: OpenAlex + Crossref). G1 Journal Matcher pipeline with CP_JOURNAL_PRIORITIES + CP_JOURNAL_SELECTION checkpoints. Setup wizard adds OpenAlex email step. 4 MCP servers.
+- **v10.2.0**: Humanization Pipeline v3.1 — Rich Checkpoint v2.0 (section-level score tables, 6 options per checkpoint), Balanced (Fast) mode (merged L1-3 single pass), G5+F5 parallel execution, target score auto-stop, section-selective humanization. `/diverga:humanize` v1.1.0.
 - **v10.1.1**: Typographic Character Enforcement — Unicode em dash/en dash/smart quotes mandated across G6 output and F5 verification. ASCII `--` is a FAIL condition. Zotero MCP removed.
 - **v10.1.0**: Humanize Orchestration Skill - `/diverga:humanize` multi-pass 4-layer pipeline orchestrator with mandatory AskUserQuestion checkpoints, OMC autonomous mode defense, CP_PASS1/2/3_REVIEW checkpoints, pipeline v3.0 reference upgrade
 - **v10.0.0**: Discourse-Level Detection & 4-Layer Humanization - G5/G6/F5 v3.0, 28 AI patterns (7 domains, D1-D4 discourse), 13 quantitative metrics, v3.0 composite scoring (6 components), Layer 4 DT1-DT4 discourse transformation, perturbation naturalization, 7 discipline profiles, section-conditional weights. Requires Humanizer MCP v3.0.0.

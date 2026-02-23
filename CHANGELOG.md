@@ -4,6 +4,110 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [10.3.0] - 2026-02-23 (Journal Intelligence MCP + G1 Pipeline)
+
+### Overview
+
+**Diverga v10.3.0** — Adds the Journal Intelligence MCP server (`journal-server.js`) with 6 tools powered by OpenAlex and Crossref APIs for real-time journal data. G1 Journal Matcher overhauled from a static, single-run agent to a checkpoint-based pipeline with MCP integration. Setup wizard updated with OpenAlex email configuration step.
+
+### New Features
+
+- **Journal Intelligence MCP** (`mcp/journal-server.js`): Standalone MCP server with 6 tools:
+  - `journal_search_by_field`: Search journals by research field (OpenAlex)
+  - `journal_metrics`: Detailed journal metrics — h-index, citations, OA, APC (OpenAlex)
+  - `journal_publication_trends`: Works/citations per year trend data (OpenAlex)
+  - `journal_editor_info`: Top authors by publication count in a journal (OpenAlex)
+  - `journal_compare`: Compare 2-5 journals side by side (OpenAlex)
+  - `journal_special_issues`: Recent themed publications (Crossref)
+- **G1 Journal Matcher Pipeline v10.0.0**: Checkpoint-based pipeline with MCP integration:
+  - Stage 1: `journal_search_by_field` + `journal_metrics` (parallel)
+  - CP_JOURNAL_PRIORITIES: User selects priority (IF/Speed/OA/Scope/Balanced)
+  - Stage 2: `journal_compare` + `journal_publication_trends` (parallel)
+  - CP_JOURNAL_SELECTION: User selects journal or strategy
+  - Stage 3: `journal_editor_info` + `journal_special_issues` (parallel)
+  - Output: Report + Cover letter + Sequential submission plan
+- **OpenAlex Email Setup** (Step 2 in `/diverga:setup`):
+  - Optional email for OpenAlex polite pool (faster API + higher rate limit)
+  - Saved to `.omc/config.json` → `openalex_email`
+  - `OPENALEX_EMAIL` env var takes precedence
+
+### New Checkpoints
+
+| Checkpoint | Level | Agent | Description |
+|------------|-------|-------|-------------|
+| CP_JOURNAL_PRIORITIES | 🟠 Recommended | G1 | User selects journal ranking priority |
+| CP_JOURNAL_SELECTION | 🟠 Recommended | G1 | User selects target journal or multi-submit strategy |
+
+### Updated Files
+
+| File | Changes |
+|------|---------|
+| `mcp/journal-server.js` | **New** — Journal Intelligence MCP server (6 tools) |
+| `.mcp.json` | Added `journal` server entry (4 servers total) |
+| `skills/g1/SKILL.md` | v10.0.0 — MCP pipeline, checkpoints, natural language routing |
+| `mcp/agent-prerequisite-map.json` | G1 checkpoints + dependency_order + checkpoint_levels |
+| `skills/setup/SKILL.md` | v10.3.0 — Added Step 2 (OpenAlex email), renumbered steps |
+| `CLAUDE.md` | v10.3.0 — Journal MCP docs, G1 pipeline, version bump |
+| `CHANGELOG.md` | This entry |
+
+### MCP Server Stack (4 servers)
+
+| Server | Tools | Strategy |
+|--------|-------|----------|
+| **diverga** | 16 (checkpoint/memory/comm) | `${CLAUDE_PLUGIN_ROOT}` bundle |
+| **journal** | 6 (OpenAlex + Crossref) | `${CLAUDE_PLUGIN_ROOT}` bundle |
+| **humanizer** | 4+ (stylometric metrics) | `uvx` from GitHub |
+| **context7** | 2 (docs lookup) | `npx` from npm |
+
+---
+
+## [10.2.0] - 2026-02-23 (Humanization Pipeline v3.1 — Rich Checkpoints + Smart Pass Merge)
+
+### Overview
+
+**Diverga v10.2.0** — Major upgrade to the humanization pipeline (v3.0 to v3.1). Introduces Rich Checkpoint v2.0 with section-level score tables, Balanced (Fast) mode for merged L1-3 passes, G5+F5 parallel execution, target score auto-stop, and section-selective humanization. The `/diverga:humanize` orchestration skill is updated to v1.1.0.
+
+### New Features
+
+- **Rich Checkpoint v2.0**: All CP_PASSn_REVIEW checkpoints now display:
+  - Section-level score table (Abstract, Introduction, Methods, Results, Discussion, Conclusion)
+  - Before/after scores per section with remaining pattern counts
+  - 6 options instead of 4: continue all, select sections, per-section intensity, preserve sentences, accept, diff
+- **Balanced (Fast) mode**: New 5th option at CP_HUMANIZATION_REVIEW that merges Pass 1 (L1-2) and Pass 2 (L3) into a single G6 call, skipping CP_PASS1_REVIEW. Saves 1 G5 rescan + 1 F5 verify + 1 checkpoint wait.
+- **G5+F5 parallel execution**: After each G6 transform, G5 rescan and F5 verify now run in parallel (both are read-only on the same output). Reduces per-pass latency.
+- **Target score auto-stop**: User sets target_score at STAGE 0 (default: 30%). When target is reached, pipeline auto-recommends "Accept" at the next checkpoint. User can always override.
+- **Section-selective humanization**: New `sections` parameter (e.g., `["discussion", "conclusion"]`). Non-selected sections pass through unchanged. Users can modify section selection at any Rich Checkpoint.
+
+### Agent/Skill Updates
+
+| Component | Version | Changes |
+|-----------|---------|---------|
+| `/diverga:humanize` | v1.1.0 | Rich Checkpoint v2.0, Balanced (Fast) mode, parallel G5+F5, target auto-stop, section-selective |
+| G5-AcademicStyleAuditor | v9.0.0 | Added `section_scores` and `top_patterns` to output format (Section-Level Scores v3.1) |
+| G6-AcademicStyleHumanizer | v9.0.0 | Added `sections` input parameter for section-selective humanization |
+
+### Updated Files
+
+| File | Changes |
+|------|---------|
+| `skills/humanize/SKILL.md` | v1.0.0 to v1.1.0 — Rich Checkpoint v2.0, Balanced (Fast), parallel G5+F5, target auto-stop, section-selective |
+| `skills/g5/SKILL.md` | Added "Section-Level Scores (v3.1)" subsection with `section_scores` and `top_patterns` output |
+| `skills/g6/SKILL.md` | Added `sections` optional input parameter for section-selective humanization |
+| `CLAUDE.md` | v10.1.1 to v10.2.0 — Pipeline v3.1 header, Balanced (Fast) in modes table, CP_PASS3_REVIEW in checkpoints, parallel/section-selective/auto-stop notes, version history |
+| `CHANGELOG.md` | This entry |
+
+### Pipeline Changes Summary
+
+| Improvement | Description | Savings |
+|-------------|-------------|---------|
+| **Balanced (Fast)** | L1-2 + L3 merged into single G6 call | 1 G5 + 1 F5 + 1 checkpoint |
+| **Rich Checkpoint v2.0** | Section-level tables, 6 options | Better user control |
+| **G5+F5 parallel** | Read-only agents run simultaneously | ~50% per-pass verification time |
+| **Target auto-stop** | Auto-recommend accept when target met | Fewer unnecessary passes |
+| **Section-selective** | Transform only specified sections | Faster, more targeted |
+
+---
+
 ## [10.1.1] - 2026-02-23 (Typographic Enforcement + Zotero Removal)
 
 ### Overview

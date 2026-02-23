@@ -1,20 +1,20 @@
 ---
 name: setup
 description: |
-  Diverga v8.0 initial configuration wizard. Simplified 2-step setup.
-  Sets up checkpoints and HUD preferences.
+  Diverga v10.3.0 initial configuration wizard. 3-step setup.
+  Sets up checkpoints, OpenAlex email, and HUD preferences.
   Triggers: setup, configure, 설정, install
-version: "9.0.0"
+version: "10.3.0"
 ---
 
 # /diverga:setup
 
-**Version**: 8.4.0
+**Version**: 10.3.0
 **Trigger**: `/diverga:setup`
 
 ## Description
 
-Diverga v8.0 simplified setup wizard. 2 steps: Checkpoint Level + HUD.
+Diverga v10.3.0 setup wizard. 3 steps: Checkpoint Level + OpenAlex Email + HUD.
 LLM selection removed (Claude Code is already authenticated).
 
 ## Workflow
@@ -34,7 +34,7 @@ Display welcome message, then ask checkpoint level using AskUserQuestion:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                    Welcome to Diverga v8.4.0                    ║
+║                   Welcome to Diverga v10.3.0                     ║
 ║         AI Research Assistant for the Complete Lifecycle         ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
@@ -51,7 +51,28 @@ options:
     description: "Autonomous mode. No checkpoints. Not recommended for research."
 ```
 
-### Step 2: HUD Configuration
+### Step 2: OpenAlex Email (Optional)
+
+Configure email for OpenAlex polite pool (faster API responses for Journal Intelligence MCP).
+
+```
+question: "OpenAlex polite pool 이메일을 입력하세요 (선택사항) / Enter email for OpenAlex polite pool (optional)"
+header: "OpenAlex"
+options:
+  - label: "Enter email"
+    description: "더 빠른 API 응답 + 높은 rate limit / Faster API responses + higher rate limit"
+  - label: "Skip"
+    description: "이메일 없이도 작동합니다 (느린 rate limit) / Works without email (slower rate limit)"
+```
+
+**If email provided**:
+- Save to `.omc/config.json`: `{ "openalex_email": "{email}" }`
+- Create `.omc/` directory if not exists
+
+**Environment variable override**:
+- `OPENALEX_EMAIL` env var takes precedence over config file when set
+
+### Step 3: HUD Configuration
 
 ```
 question: "Enable Diverga HUD statusline?"
@@ -65,13 +86,13 @@ options:
     description: "No HUD display."
 ```
 
-### Step 3: Generate Configuration & Complete
+### Step 4: Generate Configuration & Complete
 
 After collecting all preferences, generate `config/diverga-config.json`:
 
 ```json
 {
-  "version": "8.4.0",
+  "version": "10.3.0",
   "human_checkpoints": {
     "enabled": true,
     "level": "<full|minimal|off>",
@@ -91,11 +112,19 @@ After collecting all preferences, generate `config/diverga-config.json`:
 }
 ```
 
+If OpenAlex email was provided, also generate/update `.omc/config.json`:
+
+```json
+{
+  "openalex_email": "user@example.com"
+}
+```
+
 Display completion:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                   Diverga v8.4.0 Setup Complete!                ║
+║                  Diverga v10.3.0 Setup Complete!                 ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Configuration saved to: config/diverga-config.json             ║
 ║                                                                  ║
@@ -103,6 +132,10 @@ Display completion:
 ║  • Just describe your research in natural language               ║
 ║  • "I want to conduct a systematic review on AI in education"    ║
 ║  • Diverga will auto-detect and guide you with checkpoints       ║
+║                                                                  ║
+║  New in v10.3.0:                                                 ║
+║  • Journal Intelligence MCP — real-time journal data             ║
+║  • G1 Journal Matcher with live OpenAlex + Crossref metrics      ║
 ║                                                                  ║
 ║  Commands:                                                       ║
 ║  • /diverga:help     - View all 44 agents                       ║
