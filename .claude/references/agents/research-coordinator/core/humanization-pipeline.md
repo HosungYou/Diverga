@@ -948,6 +948,48 @@ stage_6_enhanced:
 
 ---
 
+## MCP Tool Integration (v2.1)
+
+The humanizer MCP server provides 4 tools for precise quantitative metrics, replacing LLM estimation in the pipeline:
+
+| Tool | Pipeline Stage | Purpose |
+|------|---------------|---------|
+| `humanizer_metrics` | Stage 2 (G5 Analysis) | Exact burstiness CV, MTLD, Fano Factor, opener diversity |
+| `humanizer_verify` | After each G6 pass | Regression detection, needs_another_pass recommendation |
+| `humanizer_diff` | Checkpoint reports | Per-metric deltas and improvement percentages |
+| `humanizer_status` | Pipeline start | Baseline metrics with discipline-specific calibration |
+
+### Tool Call Sequence in Multi-Pass Flow
+
+```
+1. Pipeline Start:
+   humanizer_status(text, discipline, target) -> baseline metrics + readiness
+
+2. G5 Analysis (Stage 2):
+   humanizer_metrics(text, pattern_score, structural_penalty, discipline) -> full metrics
+
+3. After each G6 Pass:
+   humanizer_verify(original, humanized, score_before, score_after)
+   -> regressions, needs_another_pass, recommendations
+
+4. Checkpoint Reports:
+   humanizer_diff(original, humanized) -> deltas, improvement_pct, distributions
+```
+
+### Discipline Calibration (via MCP)
+
+Pass `discipline` parameter to tools for field-specific thresholds:
+- `"psychology"`: burstiness 0.40, MTLD 75
+- `"management"`: burstiness 0.42, MTLD 78
+- `"education"`: burstiness 0.43, MTLD 76
+- `"default"`: burstiness 0.45, MTLD 80
+
+### Fallback
+
+If MCP tools are unavailable, agents fall back to LLM estimation as in v2.0.
+
+---
+
 ## References
 
 - **G5 Agent**: `../research-agents/G5-academic-style-auditor/SKILL.md`

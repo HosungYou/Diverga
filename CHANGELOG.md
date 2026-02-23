@@ -4,6 +4,67 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [9.2.0] - 2026-02-23 (MCP Tool Integration — Humanizer Server)
+
+### Overview
+
+**Diverga v9.2.0** — Adds the `humanizer` MCP server (Python, 4 tools) providing exact stylometric computation for the G5/G6/F5 humanization pipeline. Replaces LLM estimation of burstiness CV, MTLD, Fano Factor, and other quantitative metrics with algorithmic precision. Resolves 5 of 6 known gaps from the v2.0 pipeline release.
+
+### Key Highlights
+
+- **Humanizer MCP server**: 4 tools (`humanizer_metrics`, `humanizer_verify`, `humanizer_diff`, `humanizer_status`) via `stdio` transport
+- **Precise stylometric computation**: Burstiness CV, MTLD (McCarthy & Jarvis 2010), Fano Factor, sentence length range, paragraph opener diversity, hedge density, composite AI probability scoring
+- **Feedback loop** (Gap 1): `humanizer_verify` returns `needs_another_pass` with specific recommendations
+- **Discipline calibration** (Gap 3): Psychology, management, education profiles with field-specific thresholds
+- **Diff visualization** (Gap 5): `humanizer_diff` with per-metric deltas and improvement percentages
+- **Pattern recovery detection** (Gap 6): Regression detection for opener diversity and burstiness
+- **Hedge density tracking** (Gap 7): Per-sentence hedge word counting
+- **120 tests passing** (84 pipeline + 36 MCP server)
+
+### MCP Tools
+
+| Tool | Purpose | Pipeline Stage |
+|------|---------|---------------|
+| `humanizer_metrics` | Full stylometric analysis | G5 Analysis |
+| `humanizer_verify` | Before/after comparison, regression detection | After each G6 pass |
+| `humanizer_diff` | Per-metric delta report | Checkpoint reports |
+| `humanizer_status` | Readiness assessment with discipline calibration | Pipeline start |
+
+### Agent Updates
+
+| Agent | Change |
+|-------|--------|
+| **G5** (Academic Style Auditor) | Added MCP integration: calls `humanizer_metrics` and `humanizer_status` when available |
+| **G6** (Academic Style Humanizer) | Added MCP integration: calls `humanizer_verify` and `humanizer_diff` after transformation |
+| **F5** (Humanization Verifier) | Added MCP integration: calls `humanizer_verify` for Domains 5-6 (burstiness, structural) |
+| **Humanization Pipeline** | Added MCP Tool Integration v2.1 section with tool call sequence and discipline calibration |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `agents/g5.md` | Added MCP Tool Integration section |
+| `agents/g6.md` | Added MCP Tool Integration section |
+| `agents/f5.md` | Added MCP Tool Integration section |
+| `.claude/references/.../humanization-pipeline.md` | Added MCP Tool Integration v2.1 section |
+
+### Gaps Resolved
+
+| Gap | Status |
+|-----|--------|
+| Gap 1: Feedback loop | Resolved — `humanizer_verify` `needs_another_pass` |
+| Gap 3: Discipline calibration | Resolved — `humanizer_status` profiles |
+| Gap 5: Diff visualization | Resolved — `humanizer_diff` deltas |
+| Gap 6: Pattern recovery | Resolved — regression detection |
+| Gap 7: Hedge calibration | Resolved — `hedge_density` metric |
+| Gap 4: Custom preservation lists | Open — future release |
+
+### Related Repository
+
+Humanizer MCP server: https://github.com/HosungYou/humanizer (v2.1.0)
+
+---
+
 ## [9.0.0] - 2026-02-16 (Architecture — SQLite + MCP Server Split)
 
 ### Overview
