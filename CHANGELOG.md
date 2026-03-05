@@ -4,6 +4,45 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [10.3.2] - 2026-03-05 (Hook Path Portability Fix)
+
+### Overview
+
+**Diverga v10.3.2** — Fixes hardcoded `/Users/hosung/` paths in hook commands and skill instructions that prevented the checkpoint enforcement system from working for any user other than the original developer. Hook commands now use `$HOME` shell expansion for universal compatibility.
+
+### Bug Fixes
+
+- **`hooks/hooks.json`**: Replace hardcoded `/Users/hosung/` with `$HOME/` in hook commands — checkpoint-enforcer and skill-interceptor now resolve correctly on any machine via shell expansion
+- **`skills/diverga/SKILL.md`**: Replace hardcoded config path with portable `~/` prefix
+- **`skills/doctor/SKILL.md`**: Replace 5 hardcoded paths with portable `~/` references (plugin registry, config, skill directories)
+- **`docs/SDD-hook-enforcement.md`**: Replace 8 hardcoded paths with portable `~/` references across all architecture documentation
+
+### Impact
+
+Without this fix, the v10.3.1 hook enforcement system silently failed for all users except the original developer — hooks returned `{ continue: true }` on error, making checkpoint bypass invisible. This patch ensures the PreToolUse hooks execute correctly on any system.
+
+### Modified Files
+
+| File | Changes |
+|------|---------|
+| `hooks/hooks.json` | `$HOME` instead of `/Users/hosung` in 2 command paths |
+| `skills/diverga/SKILL.md` | Portable config path |
+| `skills/doctor/SKILL.md` | 5 portable paths |
+| `docs/SDD-hook-enforcement.md` | 8 portable paths |
+| `package.json` | Version bump to 10.3.2 |
+
+### Tests
+
+| Suite | Tests | Status |
+|-------|-------|--------|
+| Hook tests (node:test) | 91 | All pass |
+| checkpoint-enforcer | 25 | Pass |
+| skill-interceptor | 16 | Pass |
+| prereq-checker | 39 | Pass |
+| checkpoint-logic lazy init | 11 | Pass |
+
+---
+
 ## [10.3.1] - 2026-02-28 (Platform Hook Enforcement + OpenCode Full Parity)
 
 ### Overview

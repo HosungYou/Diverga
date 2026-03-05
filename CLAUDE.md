@@ -1,9 +1,10 @@
 # CLAUDE.md
 
-# Diverga v10.3.1 (Platform Hook Enforcement + OpenCode Full Parity)
+# Diverga v10.3.2 (Hook Path Portability Fix)
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
+**v10.3.2**: Hook Path Portability Fix — Replaced hardcoded `/Users/hosung/` paths with `$HOME` (hooks.json) and `~/` (skills, docs) so checkpoint enforcement works for all users, not just the original developer.
 **v10.3.1**: Platform Hook Enforcement — Claude Code PreToolUse hooks (`checkpoint-enforcer.mjs`, `skill-interceptor.mjs`) intercept every `diverga:*` agent call at platform level, enforcing prerequisite checkpoints via shared `prereq-checker.mjs`. Soft block pattern (always `continue: true` with warning injection). OpenCode full feature parity: 44 agents, MCP-first checkpoint enforcement, 3-layer memory, HUD, setup wizard, humanization/review pipelines, 49 keyword triggers. Lazy init creates checkpoint skeleton on first run.
 **v10.3.0**: Journal Intelligence MCP — New `journal-server.js` MCP server with 6 tools (OpenAlex + Crossref APIs) for real-time journal data. G1 Journal Matcher overhauled with checkpoint-based pipeline (CP_JOURNAL_PRIORITIES + CP_JOURNAL_SELECTION). Setup wizard adds OpenAlex email configuration (Step 2). 4 MCP servers total.
 **v10.2.0**: Humanization Pipeline v3.1 — Rich Checkpoint v2.0 (section-level scores, 6 options per checkpoint), Balanced (Fast) mode (merged L1-3 pass), G5+F5 parallel execution, target score auto-stop, section-selective humanization. `/diverga:humanize` v1.1.0.

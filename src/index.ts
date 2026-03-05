@@ -26,7 +26,7 @@
 export * from './agents/index.js';
 
 // Package info
-export const VERSION = '10.3.0';
+export const VERSION = '10.3.2';
 export const PACKAGE_NAME = 'diverga';
 
 /**

@@ -253,7 +253,7 @@ graph TB
 
 #### 3.1.1 hooks.json 설정
 
-**파일 경로**: `/Users/hosung/.claude/plugins/diverga/hooks/hooks.json`
+**파일 경로**: `~/.claude/plugins/diverga/hooks/hooks.json`
 
 ```json
 {
@@ -264,7 +264,7 @@ graph TB
         "hooks": [
           {
             "type": "command",
-            "command": "node /Users/hosung/.claude/plugins/diverga/hooks/checkpoint-enforcer.mjs",
+            "command": "node ~/.claude/plugins/diverga/hooks/checkpoint-enforcer.mjs",
             "timeout": 5
           }
         ]
@@ -274,7 +274,7 @@ graph TB
         "hooks": [
           {
             "type": "command",
-            "command": "node /Users/hosung/.claude/plugins/diverga/hooks/skill-interceptor.mjs",
+            "command": "node ~/.claude/plugins/diverga/hooks/skill-interceptor.mjs",
             "timeout": 5
           }
         ]
@@ -293,7 +293,7 @@ graph TB
 
 #### 3.1.2 checkpoint-enforcer.mjs
 
-**파일 경로**: `/Users/hosung/.claude/plugins/diverga/hooks/checkpoint-enforcer.mjs`
+**파일 경로**: `~/.claude/plugins/diverga/hooks/checkpoint-enforcer.mjs`
 
 **처리 흐름**:
 
@@ -356,7 +356,7 @@ if (!match) return { continue: true };
 
 #### 3.1.3 skill-interceptor.mjs
 
-**파일 경로**: `/Users/hosung/.claude/plugins/diverga/hooks/skill-interceptor.mjs`
+**파일 경로**: `~/.claude/plugins/diverga/hooks/skill-interceptor.mjs`
 
 `checkpoint-enforcer.mjs`와 동일한 패턴이지만, `tool_input.subagent_type` 대신 `tool_input.skill`에서 에이전트 ID를 추출한다:
 
@@ -377,7 +377,7 @@ const match = skillName.match(/^diverga:([a-i]\d+)/i);
 
 ### 3.2 공유 필수조건 검사기 (prereq-checker.mjs)
 
-**파일 경로**: `/Users/hosung/.claude/plugins/diverga/mcp/lib/prereq-checker.mjs`
+**파일 경로**: `~/.claude/plugins/diverga/mcp/lib/prereq-checker.mjs`
 
 이 모듈은 양쪽 hook이 공유하는 핵심 유틸리티로, 체크포인트 강제의 비즈니스 로직을 담당한다.
 
@@ -468,7 +468,7 @@ These are recommended checkpoints. You may proceed or complete them first.
 
 #### 3.3.1 checkpoint-enforcer.ts
 
-**파일 경로**: `/Users/hosung/.claude/plugins/diverga/.opencode/plugins/diverga/hooks/checkpoint-enforcer.ts`
+**파일 경로**: `~/.claude/plugins/diverga/.opencode/plugins/diverga/hooks/checkpoint-enforcer.ts`
 
 OpenCode 플랫폼의 TypeScript 기반 hook 구현체. Claude Code와 달리 shell 명령 대신 TypeScript 함수로 실행되며, MCP-first 전략을 사용한다.
 
@@ -557,7 +557,7 @@ MCP가 `null`을 반환하면 `AGENT_PREREQUISITES` (agent-prerequisite-map.json
 
 ### 3.4 Lazy Init (checkpoint-logic.js)
 
-**파일 경로**: `/Users/hosung/.claude/plugins/diverga/mcp/lib/checkpoint-logic.js` (lines 96-133)
+**파일 경로**: `~/.claude/plugins/diverga/mcp/lib/checkpoint-logic.js` (lines 96-133)
 
 #### 3.4.1 활성화 조건
 

@@ -37,7 +37,7 @@ Output this exact logo block:
 
 ### Step 2: Read Configuration
 
-Read `config/diverga-config.json` (relative to the plugin directory at `/Users/hosung/.claude/plugins/diverga/config/diverga-config.json`). Extract:
+Read `config/diverga-config.json` (relative to the plugin directory at `~/.claude/plugins/diverga/config/diverga-config.json`). Extract:
 - `human_checkpoints.level` or infer from `human_checkpoints.enabled` + `human_checkpoints.required`
 - `hud.preset` if present
 - `language`

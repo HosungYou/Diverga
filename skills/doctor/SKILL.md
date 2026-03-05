@@ -25,12 +25,12 @@ When user invokes `/diverga:doctor`, execute all 5 diagnostic layers sequentiall
 ### Layer 1: Plugin Health
 
 **Check plugin registration:**
-- Read `/Users/hosung/.claude/plugins/installed_plugins.json`
+- Read `~/.claude/plugins/installed_plugins.json`
 - Verify `diverga@diverga` entry exists
 - Extract version and install date
 
 **Check config JSON validity:**
-- Read `/Users/hosung/.claude/plugins/diverga/config/diverga-config.json`
+- Read `~/.claude/plugins/diverga/config/diverga-config.json`
 - Verify it parses as valid JSON
 - Check required fields exist: `version`, `human_checkpoints`, `language`
 
@@ -50,8 +50,8 @@ PLUGIN HEALTH
 ### Layer 2: Skill Sync
 
 **Check skill counts match between plugin and local cache:**
-- Use Glob to count directories in `/Users/hosung/.claude/plugins/diverga/skills/*/SKILL.md`
-- Use Glob to count directories in `/Users/hosung/.claude/skills/diverga-*/SKILL.md` (exclude `diverga-diverga` prefix duplication — count unique skill names)
+- Use Glob to count directories in `~/.claude/plugins/diverga/skills/*/SKILL.md`
+- Use Glob to count directories in `~/.claude/skills/diverga-*/SKILL.md` (exclude `diverga-diverga` prefix duplication — count unique skill names)
 - Compare counts
 
 **Check for missing skills in local cache:**
@@ -74,7 +74,7 @@ SKILL SYNC
 ### Layer 3: Config Validity
 
 **Deep validation of diverga-config.json:**
-- Read `/Users/hosung/.claude/plugins/diverga/config/diverga-config.json`
+- Read `~/.claude/plugins/diverga/config/diverga-config.json`
 - Check `version` field matches "8.4.0"
 - Check `human_checkpoints` object exists and has `enabled` (boolean) and `required` (array)
 - Check `language` is one of: "en", "ko", "auto"
