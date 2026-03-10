@@ -341,8 +341,8 @@ Task(subagent_type="diverga:c5", prompt="Meta-analysis orchestration...")
 |-------|-------|---------|
 | G1-journal-matcher | Sonnet | Target journal selection |
 | G2-academic-communicator | Sonnet | Audience adaptation |
-| G5-academic-style-auditor | Sonnet | AI pattern detection (24 categories) |
-| G6-academic-style-humanizer | Opus | Pattern transformation (HAVS) |
+| G5-academic-style-auditor | Sonnet | Academic writing quality analysis (24 categories) |
+| G6-academic-style-humanizer | Opus | Scholarly voice improvement (HAVS) |
 
 </details>
 
@@ -446,7 +446,7 @@ done
 | **v6.7.0** | 2026-01-28 | Systematic Review Automation — Category I agents (I0-I3), PRISMA 2020 pipeline |
 | **v6.5.0** | 2026-01-26 | Parallel Execution — Task tool support, /agents/ directory |
 | **v6.3.0** | 2026-01-26 | Meta-Analysis Agent System — C5/C6/C7 for Hedges' g calculation |
-| **v6.1.0** | 2026-01-25 | Humanization Pipeline — G5/G6/F5 for natural academic prose (HAVS) |
+| **v6.1.0** | 2026-01-25 | Writing Quality Pipeline — G5/G6/F5 for authentic academic expression (HAVS) |
 | **v6.0.0** | 2026-01-25 | Human-Centered Edition — Mandatory checkpoints, removed autonomous modes |
 
 See [CHANGELOG](docs/CHANGELOG.md) for full history.

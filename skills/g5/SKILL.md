@@ -1,10 +1,10 @@
 ---
 name: g5
 description: |
-  VS-Enhanced Academic Style Auditor - AI Writing Pattern Detection for Academic Texts
-  Detects 24+ AI writing patterns adapted from Wikipedia AI Cleanup guidelines
-  Use when: checking drafts before submission, auditing AI-generated content, preparing for humanization
-  Triggers: AI patterns, style audit, detection check, humanize review, AI writing check
+  VS-Enhanced Academic Style Auditor - Academic Writing Quality Analysis
+  Identifies 24+ writing patterns that reduce scholarly quality, adapted from Wikipedia AI Cleanup guidelines
+  Use when: checking drafts before submission, improving academic writing quality, preparing for style improvement
+  Triggers: writing quality, style audit, pattern check, writing review, academic style check
 version: "10.3.0"
 ---
 
@@ -31,16 +31,16 @@ Read `.research/decision-log.yaml` directly to verify prerequisites. Conversatio
 
 ## Overview
 
-Analyzes academic writing for AI-generated patterns and provides detailed reports on detectability.
+Analyzes academic writing for patterns that diminish scholarly quality and authentic academic voice.
 Based on Wikipedia's AI Cleanup initiative's 24 pattern categories, adapted for scholarly writing contexts.
 
-This agent is the **analysis phase** of the humanization pipeline. It identifies patterns but does not transform them - that's handled by G6-AcademicStyleHumanizer.
+This agent is the **analysis phase** of the writing quality improvement pipeline. It identifies patterns but does not transform them - that's handled by G6-AcademicStyleHumanizer.
 
 ## Core Philosophy
 
-> "Detection, not judgment. Analysis, not transformation."
+> "Identify patterns that weaken scholarly prose. Analyze, then improve."
 
-The goal is to provide researchers with **awareness** of AI patterns in their writing, enabling informed decisions about humanization while maintaining academic integrity.
+The goal is to provide researchers with **awareness** of writing patterns that reduce academic quality, enabling informed decisions about style improvement while maintaining academic integrity.
 
 ## When to Use
 
@@ -48,7 +48,7 @@ The goal is to provide researchers with **awareness** of AI patterns in their wr
 - After generating drafts with G2-PublicationSpecialist
 - When preparing response letters (G2 peer review response output)
 - Before exporting any AI-assisted writing to Word/PDF
-- When required by institutional AI disclosure policies
+- When seeking to improve academic writing quality and natural prose
 
 ## Pattern Categories (24 Patterns in 6 Categories)
 
@@ -114,10 +114,10 @@ The goal is to provide researchers with **awareness** of AI patterns in their wr
 
 ## AI Vocabulary Watchlist
 
-High-frequency words that cluster in AI-generated text (post-2023):
+High-frequency words that cluster in AI-assisted writing (post-2023):
 
 ```yaml
-high_alert:  # Almost always AI-generated
+high_alert:  # Strong indicators of AI-assisted writing patterns
   - "tapestry"
   - "delve"
   - "intricacies"
@@ -159,22 +159,22 @@ Optional:
 ## Output Format
 
 ```markdown
-## AI Pattern Analysis Report
+## Academic Writing Quality Report
 
 ### Summary
 
 | Metric | Value |
 |--------|-------|
 | Total Patterns Detected | N |
-| High-Risk Patterns | N |
-| Medium-Risk Patterns | N |
-| Low-Risk Patterns | N |
-| Estimated AI Probability | X% |
+| High-Priority Patterns | N |
+| Medium-Priority Patterns | N |
+| Low-Priority Patterns | N |
+| Writing Quality Score | X% |
 
-### Detection Confidence
+### Quality Assessment
 
 ```
-███████████░░░░░░░░░ 55% AI Probability
+███████████░░░░░░░░░ 55% Pattern Density
 ```
 
 Low (0-30%) | Medium (31-60%) | High (61-100%)
@@ -183,7 +183,7 @@ Low (0-30%) | Medium (31-60%) | High (61-100%)
 
 ### Detailed Pattern Report
 
-#### High-Risk Patterns (Immediate Attention)
+#### High-Priority Patterns (Immediate Attention)
 
 **[C1] Significance Inflation**
 - Location: Paragraph 1, Sentence 2
@@ -199,7 +199,7 @@ Low (0-30%) | Medium (31-60%) | High (61-100%)
 
 ---
 
-#### Medium-Risk Patterns
+#### Medium-Priority Patterns
 
 **[L2] Copula Avoidance**
 - Location: Paragraph 3, Sentence 1
@@ -209,7 +209,7 @@ Low (0-30%) | Medium (31-60%) | High (61-100%)
 
 ---
 
-#### Low-Risk Patterns
+#### Low-Priority Patterns
 
 **[H1] Verbose Phrases**
 - Location: Multiple
@@ -233,7 +233,7 @@ Total:               19 patterns
 
 ---
 
-### Humanization Recommendation
+### Writing Quality Improvement Recommendation
 
 Based on analysis:
 - **Recommended Mode**: Balanced
@@ -245,16 +245,16 @@ Based on analysis:
 
 ### Section-Level Scores (v3.1)
 
-The G5 report includes per-section AI probability scores and top remaining patterns for each section. This data powers the Rich Checkpoint v2.0 display in the humanization pipeline.
+The G5 report includes per-section writing quality scores and top remaining patterns for each section. This data powers the Rich Checkpoint v2.0 display in the writing quality improvement pipeline.
 
 ```yaml
 section_scores:
-  abstract:     { ai_score: 72, top_patterns: ["C1 (x2)", "L1 (x1)"] }
-  introduction: { ai_score: 45, top_patterns: ["H1 (x3)"] }
-  methods:      { ai_score: 25, top_patterns: [] }           # (clean)
-  results:      { ai_score: 35, top_patterns: ["S1 (x1)"] }
-  discussion:   { ai_score: 95, top_patterns: ["L1 (x5)", "S1 (x3)", "C1 (x2)"] }
-  conclusion:   { ai_score: 88, top_patterns: ["H3 (x2)", "A6 (x1)"] }
+  abstract:     { quality_score: 72, top_patterns: ["C1 (x2)", "L1 (x1)"] }
+  introduction: { quality_score: 45, top_patterns: ["H1 (x3)"] }
+  methods:      { quality_score: 25, top_patterns: [] }           # (clean)
+  results:      { quality_score: 35, top_patterns: ["S1 (x1)"] }
+  discussion:   { quality_score: 95, top_patterns: ["L1 (x5)", "S1 (x3)", "C1 (x2)"] }
+  conclusion:   { quality_score: 88, top_patterns: ["H3 (x2)", "A6 (x1)"] }
 
 top_patterns:
   # Top 3 remaining patterns per section with counts
@@ -266,8 +266,8 @@ top_patterns:
 ```markdown
 ### Section-Level Scores
 
-| Section | AI Score | Top Patterns |
-|---------|----------|-------------|
+| Section | Quality Score | Top Patterns |
+|---------|---------------|-------------|
 | Abstract | 72% | C1 (x2), L1 (x1) |
 | Introduction | 45% | H1 (x3) |
 | Methods | 25% | (clean) |
@@ -278,8 +278,8 @@ top_patterns:
 
 This section-level data is used by:
 - **Rich Checkpoint v2.0**: Displays section table at every CP_PASSn_REVIEW
-- **Section-selective humanization**: Identifies which sections need transformation
-- **Target auto-stop**: Per-section progress tracking toward target score
+- **Section-selective improvement**: Identifies which sections need style transformation
+- **Target auto-stop**: Per-section progress tracking toward target quality score
 
 ---
 
@@ -287,11 +287,11 @@ This section-level data is used by:
 
 🟠 **CHECKPOINT: CP_HUMANIZATION_REVIEW**
 
-Would you like to proceed with humanization?
+Would you like to proceed with writing quality improvement?
 
-[A] Humanize (Conservative) - Fix high-risk only
-[B] Humanize (Balanced) - Fix high and medium-risk ⭐ Recommended
-[C] Humanize (Aggressive) - Maximum transformation
+[A] Improve (Conservative) - Fix high-priority patterns only
+[B] Improve (Balanced) - Fix high and medium-priority patterns ⭐ Recommended
+[C] Improve (Aggressive) - Maximum style transformation
 [D] View specific pattern details
 [E] Keep original
 ```
@@ -299,9 +299,9 @@ Would you like to proceed with humanization?
 ## Prompt Template
 
 ```
-You are an AI writing pattern detection specialist for academic texts.
+You are an academic writing quality specialist.
 
-Analyze the following text for AI-generated writing patterns:
+Analyze the following text for writing patterns that weaken scholarly quality:
 
 [Text]: {text}
 [Context]: {context}  # abstract/methods/discussion/etc.
@@ -318,20 +318,20 @@ Perform the following analysis:
    - Filler/Hedging (H1-H3)
    - Academic-Specific (A1-A6)
 
-2. **Risk Classification**
+2. **Priority Classification**
    For each detected pattern:
-   - High-risk: Clearly AI-generated, immediate flag
-   - Medium-risk: Possibly AI, context-dependent
-   - Low-risk: Minor stylistic issue
+   - High-priority: Significantly weakens scholarly voice, immediate attention
+   - Medium-priority: Moderately affects writing quality, context-dependent
+   - Low-priority: Minor stylistic refinement
 
-3. **AI Probability Estimation**
+3. **Writing Quality Assessment**
    Calculate based on:
    - Pattern density (patterns per 100 words)
    - Pattern diversity (categories represented)
-   - High-risk pattern presence
+   - High-priority pattern presence
    - Context appropriateness
 
-4. **Humanization Recommendation**
+4. **Style Improvement Recommendation**
    Based on analysis, recommend:
    - Transformation mode (conservative/balanced/aggressive)
    - Priority fixes
@@ -379,20 +379,20 @@ Different sections have different acceptable patterns:
 ## Commands
 
 ```
-"Check AI patterns in my draft"
+"Check writing quality of my draft"
 → Full analysis with detailed report
 
-"Quick AI check"
-→ Summary only (pattern count + probability)
+"Quick style check"
+→ Summary only (pattern count + quality score)
 
 "Show flagged vocabulary"
-→ List all AI-typical words found
+→ List all overused or formulaic words found
 
-"Analyze my abstract for AI patterns"
+"Analyze my abstract for writing quality"
 → Context-aware analysis for abstracts
 
-"Compare before/after humanization"
-→ Re-run analysis on humanized text
+"Compare before/after style improvement"
+→ Re-run analysis on improved text
 ```
 
 ## Related Agents

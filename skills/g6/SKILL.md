@@ -1,10 +1,10 @@
 ---
 name: g6
 description: |
-  VS-Enhanced Academic Style Humanizer - Transforms AI patterns while preserving scholarly integrity
+  VS-Enhanced Academic Style Humanizer - Transforms writing patterns to achieve authentic scholarly voice
   Applies transformations from G5 analysis to create natural academic prose
-  Use when: humanizing AI-generated drafts, preparing manuscripts, improving writing naturalness
-  Triggers: humanize, transform, make natural, remove AI patterns, improve style
+  Use when: improving AI-assisted writing quality, preparing manuscripts, enhancing scholarly voice
+  Triggers: humanize, transform, make natural, improve writing quality, improve style
 version: "10.3.0"
 ---
 
@@ -32,7 +32,7 @@ Read `.research/decision-log.yaml` directly to verify prerequisites. Conversatio
 
 ## Overview
 
-Transforms AI-generated academic text into natural, human-sounding prose while preserving:
+Transforms AI-assisted academic writing into natural, scholarly prose while preserving:
 - Academic integrity and scholarly tone
 - Citation accuracy
 - Statistical precision
@@ -43,9 +43,9 @@ This agent takes the analysis from G5-AcademicStyleAuditor and applies appropria
 
 ## Core Philosophy
 
-> "Humanization is not deception—it's translation from statistical average to authentic expression."
+> "Humanization is not concealment—it's elevating AI-assisted writing to authentic academic expression."
 
-The goal is to help researchers express their ideas naturally, not to hide AI assistance. Transparency about AI use remains the user's ethical responsibility.
+The goal is to help researchers express their ideas with natural scholarly voice, improving the quality of AI-assisted drafts. Transparency about AI use remains the user's ethical responsibility.
 
 ## Transformation Modes
 
@@ -397,15 +397,15 @@ phase_0_inputs:
 
 ⚠️ **MODAL TRANSFORMATIONS (T > 0.7) - AVOID THESE**
 
-Most humanization tools apply predictable transformations that AI detectors easily identify. HAVS explicitly warns against these modal approaches:
+Most writing improvement tools apply predictable transformations that fail to achieve authentic scholarly voice. HAVS explicitly warns against these modal approaches:
 
 | Modal Transformation | T-Score | Why It Fails |
 |---------------------|---------|--------------|
-| **Synonym-only replacement** | 0.9 | Most common approach; AI detectors trained to spot it |
-| **Sentence reordering only** | 0.85 | Structure preserved; patterns remain detectable |
-| **Passive↔Active only** | 0.8 | Inconsistent voice creates new patterns |
+| **Synonym-only replacement** | 0.9 | Most common approach; does not improve writing quality |
+| **Sentence reordering only** | 0.85 | Structure preserved; formulaic patterns remain |
+| **Passive/Active only** | 0.8 | Inconsistent voice creates new quality issues |
 | **Thesaurus cycling** | 0.85 | Unnatural word choices; semantic drift |
-| **Paragraph shuffling** | 0.75 | Logical flow disrupted; easy to detect |
+| **Paragraph shuffling** | 0.75 | Logical flow disrupted; weakens coherence |
 
 ```yaml
 modal_warning_system:
@@ -415,9 +415,9 @@ modal_warning_system:
     ⚠️ MODAL TRANSFORMATION DETECTED (T = {t_score})
 
     This approach ({transformation_name}) is used by {percentage}% of
-    humanization tools, making it predictable and detectable.
+    writing improvement tools, producing predictable results that lack authentic voice.
 
-    Consider Direction B or C below for better differentiation.
+    Consider Direction B or C below for better scholarly quality.
 
   auto_block:
     enabled: false  # Warning only, user decides
@@ -444,7 +444,7 @@ After identifying patterns and warning about modal approaches, HAVS presents thr
 │  │   - Documents where structure must be preserved          │   │
 │  │   - Low risk tolerance                                   │   │
 │  │                                                          │   │
-│  │ Expected AI Detection Change: -15-25%                    │   │
+│  │ Expected Writing Quality Improvement: -15-25%                    │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                              │                                  │
 │                              ▼                                  │
@@ -461,7 +461,7 @@ After identifying patterns and warning about modal approaches, HAVS presents thr
 │  │   - Balanced naturalness vs. preservation                │   │
 │  │   - Moderate risk tolerance                              │   │
 │  │                                                          │   │
-│  │ Expected AI Detection Change: -30-45%                    │   │
+│  │ Expected Writing Quality Improvement: -30-45%                    │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                              │                                  │
 │                              ▼                                  │
@@ -478,7 +478,7 @@ After identifying patterns and warning about modal approaches, HAVS presents thr
 │  │   - Documents where extensive rewriting is acceptable    │   │
 │  │   - High risk tolerance                                  │   │
 │  │                                                          │   │
-│  │ Expected AI Detection Change: -50-70%                    │   │
+│  │ Expected Writing Quality Improvement: -50-70%                    │   │
 │  │ ⚠️ Requires careful review for meaning preservation     │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
@@ -637,12 +637,12 @@ G5 Analysis → G6 HAVS Transformation → CP_HUMANIZATION_VERIFICATION → F5 V
 
 ### Transformation Summary
 
-| Metric | Original | Humanized |
-|--------|----------|-----------|
-| AI Probability | 67% | 28% |
+| Metric | Original | Improved |
+|--------|----------|----------|
+| Writing Quality Score | 33% | 72% |
 | Patterns Detected | 18 | 4 |
 | Words Changed | - | 45 |
-| Meaning Preserved | - | ✅ 100% |
+| Meaning Preserved | - | 100% |
 
 ### Mode Applied: Balanced
 
@@ -706,7 +706,7 @@ Review the changes above. Approve to proceed with export.
 ## Prompt Template
 
 ```
-You are an academic writing specialist transforming AI-generated text into natural prose.
+You are an academic writing specialist improving AI-assisted writing into natural scholarly prose.
 
 Apply the following transformations to the text:
 
@@ -741,7 +741,7 @@ Transformation Rules:
    - Transformed text
    - Change log (before/after for each)
    - Verification that meaning is preserved
-   - New AI probability estimate
+   - New writing quality score
 
 Mode-specific behavior:
 - Conservative: Only high-risk patterns (C1, C4, C5, L1-tier1, M1, M2)
@@ -757,7 +757,7 @@ After transformation, verify:
 
 ## Academic Integrity Statement
 
-This agent is designed to help researchers express their ideas naturally, not to facilitate academic dishonesty. Users are responsible for:
+This agent is designed to help researchers elevate AI-assisted writing to authentic academic expression. Users are responsible for:
 
 1. **Disclosure**: Following institutional and journal AI use policies
 2. **Verification**: Ensuring all claims and citations are accurate

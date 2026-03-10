@@ -10,8 +10,21 @@
  */
 
 import { checkAgentPrereqs, formatWarningMessage } from '../mcp/lib/prereq-checker.mjs';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// Load agent alias map for human-readable name resolution
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+let aliasMap = {};
+try {
+  const aliasPath = join(__dirname, '..', 'config', 'agent-aliases.json');
+  const aliasData = JSON.parse(readFileSync(aliasPath, 'utf8'));
+  aliasMap = aliasData.aliases || {};
+} catch {
+  // Alias file missing or malformed — continue without aliases
+}
 
 let input = '';
 process.stdin.setEncoding('utf8');
@@ -44,7 +57,14 @@ function processHook(hookData) {
   const toolInput = hookData.tool_input || {};
 
   // Handle both Task (subagent_type) and Skill (skill) tool calls
-  const source = toolInput.subagent_type || toolInput.skill || '';
+  let source = toolInput.subagent_type || toolInput.skill || '';
+
+  // Resolve alias if source uses a human-readable name (e.g., "diverga:meta-analysis" → "diverga:c5")
+  const aliasKey = source.replace(/^diverga:/i, '');
+  if (aliasMap[aliasKey]) {
+    source = `diverga:${aliasMap[aliasKey]}`;
+  }
+
   const match = source.match(/^diverga:([a-ix]\d+)/i);
 
   if (!match) {

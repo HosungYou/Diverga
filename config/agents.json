@@ -482,7 +482,7 @@
       "fullId": "diverga:g5",
       "directoryName": "G5-academic-style-auditor",
       "displayName": "Academic Style Auditor",
-      "description": "Academic Style Auditor - AI pattern detection (24 categories), probability scoring, risk classification.",
+      "description": "Academic Style Auditor - Academic writing pattern identification (24 categories), quality scoring, priority classification.",
       "category": "G",
       "categoryName": "Publication & Communication",
       "tier": "MEDIUM",
@@ -492,7 +492,7 @@
       "vsLevel": "Light",
       "vsPhases": [0, 1, 4],
       "triggers": {
-        "en": ["AI pattern", "check AI writing", "style audit", "AI probability"]
+        "en": ["writing pattern", "check writing quality", "style audit", "writing quality"]
       },
       "paradigmAffinity": ["quantitative", "qualitative", "mixed"],
       "checkpoints": ["CP_HUMANIZATION_REVIEW"],
@@ -509,7 +509,7 @@
       "fullId": "diverga:g6",
       "directoryName": "G6-academic-style-humanizer",
       "displayName": "Academic Style Humanizer",
-      "description": "Academic Style Humanizer - Transform AI patterns to natural prose with citation preservation.",
+      "description": "Academic Style Humanizer - Improve writing quality to natural scholarly prose with citation preservation.",
       "category": "G",
       "categoryName": "Publication & Communication",
       "tier": "HIGH",
@@ -519,7 +519,7 @@
       "vsLevel": "Enhanced",
       "vsPhases": [0, 1, 2, 4],
       "triggers": {
-        "en": ["humanize", "humanization", "natural writing", "reduce AI patterns"]
+        "en": ["humanize", "humanization", "natural writing", "improve writing quality"]
       },
       "paradigmAffinity": ["quantitative", "qualitative", "mixed"],
       "checkpoints": ["CP_HUMANIZATION_REVIEW", "CP_HUMANIZATION_VERIFY"],
