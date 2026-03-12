@@ -1,6 +1,6 @@
 {
   "$schema": "./agents.schema.json",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "agents": [
     {
       "id": "a1",
@@ -26,8 +26,8 @@
       "prerequisites": [],
       "ownCheckpoints": [
         {"id": "CP_RESEARCH_DIRECTION", "level": "required"},
-        {"id": "CP_VS_001", "level": "required"},
-        {"id": "CP_VS_003", "level": "required"}
+        {"id": "CP_VS_001", "level": "recommended"},
+        {"id": "CP_VS_003", "level": "recommended"}
       ],
       "entryPoint": true,
       "absorbedFrom": []
@@ -55,10 +55,10 @@
       "creativityModules": ["forced-analogy", "iterative-loop", "semantic-distance", "temporal-reframing", "community-simulation"],
       "prerequisites": ["CP_RESEARCH_DIRECTION"],
       "ownCheckpoints": [
-        {"id": "CP_THEORY_SELECTION", "level": "required"},
-        {"id": "CP_VS_001", "level": "required"},
+        {"id": "CP_THEORY_SELECTION", "level": "recommended"},
+        {"id": "CP_VS_001", "level": "recommended"},
         {"id": "CP_VS_002", "level": "recommended"},
-        {"id": "CP_VS_003", "level": "required"}
+        {"id": "CP_VS_003", "level": "recommended"}
       ],
       "entryPoint": false,
       "absorbedFrom": ["a3", "a4", "a6"]
@@ -116,7 +116,7 @@
       "ownCheckpoints": [
         {"id": "CP_SCREENING_CRITERIA", "level": "recommended"},
         {"id": "CP_SEARCH_STRATEGY", "level": "optional"},
-        {"id": "CP_VS_001", "level": "required"}
+        {"id": "CP_VS_001", "level": "recommended"}
       ],
       "entryPoint": false,
       "absorbedFrom": ["b4", "b5"]
@@ -172,8 +172,8 @@
       "prerequisites": ["CP_PARADIGM_SELECTION", "CP_RESEARCH_DIRECTION"],
       "ownCheckpoints": [
         {"id": "CP_METHODOLOGY_APPROVAL", "level": "required"},
-        {"id": "CP_VS_001", "level": "required"},
-        {"id": "CP_VS_003", "level": "required"}
+        {"id": "CP_VS_001", "level": "recommended"},
+        {"id": "CP_VS_003", "level": "recommended"}
       ],
       "entryPoint": false,
       "absorbedFrom": ["c4", "d1"]
@@ -202,7 +202,7 @@
       "prerequisites": ["CP_PARADIGM_SELECTION", "CP_RESEARCH_DIRECTION"],
       "ownCheckpoints": [
         {"id": "CP_METHODOLOGY_APPROVAL", "level": "required"},
-        {"id": "CP_VS_001", "level": "required"}
+        {"id": "CP_VS_001", "level": "recommended"}
       ],
       "entryPoint": false,
       "absorbedFrom": ["h1", "h2"]
@@ -585,7 +585,7 @@
       "prerequisites": [],
       "ownCheckpoints": [
         {"id": "SCH_DATABASE_SELECTION", "level": "required"},
-        {"id": "SCH_API_KEY_VALIDATION", "level": "required"}
+        {"id": "SCH_API_KEY_VALIDATION", "level": "recommended"}
       ],
       "entryPoint": false,
       "absorbedFrom": []
@@ -670,6 +670,131 @@
       "prerequisites": [],
       "ownCheckpoints": [],
       "entryPoint": true,
+      "absorbedFrom": []
+    },
+    {
+      "id": "v1",
+      "fullId": "diverga:v1",
+      "directoryName": "V1-vs-positivist",
+      "displayName": "VS Post-Positivist",
+      "description": "VS Arena Persona - Post-positivist methodology expert. Emphasizes falsifiability, measurement precision, and replicability.",
+      "category": "V",
+      "categoryName": "VS Arena Personas",
+      "tier": "HIGH",
+      "model": "opus",
+      "icon": "\ud83c\udfaf",
+      "tools": ["Read", "Glob", "Grep", "WebSearch"],
+      "vsLevel": "Arena",
+      "vsPhases": [],
+      "triggers": {
+        "en": ["post-positivist", "positivist methodology"]
+      },
+      "paradigmAffinity": ["quantitative"],
+      "checkpoints": [],
+      "creativityModules": [],
+      "prerequisites": ["CP_RESEARCH_DIRECTION", "CP_PARADIGM_SELECTION"],
+      "ownCheckpoints": [],
+      "entryPoint": false,
+      "absorbedFrom": []
+    },
+    {
+      "id": "v2",
+      "fullId": "diverga:v2",
+      "directoryName": "V2-vs-critical-theory",
+      "displayName": "VS Critical Theorist",
+      "description": "VS Arena Persona - Critical theory methodology expert. Centers power dynamics, marginalized voices, and transformative potential.",
+      "category": "V",
+      "categoryName": "VS Arena Personas",
+      "tier": "HIGH",
+      "model": "opus",
+      "icon": "\u270a",
+      "tools": ["Read", "Glob", "Grep", "WebSearch"],
+      "vsLevel": "Arena",
+      "vsPhases": [],
+      "triggers": {
+        "en": ["critical theory methodology", "critical methodology"]
+      },
+      "paradigmAffinity": ["qualitative", "mixed"],
+      "checkpoints": [],
+      "creativityModules": [],
+      "prerequisites": ["CP_RESEARCH_DIRECTION", "CP_PARADIGM_SELECTION"],
+      "ownCheckpoints": [],
+      "entryPoint": false,
+      "absorbedFrom": []
+    },
+    {
+      "id": "v3",
+      "fullId": "diverga:v3",
+      "directoryName": "V3-vs-pragmatist",
+      "displayName": "VS Pragmatist",
+      "description": "VS Arena Persona - Pragmatist methodology expert. Emphasizes practical consequences, real-world applicability, and methodological flexibility.",
+      "category": "V",
+      "categoryName": "VS Arena Personas",
+      "tier": "HIGH",
+      "model": "opus",
+      "icon": "\ud83d\udee0\ufe0f",
+      "tools": ["Read", "Glob", "Grep", "WebSearch"],
+      "vsLevel": "Arena",
+      "vsPhases": [],
+      "triggers": {
+        "en": ["pragmatist methodology", "practical methodology"]
+      },
+      "paradigmAffinity": ["mixed", "quantitative", "qualitative"],
+      "checkpoints": [],
+      "creativityModules": [],
+      "prerequisites": ["CP_RESEARCH_DIRECTION", "CP_PARADIGM_SELECTION"],
+      "ownCheckpoints": [],
+      "entryPoint": false,
+      "absorbedFrom": []
+    },
+    {
+      "id": "v4",
+      "fullId": "diverga:v4",
+      "directoryName": "V4-vs-interpretivist",
+      "displayName": "VS Interpretivist",
+      "description": "VS Arena Persona - Interpretivist methodology expert. Emphasizes meaning-making, lived experience, and contextual depth.",
+      "category": "V",
+      "categoryName": "VS Arena Personas",
+      "tier": "HIGH",
+      "model": "opus",
+      "icon": "\ud83d\udd2e",
+      "tools": ["Read", "Glob", "Grep", "WebSearch"],
+      "vsLevel": "Arena",
+      "vsPhases": [],
+      "triggers": {
+        "en": ["interpretivist methodology", "constructivist methodology"]
+      },
+      "paradigmAffinity": ["qualitative"],
+      "checkpoints": [],
+      "creativityModules": [],
+      "prerequisites": ["CP_RESEARCH_DIRECTION", "CP_PARADIGM_SELECTION"],
+      "ownCheckpoints": [],
+      "entryPoint": false,
+      "absorbedFrom": []
+    },
+    {
+      "id": "v5",
+      "fullId": "diverga:v5",
+      "directoryName": "V5-vs-transformative",
+      "displayName": "VS Transformative",
+      "description": "VS Arena Persona - Transformative methodology expert. Centers participant agency, cultural responsiveness, and social change.",
+      "category": "V",
+      "categoryName": "VS Arena Personas",
+      "tier": "HIGH",
+      "model": "opus",
+      "icon": "\ud83c\udf1f",
+      "tools": ["Read", "Glob", "Grep", "WebSearch"],
+      "vsLevel": "Arena",
+      "vsPhases": [],
+      "triggers": {
+        "en": ["transformative methodology", "social justice methodology"]
+      },
+      "paradigmAffinity": ["qualitative", "mixed"],
+      "checkpoints": [],
+      "creativityModules": [],
+      "prerequisites": ["CP_RESEARCH_DIRECTION", "CP_PARADIGM_SELECTION"],
+      "ownCheckpoints": [],
+      "entryPoint": false,
       "absorbedFrom": []
     }
   ]

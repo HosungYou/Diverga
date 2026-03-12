@@ -47,7 +47,6 @@ logs/
 
 # Coverage reports
 coverage/
-.opencode/plugins/diverga/coverage/
 
 # Build artifacts
 dist/
@@ -55,7 +54,6 @@ dist/
 
 # Package lock files (use npm ci with package-lock.json if needed)
 package-lock.json
-.opencode/plugins/diverga/package-lock.json
 
 # TypeScript build cache
 *.js.map

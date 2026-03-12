@@ -20,7 +20,7 @@
               └─────────────────────────────────────────────────┘
 ```
 
-[![Version](https://img.shields.io/badge/version-11.0.0-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
+[![Version](https://img.shields.io/badge/version-11.1.0-7c3aed?style=for-the-badge&logo=semantic-release&logoColor=white)](https://github.com/HosungYou/Diverga)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-FF6B00?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai/code)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Methodology](https://img.shields.io/badge/Powered_by-VS+HAVS-violet?style=for-the-badge&logo=academia&logoColor=white)](docs/methodology.md)
@@ -487,7 +487,7 @@ MIT License - see [LICENSE](LICENSE) for details.
   author = {You, Hosung},
   title = {Diverga: Beyond Modal AI Research Assistant},
   year = {2026},
-  version = {11.0.0},
+  version = {11.1.0},
   url = {https://github.com/HosungYou/Diverga},
   note = {24 agents with VS methodology, MCP-enforced human checkpoints,
           meta-analysis system, humanization pipeline (HAVS),

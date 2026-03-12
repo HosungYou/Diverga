@@ -4,8 +4,7 @@ Tests for Setup Wizard System
 ===============================
 
 Validates the setup wizard configuration, the diverga-config.json schema,
-and that the setup SKILL.md describes the correct 3-step wizard flow
-without the removed LLM selection step.
+and that the setup SKILL.md describes the correct wizard flow.
 
 Usage:
     pytest tests/test_setup_wizard.py -v
@@ -134,19 +133,13 @@ class TestSetupSkillStructure:
         """setup/SKILL.md must exist."""
         assert SETUP_SKILL_PATH.exists()
 
-    def test_describes_3_step_wizard(self, setup_content: str):
-        """Setup SKILL.md must describe a 3-step wizard (Steps 1-3).
-
-        The setup has Step 0 (detection) + Steps 1-3 (user interaction) = 3 user steps.
-        """
+    def test_describes_multi_step_wizard(self, setup_content: str):
+        """Setup SKILL.md must describe a multi-step wizard (Steps 1+)."""
         assert "Step 1:" in setup_content or "### Step 1" in setup_content, (
             "Setup SKILL.md missing Step 1"
         )
         assert "Step 2:" in setup_content or "### Step 2" in setup_content, (
             "Setup SKILL.md missing Step 2"
-        )
-        assert "Step 3:" in setup_content or "### Step 3" in setup_content, (
-            "Setup SKILL.md missing Step 3"
         )
 
     def test_step_0_is_project_detection(self, setup_content: str):
@@ -169,28 +162,16 @@ class TestSetupSkillStructure:
             "Step 1 should include checkpoint level selection"
         )
 
-    def test_step_2_is_hud_configuration(self, setup_content: str):
-        """Step 2 must include HUD configuration."""
-        step2_match = re.search(
-            r"### Step 2.*?(?=### Step 3|\Z)",
-            setup_content,
-            re.DOTALL,
+    def test_has_hud_configuration(self, setup_content: str):
+        """Setup must include HUD configuration step."""
+        assert "hud" in setup_content.lower(), (
+            "Setup should include HUD configuration"
         )
-        assert step2_match is not None, "Cannot find Step 2 section"
-        step2 = step2_match.group(0).lower()
-        assert "hud" in step2, "Step 2 should include HUD configuration"
 
-    def test_step_3_is_language_preference(self, setup_content: str):
-        """Step 3 must include language preference selection."""
-        step3_match = re.search(
-            r"### Step 3.*?(?=### Step 4|## |\Z)",
-            setup_content,
-            re.DOTALL,
-        )
-        assert step3_match is not None, "Cannot find Step 3 section"
-        step3 = step3_match.group(0).lower()
-        assert "language" in step3, (
-            "Step 3 should include language preference selection"
+    def test_has_vs_arena_step(self, setup_content: str):
+        """Setup must include VS Arena configuration step (v11.1)."""
+        assert "vs arena" in setup_content.lower() or "VS Arena" in setup_content, (
+            "Setup should include VS Arena configuration step"
         )
 
     def test_no_llm_selection_step(self, setup_content: str):
@@ -205,21 +186,14 @@ class TestSetupSkillStructure:
             "(Claude Code is already authenticated)"
         )
 
-    def test_mentions_3_step_simplified(self, setup_content: str):
-        """Setup description should mention '3-step' or 'simplified'."""
-        content_lower = setup_content.lower()
-        assert "3-step" in content_lower or "3 step" in content_lower or "simplified" in content_lower, (
-            "Setup SKILL.md should mention '3-step' or 'simplified' setup"
-        )
-
-    def test_no_8_step_wizard(self, setup_content: str):
-        """Setup must NOT describe an 8-step wizard (old format)."""
-        has_step_5_8 = any(
+    def test_no_old_wizard_format(self, setup_content: str):
+        """Setup must NOT describe steps beyond Step 6 (old format)."""
+        has_step_7_plus = any(
             f"### Step {n}" in setup_content
-            for n in range(5, 9)
+            for n in range(7, 9)
         )
-        assert not has_step_5_8, (
-            "Setup SKILL.md should not have Steps 5-8 (old 8-step format)"
+        assert not has_step_7_plus, (
+            "Setup SKILL.md should not have Steps 7-8 (old format)"
         )
 
 

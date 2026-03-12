@@ -1,5 +1,5 @@
 {
-  "version": "10.3.0",
+  "version": "11.1.0",
   "llm_provider": "anthropic",
   "llm_api_key_env": "ANTHROPIC_API_KEY",
   "human_checkpoints": {
@@ -19,5 +19,10 @@
     "high": "opus",
     "medium": "sonnet",
     "low": "haiku"
+  },
+  "vs_arena": {
+    "enabled": false,
+    "team_size": 3,
+    "cross_critique": false
   }
 }

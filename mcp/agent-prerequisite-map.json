@@ -9,11 +9,11 @@
         },
         {
           "id": "CP_VS_001",
-          "level": "required"
+          "level": "recommended"
         },
         {
           "id": "CP_VS_003",
-          "level": "required"
+          "level": "recommended"
         }
       ],
       "entry_point": true
@@ -25,11 +25,11 @@
       "own_checkpoints": [
         {
           "id": "CP_THEORY_SELECTION",
-          "level": "required"
+          "level": "recommended"
         },
         {
           "id": "CP_VS_001",
-          "level": "required"
+          "level": "recommended"
         },
         {
           "id": "CP_VS_002",
@@ -37,7 +37,7 @@
         },
         {
           "id": "CP_VS_003",
-          "level": "required"
+          "level": "recommended"
         }
       ]
     },
@@ -66,7 +66,7 @@
         },
         {
           "id": "CP_VS_001",
-          "level": "required"
+          "level": "recommended"
         }
       ]
     },
@@ -93,11 +93,11 @@
         },
         {
           "id": "CP_VS_001",
-          "level": "required"
+          "level": "recommended"
         },
         {
           "id": "CP_VS_003",
-          "level": "required"
+          "level": "recommended"
         }
       ]
     },
@@ -113,7 +113,7 @@
         },
         {
           "id": "CP_VS_001",
-          "level": "required"
+          "level": "recommended"
         }
       ]
     },
@@ -272,7 +272,7 @@
         },
         {
           "id": "SCH_API_KEY_VALIDATION",
-          "level": "required"
+          "level": "recommended"
         }
       ]
     },
@@ -302,6 +302,41 @@
       "prerequisites": [],
       "own_checkpoints": [],
       "entry_point": true
+    },
+    "v1": {
+      "prerequisites": [
+        "CP_RESEARCH_DIRECTION",
+        "CP_PARADIGM_SELECTION"
+      ],
+      "own_checkpoints": []
+    },
+    "v2": {
+      "prerequisites": [
+        "CP_RESEARCH_DIRECTION",
+        "CP_PARADIGM_SELECTION"
+      ],
+      "own_checkpoints": []
+    },
+    "v3": {
+      "prerequisites": [
+        "CP_RESEARCH_DIRECTION",
+        "CP_PARADIGM_SELECTION"
+      ],
+      "own_checkpoints": []
+    },
+    "v4": {
+      "prerequisites": [
+        "CP_RESEARCH_DIRECTION",
+        "CP_PARADIGM_SELECTION"
+      ],
+      "own_checkpoints": []
+    },
+    "v5": {
+      "prerequisites": [
+        "CP_RESEARCH_DIRECTION",
+        "CP_PARADIGM_SELECTION"
+      ],
+      "own_checkpoints": []
     }
   },
   "dependency_order": {
@@ -339,15 +374,15 @@
   },
   "checkpoint_levels": {
     "CP_RESEARCH_DIRECTION": "required",
-    "CP_VS_001": "required",
-    "CP_VS_003": "required",
-    "CP_THEORY_SELECTION": "required",
     "CP_PARADIGM_SELECTION": "required",
     "CP_METHODOLOGY_APPROVAL": "required",
     "SCH_DATABASE_SELECTION": "required",
     "SCH_SCREENING_CRITERIA": "required",
-    "SCH_API_KEY_VALIDATION": "required",
+    "CP_VS_001": "recommended",
     "CP_VS_002": "recommended",
+    "CP_VS_003": "recommended",
+    "CP_THEORY_SELECTION": "recommended",
+    "SCH_API_KEY_VALIDATION": "recommended",
     "CP_SCREENING_CRITERIA": "recommended",
     "CP_QUALITY_REVIEW": "recommended",
     "CP_INTEGRATION_STRATEGY": "recommended",

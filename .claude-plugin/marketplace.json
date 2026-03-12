@@ -10,7 +10,7 @@
     {
       "name": "diverga",
       "description": "Complete research agent suite: 44 specialized agents (A1-I3) across 9 categories with VS methodology, human checkpoints, meta-analysis system, and parallel execution.",
-      "version": "10.3.0",
+      "version": "11.1.0",
       "author": {
         "name": "Hosung You",
         "email": "hosung.you@example.com"
@@ -18,7 +18,13 @@
       "source": "./",
       "category": "productivity",
       "homepage": "https://github.com/HosungYou/Diverga",
-      "tags": ["research", "agents", "meta-analysis", "systematic-review", "academic"]
+      "tags": [
+        "research",
+        "agents",
+        "meta-analysis",
+        "systematic-review",
+        "academic"
+      ]
     }
   ]
 }

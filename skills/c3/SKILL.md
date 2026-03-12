@@ -11,8 +11,15 @@ description: |
   - Embedded (QUAN(qual)): Secondary strand addresses different question
   - Multiphase: Long-term projects with iterative phases
   - Morse notation interpretation and recommendation
-version: "10.3.0"
+version: "11.1.0"
 ---
+
+## VS Arena Check (v11.1)
+
+Before proceeding with internal VS, check if VS Arena is enabled:
+1. Read `config/diverga-config.json` → `vs_arena.enabled`
+2. If `true` → delegate to `/diverga:vs-arena` instead of internal VS process
+3. If `false` or config unavailable → proceed with internal VS below
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)
 

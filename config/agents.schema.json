@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "title": "Diverga Agents Configuration",
-  "description": "Single Source of Truth for all 24 Diverga research agents (v11.0.0)",
+  "description": "Single Source of Truth for all 29 Diverga research agents (v11.1.0 — 24 core + 5 VS Arena personas)",
   "type": "object",
   "required": ["$schema", "version", "agents"],
   "properties": {
@@ -16,7 +16,7 @@
     "agents": {
       "type": "array",
       "minItems": 24,
-      "maxItems": 24,
+      "maxItems": 29,
       "items": {
         "$ref": "#/$defs/Agent"
       }
@@ -50,17 +50,17 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^[a-ix]\\d+$",
+          "pattern": "^[a-ixv]\\d+$",
           "description": "Short agent ID (e.g., a1, b2, i0)"
         },
         "fullId": {
           "type": "string",
-          "pattern": "^diverga:[a-ix]\\d+$",
+          "pattern": "^diverga:[a-ixv]\\d+$",
           "description": "Fully qualified agent ID (e.g., diverga:a1)"
         },
         "directoryName": {
           "type": "string",
-          "pattern": "^[A-IX]\\d+-[a-z0-9-]+$",
+          "pattern": "^[A-IXV]\\d+-[a-z0-9-]+$",
           "description": "Directory name for agent files (e.g., A1-research-question-refiner)"
         },
         "displayName": {
@@ -73,7 +73,7 @@
         },
         "category": {
           "type": "string",
-          "enum": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "X"]
+          "enum": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "V", "X"]
         },
         "categoryName": {
           "type": "string",
@@ -87,6 +87,7 @@
             "Publication & Communication",
             "Specialized Approaches",
             "Systematic Review Automation",
+            "VS Arena Personas",
             "Cross-Cutting"
           ]
         },
@@ -110,7 +111,7 @@
         },
         "vsLevel": {
           "type": "string",
-          "enum": ["Full", "Enhanced", "Light"]
+          "enum": ["Full", "Enhanced", "Light", "Arena"]
         },
         "vsPhases": {
           "type": "array",

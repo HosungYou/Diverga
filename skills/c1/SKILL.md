@@ -6,8 +6,15 @@ description: |
   Absorbed C4 (Experimental Materials Developer) and D1 (Sampling Strategy Advisor) capabilities
   Use when: selecting quantitative research design, planning experimental/survey methodology, power analysis, developing materials, sampling
   Triggers: RCT, quasi-experimental, experimental design, survey design, power analysis, sample size, factorial design, materials, stimuli, sampling strategy
-version: "11.0.0"
+version: "11.1.0"
 ---
+
+## VS Arena Check (v11.1)
+
+Before proceeding with internal VS, check if VS Arena is enabled:
+1. Read `config/diverga-config.json` → `vs_arena.enabled`
+2. If `true` → delegate to `/diverga:vs-arena` instead of internal VS process
+3. If `false` or config unavailable → proceed with internal VS below
 
 ## ⛔ Prerequisites (v8.2 — MCP Enforcement)
 
@@ -16,8 +23,8 @@ If not approved → AskUserQuestion for each missing checkpoint (see `.claude/re
 
 ### Checkpoints During Execution
 - 🔴 CP_METHODOLOGY_APPROVAL → `diverga_mark_checkpoint("CP_METHODOLOGY_APPROVAL", decision, rationale)`
-- 🔴 CP_VS_001 → `diverga_mark_checkpoint("CP_VS_001", decision, rationale)`
-- 🔴 CP_VS_003 → `diverga_mark_checkpoint("CP_VS_003", decision, rationale)`
+- 🟠 CP_VS_001 → `diverga_mark_checkpoint("CP_VS_001", decision, rationale)`
+- 🟠 CP_VS_003 → `diverga_mark_checkpoint("CP_VS_003", decision, rationale)`
 
 ### Fallback (MCP unavailable)
 Read `.research/decision-log.yaml` directly to verify prerequisites. Conversation history is last resort.

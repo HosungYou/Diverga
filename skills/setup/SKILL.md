@@ -4,7 +4,7 @@ description: |
   Diverga v11.0 initial configuration wizard. 3-step setup.
   Sets up checkpoints, OpenAlex email, and HUD preferences.
   Triggers: setup, configure, 설정, install
-version: "11.0.0"
+version: "11.1.0"
 ---
 
 # /diverga:setup
@@ -86,7 +86,32 @@ options:
     description: "No HUD display."
 ```
 
-### Step 4: Generate Configuration & Complete
+### Step 4: VS Arena Configuration (v11.1)
+
+```
+question: "Enable VS Arena for methodology selection?"
+header: "VS Arena"
+options:
+  - label: "Classic VS (Default)"
+    description: "Single agent generates 3 methodology options using VS process."
+  - label: "VS Arena"
+    description: "3 persona agents with distinct epistemological commitments debate methodology choices."
+  - label: "VS Arena + Cross-Critique"
+    description: "VS Arena with inter-persona critique round for deeper analysis."
+```
+
+**If VS Arena or VS Arena + Cross-Critique selected**, add to config:
+```json
+{
+  "vs_arena": {
+    "enabled": true,
+    "team_size": 3,
+    "cross_critique": false  // true if "VS Arena + Cross-Critique"
+  }
+}
+```
+
+### Step 5: Generate Configuration & Complete
 
 After collecting all preferences, generate `config/diverga-config.json`:
 
@@ -133,9 +158,10 @@ Display completion:
 ║  • "I want to conduct a systematic review on AI in education"    ║
 ║  • Diverga will auto-detect and guide you with checkpoints       ║
 ║                                                                  ║
-║  New in v11.0:                                                   ║
-║  • Agent Consolidation — 24 agents across 9 categories           ║
-║  • Expanded agents absorb specialized capabilities               ║
+║  New in v11.1:                                                   ║
+║  • VS Arena — multi-agent methodology debate (optional)          ║
+║  • Hard-blocking checkpoint enforcement                          ║
+║  • 29 agents (24 core + 5 VS Arena personas)                     ║
 ║                                                                  ║
 ║  Commands:                                                       ║
 ║  • /diverga:help     - View all 24 agents                       ║

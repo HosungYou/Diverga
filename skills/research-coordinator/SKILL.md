@@ -11,7 +11,7 @@ description: |
   conceptual framework, visualization, systematic review, qualitative, phenomenology, grounded theory,
   thematic analysis, mixed methods, interview, focus group, ethnography, action research,
   paper retrieval, AI screening, RAG builder, humanization, AI pattern detection
-version: "11.0.0"
+version: "11.1.0"
 ---
 
 ## MANDATORY: Checkpoint Enforcement Rules (v8.2 — MCP-First)
@@ -104,7 +104,7 @@ Your AI research assistant for the **complete research lifecycle** - from questi
 
 | Change | Before (v10.3) | After (v11.0) |
 |--------|---------------|----------------|
-| **Agent Count** | 44 agents across 9 categories | **24 agents** across 8 categories |
+| **Agent Count** | 44 agents across 9 categories | **24 agents** across 9 categories |
 | **Category H** | 2 standalone agents (H1, H2) | **Absorbed into C2** |
 | **Meta-Analysis** | C5 + C6 + C7 + B3 + E5 | **C5 consolidated** (absorbed C6, C7, B3, E5-meta) |
 | **Humanization** | G5/G6/F5 Pipeline | **Kept** (G5/G6/F5 unchanged) |
@@ -139,7 +139,7 @@ Your AI research assistant for the **complete research lifecycle** - from questi
 1. [Core Value Proposition](#core-value-proposition)
 2. [Human Checkpoint System](#human-checkpoint-system)
 3. [Paradigm Detection](#paradigm-detection)
-4. [Agent Catalog (44 Agents)](#agent-catalog-44-agents)
+4. [Agent Catalog (24 Agents)](#agent-catalog-24-agents)
 5. [Model Routing](#model-routing)
 6. [VS-Research Methodology](#vs-research-methodology)
 7. [Core Systems](#core-systems)
@@ -199,7 +199,7 @@ Research Coordinator isn't just another AI tool. Its **real value** is:
 | **CP_RESEARCH_DIRECTION** | Research question finalized | "Research direction is set. Shall we proceed?" + VS alternatives |
 | **CP_PARADIGM_SELECTION** | Methodology approach | "Please select your research paradigm: Quantitative/Qualitative/Mixed" |
 | **CP_THEORY_SELECTION** | Framework chosen | "Please select your theoretical framework" + VS alternatives |
-| **CP_METHODOLOGY_APPROVAL** | Design complete | "Please approve your research methodology" + detailed design |
+| **CP_METHODOLOGY_APPROVAL** | Design complete | If VS Arena enabled → dispatch `/diverga:vs-arena`; else present methodology + VS alternatives |
 | **CP_META_GATE** | Meta-analysis gate failure | "Meta-analysis gate validation failed. Please select direction" (C5) |
 | **SCH_DATABASE_SELECTION** | Before paper retrieval | "Please select databases" (I1) |
 | **SCH_SCREENING_CRITERIA** | Before AI screening | "Please approve inclusion/exclusion criteria" (I2) |
@@ -624,7 +624,7 @@ The system will:
 ## Version History
 
 - **v11.0.0**: Agent Consolidation - 24 agents across 8 categories, 20 agents absorbed into expanded hosts
-- **v6.7.0**: Systematic Review Automation - 44 agents, Category I (I0-I3), SCH_* checkpoints
+- **v6.7.0**: Systematic Review Automation - Category I (I0-I3), SCH_* checkpoints
 - **v6.5.0**: Systematic Review Automation - Category I agents, Groq LLM support
 - **v6.3.0**: Meta-Analysis Agent System - C5/C6/C7 multi-gate validation
 - **v6.2.0**: Parallel Document Processing - B5 high-throughput PDF processing

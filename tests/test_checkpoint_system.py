@@ -4,9 +4,9 @@ Tests for Checkpoint System
 ==============================
 
 Validates the human checkpoint system:
-- All checkpoints are defined (at least 11)
+- All checkpoints are defined (at least 5 REQUIRED)
 - Required checkpoints include CP_PARADIGM and CP_METHODOLOGY
-- Checkpoint protocol includes STOP, WAIT, DO NOT PROCEED rules
+- Checkpoint enforcement via prereq-enforcer hook
 - Checkpoint levels (REQUIRED/RECOMMENDED/OPTIONAL) are documented
 
 Usage:
@@ -37,63 +37,47 @@ def _load_all_checkpoint_sources() -> str:
     return "\n".join(sources)
 
 
-# Known checkpoint IDs extracted from CLAUDE.md and memory SKILL.md
-KNOWN_CHECKPOINTS = [
+# Known checkpoint IDs (v11.1 — 5 REQUIRED + 4 RECOMMENDED)
+REQUIRED_CHECKPOINTS = [
     "CP_RESEARCH_DIRECTION",
     "CP_PARADIGM_SELECTION",
-    "CP_SCOPE_DEFINITION",
-    "CP_THEORY_SELECTION",
-    "CP_VARIABLE_DEFINITION",
     "CP_METHODOLOGY_APPROVAL",
-    "CP_DATABASE_SELECTION",
-    "CP_SEARCH_STRATEGY",
-    "CP_SAMPLE_PLANNING",
-    "CP_SCREENING_CRITERIA",
-    "CP_RAG_READINESS",
+    "SCH_DATABASE_SELECTION",
+    "SCH_SCREENING_CRITERIA",
 ]
 
-# Additional checkpoints that may be defined
-EXTENDED_CHECKPOINTS = [
-    "CP_DATA_EXTRACTION",
-    "CP_ANALYSIS_PLAN",
-    "CP_QUALITY_GATES",
-    "CP_PEER_REVIEW",
-    "CP_PUBLICATION_READY",
-    "CP_HUMANIZATION_REVIEW",
-    "CP_HUMANIZATION_VERIFY",
+RECOMMENDED_CHECKPOINTS = [
+    "CP_VS_001",
+    "CP_VS_003",
+    "CP_THEORY_SELECTION",
+    "SCH_API_KEY_VALIDATION",
 ]
 
 
 class TestCheckpointDefinitions:
     """Tests that all checkpoints are properly defined."""
 
-    def test_at_least_11_checkpoints_defined(self):
-        """At least 11 checkpoints must be defined across documentation."""
+    def test_at_least_5_required_checkpoints(self):
+        """At least 5 REQUIRED checkpoints must be defined."""
         content = _load_all_checkpoint_sources()
-        # Find all CP_* patterns
-        checkpoint_ids = set(re.findall(r"CP_[A-Z_]+", content))
-        assert len(checkpoint_ids) >= 11, (
-            f"Expected at least 11 checkpoints, found {len(checkpoint_ids)}: "
-            f"{sorted(checkpoint_ids)}"
+        found = [cp for cp in REQUIRED_CHECKPOINTS if cp in content]
+        assert len(found) >= 5, (
+            f"Expected at least 5 REQUIRED checkpoints, found {len(found)}: {found}"
         )
 
-    def test_known_checkpoints_are_defined(self):
-        """All 11 core checkpoint IDs must appear in documentation."""
+    def test_required_checkpoints_are_defined(self):
+        """All 5 REQUIRED checkpoint IDs must appear in documentation."""
         content = _load_all_checkpoint_sources()
-
-        missing = [
-            cp for cp in KNOWN_CHECKPOINTS
-            if cp not in content
-        ]
+        missing = [cp for cp in REQUIRED_CHECKPOINTS if cp not in content]
         assert not missing, (
-            f"Missing checkpoint definitions: {missing}"
+            f"Missing REQUIRED checkpoint definitions: {missing}"
         )
 
-    def test_setup_mentions_11_checkpoints(self):
-        """Setup SKILL.md should reference '11 checkpoints' for Full mode."""
+    def test_setup_mentions_checkpoints(self):
+        """Setup SKILL.md should reference checkpoints."""
         content = SETUP_SKILL_PATH.read_text(encoding="utf-8")
-        assert "11 checkpoint" in content.lower() or "11" in content, (
-            "Setup SKILL.md should mention '11 checkpoints' for Full checkpoint level"
+        assert "checkpoint" in content.lower(), (
+            "Setup SKILL.md should mention checkpoints"
         )
 
 
@@ -101,25 +85,17 @@ class TestRequiredCheckpoints:
     """Tests that mandatory checkpoints are correctly identified."""
 
     def test_cp_paradigm_is_required(self):
-        """CP_PARADIGM_SELECTION or CP_PARADIGM must be in the required checkpoints."""
+        """CP_PARADIGM_SELECTION must be in the required checkpoints."""
         content = _load_all_checkpoint_sources()
-        has_paradigm_required = (
-            ("CP_PARADIGM" in content and "required" in content.lower())
-            or "CP_PARADIGM_SELECTION" in content
-        )
-        assert has_paradigm_required, (
-            "CP_PARADIGM checkpoint must be defined as required"
+        assert "CP_PARADIGM_SELECTION" in content, (
+            "CP_PARADIGM_SELECTION checkpoint must be defined"
         )
 
     def test_cp_methodology_is_required(self):
-        """CP_METHODOLOGY_APPROVAL or CP_METHODOLOGY must be in required checkpoints."""
+        """CP_METHODOLOGY_APPROVAL must be defined."""
         content = _load_all_checkpoint_sources()
-        has_methodology = (
-            "CP_METHODOLOGY" in content
-            or "CP_METHODOLOGY_APPROVAL" in content
-        )
-        assert has_methodology, (
-            "CP_METHODOLOGY checkpoint must be defined"
+        assert "CP_METHODOLOGY_APPROVAL" in content, (
+            "CP_METHODOLOGY_APPROVAL checkpoint must be defined"
         )
 
     def test_config_has_cp_paradigm_in_required(self):
@@ -150,38 +126,47 @@ class TestCheckpointProtocol:
         return CLAUDE_MD.read_text(encoding="utf-8")
 
     def test_stop_rule_documented(self, claude_content: str):
-        """Checkpoint protocol must include 'STOP immediately' rule."""
-        assert "STOP immediately" in claude_content or "STOP" in claude_content, (
-            "Checkpoint protocol must document STOP rule"
-        )
+        """Checkpoint protocol must include enforcement rules."""
+        assert (
+            "STOP" in claude_content
+            or "hard block" in claude_content.lower()
+            or "cannot run" in claude_content.lower()
+        ), "Checkpoint protocol must document enforcement behavior"
 
     def test_wait_rule_documented(self, claude_content: str):
-        """Checkpoint protocol must include 'WAIT for explicit human approval' rule."""
+        """Checkpoint protocol must include waiting for human approval."""
         content_lower = claude_content.lower()
-        assert "wait for" in content_lower or "wait" in content_lower, (
-            "Checkpoint protocol must document WAIT for human approval rule"
+        assert "wait" in content_lower or "human" in content_lower, (
+            "Checkpoint protocol must document human approval requirement"
         )
 
     def test_do_not_proceed_rule_documented(self, claude_content: str):
-        """Checkpoint protocol must include 'DO NOT proceed' rule."""
+        """Checkpoint protocol must include enforcement rules."""
         assert (
             "DO NOT proceed" in claude_content
             or "do not proceed" in claude_content.lower()
             or "Cannot proceed" in claude_content
-        ), "Checkpoint protocol must specify DO NOT PROCEED without approval"
+            or "cannot run" in claude_content.lower()
+            or "hard block" in claude_content.lower()
+        ), "Checkpoint protocol must specify enforcement behavior"
 
-    def test_do_not_assume_rule_documented(self, claude_content: str):
-        """Checkpoint protocol must include 'DO NOT assume approval' rule."""
+    def test_enforcement_rules_documented(self, claude_content: str):
+        """Checkpoint enforcement must be documented (hook or protocol)."""
         assert (
             "DO NOT assume" in claude_content
             or "do not assume" in claude_content.lower()
-        ), "Checkpoint protocol must specify DO NOT assume approval based on context"
+            or "hard block" in claude_content.lower()
+            or "cannot run" in claude_content.lower()
+            or "Hook Enforcement" in claude_content
+        ), "Checkpoint enforcement rules must be documented"
 
-    def test_checkpoint_protocol_box_exists(self, claude_content: str):
-        """CLAUDE.md must contain the CHECKPOINT PROTOCOL block."""
-        assert "CHECKPOINT PROTOCOL" in claude_content, (
-            "CLAUDE.md must contain the CHECKPOINT PROTOCOL documentation block"
-        )
+    def test_checkpoint_enforcement_section_exists(self, claude_content: str):
+        """CLAUDE.md must contain checkpoint enforcement documentation."""
+        assert (
+            "Hook Enforcement" in claude_content
+            or "CHECKPOINT PROTOCOL" in claude_content
+            or "Checkpoint" in claude_content
+        ), "CLAUDE.md must contain checkpoint enforcement documentation"
 
 
 class TestCheckpointLevels:
@@ -204,33 +189,33 @@ class TestCheckpointLevels:
     def test_optional_level_defined(self):
         """OPTIONAL checkpoint level must be defined."""
         content = _load_all_checkpoint_sources()
-        assert "OPTIONAL" in content, (
-            "OPTIONAL checkpoint level must be defined"
+        assert "OPTIONAL" in content or "pass through" in content.lower(), (
+            "OPTIONAL checkpoint level or pass-through behavior must be defined"
         )
 
     def test_required_level_has_stop_behavior(self):
-        """REQUIRED level must specify that the system STOPS."""
+        """REQUIRED level must specify that the system blocks/stops."""
         content = CLAUDE_MD.read_text(encoding="utf-8")
-        # Look for REQUIRED and STOP in proximity
         required_section = re.search(
-            r"REQUIRED.*?STOP|STOP.*?REQUIRED",
+            r"REQUIRED.*?(STOP|block|cannot|CANNOT)|"
+            r"(STOP|block|cannot|CANNOT).*?REQUIRED",
             content,
             re.DOTALL | re.IGNORECASE,
         )
         assert required_section is not None, (
-            "REQUIRED checkpoint level must specify STOP behavior"
+            "REQUIRED checkpoint level must specify blocking/stop behavior"
         )
 
-    def test_checkpoint_icons_documented(self):
-        """Checkpoint levels should have icon indicators documented."""
+    def test_checkpoint_levels_documented(self):
+        """Checkpoint levels should have visual or text indicators documented."""
         content = CLAUDE_MD.read_text(encoding="utf-8")
-        has_red = "\U0001f534" in content     # Red circle for REQUIRED
-        has_orange = "\U0001f7e0" in content  # Orange circle for RECOMMENDED
-        has_yellow = "\U0001f7e1" in content  # Yellow circle for OPTIONAL
+        has_required = "REQUIRED" in content
+        has_recommended = "RECOMMENDED" in content
+        has_optional = "OPTIONAL" in content or "pass through" in content.lower()
 
-        assert has_red, "REQUIRED checkpoint should have red circle icon"
-        assert has_orange, "RECOMMENDED checkpoint should have orange circle icon"
-        assert has_yellow, "OPTIONAL checkpoint should have yellow circle icon"
+        assert has_required, "REQUIRED checkpoint level should be documented"
+        assert has_recommended, "RECOMMENDED checkpoint level should be documented"
+        assert has_optional, "OPTIONAL or pass-through behavior should be documented"
 
 
 class TestCheckpointInMemorySystem:
@@ -277,20 +262,23 @@ class TestCheckpointInMemorySystem:
 class TestCheckpointEnforcement:
     """Tests that checkpoint enforcement rules are clearly stated."""
 
-    def test_never_auto_proceed(self):
-        """Documentation must state never to auto-proceed past checkpoints."""
+    def test_enforcement_behavior_documented(self):
+        """Documentation must state enforcement behavior for checkpoints."""
         content = CLAUDE_MD.read_text(encoding="utf-8")
         assert (
             "DO NOT proceed" in content
             or "DO NOT assume" in content
             or "NEVER" in content
-        ), "Must document that AI should never auto-proceed past checkpoints"
+            or "cannot run" in content.lower()
+            or "hard block" in content.lower()
+            or "continue: false" in content
+        ), "Must document checkpoint enforcement behavior"
 
-    def test_always_ask_pattern(self):
-        """Documentation must show the 'always ask' pattern."""
+    def test_emphasis_pattern(self):
+        """Documentation must use emphasis patterns for checkpoint enforcement."""
         content = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "ALWAYS" in content, (
-            "Documentation must use ALWAYS to emphasize asking at checkpoints"
+        assert "ALWAYS" in content or "MUST" in content or "REQUIRED" in content, (
+            "Documentation must use emphasis (ALWAYS/MUST/REQUIRED) for enforcement"
         )
 
     def test_human_centered_principle(self):

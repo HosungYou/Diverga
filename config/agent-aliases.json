@@ -1,6 +1,6 @@
 {
   "$schema": "./agent-aliases.schema.json",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "aliases": {
     "research-question": "a1",
     "rq": "a1",
@@ -107,6 +107,17 @@
     "irb": "x1",
     "bias": "x1",
     "integrity": "x1",
-    "guardian": "x1"
+    "guardian": "x1",
+
+    "positivist": "v1",
+    "post-positivist": "v1",
+    "critical-theory": "v2",
+    "critical-theorist": "v2",
+    "pragmatist": "v3",
+    "pragmatism": "v3",
+    "interpretivist": "v4",
+    "constructivist": "v4",
+    "transformative": "v5",
+    "social-justice": "v5"
   }
 }

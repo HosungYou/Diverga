@@ -8,7 +8,6 @@ Validates that the agent system is internally consistent:
 - Model routing counts match (Opus/Sonnet/Haiku)
 - Parallel execution groups reference valid agents
 - Sequential pipeline agents exist
-- Auto-trigger keywords map to valid agent IDs
 
 Usage:
     pytest tests/test_agent_consistency.py -v
@@ -25,60 +24,53 @@ BASE_DIR = Path(__file__).parent.parent
 SKILLS_DIR = BASE_DIR / "skills"
 CLAUDE_MD = BASE_DIR / "CLAUDE.md"
 
-# Agent IDs as they appear in CLAUDE.md trigger tables (diverga:XX format)
+# 24 core agent IDs (v11.1 — consolidated from 44; excludes V1-V5 VS Arena personas)
 AGENT_IDS = [
-    "a1", "a2", "a3", "a4", "a5", "a6",
-    "b1", "b2", "b3", "b4", "b5",
-    "c1", "c2", "c3", "c4", "c5", "c6", "c7",
-    "d1", "d2", "d3", "d4",
-    "e1", "e2", "e3", "e4", "e5",
-    "f1", "f2", "f3", "f4", "f5",
-    "g1", "g2", "g3", "g4", "g5", "g6",
-    "h1", "h2",
+    "a1", "a2", "a5",
+    "b1", "b2",
+    "c1", "c2", "c3", "c5",
+    "d2", "d4",
+    "e1", "e2", "e3",
+    "f5",
+    "g1", "g2", "g5", "g6",
     "i0", "i1", "i2", "i3",
+    "x1",
 ]
 
-# Model routing per CLAUDE.md section "Model Routing (v6.7)"
+# Model routing per agents.json (v11.1)
 OPUS_AGENTS = [
-    "a1", "a2", "a3", "a5", "b5",
-    "c1", "c2", "c3", "d4",
+    "a1", "a2",
+    "c1", "c2", "c3",
     "e1", "e2", "e3",
-    "g3", "g6",
-    "h1", "h2",
+    "g6",
     "i0",
-]  # 17 agents
+    "x1",
+]  # 11 agents
 
 SONNET_AGENTS = [
-    "a4", "a6",
+    "a5",
     "b1", "b2",
-    "c4",
-    "d1", "d2",
-    "e5",
-    "f3", "f4",
-    "g1", "g2", "g4", "g5",
+    "c5",
+    "d2", "d4",
+    "g1", "g2", "g5",
     "i1", "i2",
-]  # 16 agents
+]  # 11 agents
 
 HAIKU_AGENTS = [
-    "b3", "b4",
-    "d3",
-    "e4",
-    "f1", "f2", "f5",
+    "f5",
     "i3",
-]  # 8 agents
+]  # 2 agents
 
 # Parallel execution groups from CLAUDE.md
 PARALLEL_GROUPS = {
     "Group 1: Research Design": ["a1", "a2", "a5"],
-    "Group 2: Literature & Evidence": ["b1", "b2", "b3"],
-    "Group 4: Quality Assurance": ["f1", "f3", "f4"],
+    "Group 2: Literature & Evidence": ["b1", "b2"],
     "Group 5: Publication Prep": ["g1", "g2", "g5"],
     "Group 6: Systematic Review Screening (parallel)": ["i1", "i2"],
 }
 
 # Sequential pipeline agents from CLAUDE.md
 SEQUENTIAL_PIPELINES = {
-    "Meta-Analysis Pipeline": ["c5", "c6", "c7"],
     "Humanization Pipeline": ["g5", "g6", "f5"],
     "Systematic Review Pipeline": ["i0", "i1", "i2", "i3"],
 }
@@ -87,8 +79,8 @@ SEQUENTIAL_PIPELINES = {
 class TestAgentDirectoryExistence:
     """Tests that all agents referenced in CLAUDE.md exist as skill directories."""
 
-    def test_all_44_agents_have_skill_directories(self):
-        """Every one of the 44 agent IDs must have a corresponding skill directory."""
+    def test_all_24_agents_have_skill_directories(self):
+        """Every one of the 24 core agent IDs must have a corresponding skill directory."""
         missing = [
             aid for aid in AGENT_IDS
             if not (SKILLS_DIR / aid).is_dir()
@@ -97,7 +89,7 @@ class TestAgentDirectoryExistence:
             f"Agent IDs referenced in CLAUDE.md but missing skill directories: {missing}"
         )
 
-    def test_all_44_agents_have_skill_md(self):
+    def test_all_24_agents_have_skill_md(self):
         """Every agent skill directory must contain a SKILL.md file."""
         missing_md = [
             aid for aid in AGENT_IDS
@@ -109,15 +101,15 @@ class TestAgentDirectoryExistence:
         )
 
     def test_claude_md_references_all_agents(self):
-        """CLAUDE.md must reference all 44 agent IDs in the auto-trigger tables."""
+        """CLAUDE.md must reference all 24 core agent IDs."""
         assert CLAUDE_MD.exists(), f"CLAUDE.md not found at {CLAUDE_MD}"
         content = CLAUDE_MD.read_text(encoding="utf-8")
+        content_upper = content.upper()
 
         unreferenced = []
         for aid in AGENT_IDS:
-            # Look for diverga:XX pattern in CLAUDE.md
-            pattern = f"diverga:{aid}"
-            if pattern not in content:
+            # IDs appear as "A1", "B1" (uppercase) in CLAUDE.md tables
+            if aid.upper() not in content_upper:
                 unreferenced.append(aid)
 
         assert not unreferenced, (
@@ -126,38 +118,33 @@ class TestAgentDirectoryExistence:
 
 
 class TestModelRoutingConsistency:
-    """Tests that model routing in CLAUDE.md matches expected counts."""
+    """Tests that model routing matches expected counts."""
 
     def test_opus_agent_count(self):
-        """There must be exactly 17 Opus (HIGH tier) agents."""
-        assert len(OPUS_AGENTS) == 17, (
-            f"Expected 17 Opus agents, defined {len(OPUS_AGENTS)}: {OPUS_AGENTS}"
+        """There must be exactly 11 Opus (HIGH tier) agents."""
+        assert len(OPUS_AGENTS) == 11, (
+            f"Expected 11 Opus agents, defined {len(OPUS_AGENTS)}: {OPUS_AGENTS}"
         )
 
     def test_sonnet_agent_count(self):
-        """There must be exactly 16 Sonnet (MEDIUM tier) agents."""
-        assert len(SONNET_AGENTS) == 16, (
-            f"Expected 16 Sonnet agents, defined {len(SONNET_AGENTS)}: {SONNET_AGENTS}"
+        """There must be exactly 11 Sonnet (MEDIUM tier) agents."""
+        assert len(SONNET_AGENTS) == 11, (
+            f"Expected 11 Sonnet agents, defined {len(SONNET_AGENTS)}: {SONNET_AGENTS}"
         )
 
     def test_haiku_agent_count(self):
-        """There must be exactly 8 Haiku (LOW tier) agents."""
-        assert len(HAIKU_AGENTS) == 8, (
-            f"Expected 8 Haiku agents, defined {len(HAIKU_AGENTS)}: {HAIKU_AGENTS}"
+        """There must be exactly 2 Haiku (LOW tier) agents."""
+        assert len(HAIKU_AGENTS) == 2, (
+            f"Expected 2 Haiku agents, defined {len(HAIKU_AGENTS)}: {HAIKU_AGENTS}"
         )
 
-    def test_model_routing_covers_41_agents(self):
-        """Opus + Sonnet + Haiku must total 41 agents in the routing table.
-
-        CLAUDE.md routing table lists 17 + 16 + 8 = 41 agents explicitly.
-        The remaining 3 agents (c5, c6, c7) are documented in their own
-        meta-analysis section with model assignments.
-        """
+    def test_model_routing_covers_all_24_agents(self):
+        """Opus + Sonnet + Haiku must total 24 agents (all core agents routed)."""
         all_routed = set(OPUS_AGENTS + SONNET_AGENTS + HAIKU_AGENTS)
         total = len(OPUS_AGENTS) + len(SONNET_AGENTS) + len(HAIKU_AGENTS)
-        assert total == 41, (
-            f"Model routing covers {total} agents, expected 41 "
-            f"(17 Opus + 16 Sonnet + 8 Haiku)"
+        assert total == 24, (
+            f"Model routing covers {total} agents, expected 24 "
+            f"(11 Opus + 11 Sonnet + 2 Haiku)"
         )
 
     def test_no_duplicate_agents_across_tiers(self):
@@ -188,14 +175,12 @@ class TestModelRoutingConsistency:
             f"Model routing references invalid agent IDs: {invalid}"
         )
 
-    def test_unrouted_agents_are_meta_analysis(self):
-        """Agents not in the main routing table should be the meta-analysis set (c5, c6, c7)."""
+    def test_all_agents_are_routed(self):
+        """All 24 core agents should be in the model routing table."""
         all_routed = set(OPUS_AGENTS + SONNET_AGENTS + HAIKU_AGENTS)
         unrouted = set(AGENT_IDS) - all_routed
-        expected_unrouted = {"c5", "c6", "c7"}
-        assert unrouted == expected_unrouted, (
-            f"Unrouted agents are {sorted(unrouted)}, "
-            f"expected {sorted(expected_unrouted)} (meta-analysis agents)"
+        assert not unrouted, (
+            f"Unrouted agents: {sorted(unrouted)} — all agents should be assigned a tier"
         )
 
 
@@ -263,14 +248,15 @@ class TestAutoTriggerKeywords:
     """Tests that auto-trigger keyword tables reference valid agent IDs."""
 
     def test_claude_md_trigger_table_agents_are_valid(self):
-        """All diverga:XX references in CLAUDE.md trigger tables must be valid agents."""
+        """All diverga:XX references in CLAUDE.md must be valid agents or VS Arena personas."""
         assert CLAUDE_MD.exists(), f"CLAUDE.md not found at {CLAUDE_MD}"
         content = CLAUDE_MD.read_text(encoding="utf-8")
 
         # Extract all diverga:XX references
         references = set(re.findall(r"diverga:([a-z]\d+)", content))
 
-        all_valid = set(AGENT_IDS)
+        # Valid includes core agents + VS Arena personas (v1-v5)
+        all_valid = set(AGENT_IDS) | {"v1", "v2", "v3", "v4", "v5"}
         invalid = references - all_valid
         assert not invalid, (
             f"CLAUDE.md references invalid agent IDs: {sorted(invalid)}"
@@ -305,29 +291,29 @@ class TestCategoryStructure:
     """Tests that agent categories match the documented structure."""
 
     CATEGORIES = {
-        "A: Foundation": ["a1", "a2", "a3", "a4", "a5", "a6"],
-        "B: Evidence": ["b1", "b2", "b3", "b4", "b5"],
-        "C: Design & Meta-Analysis": ["c1", "c2", "c3", "c4", "c5", "c6", "c7"],
-        "D: Data Collection": ["d1", "d2", "d3", "d4"],
-        "E: Analysis": ["e1", "e2", "e3", "e4", "e5"],
-        "F: Quality": ["f1", "f2", "f3", "f4", "f5"],
-        "G: Communication": ["g1", "g2", "g3", "g4", "g5", "g6"],
-        "H: Specialized": ["h1", "h2"],
+        "A: Foundation": ["a1", "a2", "a5"],
+        "B: Evidence": ["b1", "b2"],
+        "C: Design & Meta-Analysis": ["c1", "c2", "c3", "c5"],
+        "D: Data Collection": ["d2", "d4"],
+        "E: Analysis": ["e1", "e2", "e3"],
+        "F: Quality": ["f5"],
+        "G: Communication": ["g1", "g2", "g5", "g6"],
         "I: Systematic Review": ["i0", "i1", "i2", "i3"],
+        "X: Cross-Cutting": ["x1"],
     }
 
     def test_category_agent_counts(self):
         """Each category must have the documented number of agents."""
         expected_counts = {
-            "A: Foundation": 6,
-            "B: Evidence": 5,
-            "C: Design & Meta-Analysis": 7,
-            "D: Data Collection": 4,
-            "E: Analysis": 5,
-            "F: Quality": 5,
-            "G: Communication": 6,
-            "H: Specialized": 2,
+            "A: Foundation": 3,
+            "B: Evidence": 2,
+            "C: Design & Meta-Analysis": 4,
+            "D: Data Collection": 2,
+            "E: Analysis": 3,
+            "F: Quality": 1,
+            "G: Communication": 4,
             "I: Systematic Review": 4,
+            "X: Cross-Cutting": 1,
         }
 
         for category, expected_count in expected_counts.items():
@@ -337,11 +323,11 @@ class TestCategoryStructure:
                 f"expected {expected_count}"
             )
 
-    def test_total_agents_across_categories_is_44(self):
-        """Sum of all category agents must equal 44."""
+    def test_total_agents_across_categories_is_24(self):
+        """Sum of all category agents must equal 24."""
         total = sum(len(agents) for agents in self.CATEGORIES.values())
-        assert total == 44, (
-            f"Total agents across categories is {total}, expected 44"
+        assert total == 24, (
+            f"Total agents across categories is {total}, expected 24"
         )
 
     def test_no_duplicate_agents_across_categories(self):

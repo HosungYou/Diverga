@@ -4,7 +4,7 @@ description: |
   System diagnostics and health checks for Diverga plugin.
   OpenClaw-style Check-Report-Fix pattern with 5-layer diagnostics.
   Triggers: /diverga:doctor, diverga doctor, system check, diagnose, 진단
-version: "10.3.0"
+version: "11.1.0"
 ---
 
 # Diverga Doctor
@@ -168,7 +168,7 @@ OVERALL: [HEALTHY | X WARNING(S) | X ERROR(S)]
 
 [If healthy:]
   All systems operational. Diverga is ready to use.
-  Run /diverga:help to see all 44 agents and commands.
+  Run /diverga:help to see all 24 agents and commands.
 ══════════════════════════════════════════════
 ```
 

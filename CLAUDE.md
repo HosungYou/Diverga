@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-# Diverga v11.0.0 — Research Methodology AI Assistant
+# Diverga v11.1.0 — Research Methodology AI Assistant
 
 **Beyond Modal: AI Research Assistant That Thinks Creatively**
 
@@ -50,7 +50,7 @@ The system will:
 
 ---
 
-## Agent Overview (24 Agents, 9 Categories)
+## Agent Overview (29 Agents, 10 Categories — 24 core + 5 VS Arena)
 
 | ID | Display Name | Cat | Model | ID | Display Name | Cat | Model |
 |----|-------------|-----|-------|----|-------------|-----|-------|
@@ -90,6 +90,7 @@ The system will:
 | F | Quality & Validation | 1 | Humanization verification |
 | G | Publication & Communication | 4 | Journal, writing, humanization |
 | I | Systematic Review | 4 | Systematic review automation |
+| V | VS Arena Personas | 5 | Epistemological persona agents (off by default) |
 | X | Cross-Cutting | 1 | Research integrity, ethics oversight |
 
 Full details: `docs/AGENT-REFERENCE.md`
@@ -158,6 +159,72 @@ REQUIRED 체크포인트는 사용자 요청으로도 건너뛸 수 없습니다
 -> `approved: false` -> `missing` 배열의 각 체크포인트에 대해 AskUserQuestion 호출
 -> MCP 미가용 시: `research/decision-log.yaml` 직접 읽기
 -> 대화 이력은 최후 수단 (세션 간 유지 안 됨)
+
+---
+
+## Hook Enforcement (v11.1)
+
+The `prereq-enforcer.mjs` hook reads checkpoint state from SQLite (`diverga.db`) and enforces prerequisites:
+
+| Missing Level | Behavior | Result |
+|---------------|----------|--------|
+| **REQUIRED** | **Hard block** | `continue: false` — agent CANNOT run |
+| **RECOMMENDED** | Soft block | `continue: true` + warning in additionalContext |
+| **OPTIONAL** | Pass through | No action |
+
+### REQUIRED Checkpoints (5 total)
+
+| Checkpoint | Gates |
+|------------|-------|
+| `CP_RESEARCH_DIRECTION` | 7 downstream agents |
+| `CP_PARADIGM_SELECTION` | C1, C2, C3, V1-V5 |
+| `CP_METHODOLOGY_APPROVAL` | D2, D4, E1, E2, E3, C5 |
+| `SCH_DATABASE_SELECTION` | I2 |
+| `SCH_SCREENING_CRITERIA` | I3 |
+
+### Entry-Point Agents (always allowed)
+
+A1, A5, G1, X1 — these agents have no prerequisites and can run without a checkpoint database.
+
+### Debug Mode
+
+```bash
+DIVERGA_HOOK_DEBUG=1  # Enables verbose stderr logging
+DIVERGA_RESEARCH_DIR=/path/to/project  # Override research directory detection
+```
+
+---
+
+## VS Arena (v11.1, OFF by default)
+
+Multi-agent methodology debate using epistemological personas.
+
+### Personas (V1-V5)
+
+| ID | Paradigm | Cannot Recommend | T-Score |
+|----|----------|------------------|---------|
+| V1 | Post-positivist | Phenomenology, narrative inquiry, autoethnography | 0.5-0.8 |
+| V2 | Critical theory | Value-neutral experiments, participants as "subjects" | 0.2-0.5 |
+| V3 | Pragmatist | Single-paradigm rigidity, philosophy-over-function | 0.3-0.6 |
+| V4 | Interpretivist | Purely quantitative, RCTs as primary | 0.3-0.7 |
+| V5 | Transformative | Status-quo designs, no participant voice | 0.1-0.4 |
+
+### How It Works
+
+1. Select 3 of 5 personas based on research question
+2. Dispatch in parallel as background agents
+3. Each persona recommends ONE methodology (constraint-differentiated)
+4. Present 3 competing recommendations at CP_METHODOLOGY_APPROVAL
+5. User selects → record decision
+
+### Enable
+
+```json
+// config/diverga-config.json
+{ "vs_arena": { "enabled": true, "team_size": 3, "cross_critique": false } }
+```
+
+Or via `/diverga:setup`.
 
 ---
 
@@ -286,8 +353,8 @@ Confirmation always required via CP_PARADIGM_SELECTION.
 | System | Implementation |
 |--------|---------------|
 | State | SQLite WAL mode (YAML fallback) |
-| Hooks | prereq-enforcer.mjs (unified) |
-| Config | config/agents.json (24 agents) |
+| Hooks | prereq-enforcer.mjs (SQLite-based, hard-block for REQUIRED) |
+| Config | config/agents.json (29 agents: 24 core + 5 VS Arena) |
 | MCP | diverga-server.js (16 tools) + journal-server.js (6 tools) |
 | Memory | 3-layer context with cross-session persistence |
 
