@@ -41,6 +41,7 @@ logs/
 
 # Local development
 .local/
+.dev-mode.json
 
 # oh-my-claudecode runtime state
 .omc/

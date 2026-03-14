@@ -44,7 +44,12 @@
     "doctor": "node scripts/doctor.js",
     "precommit": "npm run version:check && npm run generate:check",
     "test:all": "npm run typecheck && npm run version:check && npm run generate:check",
-    "test:hooks": "NODE_PATH=mcp/node_modules node --test tests/hooks/*.test.mjs"
+    "test:hooks": "NODE_PATH=mcp/node_modules node --test tests/hooks/*.test.mjs",
+    "dev": "node scripts/dev.js",
+    "dev:on": "node scripts/dev.js on",
+    "dev:off": "node scripts/dev.js off",
+    "dev:status": "node scripts/dev.js status",
+    "deploy": "node scripts/deploy.js"
   },
   "repository": {
     "type": "git",
