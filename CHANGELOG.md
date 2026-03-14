@@ -4,6 +4,68 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [11.3.1] - 2026-03-14 (Plugin Infrastructure Fix)
+
+### Overview
+
+**Diverga v11.3.1** — Fixes plugin loading errors caused by hooks duplication, version drift between manifests, and deploy pipeline bugs. Resolves MCP server crashes after deployment and dev mode state corruption.
+
+### Bug Fixes
+
+- **Plugin hooks duplication**: Removed explicit `"hooks"` field from `plugin.json` — Claude Code auto-loads `hooks/hooks.json` from the standard location, so declaring it again caused a duplicate error
+- **Version drift**: `sync-version.js` now syncs `plugin.json` and `.claude-plugin/plugin.json` alongside all other version-bearing files
+- **deploy.js version bump no-op**: `bumpVersion()` now writes `package.json` before running `sync-version.js`, which reads it as source of truth
+- **MCP server crash after deploy**: `refreshCache()` now runs `npm install --production` in the cache's `mcp/` directory to install `@modelcontextprotocol/sdk`
+- **Dev mode state corruption**: `deactivate()` now falls back to `.dev-mode.json` state and on-disk cache discovery when `/plugin update` has overwritten markers
+
+### Improvements
+
+- `dev.js activate()` manages the plugin root symlink (`~/.claude/plugins/diverga`) during development
+- `dev.js deactivate()` restores the previous symlink target
+- Root `plugin.json` added to `DEPLOY_ALLOWLIST`
+- `.research/` added to `.gitignore`
+
+---
+
+## [11.3.0] - 2026-03-14 (Dev Mode, Deploy Pipeline, Agent Teams)
+
+### Overview
+
+**Diverga v11.3.0** — Introduces selective symlink dev mode, one-command deploy pipeline, and Agent Teams integration for VS Arena. Redesigns the setup wizard as a researcher profile interview.
+
+### Added
+
+- **`scripts/dev.js`**: Selective symlink dev mode — links only allowlisted paths (agents, skills, mcp, hooks, config, etc.) into a dev cache, blocking build artifacts and session data from leaking into production
+- **`scripts/deploy.js`**: One-command 6-stage release pipeline — pre-flight checks, build/validate, version sync, git commit/tag/push, GitHub Release, cache refresh
+- **Agent Teams integration**: VS Arena can dispatch parallel persona agents via Agent Teams when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set, with automatic fallback to subagents
+- **Setup wizard redesign**: Researcher profile interview collecting experience level, discipline, stats software, and database access preferences — all agents adapt behavior based on the profile
+
+### Modified
+
+- TypeScript types: added V/X categories and Arena VS level
+- CLAUDE.md, CONTRIBUTING.md, DEVELOPER.md: dev mode and Agent Teams documentation
+- npm scripts: `dev:on`, `dev:off`, `dev:status`, `deploy`
+
+---
+
+## [11.1.2] - 2026-03-14 (Setup Wizard Fix)
+
+### Overview
+
+**Diverga v11.1.2** — Fixes the setup wizard to align with v11.1.1 config schema, adds first-run detection, and documents symlink-based development workflow.
+
+### Bug Fixes
+
+- Setup wizard synced with v11.1.1 config schema
+- First-run detection added to session start
+- `plugin.json` converted from symlink to regular file for Windows compatibility
+
+### Added
+
+- Symlink-based development guide in DEVELOPER.md
+
+---
+
 ## [11.1.1] - 2026-03-13 (latex2omml Integration)
 
 ### Overview
