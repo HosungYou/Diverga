@@ -4,7 +4,7 @@ description: |
   Diverga v11.3 setup wizard. 3-step researcher profile setup.
   Captures discipline, experience, tools, database access, and Agent Teams preference.
   Triggers: setup, configure, 설정, install
-version: "11.1.2"
+version: "11.3.0"
 ---
 
 # /diverga:setup
