@@ -183,7 +183,13 @@ function bumpVersion(bump, dryRun) {
   console.log(`  ${DIM}New:${RESET}     ${GREEN}${newVersion}${RESET}`);
 
   if (!dryRun) {
-    run(`node scripts/sync-version.js --fix --version ${newVersion}`, { silent: true });
+    // Update package.json first (source of truth for sync-version.js)
+    pkg.version = newVersion;
+    writeJSON(join(ROOT, 'package.json'), pkg);
+    console.log(`  ${GREEN}\u2713${RESET} package.json → ${newVersion}`);
+
+    // Propagate to all version-bearing files
+    run('node scripts/sync-version.js --fix', { silent: true });
     console.log(`  ${GREEN}\u2713${RESET} Version synced across all files`);
   }
 
@@ -199,7 +205,12 @@ function gitCommitAndTag(newVersion, dryRun) {
   }
 
   run('git add -A');
-  run(`git commit -m "release: v${newVersion}"`);
+  const status = runSilent('git status --porcelain');
+  if (status.length > 0) {
+    run(`git commit -m "release: v${newVersion}"`);
+  } else {
+    console.log(`  ${YELLOW}⚠${RESET} No changes to commit (version already up to date)`);
+  }
   run(`git tag v${newVersion}`);
   run('git push origin main --tags');
   console.log(`  ${GREEN}\u2713${RESET} Pushed v${newVersion} with tag`);
