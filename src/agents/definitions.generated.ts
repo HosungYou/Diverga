@@ -1,5 +1,5 @@
 // @generated DO NOT EDIT - Generated from config/agents.json by scripts/generate.js
-// Version: 11.0.0
+// Version: 11.1.0
 
 import type {
   ModelType,
@@ -56,6 +56,13 @@ export const AGENT_MAPPINGS: AgentIdMapping[] = [
   // Category X: Cross-Cutting (1 agents)
   { shortId: 'x1', fullId: 'diverga:x1', directoryName: 'X1-research-guardian' },
 
+  // Category V: VS Arena Personas (5 agents)
+  { shortId: 'v1', fullId: 'diverga:v1', directoryName: 'V1-vs-positivist' },
+  { shortId: 'v2', fullId: 'diverga:v2', directoryName: 'V2-vs-critical-theory' },
+  { shortId: 'v3', fullId: 'diverga:v3', directoryName: 'V3-vs-pragmatist' },
+  { shortId: 'v4', fullId: 'diverga:v4', directoryName: 'V4-vs-interpretivist' },
+  { shortId: 'v5', fullId: 'diverga:v5', directoryName: 'V5-vs-transformative' },
+
 ];
 
 // ============================================================
@@ -70,7 +77,7 @@ interface AgentStaticConfig {
   tier: TierLevel;
   tools: string[];
   icon: string;
-  vsLevel: 'Full' | 'Enhanced' | 'Light';
+  vsLevel: 'Full' | 'Enhanced' | 'Light' | 'Arena';
   vsPhases: number[];
   triggers: string[];
   paradigmAffinity: string[];
@@ -535,14 +542,14 @@ export const AGENT_CONFIGS: Record<string, AgentStaticConfig> = {
 
   'g5': {
     displayName: 'Academic Style Auditor',
-    description: 'Academic Style Auditor - AI pattern detection (24 categories), probability scoring, risk classification.',
+    description: 'Academic Style Auditor - Academic writing pattern identification (24 categories), quality scoring, priority classification.',
     model: 'sonnet',
     tier: 'MEDIUM',
     tools: ["Read","Glob","Grep"],
     icon: '🔍',
     vsLevel: 'Light',
     vsPhases: [0,1,4],
-    triggers: ['AI pattern', 'check AI writing', 'style audit', 'AI probability'],
+    triggers: ['writing pattern', 'check writing quality', 'style audit', 'writing quality'],
     paradigmAffinity: ["quantitative","qualitative","mixed"],
     checkpoints: ["CP_HUMANIZATION_REVIEW"],
     creativityModules: [],
@@ -552,14 +559,14 @@ export const AGENT_CONFIGS: Record<string, AgentStaticConfig> = {
 
   'g6': {
     displayName: 'Academic Style Humanizer',
-    description: 'Academic Style Humanizer - Transform AI patterns to natural prose with citation preservation.',
+    description: 'Academic Style Humanizer - Improve writing quality to natural scholarly prose with citation preservation.',
     model: 'opus',
     tier: 'HIGH',
     tools: ["Read","Glob","Grep","Edit","Write"],
     icon: '✨',
     vsLevel: 'Enhanced',
     vsPhases: [0,1,2,4],
-    triggers: ['humanize', 'humanization', 'natural writing', 'reduce AI patterns'],
+    triggers: ['humanize', 'humanization', 'natural writing', 'improve writing quality'],
     paradigmAffinity: ["quantitative","qualitative","mixed"],
     checkpoints: ["CP_HUMANIZATION_REVIEW","CP_HUMANIZATION_VERIFY"],
     creativityModules: ["semantic-distance"],
@@ -666,6 +673,95 @@ export const AGENT_CONFIGS: Record<string, AgentStaticConfig> = {
     creativityModules: ["forced-analogy","semantic-distance"],
     category: 'X',
     categoryName: 'Cross-Cutting',
+  },
+
+  // ============================================================
+  // CATEGORY V: VS ARENA PERSONAS (5 agents)
+  // ============================================================
+
+  'v1': {
+    displayName: 'VS Post-Positivist',
+    description: 'VS Arena Persona - Post-positivist methodology expert. Emphasizes falsifiability, measurement precision, and replicability.',
+    model: 'opus',
+    tier: 'HIGH',
+    tools: ["Read","Glob","Grep","WebSearch"],
+    icon: '🎯',
+    vsLevel: 'Arena',
+    vsPhases: [],
+    triggers: ['post-positivist', 'positivist methodology'],
+    paradigmAffinity: ["quantitative"],
+    checkpoints: [],
+    creativityModules: [],
+    category: 'V',
+    categoryName: 'VS Arena Personas',
+  },
+
+  'v2': {
+    displayName: 'VS Critical Theorist',
+    description: 'VS Arena Persona - Critical theory methodology expert. Centers power dynamics, marginalized voices, and transformative potential.',
+    model: 'opus',
+    tier: 'HIGH',
+    tools: ["Read","Glob","Grep","WebSearch"],
+    icon: '✊',
+    vsLevel: 'Arena',
+    vsPhases: [],
+    triggers: ['critical theory methodology', 'critical methodology'],
+    paradigmAffinity: ["qualitative","mixed"],
+    checkpoints: [],
+    creativityModules: [],
+    category: 'V',
+    categoryName: 'VS Arena Personas',
+  },
+
+  'v3': {
+    displayName: 'VS Pragmatist',
+    description: 'VS Arena Persona - Pragmatist methodology expert. Emphasizes practical consequences, real-world applicability, and methodological flexibility.',
+    model: 'opus',
+    tier: 'HIGH',
+    tools: ["Read","Glob","Grep","WebSearch"],
+    icon: '🛠️',
+    vsLevel: 'Arena',
+    vsPhases: [],
+    triggers: ['pragmatist methodology', 'practical methodology'],
+    paradigmAffinity: ["mixed","quantitative","qualitative"],
+    checkpoints: [],
+    creativityModules: [],
+    category: 'V',
+    categoryName: 'VS Arena Personas',
+  },
+
+  'v4': {
+    displayName: 'VS Interpretivist',
+    description: 'VS Arena Persona - Interpretivist methodology expert. Emphasizes meaning-making, lived experience, and contextual depth.',
+    model: 'opus',
+    tier: 'HIGH',
+    tools: ["Read","Glob","Grep","WebSearch"],
+    icon: '🔮',
+    vsLevel: 'Arena',
+    vsPhases: [],
+    triggers: ['interpretivist methodology', 'constructivist methodology'],
+    paradigmAffinity: ["qualitative"],
+    checkpoints: [],
+    creativityModules: [],
+    category: 'V',
+    categoryName: 'VS Arena Personas',
+  },
+
+  'v5': {
+    displayName: 'VS Transformative',
+    description: 'VS Arena Persona - Transformative methodology expert. Centers participant agency, cultural responsiveness, and social change.',
+    model: 'opus',
+    tier: 'HIGH',
+    tools: ["Read","Glob","Grep","WebSearch"],
+    icon: '🌟',
+    vsLevel: 'Arena',
+    vsPhases: [],
+    triggers: ['transformative methodology', 'social justice methodology'],
+    paradigmAffinity: ["qualitative","mixed"],
+    checkpoints: [],
+    creativityModules: [],
+    category: 'V',
+    categoryName: 'VS Arena Personas',
   },
 
 };

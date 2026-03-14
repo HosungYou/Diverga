@@ -138,7 +138,7 @@ function generateDefinitionsTS() {
   lines.push(`  tier: TierLevel;`);
   lines.push(`  tools: string[];`);
   lines.push(`  icon: string;`);
-  lines.push(`  vsLevel: 'Full' | 'Enhanced' | 'Light';`);
+  lines.push(`  vsLevel: 'Full' | 'Enhanced' | 'Light' | 'Arena';`);
   lines.push(`  vsPhases: number[];`);
   lines.push(`  triggers: string[];`);
   lines.push(`  paradigmAffinity: string[];`);

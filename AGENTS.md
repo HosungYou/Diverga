@@ -100,16 +100,21 @@ When AI reaches a checkpoint:
 | E1 | Quantitative Analysis & Code Gen | E: Analysis | HIGH | opus | Full | statistical analysis, ANOVA, regression |
 | E2 | Qualitative Coding | E: Analysis | HIGH | opus | Full | qualitative coding, thematic analysis, grounded theory coding |
 | E3 | Mixed Methods Integration | E: Analysis | HIGH | opus | Full | integration, joint display, mixed methods analysis |
-| F5 | Humanization Verifier | F: Quality & Validation | LOW | haiku | Light | verify humanization, check transformation, validate changes |
+| F5 | Humanization Verifier | F: Quality & Validation | MEDIUM | sonnet | Full | verify humanization, check transformation, validate changes |
 | G1 | Journal Matcher | G: Publication & Communication | MEDIUM | sonnet | Light | journal, where to publish, target journal |
 | G2 | Publication Specialist | G: Publication & Communication | MEDIUM | sonnet | Enhanced | abstract, plain language, academic writing |
-| G5 | Academic Style Auditor | G: Publication & Communication | MEDIUM | sonnet | Light | AI pattern, check AI writing, style audit |
+| G5 | Academic Style Auditor | G: Publication & Communication | MEDIUM | sonnet | Light | writing pattern, check writing quality, style audit |
 | G6 | Academic Style Humanizer | G: Publication & Communication | HIGH | opus | Enhanced | humanize, humanization, natural writing |
-| I0 | SR Pipeline Orchestrator | I: Systematic Review Automation | HIGH | opus | Enhanced | systematic review, PRISMA |
+| I0 | SR Pipeline Orchestrator | I: Systematic Review Automation | HIGH | opus | Enhanced | systematic review, PRISMA, 체계적 문헌고찰 |
 | I1 | Paper Retrieval | I: Systematic Review Automation | MEDIUM | sonnet | Light | fetch papers, retrieve papers, database search |
 | I2 | Screening Assistant | I: Systematic Review Automation | MEDIUM | sonnet | Light | screen papers, inclusion criteria, AI screening |
 | I3 | RAG Builder | I: Systematic Review Automation | LOW | haiku | Light | build RAG, vector database, PDF download |
-| X1 | Research Guardian | X: Cross-Cutting | MEDIUM | sonnet | Full | research integrity, guardian, oversight |
+| X1 | Research Guardian | X: Cross-Cutting | HIGH | opus | Full | research integrity, guardian, oversight |
+| V1 | VS Post-Positivist | V: VS Arena Personas | HIGH | opus | Arena | post-positivist, positivist methodology |
+| V2 | VS Critical Theorist | V: VS Arena Personas | HIGH | opus | Arena | critical theory methodology, critical methodology |
+| V3 | VS Pragmatist | V: VS Arena Personas | HIGH | opus | Arena | pragmatist methodology, practical methodology |
+| V4 | VS Interpretivist | V: VS Arena Personas | HIGH | opus | Arena | interpretivist methodology, constructivist methodology |
+| V5 | VS Transformative | V: VS Arena Personas | HIGH | opus | Arena | transformative methodology, social justice methodology |
 <!-- GENERATED:END -->
 
 ---

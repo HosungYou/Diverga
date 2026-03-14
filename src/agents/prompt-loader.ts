@@ -280,6 +280,14 @@ This agent applies basic VS awareness:
 - Present alternatives when applicable
 - Execute with user confirmation
 `,
+  'Arena': `
+## VS Arena Persona
+
+This agent is a VS Arena persona with a distinct epistemological commitment.
+It advocates for methodologies aligned with its paradigm and challenges
+competing perspectives. When Agent Teams is enabled, it debates directly
+with other personas via SendMessage.
+`,
 };
 
 /**

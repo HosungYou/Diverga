@@ -379,10 +379,9 @@
     "SCH_DATABASE_SELECTION": "required",
     "SCH_SCREENING_CRITERIA": "required",
     "CP_VS_001": "recommended",
-    "CP_VS_002": "recommended",
     "CP_VS_003": "recommended",
     "CP_THEORY_SELECTION": "recommended",
-    "SCH_API_KEY_VALIDATION": "recommended",
+    "CP_VS_002": "recommended",
     "CP_SCREENING_CRITERIA": "recommended",
     "CP_QUALITY_REVIEW": "recommended",
     "CP_INTEGRATION_STRATEGY": "recommended",
@@ -394,6 +393,7 @@
     "CP_JOURNAL_SELECTION": "recommended",
     "CP_HUMANIZATION_REVIEW": "recommended",
     "SCH_RAG_READINESS": "recommended",
+    "SCH_API_KEY_VALIDATION": "recommended",
     "CP_SEARCH_STRATEGY": "optional",
     "CP_HUMANIZATION_VERIFY": "optional"
   }

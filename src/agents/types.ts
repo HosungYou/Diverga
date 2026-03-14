@@ -6,13 +6,13 @@
  */
 
 export type ModelType = 'opus' | 'sonnet' | 'haiku';
-export type VSLevel = 'Full' | 'Enhanced' | 'Light';
+export type VSLevel = 'Full' | 'Enhanced' | 'Light' | 'Arena';
 export type TierLevel = 'HIGH' | 'MEDIUM' | 'LOW';
 
 /**
  * Category identifiers for the 9 agent categories
  */
-export type CategoryId = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I';
+export type CategoryId = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'V' | 'X';
 
 /**
  * Category metadata
@@ -160,6 +160,8 @@ export const CATEGORIES: Record<CategoryId, CategoryInfo> = {
   G: { id: 'G', name: 'Publication & Communication', description: 'Research dissemination' },
   H: { id: 'H', name: 'Specialized Approaches', description: 'Specialized methodologies' },
   I: { id: 'I', name: 'Systematic Review Automation', description: 'Automated systematic literature review pipeline' },
+  V: { id: 'V', name: 'VS Arena Personas', description: 'Epistemological persona agents for methodology debate' },
+  X: { id: 'X', name: 'Cross-Cutting', description: 'Research integrity and ethics oversight' },
 };
 
 /**
@@ -184,4 +186,6 @@ export const CATEGORY_TOOLS: Record<CategoryId, string[]> = {
   G: ['Read', 'Glob', 'Grep', 'Edit', 'Write', 'WebSearch'],
   H: ['Read', 'Glob', 'Grep', 'Edit', 'Write', 'WebSearch'],
   I: ['Read', 'Glob', 'Grep', 'Bash', 'Task'],
+  V: ['Read', 'Glob', 'Grep', 'WebSearch'],
+  X: ['Read', 'Glob', 'Grep'],
 };
