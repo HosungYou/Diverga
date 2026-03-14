@@ -286,14 +286,45 @@ meta_analysis_system: enabled             # C5/C6/C7 multi-gate validation
 humanization_pipeline: enabled            # G5/G6/F5 AI pattern detection
 ```
 
-### Agent Teams Dispatch (v8.5)
+### Agent Teams Dispatch (v11.2)
 
-For Category I systematic review pipeline, the orchestrator can activate I0 in Team Lead mode:
-- When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set
-- I0 creates a `scholarag-pipeline` team for parallel database fetching
-- 3x I1 instances fetch from Semantic Scholar, OpenAlex, arXiv simultaneously
-- Dependencies auto-managed via TaskCreate blockedBy
-- Falls back to sequential mode when teams unavailable
+When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set AND `config.agent_teams.enabled` is true,
+the orchestrator contextually decides whether to use Agent Teams or subagents.
+
+#### Decision Logic
+
+```
+Task received → Check agent_teams config
+  ├── enabled: false → Always use subagents (existing behavior)
+  └── enabled: true → Evaluate scenario
+      ├── VS Arena (V1-V5 debate) → Teams mode
+      │   TeamCreate("vs-arena-debate")
+      │   3 persona teammates with SendMessage cross-critique
+      ├── Systematic Review (I0 pipeline) → Teams mode
+      │   TeamCreate("scholarag-pipeline")
+      │   I1 fetchers + I2 screener + I3 RAG builder in parallel
+      ├── Humanize Pipeline (G5→G6→F5) → Teams mode
+      │   TeamCreate("humanize-pipeline")
+      │   G6 ↔ F5 direct verification loop
+      ├── Cross-Method (C1+C2+C3) → Teams mode
+      │   TeamCreate("method-comparison")
+      │   Competing design recommendations with mutual challenge
+      └── All other workflows → Subagents (existing behavior)
+```
+
+#### Graceful Fallback
+
+If Agent Teams are unavailable (env var not set or feature disabled):
+- All workflows fall back to existing subagent dispatch
+- No code changes needed — same skill files, different execution path
+- Orchestrator logs: "Agent Teams unavailable, using subagent mode"
+
+#### Token Cost Awareness
+
+Agent Teams use significantly more tokens. The orchestrator should:
+- Prefer subagents for simple sequential tasks
+- Only activate teams when parallel exploration or inter-agent debate adds value
+- Maximum 3-5 teammates per team (per Claude Code best practices)
 
 ---
 
