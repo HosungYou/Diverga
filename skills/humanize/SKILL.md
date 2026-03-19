@@ -732,7 +732,7 @@ This saves latency on every pass without any risk to data integrity.
 | `/diverga:g5` | This skill CALLS g5 as a sub-step | No — g5 is a component |
 | `/diverga:g6` | This skill CALLS g6 as a sub-step | No — g6 is a component |
 | `/diverga:f5` | This skill CALLS f5 as a sub-step | No — f5 is a component |
-| `/diverga:research-orchestrator` | Independent workflow | No — different trigger patterns |
+| `/diverga:orchestrator` | Independent workflow | No — different trigger patterns |
 
 **When to use which:**
 - `/diverga:humanize` → Full multi-pass pipeline (recommended for manuscripts)
