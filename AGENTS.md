@@ -1,12 +1,12 @@
 # AGENTS.md
 
-> AI-readable documentation for Diverga v11.0.0
+> AI-readable documentation for Diverga v12.0.0
 
 ## Project Overview
 
 **Diverga** is a Claude Code Skills-based AI research assistant system that breaks free from mode collapse through **Verbalized Sampling (VS) methodology**. It provides context-persistent support for the complete research lifecycle with a focus on **creative, defensible research choices** while ensuring **human decisions remain with humans**.
 
-**Version**: 11.0.0
+**Version**: 12.0.0
 **Generated**: 2026-03-10
 **Repository**: https://github.com/HosungYou/Diverga
 
