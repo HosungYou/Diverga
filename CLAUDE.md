@@ -50,6 +50,8 @@ The system will: detect paradigm -> confirm -> present VS alternatives -> wait f
 
 Required checkpoints: CP_RESEARCH_DIRECTION, CP_PARADIGM_SELECTION, CP_THEORY_SELECTION, CP_METHODOLOGY_APPROVAL, SCH_DATABASE_SELECTION, SCH_SCREENING_CRITERIA.
 
+**Team Dispatch Bypass**: When orchestrator dispatches Agent Teams with user approval, include `DIVERGA_TEAM_DISPATCH=1` in agent prompts to bypass prerequisite enforcement (Rule 7).
+
 ## Paradigm Detection
 
 **Quantitative**: hypothesis, effect size, p-value, experiment, ANOVA, regression, 가설, 효과크기, 통계

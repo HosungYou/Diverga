@@ -4,6 +4,29 @@ All notable changes to Diverga (formerly Research Coordinator) will be documente
 
 ---
 
+## [12.0.1] - 2026-03-30 (Team Dispatch Bypass)
+
+### Overview
+
+**Diverga v12.0.1** — Fixes Agent Teams being blocked by prerequisite enforcement. When orchestrator dispatches a team with user approval, individual agent prerequisite checks are now bypassed via `DIVERGA_TEAM_DISPATCH=1` flag.
+
+### Bug Fixes
+
+- **Agent Teams blocked by prereq-enforcer**: Non-entry-point agents (A2, B2, E1, etc.) were hard-blocked when dispatched as a team because no `diverga.db` existed or required checkpoints were incomplete. The orchestrator's dispatch approval now serves as the checkpoint.
+
+### Added
+
+- **DIVERGA_TEAM_DISPATCH flag**: prereq-enforcer.mjs (v11.2) checks for `DIVERGA_TEAM_DISPATCH=1` in agent prompt or env var, bypassing all prerequisite checks for orchestrator-approved dispatches
+- **Rule 7 (Team Dispatch Bypass)**: New checkpoint rule in `docs/CHECKPOINT-RULES.md`
+- **Architecture spec**: `docs/specs/2026-03-26-execution-context-architecture.md`
+
+### Modified
+
+- `CLAUDE.md`: Added Team Dispatch Bypass note under checkpoint types
+- `research-orchestrator/SKILL.md`: Added Team Dispatch Bypass section with usage protocol
+
+---
+
 ## [11.3.1] - 2026-03-14 (Plugin Infrastructure Fix)
 
 ### Overview

@@ -1,4 +1,4 @@
-# Checkpoint Rules — v12.0.0
+# Checkpoint Rules — v12.0.1
 
 Human Checkpoint System enforcement rules for Diverga agents.
 
@@ -90,3 +90,20 @@ REQUIRED 체크포인트는 사용자 요청으로도 건너뛸 수 없습니다
 -> `approved: false` -> `missing` 배열의 각 체크포인트에 대해 AskUserQuestion 호출
 -> MCP 미가용 시: `research/decision-log.yaml` 직접 읽기
 -> 대화 이력은 최후 수단 (세션 간 유지 안 됨)
+
+---
+
+## Rule 7: Team Dispatch Bypass (v12.0.1)
+
+Orchestrator가 Agent Teams로 다수 에이전트를 병렬 투입할 때,
+dispatch 결정 자체가 checkpoint 역할을 합니다. 개별 에이전트의
+전제조건 검사는 우회됩니다.
+
+**작동 방식**: Orchestrator가 agent prompt 첫 줄에 `DIVERGA_TEAM_DISPATCH=1`을
+포함하면, prereq-enforcer hook이 prerequisite 검사를 건너뜁니다.
+
+**적용 대상**: Orchestrator가 사용자 승인을 받고 투입하는 모든 팀 dispatch
+(원고 리뷰, 다중 에이전트 평가, VS Arena 토론, 파이프라인 fan-out)
+
+**비적용 대상**: 사용자가 직접 호출하는 단일 에이전트 (예: `/diverga:e1`).
+이 경우 기존 Rule 2-6의 전제조건 enforcement가 그대로 적용됩니다.
