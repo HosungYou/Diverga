@@ -10,7 +10,7 @@
  *   node scripts/dev.js --help   # Show usage
  */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync, lstatSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync, lstatSync, unlinkSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
@@ -181,12 +181,25 @@ function activate() {
   }
 
   // Step 6: Update plugin root symlink to point to source
+  //   Node 20+ rmSync refuses to remove a symlink that resolves to a directory
+  //   unless recursive:true, but recursive:true on a real directory would nuke
+  //   files inside. Branch on lstat to pick the right removal syscall.
+  //   We use lstatSync directly (wrapped in try) so a broken symlink still
+  //   gets detected and cleaned up.
   let previousSymlinkTarget = null;
-  if (existsSync(PLUGIN_SYMLINK)) {
-    try {
-      previousSymlinkTarget = readlinkSync(PLUGIN_SYMLINK);
-    } catch { /* not a symlink */ }
-    rmSync(PLUGIN_SYMLINK, { force: true });
+  let existingLstat = null;
+  try {
+    existingLstat = lstatSync(PLUGIN_SYMLINK);
+  } catch { /* does not exist */ }
+  if (existingLstat) {
+    if (existingLstat.isSymbolicLink()) {
+      try {
+        previousSymlinkTarget = readlinkSync(PLUGIN_SYMLINK);
+      } catch { /* unreadable symlink */ }
+      unlinkSync(PLUGIN_SYMLINK);
+    } else {
+      rmSync(PLUGIN_SYMLINK, { recursive: true, force: true });
+    }
   }
   symlinkSync(ROOT, PLUGIN_SYMLINK);
   console.log(`  ${GREEN}✓${RESET} Plugin symlink → ${ROOT}`);
@@ -236,8 +249,19 @@ function deactivate() {
   }
 
   // Step 3: Restore plugin root symlink
+  //   Same symlink-vs-directory caveat as activate(): use lstat+unlink for links.
   if (state.previousSymlinkTarget) {
-    if (existsSync(PLUGIN_SYMLINK)) rmSync(PLUGIN_SYMLINK, { force: true });
+    let existingLstat = null;
+    try {
+      existingLstat = lstatSync(PLUGIN_SYMLINK);
+    } catch { /* does not exist */ }
+    if (existingLstat) {
+      if (existingLstat.isSymbolicLink()) {
+        unlinkSync(PLUGIN_SYMLINK);
+      } else {
+        rmSync(PLUGIN_SYMLINK, { recursive: true, force: true });
+      }
+    }
     symlinkSync(state.previousSymlinkTarget, PLUGIN_SYMLINK);
     console.log(`  ${GREEN}✓${RESET} Plugin symlink → ${state.previousSymlinkTarget}`);
   }

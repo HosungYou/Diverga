@@ -706,17 +706,29 @@ If session interrupted mid-pipeline:
 
 ## Agent Spawning Rules
 
-**ALWAYS use Task tool with diverga agent types:**
+**ALWAYS use Task tool with diverga agent types.** The humanize pipeline is orchestrator-style: the user's invocation of `/diverga:humanize` subsumes individual G5/G6/F5 prerequisite checks per Rule 7 (`docs/CHECKPOINT-RULES.md`). Every spawned sub-agent MUST prepend `DIVERGA_TEAM_DISPATCH=1` as the first line of the prompt so `prereq-enforcer.mjs` bypasses the prerequisite gate. Do not drop the marker.
 
 ```
 # G5 Audit
-Task(subagent_type="diverga:g5", model="sonnet", prompt="...")
+Task(
+    subagent_type="diverga:g5",
+    model="sonnet",
+    prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual g5 audit task]"
+)
 
 # G6 Transform
-Task(subagent_type="diverga:g6", model="opus", prompt="...")
+Task(
+    subagent_type="diverga:g6",
+    model="opus",
+    prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual g6 transform task]"
+)
 
 # F5 Verify
-Task(subagent_type="diverga:f5", model="haiku", prompt="...")
+Task(
+    subagent_type="diverga:f5",
+    model="haiku",
+    prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual f5 verify task]"
+)
 ```
 
 **NEVER run G6 in parallel with G5 or F5 within a single pass.**

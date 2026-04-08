@@ -111,12 +111,16 @@ I0 must ask user to select project type at Stage 1:
 
 ## Agent Delegation Pattern
 
+**Rule 7 — Team Dispatch Bypass**: I0 is an orchestrator. When the user invokes `/diverga:i0` and approves the pipeline, that approval subsumes downstream agent prerequisite checks. Every downstream `Task()` dispatch below MUST prepend `DIVERGA_TEAM_DISPATCH=1` as the first line of the prompt so `prereq-enforcer.mjs` recognizes it as orchestrator-approved. See `docs/CHECKPOINT-RULES.md` Rule 7. Do not drop the marker when adding new stages.
+
 ```python
 # Stage 3: Paper Retrieval
 Task(
     subagent_type="diverga:i1",
     model="sonnet",
     prompt="""
+    DIVERGA_TEAM_DISPATCH=1
+
     [Paper Retrieval]
 
     Project: {project_path}
@@ -135,6 +139,8 @@ Task(
     subagent_type="diverga:i2",
     model="sonnet",
     prompt="""
+    DIVERGA_TEAM_DISPATCH=1
+
     [PRISMA Screening]
 
     Project: {project_path}
@@ -154,6 +160,8 @@ Task(
     subagent_type="diverga:i3",
     model="haiku",
     prompt="""
+    DIVERGA_TEAM_DISPATCH=1
+
     [RAG Building]
 
     Project: {project_path}
@@ -189,17 +197,26 @@ Total cost for 500-paper systematic review: **~$0.07** (vs $7.50 with Claude onl
 
 ## Integration with Diverga
 
-I0 can invoke existing Diverga agents for enhanced functionality:
+I0 can invoke existing Diverga agents for enhanced functionality. **Rule 7 marker required** — same rationale as the Agent Delegation Pattern above:
 
 ```python
 # Literature review strategy
-Task(subagent_type="diverga:b1", ...)  # B1-systematic-literature-scout
+Task(
+    subagent_type="diverga:b1",
+    prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual b1 task prompt]"
+)  # B1-systematic-literature-scout
 
 # Quality appraisal
-Task(subagent_type="diverga:b2", ...)  # B2-evidence-quality-appraiser
+Task(
+    subagent_type="diverga:b2",
+    prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual b2 task prompt]"
+)  # B2-evidence-quality-appraiser
 
 # Meta-analysis (if project type allows)
-Task(subagent_type="diverga:c5", ...)  # C5-meta-analysis-master
+Task(
+    subagent_type="diverga:c5",
+    prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual c5 task prompt]"
+)  # C5-meta-analysis-master
 ```
 
 ## Error Handling
@@ -249,14 +266,14 @@ I0 acts as Team Lead for the `scholarag-pipeline` team:
    TaskCreate(subject="I3: Build RAG vector DB", blockedBy=[5])    → task-6
    ```
 
-3. **Spawn Parallel Fetchers**
+3. **Spawn Parallel Fetchers** (Rule 7 marker required — prepend `DIVERGA_TEAM_DISPATCH=1\n\n` to every prompt)
    ```
    Task(team_name="scholarag-pipeline", name="fetcher-ss", subagent_type="diverga:i1",
-        prompt="Fetch papers from Semantic Scholar for query: {query}. Save to data/raw/semantic_scholar/")
+        prompt="DIVERGA_TEAM_DISPATCH=1\n\nFetch papers from Semantic Scholar for query: {query}. Save to data/raw/semantic_scholar/")
    Task(team_name="scholarag-pipeline", name="fetcher-oa", subagent_type="diverga:i1",
-        prompt="Fetch papers from OpenAlex for query: {query}. Save to data/raw/openalex/")
+        prompt="DIVERGA_TEAM_DISPATCH=1\n\nFetch papers from OpenAlex for query: {query}. Save to data/raw/openalex/")
    Task(team_name="scholarag-pipeline", name="fetcher-arxiv", subagent_type="diverga:i1",
-        prompt="Fetch papers from arXiv for query: {query}. Save to data/raw/arxiv/")
+        prompt="DIVERGA_TEAM_DISPATCH=1\n\nFetch papers from arXiv for query: {query}. Save to data/raw/arxiv/")
    ```
 
 4. **Checkpoint Integration**

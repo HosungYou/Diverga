@@ -204,8 +204,18 @@ Maximum teammates: 5 (per Claude Code best practices). If user requests more, su
 
 When teams are disabled or unavailable, all workflows fall back to subagent dispatch.
 
+**Rule 7 — Team Dispatch Bypass**: Both team mode and subagent mode dispatches are orchestrator-approved. Any `Task(subagent_type="diverga:...")` invoked from this skill MUST prepend `DIVERGA_TEAM_DISPATCH=1` as the first line of the prompt so `prereq-enforcer.mjs` recognizes the dispatch and skips individual agent prerequisite checks (`docs/CHECKPOINT-RULES.md` Rule 7). This preserves checkpoint enforcement for ad-hoc single agent calls while allowing orchestrator fan-out to proceed.
+
 Same VS Arena stages, but:
-- **Stage 3**: `Task(subagent_type="diverga:v{N}", model="opus", run_in_background=true)` instead of team creation
+- **Stage 3**: Subagent dispatch example (V1 persona, other personas follow the same pattern):
+  ```python
+  Task(
+      subagent_type="diverga:v1",
+      model="opus",
+      prompt="DIVERGA_TEAM_DISPATCH=1\n\n[actual persona debate task]",
+      run_in_background=True
+  )
+  ```
 - **Stage 5**: SKIP cross-critique -- subagents cannot message each other. Orchestrator synthesizes comparison instead: reads all 3 outputs, identifies overlaps and contradictions, presents unified comparison.
 - **Stage 6**: Lead presents orchestrator-synthesized comparison at checkpoint
 

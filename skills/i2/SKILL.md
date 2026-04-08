@@ -216,13 +216,17 @@ Papers with hallucinated evidence are routed to human review.
 
 ## Integration with B2
 
-I2 can call B2-evidence-quality-appraiser for deeper quality assessment:
+I2 can call B2-evidence-quality-appraiser for deeper quality assessment.
+
+**Rule 7 — Team Dispatch Bypass**: I2 is downstream of I0's approved pipeline, so B2 invoked from here is orchestrator-approved. Prepend `DIVERGA_TEAM_DISPATCH=1` as the first line of the prompt so `prereq-enforcer.mjs` recognizes the dispatch and skips prerequisite checks (see `docs/CHECKPOINT-RULES.md` Rule 7).
 
 ```python
 Task(
     subagent_type="diverga:b2",
     model="sonnet",
     prompt="""
+    DIVERGA_TEAM_DISPATCH=1
+
     Assess quality of included papers using:
     - Risk of Bias (RoB) for RCTs
     - Newcastle-Ottawa for observational

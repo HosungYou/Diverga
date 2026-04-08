@@ -240,13 +240,17 @@ delay_between_requests = 3  # seconds
 
 ## Integration with B1
 
-I1 can call B1-systematic-literature-scout for advanced search strategy:
+I1 can call B1-systematic-literature-scout for advanced search strategy.
+
+**Rule 7 — Team Dispatch Bypass**: I1 is already downstream of I0's approved pipeline, so B1 invoked from here is orchestrator-approved. Prepend `DIVERGA_TEAM_DISPATCH=1` as the first line of the prompt so `prereq-enforcer.mjs` recognizes the dispatch and skips prerequisite checks (see `docs/CHECKPOINT-RULES.md` Rule 7).
 
 ```python
 Task(
     subagent_type="diverga:b1",
     model="sonnet",
     prompt="""
+    DIVERGA_TEAM_DISPATCH=1
+
     Help design search strategy for:
     Research question: {question}
 
