@@ -95,6 +95,44 @@ LongTable은 아래 두 종류를 허용한다.
 
 연구자-facing 답변에서 “객관적 정보”를 제공한다고 말할 때는, 가능한 한 실제 링크나 파일 경로를 함께 보여준다.
 
+## Citation Verification
+
+reference가 존재한다는 것과 그 reference가 사용자의 claim을 실제로 뒷받침한다는 것은 다르다.
+
+따라서 LongTable은 citation을 붙이는 것에서 멈추지 않고, 가능한 경우 claim-citation pair를 검증해야 한다.
+
+Citation support status:
+
+- `direct_support`: source가 claim을 직접 뒷받침한다.
+- `indirect_support`: source는 관련 있지만 claim을 직접 말하지 않는다.
+- `background`: 배경지식으로는 유용하지만 claim support는 아니다.
+- `questionable_fit`: 인용 위치나 claim 범위가 과장되었을 수 있다.
+- `not_verified`: metadata는 확인했지만 본문/초록 기반 support 검증은 아직 하지 않았다.
+
+검증 깊이도 함께 표시해야 한다.
+
+- metadata only
+- abstract only
+- legal full text available
+- legal full text unavailable
+- secondary summary only
+
+초록만 확인했으면 full-paper verification처럼 말하면 안 된다.
+
+## Research Search Boundary
+
+LongTable search는 일반 웹검색이 아니라 scholarly evidence workflow로 설계해야 한다.
+
+기본 우선순위:
+
+1. 연구 의도 확인
+2. 학술 metadata source 우선 검색
+3. evidence card 생성
+4. citation support 검증
+5. panel 또는 checkpoint와 연결
+
+일반 웹검색은 scholarly source가 부적절하거나 사용자가 명시적으로 요청한 경우의 fallback이다.
+
 ## Anti-Patterns
 
 아래는 금지한다.
@@ -104,6 +142,9 @@ LongTable은 아래 두 종류를 허용한다.
 - 검색 없이 “최신 동향” 단정
 - source 없는 수치 제시
 - inference를 fact처럼 쓰기
+- metadata만 보고 citation support를 직접 확인한 것처럼 말하기
+- 링크 수를 evidence quality로 착각하기
+- 일반 웹페이지와 peer-reviewed source를 같은 증거 등급으로 섞기
 
 ## LongTable Standard
 
