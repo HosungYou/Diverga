@@ -63,6 +63,8 @@ function baseSkillSpecs(): ClaudeSkillSpec[] {
         "- `lt explore: ...`",
         "- `lt review: ...`",
         "- `lt panel: ...`",
+        "- `longtable: deploy a research team to review this measurement plan, show the main disagreements, and ask me what decision should be recorded before you revise it.`",
+        "- `longtable: use editor, reviewer, methods, measurement, and voice perspectives to evaluate this manuscript section. Do not collapse disagreement too early.`",
         "",
         "## Rules",
         "",

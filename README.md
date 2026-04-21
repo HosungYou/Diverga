@@ -202,6 +202,28 @@ Check whether this measurement construct is defensible.
 What evidence would a reviewer expect here?
 ```
 
+For larger tasks, the most useful pattern is to ask LongTable to coordinate
+perspectives for you. In Codex, this may be an explicit `$longtable` skill
+shortcut when your runtime exposes skills. In Claude Code, use the same wording
+through `longtable`, `lt panel`, or the generated skill triggers.
+
+```text
+$longtable: deploy a research team to review this measurement plan, show the
+main disagreements, and ask me what decision should be recorded before you
+revise it.
+
+$longtable: use editor, reviewer, methods, measurement, and voice perspectives
+to evaluate this manuscript section. Do not collapse disagreement too early.
+
+$longtable: 토론을 통해 이론적 프레임워크와 측정 전략의 약점을 찾고,
+내가 결정해야 할 공백지를 먼저 질문해 줘.
+```
+
+This is the everyday LongTable path: ask for the work you need, and name the
+kind of tension you want surfaced. LongTable should route the request, coordinate
+the relevant perspectives, preserve disagreement, and create a Researcher
+Checkpoint when the next step depends on your judgment.
+
 Explicit LongTable directives are available when you want a clearer route into
 the router:
 
@@ -221,16 +243,6 @@ skill entries may appear as `$longtable` or role-specific entries such as
 skills use trigger phrases such as `longtable`, `lt review`, `lt panel`,
 `editor`, or `measurement auditor`. Do not treat any slash-command form as the
 LongTable contract unless your provider explicitly exposes it.
-
-Shell commands are also available for scripts, debugging, and reproducible
-workflows:
-
-```bash
-longtable ask --prompt "I need to narrow this project into a defensible study."
-longtable review --prompt "Review this claim."
-longtable panel --prompt "Review this methods section."
-longtable sentinel --prompt "Should I define a new measurement construct?"
-```
 
 ## Researcher Checkpoints
 
