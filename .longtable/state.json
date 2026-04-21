@@ -128,5 +128,21 @@
       "visibility": "explicit",
       "importance": "high"
     }
+  ],
+  "operationalMemory": [
+    {
+      "id": "operational_memory_npm_publish_webauthn",
+      "timestamp": "2026-04-21T21:39:22Z",
+      "scope": "npm-publish",
+      "summary": "For npm publishing as newhosung, use npm WebAuthn/security-key CLI browser authentication rather than authenticator-app OTP by default.",
+      "details": [
+        "npm account newhosung has 2FA mode auth-and-writes and uses an npm security key/passkey named Hosung You.",
+        "If npm publish returns EOTP and prints an npm.com/auth/cli URL, rerun publish in a TTY, press ENTER to open the browser, and have the user complete the npm WebAuthn/security-key prompt.",
+        "Do not ask for an authenticator-app OTP unless the user explicitly configures TOTP; do not ask for passwords, recovery codes, or npm tokens in chat.",
+        "For LongTable monorepo publishes, publish workspaces in dependency order: @longtable/core, @longtable/memory, @longtable/checkpoints, @longtable/setup, @longtable/provider-codex, @longtable/provider-claude, @longtable/cli, @longtable/mcp.",
+        "After publish, verify npm view @longtable/cli version/dist-tags, install @longtable/cli globally at the published version, and smoke-test sentinel/team commands."
+      ],
+      "source": "User requested saving the npm authentication method after LongTable 0.1.16 publish on 2026-04-21."
+    }
   ]
 }
