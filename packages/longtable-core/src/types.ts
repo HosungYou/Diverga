@@ -327,6 +327,7 @@ export interface ResearchState {
   inferredHypotheses: InferredHypothesis[];
   openTensions: string[];
   decisionLog: DecisionRecord[];
+  invocationLog: InvocationRecord[];
   artifactRecords: ArtifactRecord[];
   narrativeTraces: NarrativeTrace[];
   studyContract?: StudyContract;

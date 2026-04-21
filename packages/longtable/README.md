@@ -134,6 +134,9 @@ sequential fallback prompt. That keeps the same research semantics available in
 Codex and Claude Code without making either provider's native question or agent
 tool the source of truth.
 
+Inside a LongTable project workspace, panel planning also appends an
+`InvocationRecord` to `.longtable/state.json` and refreshes `CURRENT.md`.
+
 Default panel roles include:
 
 - `reviewer`

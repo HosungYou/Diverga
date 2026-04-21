@@ -2,6 +2,7 @@ import type {
   CheckpointSensitivity,
   InteractionMode,
   InvocationIntent,
+  InvocationRecord,
   PanelMember,
   PanelPlan,
   PanelResult,
@@ -30,6 +31,7 @@ export interface PanelFallback {
   intent: InvocationIntent;
   plan: PanelPlan;
   result: PanelResult;
+  invocationRecord: InvocationRecord;
   prompt: string;
 }
 
@@ -186,6 +188,27 @@ export function createPlannedPanelResult(
   };
 }
 
+export function createPlannedInvocationRecord(options: {
+  intent: InvocationIntent;
+  plan: PanelPlan;
+  result: PanelResult;
+  provider?: ProviderKind;
+}): InvocationRecord {
+  const createdAt = nowIso();
+  return {
+    id: createId("invocation_record"),
+    createdAt,
+    updatedAt: createdAt,
+    intent: options.intent,
+    status: "planned",
+    provider: options.provider,
+    surface: "sequential_fallback",
+    panelPlan: options.plan,
+    panelResult: options.result,
+    degradationReason: "Native provider team execution is optional; sequential fallback is the stable LongTable surface."
+  };
+}
+
 function roleInstruction(member: PanelMember): string {
   const key = parsePersonaKey(member.role);
   const definition = key ? getPersonaDefinition(key) : null;
@@ -240,10 +263,17 @@ export function buildPanelFallback(options: BuildPanelPlanOptions): PanelFallbac
     checkpointSensitivity: plan.checkpointSensitivity,
     rationale: plan.rationale
   });
+  const result = createPlannedPanelResult(plan, options.provider);
   return {
     intent,
     plan,
-    result: createPlannedPanelResult(plan, options.provider),
+    result,
+    invocationRecord: createPlannedInvocationRecord({
+      intent,
+      plan,
+      result,
+      provider: options.provider
+    }),
     prompt: renderSequentialFallbackPrompt(plan)
   };
 }

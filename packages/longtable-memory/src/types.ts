@@ -3,6 +3,7 @@ import type {
   DecisionRecord,
   InferredHypothesis,
   InteractionMode,
+  InvocationRecord,
   NarrativeTrace,
   ResearchState
 } from "@longtable/core";
@@ -13,6 +14,7 @@ export interface MemorySummary {
   inferredHypotheses: InferredHypothesis[];
   openTensions: string[];
   decisionLog: DecisionRecord[];
+  invocationLog: InvocationRecord[];
   artifactRecords: ArtifactRecord[];
   narrativeTraces: NarrativeTrace[];
 }
@@ -22,6 +24,7 @@ export type {
   DecisionRecord,
   InferredHypothesis,
   InteractionMode,
+  InvocationRecord,
   NarrativeTrace,
   ResearchState
 } from "@longtable/core";

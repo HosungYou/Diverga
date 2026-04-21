@@ -105,6 +105,7 @@ Option A 기준에서 `panel`은 native subagent나 Claude skill을 요구하지
 - stable execution surface는 `sequential_fallback`입니다.
 - `--json`은 실행 가능한 계획과 planned `PanelResult`를 보여줍니다.
 - `--print`는 provider runtime에 넘길 fallback prompt를 보여줍니다.
+- LongTable project workspace 안에서 실행되면 `.longtable/state.json`에 `InvocationRecord`를 append하고 `CURRENT.md`를 재생성합니다.
 
 예:
 

@@ -27,6 +27,7 @@ export function createEmptyResearchState(): ResearchState {
     inferredHypotheses: [],
     openTensions: [],
     decisionLog: [],
+    invocationLog: [],
     artifactRecords: [],
     narrativeTraces: []
   };
@@ -65,6 +66,7 @@ export function promoteHypothesisToExplicitState(
     ),
     openTensions: state.openTensions,
     decisionLog: state.decisionLog,
+    invocationLog: state.invocationLog ?? [],
     artifactRecords: state.artifactRecords,
     narrativeTraces: state.narrativeTraces,
     studyContract: state.studyContract
@@ -96,6 +98,16 @@ export function appendDecisionRecord(
           decisionRecordIds: [...state.studyContract.decisionRecordIds, decision.id]
         }
       : state.studyContract
+  };
+}
+
+export function appendInvocationRecord(
+  state: ResearchState,
+  invocation: NonNullable<ResearchState["invocationLog"]>[number]
+): ResearchState {
+  return {
+    ...state,
+    invocationLog: [...(state.invocationLog ?? []), invocation]
   };
 }
 
@@ -136,6 +148,7 @@ export function restoreWorkingState(state: ResearchState): ResearchState {
     inferredHypotheses: [...state.inferredHypotheses],
     openTensions: [...state.openTensions],
     decisionLog: [...state.decisionLog],
+    invocationLog: [...(state.invocationLog ?? [])],
     artifactRecords: [...state.artifactRecords],
     narrativeTraces: [...state.narrativeTraces],
     studyContract: state.studyContract
@@ -160,6 +173,10 @@ export function summarizeForCheckpoint(
       mode === "commit" || mode === "submit"
         ? state.decisionLog.slice(-5)
         : state.decisionLog.slice(-2),
+    invocationLog:
+      mode === "commit" || mode === "submit"
+        ? (state.invocationLog ?? []).slice(-5)
+        : (state.invocationLog ?? []).slice(-2),
     artifactRecords:
       mode === "submit"
         ? state.artifactRecords.slice(-5)
@@ -181,6 +198,7 @@ export function summarizeStateForMode(
     inferredHypotheses: [],
     openTensions: [],
     decisionLog: [],
+    invocationLog: [],
     artifactRecords: [],
     narrativeTraces: []
   };
@@ -202,6 +220,7 @@ export function summarizeStateForMode(
     inferredHypotheses: state.inferredHypotheses.filter((entry) => entry.status !== "rejected"),
     openTensions: state.openTensions,
     decisionLog: state.decisionLog.slice(-3),
+    invocationLog: (state.invocationLog ?? []).slice(-3),
     artifactRecords: state.artifactRecords.slice(-3),
     narrativeTraces: state.narrativeTraces.slice(-3)
   };

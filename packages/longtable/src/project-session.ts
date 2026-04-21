@@ -2,7 +2,11 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
-import { createEmptyResearchState } from "@longtable/memory";
+import {
+  appendInvocationRecord as appendInvocationToResearchState,
+  createEmptyResearchState
+} from "@longtable/memory";
+import type { InvocationRecord, ResearchState } from "@longtable/core";
 import type { SetupPersistedOutput } from "@longtable/setup";
 
 export type ProjectDisagreementPreference =
@@ -152,7 +156,8 @@ function buildResumeHint(session: LongTableSessionRecord): string {
 
 function buildCurrentGuide(
   project: LongTableProjectRecord,
-  session: LongTableSessionRecord
+  session: LongTableSessionRecord,
+  recentInvocations: InvocationRecord[] = []
 ): string {
   const locale = normalizeLocale(session.locale ?? project.locale);
   const openQuestions = session.openQuestions && session.openQuestions.length > 0
@@ -179,6 +184,16 @@ function buildCurrentGuide(
       "",
       "## 열린 질문",
       ...openQuestions.map((question) => `- ${question}`),
+      ...(recentInvocations.length > 0
+        ? [
+            "",
+            "## 최근 LongTable 호출",
+            ...recentInvocations.map((record) => {
+              const roles = record.intent.roles.length > 0 ? record.intent.roles.join(", ") : "auto";
+              return `- ${record.intent.kind}/${record.intent.mode} via ${record.surface}: ${roles}`;
+            })
+          ]
+        : []),
       "",
       "## 다시 시작 문장",
       `- "${resumeHint}"`,
@@ -208,6 +223,16 @@ function buildCurrentGuide(
     "",
     "## Open Questions",
     ...openQuestions.map((question) => `- ${question}`),
+    ...(recentInvocations.length > 0
+      ? [
+          "",
+          "## Recent LongTable Invocations",
+          ...recentInvocations.map((record) => {
+            const roles = record.intent.roles.length > 0 ? record.intent.roles.join(", ") : "auto";
+            return `- ${record.intent.kind}/${record.intent.mode} via ${record.surface}: ${roles}`;
+          })
+        ]
+      : []),
     "",
     "## Restart Prompt",
     `- "${resumeHint}"`,
@@ -219,6 +244,29 @@ function buildCurrentGuide(
     "## Evidence Rule",
     "- External or current claims should carry a source link or be labeled as inference."
   ].join("\n");
+}
+
+async function loadResearchState(stateFilePath: string): Promise<ResearchState> {
+  if (!existsSync(stateFilePath)) {
+    return createEmptyResearchState();
+  }
+
+  const parsed = JSON.parse(await readFile(stateFilePath, "utf8")) as Partial<ResearchState>;
+  return {
+    explicitState: parsed.explicitState ?? {},
+    workingState: parsed.workingState ?? {},
+    inferredHypotheses: parsed.inferredHypotheses ?? [],
+    openTensions: parsed.openTensions ?? [],
+    decisionLog: parsed.decisionLog ?? [],
+    invocationLog: parsed.invocationLog ?? [],
+    artifactRecords: parsed.artifactRecords ?? [],
+    narrativeTraces: parsed.narrativeTraces ?? [],
+    ...(parsed.studyContract ? { studyContract: parsed.studyContract } : {})
+  };
+}
+
+function recentInvocationRecords(state: ResearchState, limit = 3): InvocationRecord[] {
+  return (state.invocationLog ?? []).slice(-limit).reverse();
 }
 
 function buildProjectAgentsMd(
@@ -323,9 +371,21 @@ async function removeLegacyRootFiles(projectPath: string): Promise<void> {
 }
 
 export async function syncCurrentWorkspaceView(context: LongTableProjectContext): Promise<string> {
-  const body = buildCurrentGuide(context.project, context.session);
+  const state = await loadResearchState(context.stateFilePath);
+  const body = buildCurrentGuide(context.project, context.session, recentInvocationRecords(state));
   await writeFile(context.currentFilePath, body, "utf8");
   return context.currentFilePath;
+}
+
+export async function appendInvocationRecordToWorkspace(
+  context: LongTableProjectContext,
+  invocation: InvocationRecord
+): Promise<ResearchState> {
+  const state = await loadResearchState(context.stateFilePath);
+  const updated = appendInvocationToResearchState(state, invocation);
+  await writeFile(context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return updated;
 }
 
 export async function createOrUpdateProjectWorkspace(options: {

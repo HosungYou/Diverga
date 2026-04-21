@@ -189,6 +189,10 @@ team runtime. When provider-native orchestration is unavailable, LongTable uses 
 stable sequential fallback so Codex and Claude Code can share the same research
 semantics.
 
+When panel review runs inside a LongTable project workspace, LongTable appends an
+`InvocationRecord` to `.longtable/state.json` and refreshes `CURRENT.md` with the
+recent invocation summary.
+
 ## Evidence
 
 LongTable should not behave like a generic web scraper. For research questions,
@@ -241,6 +245,7 @@ npm run build
 - [Command Surface](docs/LONGTABLE-COMMAND-SURFACE.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Question Runtime](docs/QUESTION-RUNTIME.md)
+- [Invocation Log](docs/INVOCATION-LOG.md)
 - [Checkpointing](docs/CHECKPOINTING.md)
 - [Memory](docs/MEMORY.md)
 - [Evidence Policy](docs/EVIDENCE-POLICY.md)

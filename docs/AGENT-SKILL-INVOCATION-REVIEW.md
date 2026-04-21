@@ -24,9 +24,9 @@ LongTable already has a provider-neutral foundation:
 - generated Codex skills in `packages/longtable-provider-codex`
 - generated Claude skills in `packages/longtable-provider-claude`
 
-The missing layer is a complete invocation result contract and state log.
+The remaining layer is a complete invocation result contract and state log.
 
-Today, `routePersonas()` can say which LongTable role should shape the answer, and provider adapters can generate skill files from the same role registry. The next gap is recording when a role or panel was invoked, what surface was used, and what decision or checkpoint followed.
+Today, `routePersonas()` can say which LongTable role should shape the answer, and provider adapters can generate skill files from the same role registry. Panel planning now appends `InvocationRecord` entries to `.longtable/state.json` when run inside a LongTable project workspace. The next gap is linking those invocation records to answered checkpoint questions and final decisions.
 
 ## Diverga Findings
 
@@ -95,11 +95,12 @@ Do not adopt:
 
 ## Implementation Sequence
 
-1. Add `InvocationIntent`, `InvocationResult`, and `ProviderCapabilities` to the shared core contract.
-2. Refactor persona routing so it emits invocation intents in addition to disclosure text.
-3. Generate Claude skill bundles from the canonical role registry.
-4. Generate Codex skill bundles from the canonical role registry.
-5. Add `longtable-state` MCP as structured transport for project/session reads, checkpoint evaluation, question records, decision append, and `CURRENT.md` regeneration.
-6. Add doctor checks that verify provider installations without treating either provider as canonical.
+1. Add `InvocationIntent`, `PanelResult`, and `ProviderCapabilities` to the shared core contract. Done.
+2. Generate Claude skill bundles from the canonical role registry. Done.
+3. Generate Codex skill bundles from the canonical role registry. Done.
+4. Append panel `InvocationRecord` entries to `.longtable/state.json`. Done.
+5. Link checkpoint questions and decisions to invocation records.
+6. Add `longtable-state` MCP as structured transport for project/session reads, checkpoint evaluation, question records, decision append, and `CURRENT.md` regeneration.
+7. Add doctor checks that verify provider installations without treating either provider as canonical.
 
 This keeps Claude Code and Codex behavior aligned without forcing them to use identical native mechanisms.

@@ -49,6 +49,7 @@ import { buildPersonaGuidance, parseInvocationDirective } from "./persona-router
 import { PERSONA_DEFINITIONS, listRoleDefinitions } from "./personas.js";
 import { buildPanelFallback, renderPanelSummary } from "./panel.js";
 import {
+  appendInvocationRecordToWorkspace,
   createOrUpdateProjectWorkspace,
   loadProjectContextFromDirectory,
   renderProjectWorkspaceSummary,
@@ -1306,6 +1307,12 @@ async function runPanelCommand(args: Record<string, string | boolean>): Promise<
     provider,
     visibility
   });
+  if (projectAware.projectContextFound) {
+    const context = await loadProjectContextFromDirectory(workingDirectory);
+    if (context) {
+      await appendInvocationRecordToWorkspace(context, fallback.invocationRecord);
+    }
+  }
 
   if (args.json === true) {
     console.log(
@@ -1314,11 +1321,13 @@ async function runPanelCommand(args: Record<string, string | boolean>): Promise<
           intent: fallback.intent,
           plan: fallback.plan,
           result: fallback.result,
+          invocationRecord: fallback.invocationRecord,
           execution: {
             status: "planned",
             stableSurface: "sequential_fallback",
             nativeParallel: "not_required_for_option_a",
-            projectContextFound: projectAware.projectContextFound
+            projectContextFound: projectAware.projectContextFound,
+            invocationLogged: projectAware.projectContextFound
           },
           fallbackPrompt: fallback.prompt
         },
