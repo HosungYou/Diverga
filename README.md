@@ -26,6 +26,40 @@ The goal is not to ask more questions all the time. The goal is to ask the
 right question when an unresolved gap, tacit assumption, or high-stakes
 commitment is about to become project memory.
 
+## Philosophy
+
+LongTable's simplest claim is:
+
+> Help the researcher decide more slowly, more clearly, and more traceably.
+
+That means LongTable should not rush to produce a polished answer when the
+research problem itself is still unstable. It should first help the researcher
+notice what is being assumed, what is missing, what is being committed, and what
+will become hard to undo later.
+
+Five short principles guide the system:
+
+- **State before agents.** The center of LongTable is the research state: goals,
+  blockers, open questions, decisions, evidence, and unresolved tensions. Agents
+  are useful only when they improve that state.
+- **Tension before synthesis.** Good research often needs disagreement before
+  closure. LongTable should surface plausible objections before smoothing them
+  into a single answer.
+- **Questions before commitments.** When theory, method, measurement, evidence,
+  or authorship choices are about to become settled, LongTable should ask a
+  clear question instead of silently proceeding.
+- **Trace before trust.** A decision is more useful when the researcher can see
+  why it was made, what alternatives were considered, and what uncertainty
+  remains.
+- **Adapters are not the product.** Codex skills, Claude Code skills, MCP, and
+  tmux are surfaces. The durable product contract is the `.longtable/`
+  workspace and the researcher's recorded judgment.
+
+In one sentence:
+
+> LongTable is a thin but strict harness for protecting research judgment, not a
+> larger machine for replacing it.
+
 ## What LongTable Gives You
 
 - A durable `.longtable/` workspace for each research project
@@ -519,10 +553,12 @@ longtable mcp install --provider all
 
 ## Design Principles
 
-- Researcher judgment stays primary.
+- Researcher judgment stays primary; AI suggestions are support, not ownership.
 - AI output should not silently become project truth.
-- Gaps and tacit assumptions should be named when they matter.
+- Gaps and tacit assumptions should be named when they matter, but not inflated
+  into fake certainty.
 - Disagreement should remain visible until the researcher resolves it.
+- Checkpoints should interrupt commitments, not every conversation.
 - Provider-specific tools are adapters; `.longtable/` state is the contract.
 - Setup should ask for permissions, not a full biography.
 - Project start should ask what research object and decision risk are active.
