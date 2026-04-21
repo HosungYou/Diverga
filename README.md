@@ -215,8 +215,9 @@ revise it.
 $longtable: use editor, reviewer, methods, measurement, and voice perspectives
 to evaluate this manuscript section. Do not collapse disagreement too early.
 
-$longtable: 토론을 통해 이론적 프레임워크와 측정 전략의 약점을 찾고,
-내가 결정해야 할 공백지를 먼저 질문해 줘.
+$longtable: debate the theory framework and measurement strategy, identify
+unstated assumptions, and ask me what decision should be recorded before moving
+forward.
 ```
 
 This is the everyday LongTable path: ask for the work you need, and name the
