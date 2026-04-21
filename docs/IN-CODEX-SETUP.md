@@ -2,42 +2,46 @@
 
 ## Goal
 
-LongTable should let a researcher begin setup without leaving Codex, but this must not become the primary promised onboarding path until it is proven to work on the user's real Codex build.
+LongTable should let a researcher begin setup without leaving Codex, but this
+must match the actual Codex runtime surface.
 
 ## Constraint
 
-Codex custom prompts are the easiest in-session entry point, but they are not a full plugin runtime by themselves.
-So in-session setup must be treated as a guided overlay, not as a hidden replacement for the setup package.
+Current Codex builds may reject `/prompts`. Installed prompt files under
+`~/.codex/prompts/` are therefore not a reliable product surface.
+
+Codex skills under `~/.codex/skills/` are the preferred native adapter surface.
 
 ## Current Approach
 
-When the user's Codex build exposes installed prompt files, `/prompts:longtable-init` can handle the conversational side:
+Install Codex skills:
 
-- one question at a time
-- numbered choices
-- explicit `None of the above` fallback
-- no premature closure
+```bash
+longtable codex install-skills
+```
 
-Persistence still belongs to the setup/runtime layer.
+Then invoke naturally inside Codex:
 
-The first implementation therefore ends with one of two outcomes:
+```text
+longtable: help me set up my research workspace
+lt explore: I need to narrow this topic
+lt panel: review this methods section before I commit
+```
 
-1. the researcher gets the exact `longtable codex persist-init ... --install-prompts` command to persist setup
-2. the researcher gets a strict JSON block and can pipe it into `longtable codex persist-init --stdin --install-prompts`
+If a Codex build exposes explicit skill shortcuts, `$longtable` is the manual
+entry.
 
-## Why This Is Acceptable
+Persistence still belongs to the setup/runtime layer. In-session setup should
+produce either:
 
-The priority is to make setup possible from inside Codex without pretending the underlying persistence layer does not exist.
+1. the exact `longtable codex persist-init ... --install-skills` command to
+   persist setup
+2. a strict JSON block that can be piped into
+   `longtable codex persist-init --stdin --install-skills`
 
-That keeps the system honest:
+## Product Rule
 
-- conversation happens in-session
-- persistence remains explicit
-- the researcher still sees what is being written
-
-## Product rule
-
-The default onboarding story should still be:
+The default onboarding story remains:
 
 - `longtable init`
 - then `longtable start`
@@ -46,13 +50,7 @@ The default onboarding story should still be:
 The important distinction is:
 
 - `init` and `start` are terminal commands
-- the research conversation begins after Codex is opened inside the created project directory
+- the research conversation begins after Codex is opened inside the created
+  project directory
 
 In-Codex setup is an optional integration path, not the baseline user journey.
-
-## Next Step
-
-The current persistence bridge is `longtable codex persist-init`.
-
-If this path proves useful, the next evolution is not more prompt complexity.
-It is a dedicated persistence bridge that Codex can call directly from the LongTable init flow without making the researcher manually retype setup fields.

@@ -1,72 +1,80 @@
-# Codex Alias Overlay
+# Codex Skill Surface
 
 ## Decision
 
-LongTable may support an in-Codex command layer through installed prompt files, but this layer is experimental and must not be treated as the primary promised UX.
+LongTable's Codex-native surface is generated Codex skills, not `/prompts`
+slash commands.
 
-The current target surface is:
+Current Codex CLI builds may keep prompt files under `~/.codex/prompts/`, but
+they do not necessarily expose `/prompts:...` in the interactive command parser.
+Therefore `/prompts` must be treated as legacy/experimental and must not be
+documented as the promised user experience.
 
-- `/prompts:longtable-init`
-- `/prompts:longtable-explore`
-- `/prompts:longtable-review`
-- `/prompts:longtable-panel`
-- `/prompts:longtable-editor`
-- `/prompts:longtable-reviewer`
-- `/prompts:longtable-methods`
-- `/prompts:longtable-critique`
-- `/prompts:longtable-draft`
-- `/prompts:longtable-commit`
-- `/prompts:longtable-status`
+## Target Surface
 
-## Why This Layer Exists
+Install:
 
-Prompt files are the lightest-weight way to attempt an in-session LongTable surface without building a full plugin runtime.
+```bash
+longtable codex install-skills
+```
 
-This overlay does not replace the runtime wrapper.
-It complements it.
+Generated files:
 
-## Role Split
+```text
+~/.codex/skills/
+  longtable/SKILL.md
+  longtable-panel/SKILL.md
+  longtable-explore/SKILL.md
+  longtable-review/SKILL.md
+  longtable-methods-critic/SKILL.md
+  ...
+```
 
-- `longtable start` and `longtable ask` are the primary user-facing entry points
-- `longtable codex install-prompts` is an optional bridge for users whose Codex build actually exposes installed prompt files
+Expected user-facing invocation:
 
-## Current Rule
+```text
+longtable: help me narrow this project
+lt explore: where should I start?
+lt panel: review this methods section
+use the LongTable methods critic on this design
+```
 
-Prompt aliases are intentionally thin.
-They should:
+When a Codex build exposes explicit skill shortcuts, `$longtable` is the manual
+entrypoint.
 
-- encode LongTable mode expectations
-- expose a small number of visible role-specific entry points
-- keep question-first and narrative-trace behavior visible
-- avoid pretending to be a full plugin runtime
+## Why
 
-They should not:
+The product behavior should match how users actually invoke Codex capabilities.
+Prompt files are not enough if the active Codex build rejects `/prompts`.
 
-- silently redefine the core product contract
-- depend on provider-only assumptions outside Codex
-- be documented as guaranteed native slash commands when the user's Codex build may not expose them
+Generated skills also better match the Claude Code plugin/skill model:
 
-## Implementation
+- one native entrypoint such as `longtable`
+- role-specific generated surfaces
+- natural-language triggers
+- provider-specific files generated from one LongTable role registry
 
-The alias installer currently lives in `packages/longtable/src/prompt-aliases.ts`.
+## Legacy Prompt Files
 
-The user installs prompt files with:
+`longtable codex install-prompts` remains available only as a compatibility
+bridge. It may write files under `~/.codex/prompts/`, but LongTable must not
+promise that those files become slash commands.
+
+Use this only for local experiments:
 
 ```bash
 longtable codex install-prompts
 ```
 
-Status is checked with:
+## Product Rule
 
-```bash
-longtable codex status
-```
+The guaranteed Codex path is:
 
-## Product rule
+1. `longtable init --provider codex --install-skills`
+2. `longtable start`
+3. open Codex in the project directory
+4. invoke naturally with `longtable: ...`, `lt review: ...`, or `lt panel: ...`
 
-If prompt files are installed but the user's Codex build does not expose them as slash commands, LongTable should still be fully usable through:
-
-- `longtable start`
-- `longtable ask`
-
-Researcher trust is more important than preserving an elegant but unreliable in-Codex entry story.
+The shell commands `longtable ask`, `longtable review --role ...`, and
+`longtable panel --json` remain scriptable/debuggable surfaces, not the primary
+researcher UX.

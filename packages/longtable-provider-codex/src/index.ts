@@ -51,13 +51,14 @@ export interface CodexRuntimeBridge {
 export const CODEX_PROVIDER_CAPABILITIES: ProviderCapabilities = {
   provider: "codex",
   nativeStructuredQuestions: false,
-  generatedSkills: "unavailable",
-  promptAliases: "stable",
+  generatedSkills: "stable",
+  promptAliases: "unavailable",
   nativeParallelSubagents: "session_dependent",
   sequentialFallback: true,
   mcpTransport: "planned",
   notes: [
-    "Codex prompt aliases are a convenience surface and depend on the installed Codex build.",
+    "Codex generated skills are the preferred native surface.",
+    "Installed prompt files are not guaranteed to become slash commands in current Codex builds.",
     "Native parallel subagents may exist in an interactive session, but the npm CLI must not require them.",
     "Sequential panel fallback is the stable provider-neutral path."
   ]
@@ -202,4 +203,5 @@ export function createCodexRuntimeBridge(
 }
 
 export * from "./config.js";
+export * from "./skills.js";
 export * from "./wrapper.js";

@@ -43,8 +43,8 @@ function promptSpec() {
         "Do not move to the next question until the researcher answers the current one.",
         "Quickstart covers: provider, field, career stage, experience level, checkpoint intensity, and human authorship signal.",
         "Interview also covers: preferred entry mode, weakest domain, and panel visibility preference.",
-        "After collecting all answers, summarize the proposed setup and then output both: 1) the exact `longtable codex persist-init ... --install-prompts` command and 2) a strict JSON object with keys provider, flow, field, careerStage, experienceLevel, preferredCheckpointIntensity, and optional humanAuthorshipSignal, preferredEntryMode, weakestDomain, panelPreference.",
-        "If the user prefers paste-based setup, tell them they can pipe the JSON into `longtable codex persist-init --stdin --install-prompts`.",
+        "After collecting all answers, summarize the proposed setup and then output both: 1) the exact `longtable codex persist-init ... --install-skills` command and 2) a strict JSON object with keys provider, flow, field, careerStage, experienceLevel, preferredCheckpointIntensity, and optional humanAuthorshipSignal, preferredEntryMode, weakestDomain, panelPreference.",
+        "If the user prefers paste-based setup, tell them they can pipe the JSON into `longtable codex persist-init --stdin --install-skills`.",
         "If the researcher asks you to stay inside Codex, keep the conversation in numbered form and do not prematurely close.",
         "Frame the setup like a short researcher interview, not a bare config form.",
         "Do not pretend that this is the full project-start interview. The real project-start interview happens in `longtable start`.",
@@ -162,7 +162,7 @@ function promptSpec() {
       argumentHint: "[optional concern]",
       body: [
         "You are LongTable status mode.",
-        "Inspect whether setup and runtime artifacts appear to exist under `~/.longtable/` and whether LongTable prompt aliases appear to be installed under `~/.codex/prompts/`.",
+        "Inspect whether setup and runtime artifacts appear to exist under `~/.longtable/` and whether LongTable skills appear to be installed under `~/.codex/skills/`.",
         "Summarize what is configured, what is missing, and the next minimal action.",
         "Treat any slash-command arguments as the user's concern."
       ]

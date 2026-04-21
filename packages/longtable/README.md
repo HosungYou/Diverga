@@ -3,7 +3,7 @@
 Researcher-facing CLI for LongTable.
 
 LongTable is an npm-first, provider-neutral research harness. It keeps the core
-product contract in project files and shared packages, while Codex prompts,
+product contract in project files and shared packages, while Codex skills,
 Claude skills, and future MCP surfaces remain generated adapter artifacts.
 
 The basic contract is:
@@ -81,7 +81,7 @@ longtable resume --cwd "<project-path>"
 longtable roles
 longtable ask --cwd "<project-path>" --prompt "..."
 longtable panel --prompt "..."
-longtable codex install-prompts
+longtable codex install-skills
 longtable claude install-skills
 ```
 
@@ -109,12 +109,14 @@ lt methods: Where is the design vulnerable?
 Provider-native surfaces are available when installed:
 
 ```bash
-longtable codex install-prompts
+longtable codex install-skills
 longtable claude install-skills
 ```
 
-Codex prompt aliases include `/prompts:longtable`, `/prompts:longtable-panel`,
-and role-specific aliases such as `/prompts:longtable-methods`.
+Codex skills include `longtable`, `longtable-panel`, and generated role-specific
+skills such as `longtable-methods-critic`. If your Codex build exposes explicit
+skill shortcuts, `$longtable` is the manual entry. Do not depend on `/prompts`;
+current Codex builds may reject it.
 
 Claude Code skills include `longtable`, `longtable-panel`, and generated
 role-specific skills such as `longtable-methods-critic`. They are adapter files

@@ -5,7 +5,7 @@ Code across long research projects.
 
 It helps a researcher keep goals, decisions, open tensions, evidence, and
 authorship visible across sessions. The core contract lives in LongTable project
-state. Provider-specific surfaces, such as Codex prompt aliases or Claude skills,
+state. Provider-specific surfaces, such as Codex skills or Claude Code skills,
 are adapters.
 
 ## What It Does
@@ -90,20 +90,23 @@ LongTable should feel native in Codex and Claude Code, but the native files are
 adapters. The source of truth remains the LongTable role registry and project
 state.
 
-Codex prompt aliases:
+Codex skills:
 
 ```bash
-longtable init --flow interview --provider codex --install-prompts
-longtable codex install-prompts
+longtable init --flow interview --provider codex --install-skills
+longtable codex install-skills
 ```
 
-After installation, use prompt aliases such as:
+After installation, reopen Codex if needed and invoke LongTable naturally:
 
 ```text
-/prompts:longtable help me narrow this project
-/prompts:longtable-panel review this methods section
-/prompts:longtable-methods check whether my design matches the question
+longtable: help me narrow this project
+lt panel: review this methods section
+use the LongTable methods critic on this design
 ```
+
+If your Codex build exposes skill shortcuts, `$longtable` is the explicit entry.
+Do not use `/prompts`; current Codex builds may reject it.
 
 Claude Code skills:
 

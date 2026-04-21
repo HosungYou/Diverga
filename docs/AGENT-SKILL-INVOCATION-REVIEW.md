@@ -8,7 +8,7 @@ The useful part of Diverga was not the packaging itself. It was the contract sha
 
 - role definitions with explicit trigger language
 - checkpoint prerequisites before high-impact actions
-- provider-specific skill or prompt files generated from one canonical registry
+- provider-specific skill files generated from one canonical registry
 - a structured state layer that records questions, decisions, and invocation outcomes
 
 LongTable should keep role and checkpoint semantics in shared packages, then project those semantics into Claude Code and Codex through adapters.
@@ -21,11 +21,12 @@ LongTable already has a provider-neutral foundation:
 - checkpoint policy in `packages/longtable-checkpoints`
 - Claude question rendering in `packages/longtable-provider-claude`
 - Codex numbered checkpoint rendering in `packages/longtable-provider-codex`
-- optional Codex prompt aliases in `packages/longtable/src/prompt-aliases.ts`
+- generated Codex skills in `packages/longtable-provider-codex`
+- generated Claude skills in `packages/longtable-provider-claude`
 
-The missing layer is a real invocation contract.
+The missing layer is a complete invocation result contract and state log.
 
-Today, `routePersonas()` can say which LongTable role should shape the answer, but it does not produce an executable "call this role as a skill/agent" record. Codex prompt aliases are useful, but they are an overlay. Claude-native skill files are not yet generated from the same registry.
+Today, `routePersonas()` can say which LongTable role should shape the answer, and provider adapters can generate skill files from the same role registry. The next gap is recording when a role or panel was invoked, what surface was used, and what decision or checkpoint followed.
 
 ## Diverga Findings
 
@@ -44,7 +45,7 @@ LongTable should copy these semantics, not the old agent taxonomy wholesale.
 
 OMX v0.14.0 is stronger than the current LongTable integration in three areas:
 
-- it installs prompts, skills, and native agent config from one source of truth
+- it installs skills and native agent config from one source of truth
 - it treats MCP tools as structured transport over state
 - it records user questions as durable lifecycle records
 
@@ -64,7 +65,7 @@ Add a provider-neutral invocation layer:
 The provider adapters should translate `InvocationIntent` into their own surfaces:
 
 - Claude Code: generated `.claude/skills/longtable-*` files and native structured question payloads when available
-- Codex: generated prompt aliases or Codex skill files when available, with numbered checkpoint fallback
+- Codex: generated `.codex/skills/longtable-*` files, with numbered checkpoint fallback
 - MCP: structured read/write/evaluate tools over LongTable state, not a replacement for core semantics
 
 ## Recommended Adoption
@@ -97,7 +98,7 @@ Do not adopt:
 1. Add `InvocationIntent`, `InvocationResult`, and `ProviderCapabilities` to the shared core contract.
 2. Refactor persona routing so it emits invocation intents in addition to disclosure text.
 3. Generate Claude skill bundles from the canonical role registry.
-4. Keep Codex prompt aliases as a convenience surface, but add capability checks and clear fallback behavior.
+4. Generate Codex skill bundles from the canonical role registry.
 5. Add `longtable-state` MCP as structured transport for project/session reads, checkpoint evaluation, question records, decision append, and `CURRENT.md` regeneration.
 6. Add doctor checks that verify provider installations without treating either provider as canonical.
 

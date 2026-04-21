@@ -25,7 +25,14 @@ import {
   type SetupChoice,
   type SetupFlow
 } from "@longtable/setup";
-import { buildCodexThinWrappedPrompt, runCodexThinWrapper } from "@longtable/provider-codex";
+import {
+  buildCodexThinWrappedPrompt,
+  installCodexSkills,
+  listInstalledCodexSkills,
+  removeCodexSkills,
+  resolveCodexSkillsDir,
+  runCodexThinWrapper
+} from "@longtable/provider-codex";
 import {
   installClaudeSkills,
   listInstalledClaudeSkills,
@@ -141,7 +148,7 @@ function usage(): string {
     "  Run `longtable ...` in your terminal, not inside the Codex chat box.",
     "  After `longtable start`, move into the created project directory and open `codex` there.",
     "",
-    "  longtable init [--flow quickstart|interview] [--provider codex|claude] [--field <field>] [--career-stage <stage>] [--experience novice|intermediate|advanced] [--checkpoint low|balanced|high] [--authorship-signal <text>] [--entry-mode explore|review|critique|draft|commit] [--weakest-domain theory|methodology|measurement|analysis|writing] [--panel-preference synthesis_only|show_on_conflict|always_visible] [--json] [--no-install] [--install-prompts] [--install-skills]",
+    "  longtable init [--flow quickstart|interview] [--provider codex|claude] [--field <field>] [--career-stage <stage>] [--experience novice|intermediate|advanced] [--checkpoint low|balanced|high] [--authorship-signal <text>] [--entry-mode explore|review|critique|draft|commit] [--weakest-domain theory|methodology|measurement|analysis|writing] [--panel-preference synthesis_only|show_on_conflict|always_visible] [--json] [--no-install] [--install-skills] [--install-prompts]",
     "  longtable start [--path <dir>] [--name <project>] [--goal <text>] [--blocker <text>] [--perspectives <role[,role]>] [--disagreement synthesis_only|show_on_conflict|always_visible] [--setup <path>] [--json]",
     "  longtable resume [--cwd <path>] [--json]",
     "  longtable roles [--json]",
@@ -150,7 +157,9 @@ function usage(): string {
     "  longtable ask [--prompt <text>] [--print] [--json] [--setup <path>] [--cwd <path>]",
     "  longtable panel [--prompt <text>] [--role <role[,role]>] [--mode review|critique|draft|commit] [--visibility synthesis_only|show_on_conflict|always_visible] [--print] [--json] [--setup <path>] [--cwd <path>]",
     "  longtable explore|review|critique|draft|commit|submit [--prompt <text>] [--role <role[,role]>] [--panel] [--show-conflicts] [--show-deliberation] [--print] [--json] [--stage <stage>] [--setup <path>] [--cwd <path>]",
-    "  longtable codex persist-init [--answers-json <json> | --stdin | full setup flags] [--install-prompts] [--json]",
+    "  longtable codex persist-init [--answers-json <json> | --stdin | full setup flags] [--install-skills] [--install-prompts] [--json]",
+    "  longtable codex install-skills [--dir <path>]",
+    "  longtable codex remove-skills [--dir <path>]",
     "  longtable codex install-prompts [--dir <path>]",
     "  longtable codex remove-prompts [--dir <path>]",
     "  longtable codex status [--dir <path>] [--json]",
@@ -159,14 +168,14 @@ function usage(): string {
     "  longtable claude status [--dir <path>] [--json]",
     "",
     "Examples:",
-    "  longtable init --flow interview --install-prompts",
+    "  longtable init --flow interview --provider codex --install-skills",
     "  longtable start",
     "  longtable start --path ~/Research/My-Project --name \"AI Adoption Meta-Analysis\" --goal \"Narrow the review question\"",
     "  cd \"<project-path>\" && codex",
     "  longtable roles",
     "  longtable ask --prompt \"연구를 시작하고 싶어. 지금 어디서부터 좁혀야 할지 모르겠어.\"",
-    "  printf '{\"provider\":\"codex\",...}' | longtable codex persist-init --stdin --install-prompts",
-    "  longtable codex install-prompts",
+    "  printf '{\"provider\":\"codex\",...}' | longtable codex persist-init --stdin --install-skills",
+    "  longtable codex install-skills",
     "  longtable claude install-skills"
   ].join("\n");
 }
@@ -942,7 +951,10 @@ async function runInit(args: Record<string, string | boolean>): Promise<void> {
   if (provider === "codex" && installPrompts) {
     installedPrompts = await installCodexPromptAliases(promptsDir);
   }
-  let installedSkills = [] as Awaited<ReturnType<typeof installClaudeSkills>>;
+  let installedSkills: Array<{ name: string; path: string; description: string }> = [];
+  if (provider === "codex" && installSkills) {
+    installedSkills = await installCodexSkills(listRoleDefinitions(), skillsDir);
+  }
   if (provider === "claude" && installSkills) {
     installedSkills = await installClaudeSkills(listRoleDefinitions(), skillsDir);
   }
@@ -976,17 +988,17 @@ async function runInit(args: Record<string, string | boolean>): Promise<void> {
     console.log("");
     console.log("Installed Codex prompt files:");
     for (const prompt of installedPrompts) {
-      console.log(`- /prompts:${prompt.name}`);
+      console.log(`- ${prompt.name}`);
     }
-    console.log("  Note: whether Codex exposes these as slash commands depends on your Codex build.");
+    console.log("  Note: prompt files are legacy and may not be exposed by your Codex build.");
   }
   if (installedSkills.length > 0) {
     console.log("");
-    console.log("Installed Claude skill files:");
+    console.log(`Installed ${provider === "codex" ? "Codex" : "Claude"} skill files:`);
     for (const skill of installedSkills) {
       console.log(`- ${skill.name}`);
     }
-    console.log("  Use these inside Claude Code by naming LongTable naturally, e.g. `lt panel: ...`.");
+    console.log("  Use these by naming LongTable naturally, e.g. `lt panel: ...`.");
   }
 
   if (provider === "codex") {
@@ -994,7 +1006,7 @@ async function runInit(args: Record<string, string | boolean>): Promise<void> {
     console.log("Next step:");
     console.log("- Start here: `longtable start`.");
     console.log("- If you want a direct natural-language entry: `longtable ask --prompt \"...\"`.");
-    console.log("- Codex prompt files are available as an experimental integration, not the primary path.");
+    console.log("- Codex skills are the preferred native surface. Prompt files are legacy and may not expose slash commands.");
     console.log("- Suggested next action: create a project workspace and let LongTable interview the current session.");
   }
   if (provider === "claude") {
@@ -1039,6 +1051,10 @@ async function runCodexPersistInit(args: Record<string, string | boolean>): Prom
   if (provider === "codex" && args["install-prompts"] === true) {
     installedPrompts = await installCodexPromptAliases(typeof args.dir === "string" ? args.dir : undefined);
   }
+  let installedSkills: Array<{ name: string; path: string; description: string }> = [];
+  if (provider === "codex" && args["install-skills"] === true) {
+    installedSkills = await installCodexSkills(listRoleDefinitions(), typeof args.dir === "string" ? args.dir : undefined);
+  }
 
   if (args.json === true) {
     console.log(
@@ -1046,7 +1062,8 @@ async function runCodexPersistInit(args: Record<string, string | boolean>): Prom
         {
           setup: outputValue,
           install: result,
-          installedPrompts: installedPrompts.map((prompt) => prompt.name)
+          installedPrompts: installedPrompts.map((prompt) => prompt.name),
+          installedSkills: installedSkills.map((skill) => skill.name)
         },
         null,
         2
@@ -1062,9 +1079,17 @@ async function runCodexPersistInit(args: Record<string, string | boolean>): Prom
     console.log("");
     console.log("Installed Codex prompt files:");
     for (const prompt of installedPrompts) {
-      console.log(`- /prompts:${prompt.name}`);
+      console.log(`- ${prompt.name}`);
     }
-    console.log("  Note: whether Codex exposes these as slash commands depends on your Codex build.");
+    console.log("  Note: prompt files are legacy and may not be exposed by your Codex build.");
+  }
+  if (installedSkills.length > 0) {
+    console.log("");
+    console.log("Installed Codex skill files:");
+    for (const skill of installedSkills) {
+      console.log(`- ${skill.name}`);
+    }
+    console.log("  Use these inside Codex by naming LongTable naturally, e.g. `lt panel: ...`.");
   }
 
   if (provider === "codex") {
@@ -1072,7 +1097,7 @@ async function runCodexPersistInit(args: Record<string, string | boolean>): Prom
     console.log("Next step:");
     console.log("- Start here: `longtable start`.");
     console.log("- If you want a direct natural-language entry: `longtable ask --prompt \"...\"`.");
-    console.log("- Codex prompt files are available as an experimental integration, not the primary path.");
+    console.log("- Codex skills are the preferred native surface. Prompt files are legacy and may not expose slash commands.");
     console.log("- Suggested next action: create a project workspace and let LongTable interview the current session.");
   }
 }
@@ -1491,13 +1516,31 @@ async function runCodexSubcommand(
   args: Record<string, string | boolean>
 ): Promise<void> {
   const customDir = typeof args.dir === "string" ? args.dir : undefined;
+  const roles = listRoleDefinitions();
+
+  if (subcommand === "install-skills") {
+    const installed = await installCodexSkills(roles, customDir);
+    console.log(`Installed ${installed.length} LongTable Codex skills in ${resolveCodexSkillsDir(customDir)}`);
+    console.log("Use them inside Codex with natural-language triggers such as `lt explore: ...` or `lt panel: ...`.");
+    console.log("If you want an explicit trigger, use `$longtable` when your Codex build exposes skills that way.");
+    for (const skill of installed) {
+      console.log(`- ${skill.name}`);
+    }
+    return;
+  }
+
+  if (subcommand === "remove-skills") {
+    const removed = await removeCodexSkills(roles, customDir);
+    console.log(`Removed ${removed.length} LongTable Codex skills from ${resolveCodexSkillsDir(customDir)}`);
+    return;
+  }
 
   if (subcommand === "install-prompts") {
     const installed = await installCodexPromptAliases(customDir);
-    console.log(`Installed ${installed.length} LongTable prompt aliases in ${resolveCodexPromptsDir(customDir)}`);
-    console.log("Note: prompt-file discovery depends on the Codex build. Treat this as an experimental integration.");
+    console.log(`Installed ${installed.length} legacy LongTable prompt files in ${resolveCodexPromptsDir(customDir)}`);
+    console.log("Note: current Codex builds may not expose these files as slash commands. Prefer `longtable codex install-skills`.");
     for (const prompt of installed) {
-      console.log(`- /prompts:${prompt.name}`);
+      console.log(`- ${prompt.name}`);
     }
     return;
   }
@@ -1509,12 +1552,13 @@ async function runCodexSubcommand(
 
   if (subcommand === "remove-prompts") {
     const removed = await removeCodexPromptAliases(customDir);
-    console.log(`Removed ${removed.length} LongTable prompt aliases from ${resolveCodexPromptsDir(customDir)}`);
+    console.log(`Removed ${removed.length} legacy LongTable prompt files from ${resolveCodexPromptsDir(customDir)}`);
     return;
   }
 
   if (subcommand === "status") {
     const aliases = await listInstalledCodexPromptAliases(customDir);
+    const skills = await listInstalledCodexSkills(roles, customDir);
     const setupPath = resolveDefaultSetupPath(typeof args.path === "string" ? args.path : undefined).path;
     const runtimePath = resolveDefaultRuntimeConfigPath("codex", typeof args["runtime-path"] === "string" ? args["runtime-path"] : undefined).path;
     const status = {
@@ -1522,8 +1566,10 @@ async function runCodexSubcommand(
       setupExists: existsSync(setupPath),
       runtimePath,
       runtimeExists: existsSync(runtimePath),
+      skillsDir: resolveCodexSkillsDir(customDir),
+      skillsInstalled: skills.map((skill) => skill.name),
       promptsDir: resolveCodexPromptsDir(customDir),
-      promptAliasesInstalled: aliases.map((alias) => alias.name)
+      legacyPromptFilesInstalled: aliases.map((alias) => alias.name)
     };
 
     if (args.json === true) {
@@ -1534,14 +1580,23 @@ async function runCodexSubcommand(
     console.log("LongTable Codex status");
     console.log(`- setup: ${status.setupExists ? "present" : "missing"} (${setupPath})`);
     console.log(`- codex runtime artifact: ${status.runtimeExists ? "present" : "missing"} (${runtimePath})`);
-    console.log(`- prompt aliases dir: ${status.promptsDir}`);
-    console.log("- prompt-file integration: experimental (your Codex build may not expose these as slash commands)");
-    if (aliases.length === 0) {
-      console.log("- prompt aliases: none");
+    console.log(`- skills dir: ${status.skillsDir}`);
+    if (skills.length === 0) {
+      console.log("- skills: none");
     } else {
-      console.log("- prompt aliases:");
+      console.log("- skills:");
+      for (const skill of skills) {
+        console.log(`  - ${skill.name}`);
+      }
+    }
+    console.log(`- prompt aliases dir: ${status.promptsDir}`);
+    console.log("- prompt files: legacy; current Codex builds may not expose these as slash commands");
+    if (aliases.length === 0) {
+      console.log("- legacy prompt files: none");
+    } else {
+      console.log("- legacy prompt files:");
       for (const alias of aliases) {
-        console.log(`  - /prompts:${alias.name}`);
+        console.log(`  - ${alias.name}`);
       }
     }
     return;

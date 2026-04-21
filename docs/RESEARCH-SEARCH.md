@@ -126,7 +126,7 @@ Potential doctor checks:
 
 - `codex` command on PATH
 - Claude Code command on PATH
-- `~/.codex/prompts`
+- `~/.codex/skills`
 - `~/.claude` or Claude plugin directories
 - generated LongTable runtime artifacts under `~/.longtable/runtime`
 - configured MCP entries
