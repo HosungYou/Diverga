@@ -1,4 +1,4 @@
-# LongTable 0.1.15 Release Notes
+# LongTable 0.1.16 Release Notes
 
 ## Summary
 

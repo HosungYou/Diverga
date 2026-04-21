@@ -1,6 +1,6 @@
 {
   "name": "@longtable/cli",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "private": false,
   "description": "Researcher-facing LongTable CLI",
   "type": "module",
@@ -13,7 +13,7 @@
     }
   },
   "bin": {
-    "longtable": "./bin/longtable"
+    "longtable": "bin/longtable"
   },
   "directories": {
     "bin": "./bin"
@@ -28,12 +28,12 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@longtable/checkpoints": "0.1.15",
-    "@longtable/core": "0.1.15",
-    "@longtable/memory": "0.1.15",
-    "@longtable/provider-claude": "0.1.15",
-    "@longtable/provider-codex": "0.1.15",
-    "@longtable/setup": "0.1.15"
+    "@longtable/checkpoints": "0.1.16",
+    "@longtable/core": "0.1.16",
+    "@longtable/memory": "0.1.16",
+    "@longtable/provider-claude": "0.1.16",
+    "@longtable/provider-codex": "0.1.16",
+    "@longtable/setup": "0.1.16"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
