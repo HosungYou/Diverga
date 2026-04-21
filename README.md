@@ -1,39 +1,45 @@
 # LongTable
 
-LongTable is a researcher-centered workspace for working with Codex or Claude
-Code across long research projects.
+LongTable is a research harness for working with AI across long scholarly
+projects. It is designed to help researchers slow down at important moments,
+make assumptions visible, preserve decisions, and keep evidence, theory,
+measurement, and authorship traceable across sessions.
 
-It helps a researcher keep goals, decisions, open tensions, evidence, and
-authorship visible across sessions. The core contract lives in LongTable project
-state. Provider-specific surfaces, such as Codex skills or Claude Code skills,
-are adapters.
+LongTable is not a chatbot replacement and not a prompt collection. It is a
+small research workspace system that runs through a CLI, provider skills,
+optional MCP state access, and optional tmux research panels.
 
-## What It Does
+## Why LongTable Exists
 
-- creates a durable research workspace with `.longtable/` state
-- keeps a human-readable `CURRENT.md` view of the project
-- routes requests through research roles such as reviewer, methods critic, and
-  measurement auditor
-- activates **Researcher Checkpoints** when a decision needs clarification
-- supports panel-style disagreement before a claim or design choice is committed
-- treats scholarly evidence and citation support as first-class research objects
+AI can make research feel faster, but speed can hide weak decisions. LongTable
+tries to protect the moments where a researcher should pause:
 
-## System Map
+- narrowing a research question
+- choosing a theory anchor
+- defining a construct or measurement strategy
+- selecting a method or analysis plan
+- deciding whether evidence actually supports a claim
+- preserving the researcher's own authorship and judgment
+- preparing a manuscript, preregistration, submission, or public release
 
-LongTable is not a single prompt. It is a set of small systems that keep research
-work inspectable across Codex and Claude Code.
+The goal is not to ask more questions all the time. The goal is to ask the
+right question when an unresolved gap, tacit assumption, or high-stakes
+commitment is about to become project memory.
 
-| System | What It Protects | Where It Lives |
-| --- | --- | --- |
-| Research workspace | continuity across sessions | `.longtable/`, `CURRENT.md` |
-| Role router | the right research perspective at the right moment | generated Codex/Claude skills, CLI modes |
-| Panel orchestration | visible disagreement before closure | `PanelPlan`, `PanelResult`, `InvocationRecord` |
-| Researcher Checkpoints | proactive human judgment at high-stakes moments | `QuestionRecord`, provider question UI, numbered fallback |
-| Decision log | what the researcher actually committed to | `DecisionRecord` |
-| Evidence policy | scholar-first search and citation fit | evidence docs, future search adapters |
-| Provider adapters | native-feeling Codex/Claude entrypoints | generated skills and runtime artifacts |
-| MCP transport | structured state access for provider runtimes | `@longtable/mcp`, `longtable-state` |
-| Doctor | installation and project-state health | `longtable doctor` |
+## What LongTable Gives You
+
+- A durable `.longtable/` workspace for each research project
+- A human-readable `CURRENT.md` status page regenerated from project state
+- Provider-native Codex and Claude Code skills when you approve installation
+- Researcher Checkpoints for decisions that should not be skipped silently
+- Clarification Cards for smaller tacit choices inside a task
+- Role-based review from perspectives such as reviewer, editor, methods critic,
+  theory critic, measurement auditor, ethics reviewer, venue strategist, and
+  voice keeper
+- Panel and debate modes that preserve visible disagreement before synthesis
+- Optional MCP access to LongTable state for provider runtimes
+- Optional tmux HUD and research console for persistent visibility
+- `doctor` and `status` commands for checking installation and workspace health
 
 ## Install
 
@@ -42,24 +48,53 @@ npm install -g @longtable/cli
 ```
 
 The npm install only installs the `longtable` command. It does not write Codex
-skills, MCP config, hooks, tmux state, or provider runtime files. Those require
-explicit setup approval because they change files outside the npm package.
+skills, Claude skills, MCP configuration, hooks, tmux state, or provider runtime
+files. Those require explicit setup approval.
 
-## Start
+Check the installed package:
 
-Recommended Codex setup:
+```bash
+npm list -g @longtable/cli --depth=0
+which longtable
+```
+
+## The Recommended Flow
+
+LongTable has two main setup steps:
+
+1. `longtable setup` decides what LongTable is allowed to install.
+2. `longtable start` creates or enters a research workspace.
+
+### 1. Configure Runtime Support
+
+For Codex:
 
 ```bash
 longtable setup --provider codex
 ```
 
-This permission-first setup asks which runtime surfaces LongTable may install:
-where support may be installed, which surfaces to enable, how strongly
-LongTable may interrupt research decisions, and whether to create a project
-workspace now. Each option shows why it matters, what you get, and the
-tradeoff. `longtable init` remains only as a deprecated compatibility alias.
+For Claude Code:
 
-Create a project workspace:
+```bash
+longtable setup --provider claude
+```
+
+`setup` asks permission-focused questions:
+
+- Where may LongTable install runtime support?
+- Which surfaces should be enabled?
+- How strongly may LongTable interrupt research decisions?
+- Should LongTable create a project workspace now?
+
+Each option includes a short explanation of why the choice matters, what you
+get, and the tradeoff. Setup intentionally avoids heavy researcher-profile
+questions such as field, career stage, or weakest domain. Those should be
+inferred later or asked only when the project context makes them relevant.
+
+`longtable init` still exists as a deprecated compatibility alias, but new users
+should use `longtable setup`.
+
+### 2. Create A Project Workspace
 
 ```bash
 longtable start
@@ -67,389 +102,27 @@ cd "<project-path>"
 codex
 ```
 
-For Claude Code, choose Claude during setup and open the project with Claude
-Code instead:
+For Claude Code:
 
 ```bash
-longtable setup --provider claude
 longtable start
 cd "<project-path>"
 claude
 ```
 
-Return to an existing project:
-
-```bash
-cd "<project-path>"
-longtable resume
-codex
-```
-
-## Everyday Use
-
-Most work should happen in natural language inside the project directory.
-
-Useful short forms:
-
-```text
-lt explore: help me narrow this research question
-lt review: what is weak in this claim?
-lt methods: where is this design vulnerable?
-lt editor: how should I position this for a journal?
-lt panel: show disagreement before I commit this argument
-```
-
-These forms are handled by the LongTable router. They are not separate source
-files or separate agent definitions. The router maps the phrase to a mode,
-detects relevant research roles, and then uses the strongest installed provider
-surface.
-
-When a request approaches a research commitment, LongTable should not silently
-continue. It should surface a **Researcher Checkpoint**: a concise question with
-clear options, a reason for asking, and a durable record in project state.
-
-When a request contains several smaller tacit choices, LongTable uses a
-**Clarification Card** instead of one broad checkpoint. The card groups focused
-questions, marks recommended options, and records each answer as a durable
-question/decision pair. CLI runs prefer terminal selector UI; plain-text and
-non-interactive runs fall back to numbered choices.
-
-You can also call LongTable directly from the shell when you want an explicit
-debuggable route:
-
-```bash
-longtable ask --prompt "I need to narrow this project into a defensible study."
-longtable clarify --prompt "Update the rubric using the selected exemplars."
-longtable sentinel --prompt "Should I define a new measurement construct?"
-```
-
-## Runtime Surfaces
-
-LongTable has three runtime levels:
-
-| Surface | Use it for | Requires |
-| --- | --- | --- |
-| Standard chat | Portable LongTable skills, checkpoints, and CLI commands | Codex or Claude |
-| Research HUD | Persistent view of goals, blockers, pending checkpoints, and decisions | tmux |
-| Research console | Role panes for tmux-backed team discussion plus HUD | tmux |
-
-Tmux is optional. LongTable's research contract must work without it. When tmux
-is available, it can make choices and open tensions more visible:
-
-```bash
-longtable hud --watch
-longtable hud --tmux
-longtable team --tmux --prompt "Review this measurement plan before I commit it."
-longtable team --debate --prompt "Review this measurement plan before I commit it."
-```
-
-Install tmux:
-
-```bash
-# macOS
-brew install tmux
-
-# Ubuntu/Debian
-sudo apt install tmux
-```
-
-Team mode is panel discussion, not just parallel execution. LongTable opens
-role-specific panes and writes logs under `.longtable/team/<id>/` so the
-researcher can inspect disagreement before deciding what to do next.
-
-Use `longtable team --debate` when the disagreement itself should become a
-durable research artifact. Debate runs use a fixed five-round protocol:
-independent review, cross-review, rebuttal, convergence, and coordinator
-synthesis/checkpoint. The canonical record is written under
-`.longtable/team/<id>/`; tmux is optional.
-
-## Provider Surfaces
-
-LongTable should feel native in Codex and Claude Code, but the native files are
-adapters. The source of truth remains the LongTable role registry and project
-state.
-
-Codex skills:
-
-```bash
-longtable setup --provider codex --install-scope user --surfaces skills --intervention balanced --workspace later
-longtable codex install-skills
-```
-
-After installation, reopen Codex if needed and invoke LongTable naturally:
-
-```text
-longtable: help me narrow this project
-lt panel: review this methods section
-use the LongTable methods critic on this design
-```
-
-If your Codex build exposes skill shortcuts, `$longtable` is the explicit entry.
-Do not use `/prompts`; current Codex builds may reject it.
-
-Claude Code skills:
-
-```bash
-longtable setup --provider claude --install-scope user --surfaces skills --intervention balanced --workspace later
-longtable claude install-skills
-```
-
-After installation, invoke LongTable naturally in Claude Code:
-
-```text
-longtable: help me narrow this project
-lt review: what is weak in this claim?
-lt panel: show disagreement before I commit this argument
-use the LongTable methods critic on this design
-```
-
-This mirrors the OMX/OMC pattern: commands and skills are entrypoints, while the
-workflow logic stays in shared runtime state.
-
-## MCP Transport
-
-LongTable includes an optional MCP server named `longtable-state`.
-
-The MCP layer is not the LongTable core and does not replace `.longtable/`.
-It exposes structured tools over the existing project state so Codex, Claude
-Code, or another MCP-capable runtime can inspect and update LongTable records
-without scraping Markdown.
-
-Install or inspect provider config:
-
-```bash
-longtable mcp install --provider all
-longtable mcp install --provider codex --write
-longtable mcp install --provider claude --write
-```
-
-By default, `longtable mcp install` only prints the config snippets. It writes
-to provider config files only when `--write` is present.
-
-Default config targets:
-
-- Codex: `~/.codex/config.toml`
-- Claude Code: `~/.claude/settings.json`
-
-The server can also be run directly:
-
-```bash
-npx -y @longtable/mcp@0.1.21
-longtable-state --self-test
-```
-
-Current tools:
-
-- `read_project`
-- `read_session`
-- `inspect_workspace`
-- `pending_questions`
-- `evaluate_checkpoint`
-- `create_question`
-- `render_question`
-- `append_decision`
-- `regenerate_current`
-
-The practical advantage is architectural rather than visual: MCP gives provider
-runtimes typed access to project/session state, checkpoint evaluation,
-QuestionRecord creation, DecisionRecord append, and `CURRENT.md` regeneration.
-The durable source of truth remains `.longtable/`.
-
-## Researcher Checkpoints
-
-LongTable adapts the idea behind Claude's AskUserQuestion-style interaction and
-OMX's structured approval checkpoints, but names it for research work:
-**Researcher Checkpoint**.
-
-A Researcher Checkpoint is not a generic "are you sure?" prompt. It appears when
-the system is about to treat uncertainty as settled, for example:
-
-- freezing a research question
-- choosing a theory anchor
-- committing to a method or measurement design
-- interpreting tacit researcher context
-- deciding whether a panel result needs evidence, revision, or closure
-- naming or changing a LongTable platform concept
-- preparing external submission, preregistration, or public sharing
-
-The ideal shape is:
-
-```text
-Researcher Checkpoint
-Why now: this choice changes the downstream study design.
-Question: What should LongTable treat as the next human decision?
-Options: revise / gather evidence / proceed / defer / other
-Record: QuestionRecord -> DecisionRecord
-```
-
-Provider behavior differs:
-
-- Claude Code can use native structured question surfaces when available.
-- Codex uses numbered choices and strict parsing as the stable fallback.
-- Both providers write the same LongTable state records.
-
-This is the main difference from a plain AskUserQuestion tool. The UI is only the
-transport; the LongTable product contract is proactive, research-aware
-checkpointing with durable decision records.
-
-If a checkpoint allows `other`, that option must be visible to the researcher.
-Hidden `allowOther` support is not enough because it still pressures the
-researcher into the system's categories.
-
-Natural-language checkpoint triggers are handled by the shared checkpoint
-package, not by provider-specific prompt text. LongTable classifies cues such as
-submission, method design, measurement, evidence verification, authorship, and
-platform-language changes into a `CheckpointSignal`; the checkpoint policy then
-decides whether the question is blocking or advisory.
-
-When you need to record a checkpoint directly:
-
-```bash
-longtable question --prompt "We are about to finalize the measurement plan."
-longtable question --provider codex --print --prompt "We are about to finalize the measurement plan."
-longtable question --provider claude --print --prompt "We are about to finalize the measurement plan."
-longtable decide --question <id> --answer evidence --rationale "Need scale validity support first."
-```
-
-If the checkpoint is required, LongTable treats the workspace as blocked for
-normal `ask`, mode, and panel commands until `longtable decide` records an
-answer. The pending question remains visible in `CURRENT.md` and `doctor`.
-`--print` renders the provider transport: numbered prompt for Codex, structured
-question payload for Claude. In Codex/plain-text fallback, `longtable decide`
-accepts either the visible number (`1`) or the stable option value
-(`evidence`).
-
-## Health Check
-
-Use `doctor` when you want to confirm that LongTable is wired into both provider
-surfaces and that the current project state is alive:
-
-```bash
-longtable doctor
-longtable doctor --fix
-longtable doctor --json
-```
-
-`longtable status` is the same top-level health check. It reports:
-
-- global setup and provider runtime artifacts
-- Codex skill installation and legacy prompt files
-- Claude Code skill installation
-- the current `.longtable/` workspace, recent invocations, pending questions, and
-  recorded decisions
-
-If something is missing, the output includes the next command to run.
-`--fix` repairs safe mechanical issues: missing Codex/Claude skill files, stale
-legacy Codex prompt files, and provider runtime artifacts when a setup profile
-already exists. It does not invent setup approval; run `longtable setup` first
-if setup is missing.
-
-## Agent Roles
-
-LongTable roles are research perspectives. They can be triggered naturally by
-the request, through provider skills, or through an explicit CLI flag for
-testing. List available roles with:
-
-```bash
-longtable roles
-```
-
-Common roles:
-
-- `reviewer`: likely peer-review objections
-- `theory_critic`: conceptual fit and overreach
-- `methods_critic`: design logic and methodological defensibility
-- `measurement_auditor`: construct validity, scales, and evidence quality
-- `editor`: venue fit and framing
-- `voice_keeper`: authorship, tone, and narrative trace
-- `venue_strategist`: journal or conference positioning
-
-Natural role requests:
-
-```text
-Use the methods critic on this design.
-Reviewer view: what would a hostile reviewer reject?
-Editor view: is this positioned for the right journal?
-Measurement auditor: do these scales support the construct?
-```
-
-Explicit CLI role calls are mainly for testing, scripts, or reproducible runs:
-
-```bash
-longtable review --role methods_critic --prompt "Review this design."
-longtable critique --role theory_critic --prompt "Challenge this framework."
-```
-
-## Panel / Team-Style Review
-
-Use a panel when the work needs visible disagreement from multiple research
-roles.
-
-Natural panel requests:
-
-```text
-lt panel: review this methods section
-Show me reviewer, methods critic, and measurement auditor disagreement.
-Before I commit this argument, run a LongTable panel.
-```
-
-Explicit CLI panel calls:
-
-```bash
-longtable panel --prompt "Review this methods section." --json
-longtable review --role methods_critic,measurement_auditor --panel --prompt "Review this design." --json
-longtable team --debate --prompt "Review this measurement plan." --role editor,measurement_auditor --json
-```
-
-Panel review creates a provider-neutral `PanelPlan` and a planned `PanelResult`.
-It does not require native subagents, Claude-only question tools, or a persistent
-team runtime. When provider-native orchestration is unavailable, LongTable uses a
-stable sequential fallback so Codex and Claude Code can share the same research
-semantics.
-
-When panel review runs inside a LongTable project workspace, LongTable appends an
-`InvocationRecord` to `.longtable/state.json` and refreshes `CURRENT.md` with the
-recent invocation summary. It also creates a pending follow-up `QuestionRecord`
-so the researcher can explicitly decide what happens next.
-
-Record that decision with:
-
-```bash
-longtable decide --answer evidence --rationale "Need citation support before continuing."
-```
-
-This panel follow-up is also a Researcher Checkpoint. It is how LongTable avoids
-turning a multi-role review into an invisible AI decision.
-
-For deeper agent-to-agent disagreement, `longtable team --debate` records a
-five-round debate and creates a debate follow-up checkpoint. It is still a
-researcher-centered harness: the debate can surface conflict, but the researcher
-answers the final decision.
-
-## Evidence
-
-LongTable should not behave like a generic web scraper. For research questions,
-the intended search path is scholar-first:
-
-- arXiv
-- Crossref
-- OpenAlex
-- Semantic Scholar
-- PubMed/NCBI
-- ERIC
-- DOAJ
-- Unpaywall
-
-These sources should be used when the researcher asks for literature discovery,
-citation verification, publication metadata, or evidence-backed decisions. They
-should not be called for every question.
-
-Citation support should be checked explicitly. A source may be useful background
-without supporting the specific claim attached to it.
-
-## Workspace Shape
-
-`longtable start` creates a minimal project root:
+`start` asks project-specific questions:
+
+- What is the project called?
+- Where should the project live?
+- What is the current goal?
+- What is the current blocker?
+- What kind of research object are you working on?
+- What kind of gap or tacit assumption risk is present?
+- Which kind of decision should LongTable avoid skipping?
+- Which perspectives should be consulted?
+- How visible should role disagreement be?
+
+This creates:
 
 ```text
 <project>/
@@ -462,19 +135,416 @@ without supporting the specific claim attached to it.
     sessions/
 ```
 
-`AGENTS.md` and `CURRENT.md` are runtime-facing views. The source of truth is the
-machine-readable state under `.longtable/`.
+`AGENTS.md` gives runtime guidance to Codex or Claude. `CURRENT.md` is the
+human-facing status page. The source of truth is the machine-readable state in
+`.longtable/`.
+
+### 3. Resume Later
+
+```bash
+cd "<project-path>"
+longtable resume
+codex
+```
+
+`resume` regenerates `CURRENT.md` from state and prints the current project
+status.
+
+## Everyday Use
+
+Most LongTable work should happen in natural language inside the project
+directory. You can write directly to Codex or Claude Code:
+
+```text
+Help me narrow this into a defensible study.
+Use the methods critic on this design.
+Before I commit this argument, show me the disagreement.
+Check whether this measurement construct is defensible.
+What evidence would a reviewer expect here?
+```
+
+Explicit LongTable directives are available when you want a clear route:
+
+```text
+lt explore: help me narrow this research question
+lt review: what is weak in this claim?
+lt methods: where is this design vulnerable?
+lt theory: does this framework overreach?
+lt measurement: do these scales support the construct?
+lt editor: how should I position this for a journal?
+lt panel: show disagreement before I commit this argument
+```
+
+Shell commands are also available for scripts, debugging, and reproducible
+workflows:
+
+```bash
+longtable ask --prompt "I need to narrow this project into a defensible study."
+longtable review --prompt "Review this claim."
+longtable panel --prompt "Review this methods section."
+longtable sentinel --prompt "Should I define a new measurement construct?"
+```
+
+## Researcher Checkpoints
+
+A Researcher Checkpoint is a structured pause before LongTable treats a decision
+as settled.
+
+Example:
+
+```text
+Researcher Checkpoint
+Why now: This measurement choice will shape the validity of the paper.
+Question: What should LongTable treat as the next human decision?
+Options:
+1. Use an established instrument
+2. Define a new construct
+3. Keep both open until more evidence is reviewed
+4. Other
+Record: QuestionRecord -> DecisionRecord
+```
+
+LongTable may trigger checkpoints around:
+
+- research-question narrowing
+- theory choice
+- measurement or instrument selection
+- method or analysis design
+- evidence and citation support
+- authorship, voice, and researcher intent
+- venue positioning
+- submission, preregistration, or public sharing
+
+Required checkpoints block ordinary `ask`, mode, and panel commands until the
+researcher records a decision:
+
+```bash
+longtable decide --question <id> --answer evidence --rationale "Need scale validity support first."
+```
+
+If no question id is supplied, LongTable answers the most recent pending
+question:
+
+```bash
+longtable decide --answer revise --rationale "The construct definition is not stable yet."
+```
+
+## Clarification Cards
+
+Some tasks contain several small assumptions rather than one large decision. In
+that case LongTable can create a Clarification Card:
+
+```bash
+longtable clarify --prompt "Update the rubric using the selected exemplars."
+```
+
+A Clarification Card groups focused questions, marks recommended options, and
+records answers as durable question and decision records. In an interactive
+terminal, LongTable prefers selector UI. In plain text or non-interactive
+contexts, it falls back to numbered options.
+
+## Roles
+
+LongTable roles are research perspectives, not separate personalities. They are
+used to make review pressure explicit.
+
+List roles:
+
+```bash
+longtable roles
+```
+
+Common roles:
+
+| Role | What it checks |
+| --- | --- |
+| `reviewer` | likely peer-review objections and missing support |
+| `editor` | venue fit, contribution shape, and framing |
+| `methods_critic` | design logic and methodological defensibility |
+| `measurement_auditor` | construct validity, scale choice, and evidence quality |
+| `theory_critic` | conceptual coherence, anchor theory fit, and overreach |
+| `ethics_reviewer` | consent, representation, IRB, and trust harms |
+| `voice_keeper` | authorship, narrative trace, and the researcher's own voice |
+| `venue_strategist` | journal or conference positioning tradeoffs |
+
+Natural role requests:
+
+```text
+Reviewer view: what would a skeptical reviewer reject?
+Editor view: is this positioned for the right journal?
+Measurement auditor: do these measures support the construct?
+Voice keeper: does this still sound like my argument?
+```
+
+## Panel And Debate
+
+Use a panel when disagreement matters more than a quick answer.
+
+```bash
+longtable panel --prompt "Review this methods section." --json
+longtable review --role methods_critic,measurement_auditor --panel --prompt "Review this design." --json
+```
+
+Panel mode creates a provider-neutral `PanelPlan`, foregrounds role-specific
+objections, and creates a follow-up checkpoint so the researcher decides what
+happens next.
+
+For deeper agent-to-agent disagreement:
+
+```bash
+longtable team --debate --prompt "Review this measurement plan." --role editor,measurement_auditor --json
+```
+
+Debate mode records a fixed five-round protocol:
+
+1. independent review
+2. cross-review
+3. rebuttal
+4. convergence
+5. coordinator synthesis and checkpoint
+
+The result is written under `.longtable/team/<id>/`. The debate can surface
+conflict, but the researcher still answers the final decision.
+
+## Tmux HUD And Research Console
+
+Tmux is optional. LongTable should work without it. When tmux is available, it
+can make research state more visible during long sessions.
+
+Install tmux:
+
+```bash
+# macOS
+brew install tmux
+
+# Ubuntu/Debian
+sudo apt install tmux
+```
+
+Useful commands:
+
+```bash
+longtable hud --watch
+longtable hud --tmux
+longtable team --tmux --prompt "Review this measurement plan before I commit it."
+```
+
+The HUD can show:
+
+- current goal
+- current blocker
+- pending checkpoints
+- detected gaps or tacit assumptions
+- recent decisions
+- recent role or panel invocations
+
+Think of tmux as an enhanced research console, not as the LongTable core. The
+core contract remains `.longtable/` state, checkpoints, and decisions.
+
+## Provider Skills
+
+LongTable can install provider-native skills after setup approval.
+
+Codex:
+
+```bash
+longtable setup --provider codex --install-scope user --surfaces skills --intervention balanced --workspace later
+longtable codex install-skills
+```
+
+Claude Code:
+
+```bash
+longtable setup --provider claude --install-scope user --surfaces skills --intervention balanced --workspace later
+longtable claude install-skills
+```
+
+After installation, reopen the provider if needed and use natural language:
+
+```text
+longtable: help me narrow this project
+lt panel: review this methods section
+use the LongTable methods critic on this design
+```
+
+If your Codex build exposes explicit skill shortcuts, `$longtable` is the manual
+entry. Do not rely on `/prompts`; current Codex builds may reject custom prompt
+files as slash commands.
+
+## MCP Transport
+
+LongTable includes an optional MCP server named `longtable-state`.
+
+MCP is not the source of truth. It gives compatible provider runtimes typed
+access to existing LongTable state instead of scraping Markdown.
+
+Inspect config snippets:
+
+```bash
+longtable mcp install --provider all
+```
+
+Write provider config:
+
+```bash
+longtable mcp install --provider codex --write
+longtable mcp install --provider claude --write
+```
+
+Default config targets:
+
+- Codex: `~/.codex/config.toml`
+- Claude Code: `~/.claude/settings.json`
+
+Run the server directly:
+
+```bash
+npx -y @longtable/mcp@0.1.21
+longtable-state --self-test
+```
+
+Current MCP tools include:
+
+- `read_project`
+- `read_session`
+- `inspect_workspace`
+- `pending_questions`
+- `evaluate_checkpoint`
+- `create_question`
+- `render_question`
+- `append_decision`
+- `regenerate_current`
+
+## Evidence And Scholarly Search
+
+LongTable should not behave like a generic web scraper. When research claims,
+literature discovery, citation verification, or publication metadata matter,
+LongTable should prefer scholarly routes.
+
+Planned or intended scholarly sources include:
+
+- Crossref
+- OpenAlex
+- Semantic Scholar
+- PubMed/NCBI
+- ERIC
+- arXiv
+- DOAJ
+- Unpaywall
+
+The important policy is claim-level support. A source can be useful background
+while still failing to support the specific sentence attached to it.
+
+## Health Checks
+
+Use `doctor` or `status` when something feels out of sync:
+
+```bash
+longtable doctor
+longtable doctor --fix
+longtable doctor --json
+longtable status
+```
+
+These commands inspect:
+
+- setup records
+- provider runtime artifacts
+- Codex and Claude skills
+- MCP configuration
+- current workspace state
+- pending questions
+- recent decisions
+
+`--fix` repairs safe mechanical issues when setup approval already exists. It
+does not invent permission. If setup is missing, run `longtable setup`.
+
+## Command Reference
+
+Primary commands:
+
+```bash
+longtable setup
+longtable start
+longtable resume
+longtable doctor
+longtable status
+```
+
+Research commands:
+
+```bash
+longtable ask --prompt "..."
+longtable explore --prompt "..."
+longtable review --prompt "..."
+longtable critique --prompt "..."
+longtable draft --prompt "..."
+longtable commit --prompt "..."
+longtable panel --prompt "..."
+longtable sentinel --prompt "..."
+```
+
+Checkpoint commands:
+
+```bash
+longtable clarify --prompt "..."
+longtable question --prompt "..."
+longtable decide --answer <value> --rationale "..."
+```
+
+Runtime and provider commands:
+
+```bash
+longtable roles
+longtable hud --watch
+longtable hud --tmux
+longtable team --tmux --prompt "..."
+longtable team --debate --prompt "..."
+longtable codex install-skills
+longtable claude install-skills
+longtable mcp install --provider all
+```
+
+## Workspace Files
+
+| File | Purpose |
+| --- | --- |
+| `AGENTS.md` | Runtime guidance for Codex or Claude inside the project |
+| `CURRENT.md` | Human-readable current project status |
+| `.longtable/project.json` | Stable project identity |
+| `.longtable/current-session.json` | Current session cursor |
+| `.longtable/state.json` | Layered working memory, tensions, questions, decisions, and invocations |
+| `.longtable/sessions/` | Historical session snapshots |
+| `.longtable/team/<id>/` | Panel or debate artifacts when team mode is used |
+
+## Design Principles
+
+- Researcher judgment stays primary.
+- AI output should not silently become project truth.
+- Gaps and tacit assumptions should be named when they matter.
+- Disagreement should remain visible until the researcher resolves it.
+- Provider-specific tools are adapters; `.longtable/` state is the contract.
+- Setup should ask for permissions, not a full biography.
+- Project start should ask what research object and decision risk are active.
 
 ## Development
 
 ```bash
 npm install
-npm run release:check
-npm run typecheck
 npm run build
+npm run typecheck
+npm run test
+npm run pack:check
 ```
 
-## Docs
+Useful release checks:
+
+```bash
+npm run release:check
+git diff --check
+```
+
+## Documentation
 
 - [Command Surface](docs/LONGTABLE-COMMAND-SURFACE.md)
 - [Architecture](docs/ARCHITECTURE.md)
@@ -482,11 +552,8 @@ npm run build
 - [Question Runtime](docs/QUESTION-RUNTIME.md)
 - [Checkpoint Triggering](docs/CHECKPOINT-TRIGGERING.md)
 - [Researcher Checkpoints](docs/RESEARCHER-CHECKPOINTS.md)
-- [Release Process](docs/RELEASE-PROCESS.md)
-- [Docs Language Policy](docs/DOCS-LANGUAGE-POLICY.md)
-- [Invocation Log](docs/INVOCATION-LOG.md)
 - [Doctor Status](docs/DOCTOR.md)
-- [Checkpointing](docs/CHECKPOINTING.md)
 - [Memory](docs/MEMORY.md)
 - [Evidence Policy](docs/EVIDENCE-POLICY.md)
 - [Research Search](docs/RESEARCH-SEARCH.md)
+- [Release Process](docs/RELEASE-PROCESS.md)
