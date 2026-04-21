@@ -264,7 +264,9 @@ If the checkpoint is required, LongTable treats the workspace as blocked for
 normal `ask`, mode, and panel commands until `longtable decide` records an
 answer. The pending question remains visible in `CURRENT.md` and `doctor`.
 `--print` renders the provider transport: numbered prompt for Codex, structured
-question payload for Claude.
+question payload for Claude. In Codex/plain-text fallback, `longtable decide`
+accepts either the visible number (`1`) or the stable option value
+(`evidence`).
 
 ## Health Check
 

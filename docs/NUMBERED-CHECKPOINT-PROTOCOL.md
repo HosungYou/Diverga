@@ -28,6 +28,9 @@ Reply with one number only: 1, 2, or 3.
 - invalid answer triggers re-prompt
 - accepted answer is logged with timestamp and rationale if provided
 - no silent default for blocking checkpoints
+- `longtable decide --answer <value>` must accept both the visible number and
+  the stable option value, because the numbered prompt is the researcher-facing
+  contract in Codex-compatible runtimes
 
 ## Optional Extension
 
@@ -45,4 +48,5 @@ It creates a single checkpoint contract that can work in Claude, Codex, and futu
 
 Claude can present the same Researcher Checkpoint through `AskUserQuestion`;
 Codex can present it through numbered text and strict parsing. Both paths must
-normalize to the same decision record.
+normalize to the same decision record, so a researcher choosing `1` must not be
+recorded as an opaque `other` answer.

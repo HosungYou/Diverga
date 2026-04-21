@@ -126,6 +126,12 @@ export interface LongTableWorkspaceInspection {
     selectedOption?: string;
     timestamp: string;
   }>;
+  answerWarnings?: Array<{
+    questionId: string;
+    decisionRecordId?: string;
+    issue: string;
+    suggestion?: string;
+  }>;
 }
 
 const CURRENT_FILE_NAME = "CURRENT.md";
@@ -439,7 +445,23 @@ function summarizeWorkspaceInspection(
       summary: record.summary,
       ...(record.selectedOption ? { selectedOption: record.selectedOption } : {}),
       timestamp: record.timestamp
-    }))
+    })),
+    answerWarnings: questions
+      .filter((record) => record.status === "answered" && record.answer?.selectedValues.includes("other"))
+      .flatMap((record) => {
+        const raw = record.answer?.otherText ?? record.answer?.selectedLabels[0] ?? "";
+        if (!/^\d+$/.test(raw.trim())) {
+          return [];
+        }
+        const index = Number(raw.trim()) - 1;
+        const option = record.prompt.options[index];
+        return [{
+          questionId: record.id,
+          ...(record.decisionRecordId ? { decisionRecordId: record.decisionRecordId } : {}),
+          issue: `Numeric answer "${raw.trim()}" was stored as other text.`,
+          ...(option ? { suggestion: `Use "${option.value}" (${option.label}) for this checkpoint option.` } : {})
+        }];
+      })
   };
 }
 
@@ -657,7 +679,7 @@ function questionTextForCheckpoint(family: string, prompt: string): string {
   }
 }
 
-function optionsForCheckpointFamily(family: string): QuestionOption[] {
+function optionsForCheckpointTrigger(family: string, checkpointKey?: string): QuestionOption[] {
   if (family === "evidence") {
     return [
       { value: "verify", label: "Verify evidence first", description: "Check whether the source supports the specific claim." },
@@ -683,6 +705,80 @@ function optionsForCheckpointFamily(family: string): QuestionOption[] {
       { value: "proceed", label: "Proceed toward submission", description: "Accept the remaining risk and continue." },
       { value: "defer", label: "Do not submit yet", description: "Keep the submission decision open." }
     ];
+  }
+
+  if (family === "authorship") {
+    return [
+      { value: "preserve_voice", label: "Preserve the researcher's voice", description: "Keep the current authorship trace visible before rewriting or smoothing." },
+      { value: "revise_with_trace", label: "Revise with an explicit authorship trace", description: "Change the text, but record what came from the researcher." },
+      { value: "ask_researcher", label: "Ask the researcher for wording first", description: "Do not infer the intended voice or narrative stance." },
+      { value: "defer", label: "Keep authorship open", description: "Do not settle the voice or authorship decision yet." }
+    ];
+  }
+
+  if (family === "exploration") {
+    return [
+      { value: "surface_tensions", label: "Surface tensions first", description: "Ask what is unresolved before narrowing the project." },
+      { value: "narrow_scope", label: "Narrow the research scope", description: "Move toward a smaller question while keeping the choice visible." },
+      { value: "gather_context", label: "Gather context before narrowing", description: "Check materials, constraints, or evidence before choosing a direction." },
+      { value: "defer", label: "Keep exploration open", description: "Do not collapse the problem space yet." }
+    ];
+  }
+
+  if (family === "review") {
+    return [
+      { value: "revise", label: "Revise before accepting the review", description: "Change the claim, design, or draft before treating the critique as resolved." },
+      { value: "evidence", label: "Check evidence for the objection", description: "Verify whether the review concern is actually supported." },
+      { value: "proceed", label: "Proceed while logging the risk", description: "Accept the objection profile and continue with the decision recorded." },
+      { value: "defer", label: "Keep the objection open", description: "Do not convert the review into closure yet." }
+    ];
+  }
+
+  if (family === "commitment") {
+    if (checkpointKey === "research_question_freeze") {
+      return [
+        { value: "revise", label: "Revise the research question", description: "Change the framing before treating the question as settled." },
+        { value: "scope", label: "Choose the scope boundary", description: "Commit only the boundary, not the full study design." },
+        { value: "evidence", label: "Gather support before freezing", description: "Check literature, feasibility, or data fit before locking the question." },
+        { value: "defer", label: "Keep the question open", description: "Do not freeze the research question yet." }
+      ];
+    }
+
+    if (checkpointKey === "theory_selection") {
+      return [
+        { value: "revise", label: "Revise the theory anchor", description: "Change the conceptual frame before treating it as settled." },
+        { value: "compare", label: "Compare candidate theories first", description: "Keep alternatives visible before choosing one anchor." },
+        { value: "evidence", label: "Check construct fit first", description: "Verify that the theory supports the constructs and claims." },
+        { value: "defer", label: "Keep theory selection open", description: "Do not commit to a theory anchor yet." }
+      ];
+    }
+
+    if (checkpointKey === "method_design_commitment") {
+      return [
+        { value: "revise", label: "Revise the study design", description: "Change method, sample, or design before treating it as settled." },
+        { value: "ethics", label: "Check participant and ethics implications", description: "Pause for consent, representation, or trust concerns." },
+        { value: "evidence", label: "Check feasibility and evidence first", description: "Verify that the method can support the intended claims." },
+        { value: "defer", label: "Keep method design open", description: "Do not commit the design yet." }
+      ];
+    }
+
+    if (checkpointKey === "measurement_validity") {
+      return [
+        { value: "revise", label: "Revise the measurement plan", description: "Change scales, constructs, or instruments before treating them as settled." },
+        { value: "evidence", label: "Verify construct validity first", description: "Check whether the instrument supports the construct." },
+        { value: "pilot", label: "Pilot or inspect the measure", description: "Gather local evidence before committing the measurement." },
+        { value: "defer", label: "Keep measurement open", description: "Do not settle the measurement plan yet." }
+      ];
+    }
+
+    if (checkpointKey === "analysis_plan") {
+      return [
+        { value: "revise", label: "Revise the analysis plan", description: "Change model, coding, or inference strategy before committing." },
+        { value: "assumptions", label: "Check assumptions first", description: "Inspect data, model assumptions, or coding validity before closure." },
+        { value: "evidence", label: "Verify analysis fit", description: "Confirm the analysis can answer the research question." },
+        { value: "defer", label: "Keep analysis open", description: "Do not commit the analysis plan yet." }
+      ];
+    }
   }
 
   return [
@@ -918,7 +1014,7 @@ export async function createWorkspaceQuestion(options: {
       title: options.title ?? questionTitleForCheckpoint(trigger.family),
       question: options.question ?? questionTextForCheckpoint(trigger.family, options.prompt),
       type: "single_choice",
-      options: optionsForCheckpointFamily(trigger.family),
+      options: optionsForCheckpointTrigger(trigger.family, trigger.signal.checkpointKey),
       allowOther: true,
       otherLabel: "Other decision",
       required: options.required ?? trigger.requiresQuestionBeforeClosure,
@@ -966,6 +1062,97 @@ function updateInvocationWithDecision(
   };
 }
 
+function normalizeAnswerToken(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function optionAnswerCandidates(option: QuestionOption): string[] {
+  return [
+    option.value,
+    option.label,
+    ...(option.description
+      ? [
+          `${option.label} - ${option.description}`,
+          `${option.label} — ${option.description}`
+        ]
+      : [])
+  ].map(normalizeAnswerToken);
+}
+
+function splitAnswerAndRationale(rawAnswer: string): { selection: string; rationale?: string } {
+  const [firstLine = "", ...restLines] = rawAnswer.trim().split(/\r?\n/);
+  const rationale = restLines.join("\n").trim();
+  return {
+    selection: firstLine.trim(),
+    ...(rationale ? { rationale } : {})
+  };
+}
+
+function normalizeQuestionAnswerSelection(
+  question: QuestionRecord,
+  rawAnswer: string
+): {
+  selectedValue: string;
+  selectedLabel: string;
+  otherText?: string;
+  inlineRationale?: string;
+} {
+  const trimmed = rawAnswer.trim();
+  const { selection, rationale } = splitAnswerAndRationale(trimmed);
+  const numeric = Number(selection);
+  if (/^\d+$/.test(selection) && Number.isInteger(numeric)) {
+    const option = question.prompt.options[numeric - 1];
+    if (option) {
+      return {
+        selectedValue: option.value,
+        selectedLabel: option.label,
+        ...(rationale ? { inlineRationale: rationale } : {})
+      };
+    }
+
+    if (question.prompt.allowOther && numeric === question.prompt.options.length + 1) {
+      return {
+        selectedValue: "other",
+        selectedLabel: question.prompt.otherLabel ?? "Other",
+        ...(rationale ? { inlineRationale: rationale } : {})
+      };
+    }
+
+    throw new Error(`Answer ${selection} is outside the available LongTable question options.`);
+  }
+
+  const normalizedSelection = normalizeAnswerToken(selection);
+  const option = question.prompt.options.find((candidate) =>
+    optionAnswerCandidates(candidate).includes(normalizedSelection)
+  );
+  if (option) {
+    return {
+      selectedValue: option.value,
+      selectedLabel: option.label,
+      ...(rationale ? { inlineRationale: rationale } : {})
+    };
+  }
+
+  if (normalizedSelection === "other" && question.prompt.allowOther) {
+    return {
+      selectedValue: "other",
+      selectedLabel: question.prompt.otherLabel ?? "Other",
+      ...(rationale ? { inlineRationale: rationale } : {})
+    };
+  }
+
+  if (question.prompt.allowOther) {
+    return {
+      selectedValue: "other",
+      selectedLabel: selection,
+      otherText: trimmed,
+      ...(rationale ? { inlineRationale: rationale } : {})
+    };
+  }
+
+  throw new Error(`Answer "${selection}" does not match a LongTable question option.`);
+}
+
 export async function answerWorkspaceQuestion(options: {
   context: LongTableProjectContext;
   questionId?: string;
@@ -984,14 +1171,16 @@ export async function answerWorkspaceQuestion(options: {
     throw new Error(options.questionId ? `No pending LongTable question found for ${options.questionId}.` : "No pending LongTable question was found.");
   }
 
-  const option = question.prompt.options.find((candidate) => candidate.value === options.answer);
-  const explicitOther = options.answer === "other" && question.prompt.allowOther;
+  const normalized = normalizeQuestionAnswerSelection(question, options.answer);
+  const rationale = [normalized.inlineRationale, options.rationale]
+    .filter((entry): entry is string => Boolean(entry && entry.trim()))
+    .join("\n");
   const answer: QuestionAnswer = {
     promptId: question.prompt.id,
-    selectedValues: [option?.value ?? "other"],
-    selectedLabels: [option?.label ?? (explicitOther ? question.prompt.otherLabel ?? "Other" : options.answer)],
-    ...(option || explicitOther ? {} : { otherText: options.answer }),
-    ...(options.rationale ? { rationale: options.rationale } : {}),
+    selectedValues: [normalized.selectedValue],
+    selectedLabels: [normalized.selectedLabel],
+    ...(normalized.otherText ? { otherText: normalized.otherText } : {}),
+    ...(rationale ? { rationale } : {}),
     ...(options.provider ? { provider: options.provider } : {}),
     surface: options.surface ?? (options.provider === "claude" ? "native_structured" : "numbered")
   };
@@ -1005,7 +1194,7 @@ export async function answerWorkspaceQuestion(options: {
     mode: "commit",
     summary: `Answered ${question.prompt.title}: ${answer.selectedLabels.join(", ")}`,
     selectedOption: answer.selectedValues[0],
-    ...(options.rationale ? { rationale: options.rationale } : {})
+    ...(rationale ? { rationale } : {})
   };
 
   const answeredQuestion: QuestionRecord = {

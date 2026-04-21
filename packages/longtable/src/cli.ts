@@ -1470,6 +1470,15 @@ function renderDoctorStatus(status: LongTableDoctorStatus): string {
         lines.push(`  - ${question.id}: ${question.question} (${question.options.join("/")})`);
       }
     }
+    if ((workspace.answerWarnings ?? []).length > 0) {
+      lines.push("- answer warnings:");
+      for (const warning of workspace.answerWarnings ?? []) {
+        lines.push(`  - ${warning.questionId}: ${warning.issue}`);
+        if (warning.suggestion) {
+          lines.push(`    ${warning.suggestion}`);
+        }
+      }
+    }
   }
 
   const nextActions: string[] = [];
@@ -2018,6 +2027,41 @@ async function runQuestion(args: Record<string, string | boolean>): Promise<void
       console.log("prompt" in transport ? transport.prompt : JSON.stringify(transport, null, 2));
     }
     return;
+  }
+
+  if (isInteractiveTerminal()) {
+    const rl = createInterface({ input, output });
+    try {
+      console.log(renderBrandBanner("LongTable", "Researcher Checkpoint"));
+      console.log("");
+      const answer = await promptChoice(
+        rl,
+        renderQuestionHeader(
+          1,
+          1,
+          result.question.prompt.title,
+          result.question.prompt.question
+        ),
+        questionRecordToChoices(result.question)
+      );
+      const decision = await answerWorkspaceQuestion({
+        context,
+        questionId: result.question.id,
+        answer,
+        provider,
+        surface: "terminal_selector"
+      });
+      console.log("");
+      console.log("LongTable checkpoint decision recorded");
+      console.log(`- question: ${decision.question.id}`);
+      console.log(`- decision: ${decision.decision.id}`);
+      console.log(`- answer: ${decision.decision.selectedOption ?? answer}`);
+      console.log(`- state: ${context.stateFilePath}`);
+      console.log(`- current: ${context.currentFilePath}`);
+      return;
+    } finally {
+      rl.close();
+    }
   }
 
   const optionValues = [
