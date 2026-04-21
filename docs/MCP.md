@@ -2,8 +2,7 @@
 
 ## Decision
 
-LongTable includes an optional MCP server named `longtable-state` starting in
-`0.1.11`.
+LongTable includes an optional MCP server named `longtable-state`.
 
 MCP is a structured transport layer. It is not the source of truth, and it does
 not own checkpoint semantics. The source of truth remains:
@@ -45,7 +44,7 @@ longtable-state
 Direct run:
 
 ```bash
-npx -y @longtable/mcp@0.1.11
+npx -y @longtable/mcp@0.1.14
 longtable-state --self-test
 ```
 
@@ -114,7 +113,7 @@ If MCP behavior and core behavior ever disagree, core wins.
 
 ## Open Limits
 
-The `0.1.11` MCP layer is a transport hardening step, not the final runtime:
+The MCP layer is a transport hardening step, not the final runtime:
 
 - it does not yet provide OAuth or remote deployment
 - it does not own scholarly search connectors

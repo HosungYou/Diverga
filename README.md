@@ -157,7 +157,7 @@ workflow logic stays in shared runtime state.
 
 ## MCP Transport
 
-LongTable 0.1.11 adds an optional MCP server named `longtable-state`.
+LongTable includes an optional MCP server named `longtable-state`.
 
 The MCP layer is not the LongTable core and does not replace `.longtable/`.
 It exposes structured tools over the existing project state so Codex, Claude
@@ -183,7 +183,7 @@ Default config targets:
 The server can also be run directly:
 
 ```bash
-npx -y @longtable/mcp@0.1.11
+npx -y @longtable/mcp@0.1.14
 longtable-state --self-test
 ```
 
