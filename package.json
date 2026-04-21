@@ -1,14 +1,17 @@
 {
   "name": "longtable-monorepo",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "description": "Monorepo for the LongTable product surface and provider-neutral runtime packages",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "build": "npm run build --workspace @longtable/core && npm run build --workspace @longtable/memory && npm run build --workspace @longtable/checkpoints && npm run build --workspace @longtable/setup && npm run build --workspace @longtable/provider-codex && npm run build --workspace @longtable/provider-claude && npm run build --workspace @longtable/cli",
+    "typecheck": "npm run typecheck --workspace @longtable/core && npm run typecheck --workspace @longtable/memory && npm run typecheck --workspace @longtable/checkpoints && npm run typecheck --workspace @longtable/setup && npm run typecheck --workspace @longtable/provider-codex && npm run typecheck --workspace @longtable/provider-claude && npm run typecheck --workspace @longtable/cli",
+    "test": "npm run build && npm run typecheck",
+    "pack:check": "npm pack --workspaces --dry-run",
+    "release:check": "npm run test && npm run pack:check"
   },
   "engines": {
     "node": ">=18.0.0"

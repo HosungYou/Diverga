@@ -1,5 +1,5 @@
 import { resolveCheckpointPolicy } from "@longtable/checkpoints";
-import type { ProviderCapabilities } from "@longtable/core";
+import type { ProviderCapabilities, QuestionRecord } from "@longtable/core";
 import type {
   CheckpointSignal,
   ResearcherProfile,
@@ -46,6 +46,13 @@ export interface CodexRuntimeBridge {
   defaultInteractionMode: SetupPersistedOutput["defaultInteractionMode"];
   profile: ResearcherProfile;
   runtimeDefaults: CodexRuntimeDefaults;
+}
+
+export interface CodexRenderedQuestionRecord {
+  questionId: string;
+  checkpointKey: string;
+  spec: NumberedCheckpointSpec;
+  prompt: string;
 }
 
 export const CODEX_PROVIDER_CAPABILITIES: ProviderCapabilities = {
@@ -127,6 +134,46 @@ export function renderCheckpointPrompt(
 
   sections.push(buildNumberedCheckpointPrompt(spec));
   return sections.join("\n\n");
+}
+
+export function questionRecordToNumberedCheckpointSpec(
+  record: QuestionRecord
+): NumberedCheckpointSpec {
+  const options = [
+    ...record.prompt.options.map((option) => ({
+      value: option.value,
+      label: option.description ? `${option.label} — ${option.description}` : option.label
+    })),
+    ...(record.prompt.allowOther
+      ? [{
+          value: "other",
+          label: record.prompt.otherLabel ?? "Other"
+        }]
+      : [])
+  ];
+
+  return {
+    title: record.prompt.title,
+    instructions: [
+      record.prompt.question,
+      ...record.prompt.rationale.map((entry) => `Why now: ${entry}`),
+      `Question id: ${record.id}`,
+      `Checkpoint: ${record.prompt.checkpointKey ?? "manual"}`,
+      `Required: ${record.prompt.required ? "yes" : "no"}`
+    ].join("\n"),
+    options,
+    allowRationale: true
+  };
+}
+
+export function renderQuestionRecordPrompt(record: QuestionRecord): CodexRenderedQuestionRecord {
+  const spec = questionRecordToNumberedCheckpointSpec(record);
+  return {
+    questionId: record.id,
+    checkpointKey: record.prompt.checkpointKey ?? "manual",
+    spec,
+    prompt: buildNumberedCheckpointPrompt(spec)
+  };
 }
 
 export function parseCheckpointResponse(

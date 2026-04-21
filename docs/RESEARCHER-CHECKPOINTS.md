@@ -95,6 +95,12 @@ Ask proactively when one of these conditions is true:
 Do not ask just because asking is possible. Low-stakes drafting, private notes,
 or reversible formatting changes can be logged without interruption.
 
+LongTable should not rely only on explicit commands such as `lt commit:`.
+Natural-language requests are classified into checkpoint signals by
+`@longtable/checkpoints` before provider adapters render a question or fallback
+prompt. The classifier is intentionally auditable: it reports the checkpoint key,
+trigger family, matched cues, confidence, and rationale.
+
 ## Meta-Decision Checkpoints
 
 A **Meta-Decision Checkpoint** is required when LongTable itself is making a

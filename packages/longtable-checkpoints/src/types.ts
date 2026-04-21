@@ -21,6 +21,36 @@ export interface CheckpointSignal {
   studyContract?: StudyContract;
 }
 
+export type CheckpointTriggerFamily =
+  | "exploration"
+  | "review"
+  | "commitment"
+  | "submission"
+  | "meta_decision"
+  | "evidence"
+  | "authorship"
+  | "advisory";
+
+export interface CheckpointTriggerClassification {
+  signal: CheckpointSignal;
+  family: CheckpointTriggerFamily;
+  confidence: "low" | "medium" | "high";
+  matchedCues: string[];
+  requiresQuestionBeforeClosure: boolean;
+  advisoryOnly: boolean;
+  rationale: string[];
+}
+
+export interface CheckpointTriggerClassificationOptions {
+  preferredMode?: InteractionMode;
+  fallbackMode?: InteractionMode;
+  researchStage?: ResearchStage;
+  artifactStakes?: ArtifactStakes;
+  checkpointKey?: string;
+  unresolvedTensions?: string[];
+  studyContract?: StudyContract;
+}
+
 export interface ResolvedCheckpointPolicy {
   checkpointKey: string;
   level: CheckpointLevel;

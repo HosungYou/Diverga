@@ -72,6 +72,8 @@ function baseSkillSpecs(): ClaudeSkillSpec[] {
         "- If changing LongTable product language, README positioning, or checkpoint policy, ask a Meta-Decision Checkpoint first.",
         "- If a checkpoint allows `other`, make `other` visible instead of hiding it in state.",
         "- Treat Claude's structured question surface as transport; LongTable state records are the source of truth.",
+        "- When the `longtable` CLI is available in a workspace, use `longtable question --print --provider claude --prompt \"...\"` to create a canonical checkpoint payload before invoking Claude's structured question surface.",
+        "- If `CURRENT.md` shows a pending required checkpoint, do not proceed until `longtable decide --question <id> --answer <value>` records the researcher's choice.",
         "- Preserve open tensions and authorship instead of forcing closure.",
         "- Disclose consulted roles with `LongTable consulted: ...` when a role is foregrounded.",
         "- Label unsupported external claims as inference or estimate.",
@@ -105,6 +107,7 @@ function baseSkillSpecs(): ClaudeSkillSpec[] {
         "- Use multiple research perspectives when the request touches methods, theory, measurement, venue fit, ethics, or authorship.",
         "- Do not collapse disagreement too early.",
         "- Use a Researcher Checkpoint before treating panel synthesis as settled.",
+        "- If the CLI is available, prefer `longtable question --print --provider claude --prompt \"...\"` before invoking a structured question surface.",
         "- Do not expose hidden reasoning or tool logs.",
         "- If `.longtable/` exists, align the panel with `CURRENT.md` and project state.",
         "- If `longtable panel --print --prompt \"...\"` is available, it may be used to obtain the canonical fallback prompt."

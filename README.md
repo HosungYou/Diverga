@@ -188,6 +188,27 @@ If a checkpoint allows `other`, that option must be visible to the researcher.
 Hidden `allowOther` support is not enough because it still pressures the
 researcher into the system's categories.
 
+Natural-language checkpoint triggers are handled by the shared checkpoint
+package, not by provider-specific prompt text. LongTable classifies cues such as
+submission, method design, measurement, evidence verification, authorship, and
+platform-language changes into a `CheckpointSignal`; the checkpoint policy then
+decides whether the question is blocking or advisory.
+
+When you need to record a checkpoint directly:
+
+```bash
+longtable question --prompt "We are about to finalize the measurement plan."
+longtable question --provider codex --print --prompt "We are about to finalize the measurement plan."
+longtable question --provider claude --print --prompt "We are about to finalize the measurement plan."
+longtable decide --question <id> --answer evidence --rationale "Need scale validity support first."
+```
+
+If the checkpoint is required, LongTable treats the workspace as blocked for
+normal `ask`, mode, and panel commands until `longtable decide` records an
+answer. The pending question remains visible in `CURRENT.md` and `doctor`.
+`--print` renders the provider transport: numbered prompt for Codex, structured
+question payload for Claude.
+
 ## Health Check
 
 Use `doctor` when you want to confirm that LongTable is wired into both provider
@@ -332,6 +353,7 @@ machine-readable state under `.longtable/`.
 
 ```bash
 npm install
+npm run release:check
 npm run typecheck
 npm run build
 ```
@@ -341,7 +363,10 @@ npm run build
 - [Command Surface](docs/LONGTABLE-COMMAND-SURFACE.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Question Runtime](docs/QUESTION-RUNTIME.md)
+- [Checkpoint Triggering](docs/CHECKPOINT-TRIGGERING.md)
 - [Researcher Checkpoints](docs/RESEARCHER-CHECKPOINTS.md)
+- [Release Process](docs/RELEASE-PROCESS.md)
+- [Docs Language Policy](docs/DOCS-LANGUAGE-POLICY.md)
 - [Invocation Log](docs/INVOCATION-LOG.md)
 - [Doctor Status](docs/DOCTOR.md)
 - [Checkpointing](docs/CHECKPOINTING.md)

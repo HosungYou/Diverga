@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v0.1.*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+
+      - name: Release check
+        run: npm run release:check
+
+      - name: Publish workspaces
+        run: |
+          publish_if_needed() {
+            pkg="$1"
+            workspace="$2"
+            version="$(node -p "require('./$workspace/package.json').version")"
+            if npm view "$pkg@$version" version >/dev/null 2>&1; then
+              echo "$pkg@$version already exists; skipping publish."
+              return 0
+            fi
+            npm publish --workspace "$pkg" --access public --provenance
+          }
+
+          publish_if_needed @longtable/core packages/longtable-core
+          publish_if_needed @longtable/memory packages/longtable-memory
+          publish_if_needed @longtable/checkpoints packages/longtable-checkpoints
+          publish_if_needed @longtable/setup packages/longtable-setup
+          publish_if_needed @longtable/provider-codex packages/longtable-provider-codex
+          publish_if_needed @longtable/provider-claude packages/longtable-provider-claude
+          publish_if_needed @longtable/cli packages/longtable
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

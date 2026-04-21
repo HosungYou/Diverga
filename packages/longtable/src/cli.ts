@@ -33,6 +33,7 @@ import {
   buildCodexThinWrappedPrompt,
   installCodexSkills,
   listInstalledCodexSkills,
+  renderQuestionRecordPrompt,
   removeCodexSkills,
   resolveCodexSkillsDir,
   runCodexThinWrapper
@@ -41,6 +42,7 @@ import {
   buildClaudeSkillSpecs,
   installClaudeSkills,
   listInstalledClaudeSkills,
+  renderQuestionRecordInput,
   removeClaudeSkills,
   resolveClaudeSkillsDir
 } from "@longtable/provider-claude";
@@ -55,7 +57,9 @@ import { PERSONA_DEFINITIONS, listRoleDefinitions } from "./personas.js";
 import { buildPanelFallback, renderPanelSummary } from "./panel.js";
 import {
   appendInvocationRecordToWorkspace,
+  assertWorkspaceNotBlocked,
   answerWorkspaceQuestion,
+  createWorkspaceQuestion,
   createOrUpdateProjectWorkspace,
   inspectProjectWorkspace,
   loadProjectContextFromDirectory,
@@ -204,6 +208,7 @@ function usage(): string {
     "  longtable show [--json] [--path <file>]",
     "  longtable install [--json] [--path <file>] [--runtime-path <file>]",
     "  longtable ask [--prompt <text>] [--print] [--json] [--setup <path>] [--cwd <path>]",
+    "  longtable question --prompt <decision-context> [--title <text>] [--text <question>] [--provider codex|claude] [--required|--advisory] [--print] [--cwd <path>] [--json]",
     "  longtable panel [--prompt <text>] [--role <role[,role]>] [--mode review|critique|draft|commit] [--visibility synthesis_only|show_on_conflict|always_visible] [--print] [--json] [--setup <path>] [--cwd <path>]",
     "  longtable decide [--question <id>] --answer <value-or-text> [--rationale <text>] [--provider codex|claude] [--cwd <path>] [--json]",
     "  longtable explore|review|critique|draft|commit|submit [--prompt <text>] [--role <role[,role]>] [--panel] [--show-conflicts] [--show-deliberation] [--print] [--json] [--stage <stage>] [--setup <path>] [--cwd <path>]",
@@ -238,7 +243,7 @@ function parseArgs(argv: string[]): ParsedArgs {
 
   const modeCommand = command && VALID_MODES.has(command as InteractionMode);
   const directCommand =
-    command && ["init", "start", "resume", "doctor", "status", "roles", "show", "install", "codex", "claude", "ask", "panel", "decide"].includes(command);
+    command && ["init", "start", "resume", "doctor", "status", "roles", "show", "install", "codex", "claude", "ask", "question", "panel", "decide"].includes(command);
 
   let startIndex = 1;
   if (modeCommand) {
@@ -1631,6 +1636,10 @@ async function runModeCommand(
   }
 
   const setup = await loadOptionalSetup(typeof args.setup === "string" ? args.setup : undefined);
+  const projectContext = await loadProjectContextFromDirectory(workingDirectory);
+  if (projectContext) {
+    await assertWorkspaceNotBlocked(projectContext);
+  }
   const projectAware = await buildProjectAwarePrompt(prompt, workingDirectory);
   const panelPreference = setup?.profileSeed.panelPreference;
   const panelRequested =
@@ -1678,6 +1687,10 @@ async function runPanelCommand(args: Record<string, string | boolean>): Promise<
   }
 
   const setup = await loadOptionalSetup(typeof args.setup === "string" ? args.setup : undefined);
+  const existingContext = await loadProjectContextFromDirectory(workingDirectory);
+  if (existingContext) {
+    await assertWorkspaceNotBlocked(existingContext);
+  }
   const projectAware = await buildProjectAwarePrompt(prompt, workingDirectory);
   const provider = setup?.providerSelection.provider as ProviderKind | undefined;
   const visibility =
@@ -1740,6 +1753,73 @@ async function runPanelCommand(args: Record<string, string | boolean>): Promise<
     json: false
   });
   exit(exitCode);
+}
+
+async function runQuestion(args: Record<string, string | boolean>): Promise<void> {
+  const workingDirectory = typeof args.cwd === "string" ? args.cwd : cwd();
+  const prompt = await resolvePrompt(typeof args.prompt === "string" ? args.prompt : undefined);
+  if (!prompt) {
+    throw new Error("A decision context is required. Pass --prompt <text>.");
+  }
+
+  const context = await loadProjectContextFromDirectory(workingDirectory);
+  if (!context) {
+    throw new Error("No LongTable project workspace was found here. Run this inside a project or pass --cwd.");
+  }
+
+  const provider = args.provider === "claude" ? "claude" : args.provider === "codex" ? "codex" : undefined;
+  const required = args.required === true ? true : args.advisory === true ? false : undefined;
+  const result = await createWorkspaceQuestion({
+    context,
+    prompt,
+    title: typeof args.title === "string" ? args.title : undefined,
+    question: typeof args.text === "string" ? args.text : undefined,
+    provider,
+    required
+  });
+  const transport = provider === "claude"
+    ? renderQuestionRecordInput(result.question)
+    : renderQuestionRecordPrompt(result.question);
+
+  if (args.json === true) {
+    console.log(
+      JSON.stringify(
+        {
+          question: result.question,
+          transport,
+          files: {
+            state: context.stateFilePath,
+            current: context.currentFilePath
+          },
+          nextAction: `longtable decide --question ${result.question.id} --answer <value>`
+        },
+        null,
+        2
+      )
+    );
+    return;
+  }
+
+  if (args.print === true) {
+    if (provider === "claude") {
+      console.log(JSON.stringify(transport, null, 2));
+    } else {
+      console.log("prompt" in transport ? transport.prompt : JSON.stringify(transport, null, 2));
+    }
+    return;
+  }
+
+  const optionValues = [
+    ...result.question.prompt.options.map((option) => option.value),
+    ...(result.question.prompt.allowOther ? ["other"] : [])
+  ];
+  console.log(result.question.prompt.required ? "LongTable required Researcher Checkpoint recorded" : "LongTable advisory Researcher Checkpoint recorded");
+  console.log(`- question: ${result.question.id}`);
+  console.log(`- checkpoint: ${result.question.prompt.checkpointKey ?? "manual"}`);
+  console.log(`- prompt: ${result.question.prompt.question}`);
+  console.log(`- options: ${optionValues.join("/")}`);
+  console.log(`- answer: longtable decide --question ${result.question.id} --answer <value>`);
+  console.log(`- current: ${context.currentFilePath}`);
 }
 
 async function runAsk(args: Record<string, string | boolean>): Promise<void> {
@@ -2152,6 +2232,11 @@ async function main(): Promise<void> {
 
   if (command === "ask") {
     await runAsk(values);
+    return;
+  }
+
+  if (command === "question") {
+    await runQuestion(values);
     return;
   }
 

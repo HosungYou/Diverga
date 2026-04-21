@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { cwd } from "node:process";
-import { resolveCheckpointPolicy, resolveRuntimeGuidance } from "@longtable/checkpoints";
-import type { CheckpointLevel, InteractionMode, ResearchStage, ResearcherProfile, RuntimeGuidance } from "@longtable/core";
+import { classifyCheckpointTrigger, resolveCheckpointPolicy, resolveRuntimeGuidance } from "@longtable/checkpoints";
+import type { InteractionMode, ResearchStage, ResearcherProfile, RuntimeGuidance } from "@longtable/core";
 import { loadSetupOutput, resolveDefaultSetupPath } from "@longtable/setup";
 import type { SetupPersistedOutput } from "@longtable/setup";
 import { normalizeResearcherProfile, renderRuntimeGuidance } from "./index.js";
@@ -18,6 +18,8 @@ export interface CodexThinWrapperOptions {
 export interface CodexWrappedPrompt {
   mode: InteractionMode;
   researchStage: ResearchStage;
+  checkpointKey: string;
+  checkpointTrigger: ReturnType<typeof classifyCheckpointTrigger>;
   guidance: RuntimeGuidance;
   wrappedPrompt: string;
   setupLoaded: boolean;
@@ -54,21 +56,6 @@ function defaultStage(mode: InteractionMode): ResearchStage {
   }
 }
 
-function defaultCheckpointLevel(mode: InteractionMode): CheckpointLevel {
-  switch (mode) {
-    case "submit":
-      return "adaptive_required";
-    case "commit":
-      return "recommended";
-    case "review":
-    case "critique":
-    case "draft":
-    case "explore":
-    default:
-      return "recommended";
-  }
-}
-
 async function loadManagedSetup(customPath?: string): Promise<SetupPersistedOutput | null> {
   const target = resolveDefaultSetupPath(customPath).path;
 
@@ -96,28 +83,26 @@ export async function buildCodexThinWrappedPrompt(
 ): Promise<CodexWrappedPrompt> {
   const setup = await loadManagedSetup(options.setupPath);
   const profile = setup ? normalizeResearcherProfile(setup.profileSeed) : defaultProfile();
-  const mode = options.mode ?? defaultMode(setup ?? undefined);
-  const researchStage = options.researchStage ?? defaultStage(mode);
   const prompt = options.prompt.trim();
-  const signal = {
-    checkpointKey: "runtime_guidance",
-    baseLevel: defaultCheckpointLevel(mode),
-    mode,
-    artifactStakes:
-      mode === "submit"
-        ? "external_submission"
-        : mode === "commit"
-          ? "study_protocol"
-          : mode === "draft"
-            ? "internal_draft"
-            : "private_note",
-    researchStage,
+  const fallbackMode = defaultMode(setup ?? undefined);
+  const trigger = classifyCheckpointTrigger(prompt, {
+    preferredMode: options.mode,
+    fallbackMode,
+    researchStage: options.researchStage ?? (options.mode ? defaultStage(options.mode) : undefined),
     unresolvedTensions: setup?.initialState.openTensions ?? [],
     studyContract: setup?.initialState.studyContract
-  } as const;
-  const policy = resolveCheckpointPolicy(profile, signal);
-  const guidance = resolveRuntimeGuidance(profile, signal, policy);
-  const sections = [renderRuntimeGuidance(guidance)];
+  });
+  const policy = resolveCheckpointPolicy(profile, trigger.signal);
+  const guidance = resolveRuntimeGuidance(profile, trigger.signal, policy);
+  const triggerLines = [
+    "LongTable checkpoint trigger",
+    `- checkpoint: ${trigger.signal.checkpointKey}`,
+    `- trigger family: ${trigger.family}`,
+    `- confidence: ${trigger.confidence}`,
+    `- status: ${trigger.requiresQuestionBeforeClosure ? "question required before closure" : "advisory guidance"}`,
+    `- rationale: ${trigger.rationale.join(" ")}`
+  ];
+  const sections = [triggerLines.join("\n"), renderRuntimeGuidance(guidance)];
   const instructionLines = [
     "LongTable ordering rules",
     guidance.minimumQuestions > 0 || guidance.mustAskBeforeClosure
@@ -136,8 +121,10 @@ export async function buildCodexThinWrappedPrompt(
   sections.push(["User prompt", prompt].join("\n"));
 
   return {
-    mode,
-    researchStage,
+    mode: trigger.signal.mode,
+    researchStage: trigger.signal.researchStage,
+    checkpointKey: trigger.signal.checkpointKey,
+    checkpointTrigger: trigger,
     guidance,
     wrappedPrompt: sections.join("\n\n"),
     setupLoaded: Boolean(setup)

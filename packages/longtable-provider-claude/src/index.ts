@@ -1,5 +1,5 @@
 import { resolveCheckpointPolicy } from "@longtable/checkpoints";
-import type { ProviderCapabilities } from "@longtable/core";
+import type { ProviderCapabilities, QuestionRecord } from "@longtable/core";
 import type {
   CheckpointSignal,
   ResearcherProfile,
@@ -52,6 +52,13 @@ export interface ClaudeCheckpointResult {
   structuredPrompt: ClaudeStructuredCheckpoint;
   askUserQuestionInput: ClaudeAskUserQuestionInput;
   blocking: boolean;
+}
+
+export interface ClaudeRenderedQuestionRecord {
+  questionId: string;
+  checkpointKey: string;
+  structuredPrompt: ClaudeStructuredCheckpoint;
+  askUserQuestionInput: ClaudeAskUserQuestionInput;
 }
 
 export interface ClaudeRuntimeDefaults {
@@ -159,6 +166,47 @@ export function renderAskUserQuestionInput(
         multiSelect: false
       }
     ]
+  };
+}
+
+export function renderStructuredQuestionRecord(
+  record: QuestionRecord
+): ClaudeStructuredCheckpoint {
+  const choices = [
+    ...record.prompt.options.map((option) => ({
+      id: option.value,
+      label: option.description ? `${option.label} — ${option.description}` : option.label
+    })),
+    ...(record.prompt.allowOther
+      ? [{
+          id: "other",
+          label: record.prompt.otherLabel ?? "Other"
+        }]
+      : [])
+  ];
+
+  return {
+    title: record.prompt.title,
+    instructions: [
+      record.prompt.question,
+      ...record.prompt.rationale.map((entry) => `Why now: ${entry}`),
+      `Question id: ${record.id}`,
+      `Checkpoint: ${record.prompt.checkpointKey ?? "manual"}`,
+      `Required: ${record.prompt.required ? "yes" : "no"}`
+    ].join(" "),
+    choices
+  };
+}
+
+export function renderQuestionRecordInput(
+  record: QuestionRecord
+): ClaudeRenderedQuestionRecord {
+  const structuredPrompt = renderStructuredQuestionRecord(record);
+  return {
+    questionId: record.id,
+    checkpointKey: record.prompt.checkpointKey ?? "manual",
+    structuredPrompt,
+    askUserQuestionInput: renderAskUserQuestionInput(structuredPrompt)
   };
 }
 

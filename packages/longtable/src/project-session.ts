@@ -8,9 +8,12 @@ import {
   appendQuestionRecords,
   createEmptyResearchState
 } from "@longtable/memory";
+import { classifyCheckpointTrigger } from "@longtable/checkpoints";
 import type {
   DecisionRecord,
   InvocationRecord,
+  ProviderKind,
+  QuestionOption,
   QuestionAnswer,
   QuestionRecord,
   ResearchState
@@ -578,6 +581,165 @@ function findQuestionForDecision(
   return pending.at(-1) ?? null;
 }
 
+function pendingRequiredQuestions(state: ResearchState): QuestionRecord[] {
+  return (state.questionLog ?? []).filter(
+    (record) => record.status === "pending" && record.prompt.required
+  );
+}
+
+export async function listBlockingWorkspaceQuestions(
+  context: LongTableProjectContext
+): Promise<QuestionRecord[]> {
+  const state = await loadResearchState(context.stateFilePath);
+  return pendingRequiredQuestions(state);
+}
+
+export async function assertWorkspaceNotBlocked(context: LongTableProjectContext): Promise<void> {
+  const blocking = await listBlockingWorkspaceQuestions(context);
+  if (blocking.length === 0) {
+    return;
+  }
+
+  const first = blocking[0];
+  const options = formatQuestionOptionValues(first).join("/");
+  throw new Error(
+    [
+      `LongTable is blocked by a required Researcher Checkpoint: ${first.id}`,
+      first.prompt.question,
+      `Options: ${options}`,
+      `Record an answer with: longtable decide --question ${first.id} --answer <value>`
+    ].join("\n")
+  );
+}
+
+function questionTitleForCheckpoint(family: string): string {
+  switch (family) {
+    case "meta_decision":
+      return "Meta-decision checkpoint";
+    case "submission":
+      return "Submission checkpoint";
+    case "commitment":
+      return "Research commitment checkpoint";
+    case "evidence":
+      return "Evidence checkpoint";
+    case "authorship":
+      return "Authorship checkpoint";
+    case "review":
+      return "Review checkpoint";
+    case "exploration":
+      return "Exploration checkpoint";
+    default:
+      return "Researcher Checkpoint";
+  }
+}
+
+function questionTextForCheckpoint(family: string, prompt: string): string {
+  switch (family) {
+    case "meta_decision":
+      return "What should LongTable do before treating this platform decision as settled?";
+    case "submission":
+      return "What must happen before this work can move toward external release or submission?";
+    case "commitment":
+      return "What should LongTable treat as the human research commitment here?";
+    case "evidence":
+      return "How should LongTable handle the evidence risk before using this claim?";
+    case "authorship":
+      return "What should LongTable preserve before changing the researcher's voice or authorship trace?";
+    case "exploration":
+      return "What ambiguity should LongTable keep open before recommending a direction?";
+    default:
+      return `What should LongTable decide before proceeding with: ${prompt}`;
+  }
+}
+
+function optionsForCheckpointFamily(family: string): QuestionOption[] {
+  if (family === "evidence") {
+    return [
+      { value: "verify", label: "Verify evidence first", description: "Check whether the source supports the specific claim." },
+      { value: "limit", label: "Limit the claim", description: "Keep the point but narrow it to what the evidence can support." },
+      { value: "rewrite", label: "Rewrite without the claim", description: "Avoid relying on the uncertain citation or claim." },
+      { value: "defer", label: "Keep evidence risk open", description: "Do not settle the claim yet." }
+    ];
+  }
+
+  if (family === "meta_decision") {
+    return [
+      { value: "revise", label: "Revise the platform decision", description: "Change the term, policy, or README positioning before treating it as settled." },
+      { value: "evidence", label: "Gather implementation evidence first", description: "Inspect behavior or docs before committing the platform decision." },
+      { value: "proceed", label: "Proceed with current decision", description: "Accept the current platform framing and continue." },
+      { value: "defer", label: "Keep the decision open", description: "Do not make this platform language authoritative yet." }
+    ];
+  }
+
+  if (family === "submission") {
+    return [
+      { value: "review", label: "Review risk first", description: "Check claims, ethics, venue fit, or study contract before external release." },
+      { value: "evidence", label: "Verify evidence first", description: "Confirm source support before submission or public sharing." },
+      { value: "proceed", label: "Proceed toward submission", description: "Accept the remaining risk and continue." },
+      { value: "defer", label: "Do not submit yet", description: "Keep the submission decision open." }
+    ];
+  }
+
+  return [
+    { value: "revise", label: "Revise before proceeding", description: "Change the framing, design, or draft before treating this as settled." },
+    { value: "evidence", label: "Gather or verify evidence first", description: "Do not proceed until the relevant evidence is checked." },
+    { value: "proceed", label: "Proceed with current direction", description: "Accept the risk profile and continue." },
+    { value: "defer", label: "Keep this open", description: "Do not commit yet; keep the issue visible as an open tension." }
+  ];
+}
+
+export async function createWorkspaceQuestion(options: {
+  context: LongTableProjectContext;
+  prompt: string;
+  title?: string;
+  question?: string;
+  provider?: ProviderKind;
+  required?: boolean;
+}): Promise<{
+  question: QuestionRecord;
+  state: ResearchState;
+}> {
+  const state = await loadResearchState(options.context.stateFilePath);
+  const trigger = classifyCheckpointTrigger(options.prompt, {
+    unresolvedTensions: state.openTensions ?? [],
+    studyContract: state.studyContract
+  });
+  const createdAt = nowIso();
+  const question: QuestionRecord = {
+    id: createId("question_record"),
+    createdAt,
+    updatedAt: createdAt,
+    status: "pending",
+    prompt: {
+      id: createId("question_prompt"),
+      checkpointKey: trigger.signal.checkpointKey,
+      title: options.title ?? questionTitleForCheckpoint(trigger.family),
+      question: options.question ?? questionTextForCheckpoint(trigger.family, options.prompt),
+      type: "single_choice",
+      options: optionsForCheckpointFamily(trigger.family),
+      allowOther: true,
+      otherLabel: "Other decision",
+      required: options.required ?? trigger.requiresQuestionBeforeClosure,
+      source: "checkpoint",
+      rationale: [
+        ...trigger.rationale,
+        `Trigger family: ${trigger.family}.`,
+        `Trigger confidence: ${trigger.confidence}.`,
+        `Original prompt: ${options.prompt}`
+      ],
+      preferredSurfaces: options.provider === "claude"
+        ? ["native_structured", "numbered"]
+        : ["numbered", "native_structured"]
+    }
+  };
+
+  const updated = appendQuestionRecords(state, [question]);
+  await writeFile(options.context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(options.context);
+
+  return { question, state: updated };
+}
+
 function updateInvocationWithDecision(
   invocation: InvocationRecord,
   questionId: string,
@@ -620,11 +782,12 @@ export async function answerWorkspaceQuestion(options: {
   }
 
   const option = question.prompt.options.find((candidate) => candidate.value === options.answer);
+  const explicitOther = options.answer === "other" && question.prompt.allowOther;
   const answer: QuestionAnswer = {
     promptId: question.prompt.id,
     selectedValues: [option?.value ?? "other"],
-    selectedLabels: [option?.label ?? options.answer],
-    ...(option ? {} : { otherText: options.answer }),
+    selectedLabels: [option?.label ?? (explicitOther ? question.prompt.otherLabel ?? "Other" : options.answer)],
+    ...(option || explicitOther ? {} : { otherText: options.answer }),
     ...(options.rationale ? { rationale: options.rationale } : {}),
     ...(options.provider ? { provider: options.provider } : {}),
     surface: options.provider === "claude" ? "native_structured" : "numbered"

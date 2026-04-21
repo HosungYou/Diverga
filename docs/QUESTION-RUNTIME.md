@@ -36,6 +36,58 @@ Researcher Checkpoint -> QuestionRecord -> DecisionRecord
 
 `QuestionRecord` is durable lifecycle state. It exists so a required question is not inferred from prompt text alone.
 
+## Triggering
+
+Natural-language checkpoint triggering is owned by `@longtable/checkpoints`.
+The classifier converts prompt context into a `CheckpointSignal` before provider
+adapters render anything.
+
+```text
+natural language
+  -> classifyCheckpointTrigger
+  -> CheckpointSignal
+  -> resolveCheckpointPolicy
+  -> resolveRuntimeGuidance
+  -> provider-rendered checkpoint
+```
+
+This protects LongTable from depending only on explicit commands such as
+`lt commit:`. A request about submission, measurement validity, evidence
+verification, authorship, or LongTable platform-language changes can still
+activate the right checkpoint posture.
+
+## Direct Command Surface
+
+`longtable question` writes a pending `QuestionRecord` from natural-language
+decision context:
+
+```bash
+longtable question --prompt "We are about to finalize the measurement plan."
+```
+
+Provider rendering can be inspected at the same boundary:
+
+```bash
+longtable question --provider codex --print --prompt "We are about to finalize the measurement plan."
+longtable question --provider claude --print --prompt "We are about to finalize the measurement plan."
+```
+
+`longtable decide` answers that pending question and appends a `DecisionRecord`:
+
+```bash
+longtable decide --question <id> --answer evidence --rationale "Need scale validity support first."
+```
+
+Required pending questions block normal `ask`, mode, and panel commands in the
+CLI until they are answered. This gives "blocking" a concrete runtime meaning:
+the system does not silently proceed through a required checkpoint.
+
+Provider adapters expose the same record differently:
+
+- Codex uses `renderQuestionRecordPrompt(record)` to produce a numbered prompt.
+- Claude uses `renderQuestionRecordInput(record)` to produce a structured
+  AskUserQuestion-compatible payload.
+
 ## Provider Mapping
 
 ### Claude Code
