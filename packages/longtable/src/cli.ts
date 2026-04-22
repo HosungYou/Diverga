@@ -218,7 +218,7 @@ const ANSI = {
 };
 
 const LONGTABLE_MCP_SERVER_NAME = "longtable-state";
-const LONGTABLE_MCP_PACKAGE_VERSION = "0.1.31";
+const LONGTABLE_MCP_PACKAGE_VERSION = "0.1.32";
 const LONGTABLE_MCP_MARKER_START = "# LongTable state MCP START";
 const LONGTABLE_MCP_MARKER_END = "# LongTable state MCP END";
 
@@ -247,6 +247,21 @@ function renderBrandBanner(title: string, subtitle?: string): string {
   return lines.join("\n");
 }
 
+function renderInterviewLaunchSteps(provider: ProviderKind): string {
+  const command = provider === "codex" ? "codex" : "claude";
+  return renderSectionCard("LongTable Interview", [
+    "Setup is permission and runtime calibration, not the research interview.",
+    "The first research conversation now happens inside the provider so the model can listen, reflect, and ask one natural-language follow-up at a time.",
+    "",
+    "Next:",
+    "1. cd \"<research-folder>\"",
+    `2. run \`${command}\``,
+    "3. invoke `$longtable-interview`",
+    "",
+    "The interview will create or resume `.longtable/`, build a First Research Shape, and use option UI only for the final confirmation."
+  ]);
+}
+
 function renderProgressBar(current: number, total: number): string {
   const width = 10;
   const filled = Math.max(1, Math.round((current / total) * width));
@@ -257,11 +272,11 @@ function usage(): string {
   return [
     "Usage:",
     "  Run `longtable ...` in your terminal, not inside the Codex chat box.",
-    "  After `longtable start`, move into the created project directory and open `codex` there.",
+    "  LongTable research starts inside Codex or Claude with `$longtable-interview` after setup.",
     "",
     "  longtable setup [--provider codex|claude] [--install-scope user|project|none] [--surfaces cli_only|skills|skills_mcp|skills_mcp_sentinel] [--intervention advisory|balanced|strong] [--checkpoint-ui off|interactive|strong] [--workspace create|later] [--project-dir <path>] [--json] [--dir <path>] [--skills-dir <path>] [--runtime-path <file>] [--setup-path <file>]",
     "  longtable init [deprecated alias for setup; full legacy flags still supported for automation]",
-    "  longtable start [--path <dir>] [--name <project>] [--goal <text>] [--blocker <text>] [--research-object research_question|theory_framework|measurement_instrument|study_design|analysis_plan|manuscript] [--gap-risk known_gap|suspected_tacit_assumptions|diagnose] [--protected-decision theory|measurement|method|evidence_citation|authorship_voice|submission_public_sharing] [--perspectives <role[,role]>] [--disagreement synthesis_only|show_on_conflict|always_visible] [--setup <path>] [--json]",
+    "  longtable start [deprecated fallback] [--path <dir>] [--name <project>] [--goal <text>] [--blocker <text>] [--research-object research_question|theory_framework|measurement_instrument|study_design|analysis_plan|manuscript] [--gap-risk known_gap|suspected_tacit_assumptions|diagnose] [--protected-decision theory|measurement|method|evidence_citation|authorship_voice|submission_public_sharing] [--perspectives <role[,role]>] [--disagreement synthesis_only|show_on_conflict|always_visible] [--setup <path>] [--json] [--no-interview]",
     "  longtable resume [--cwd <path>] [--json]",
     "  longtable doctor [--cwd <path>] [--fix] [--json] [--codex-dir <path>] [--codex-config <path>] [--claude-dir <path>] [--codex-prompts-dir <path>] [--codex-runtime-path <file>] [--claude-runtime-path <file>]",
     "  longtable status [--cwd <path>] [--fix] [--json] [--codex-dir <path>] [--codex-config <path>] [--claude-dir <path>] [--codex-prompts-dir <path>] [--codex-runtime-path <file>] [--claude-runtime-path <file>]",
@@ -294,9 +309,9 @@ function usage(): string {
     "",
     "Examples:",
     "  longtable setup --provider codex",
-    "  longtable start",
-    "  longtable start --path ~/Research/My-Project --name \"AI Adoption Meta-Analysis\" --goal \"Narrow the review question\"",
-    "  cd \"<project-path>\" && codex",
+    "  cd \"<research-folder>\" && codex",
+    "  $longtable-interview",
+    "  longtable start --no-interview --path ~/Research/My-Project --name \"AI Adoption Meta-Analysis\" --goal \"Narrow the review question\"",
     "  longtable doctor",
     "  longtable roles",
     "  longtable ask --prompt \"연구를 시작하고 싶어. 지금 어디서부터 좁혀야 할지 모르겠어.\"",
@@ -696,13 +711,13 @@ function buildPermissionSetupChoices(): {
     workspace: [
       {
         id: "create",
-        label: "Yes, create one now",
-        description: "Why: durable state needs .longtable/. What you get: decision log and CURRENT.md. Tradeoff: asks project-specific questions now."
+        label: "Show interview launch steps",
+        description: "Why: research should start inside the provider. What you get: setup finishes with Codex/Claude + $longtable-interview steps. Tradeoff: workspace creation waits for the in-provider interview."
       },
       {
         id: "later",
         label: "No, prepare runtime only",
-        description: "Why: keeps setup short. What you get: runtime support without project state. Tradeoff: no durable research memory until `longtable start`."
+        description: "Why: keeps setup short. What you get: runtime support without project state. Tradeoff: no durable research memory until `$longtable-interview` creates or resumes a workspace."
       }
     ]
   };
@@ -879,6 +894,8 @@ async function runSetup(args: Record<string, string | boolean>): Promise<void> {
     interventionPosture: effectiveIntervention,
     checkpointUiMode: checkpointUi,
     workspaceCreationPreference: workspacePreference,
+    officialStartSurface: "$longtable-interview",
+    setupPosture: "permission_first",
     teamMode: "panel"
   };
   if (surfaces === "skills_mcp_sentinel") {
@@ -930,7 +947,12 @@ async function runSetup(args: Record<string, string | boolean>): Promise<void> {
       runtime: result,
       installedSkills: installedSkills.map((skill) => skill.name),
       mcpInstall,
-      workspacePreference
+      workspacePreference,
+      nextStep: {
+        surface: "$longtable-interview",
+        command: provider === "codex" ? "codex" : "claude",
+        description: "Open the provider in the research folder and invoke `$longtable-interview`."
+      }
     }, null, 2));
     return;
   }
@@ -959,12 +981,11 @@ async function runSetup(args: Record<string, string | boolean>): Promise<void> {
     console.log("Background sentinel approval recorded.");
     console.log("Hook installation remains opt-in; LongTable will not install hooks without an explicit hook command.");
   }
+  console.log("");
+  console.log(renderInterviewLaunchSteps(provider));
   if (workspacePreference === "create") {
     console.log("");
-    console.log("Project workspace requested. LongTable will now run `longtable start` with an adaptive start interview.");
-    await runStart({
-      setup: result.setupTarget.path
-    });
+    console.log("Workspace launch requested. Open the provider in your research folder and run `$longtable-interview`; the interview will create `.longtable/` there.");
   }
 }
 
@@ -1223,6 +1244,7 @@ async function collectProjectInterview(
   setup: Awaited<ReturnType<typeof loadSetupOutput>>,
   args: Record<string, string | boolean>
 ): Promise<ProjectInterviewAnswers> {
+  const skipResearchInterview = args["no-interview"] === true;
   const providedPerspectives = normalizePerspectiveList(typeof args.perspectives === "string" ? args.perspectives : undefined);
   const providedGoal = typeof args.goal === "string" && args.goal.trim() ? args.goal.trim() : undefined;
   const providedBlocker = typeof args.blocker === "string" && args.blocker.trim() ? args.blocker.trim() : undefined;
@@ -1241,11 +1263,13 @@ async function collectProjectInterview(
   const needsInteractivePrompts =
     !(typeof args.name === "string" && args.name.trim()) ||
     !(typeof args.path === "string" && args.path.trim()) ||
-    !providedGoal ||
-    !providedBlocker ||
-    !providedResearchObject ||
-    !providedGapRisk ||
-    !providedProtectedDecision;
+    (!skipResearchInterview && (
+      !providedGoal ||
+      !providedBlocker ||
+      !providedResearchObject ||
+      !providedGapRisk ||
+      !providedProtectedDecision
+    ));
 
   if (needsInteractivePrompts) {
     console.log("");
@@ -1289,16 +1313,18 @@ async function collectProjectInterview(
           projectName
         ))!;
 
-  const adaptive = await collectAdaptiveStartInterview({
-    currentGoal: providedGoal,
-    currentBlocker: providedBlocker,
-    needsResearchSeed:
-      !providedGoal ||
-      !providedBlocker ||
-      !providedResearchObject ||
-      !providedGapRisk ||
-      !providedProtectedDecision
-  });
+  const adaptive = skipResearchInterview
+    ? {}
+    : await collectAdaptiveStartInterview({
+        currentGoal: providedGoal,
+        currentBlocker: providedBlocker,
+        needsResearchSeed:
+          !providedGoal ||
+          !providedBlocker ||
+          !providedResearchObject ||
+          !providedGapRisk ||
+          !providedProtectedDecision
+      });
 
   const currentGoal = providedGoal ?? adaptive.currentGoal;
   if (!currentGoal?.trim()) {
@@ -3524,6 +3550,29 @@ async function runRoles(args: Record<string, string | boolean>): Promise<void> {
 }
 
 async function runStart(args: Record<string, string | boolean>): Promise<void> {
+  const hasMinimalFallbackArgs =
+    typeof args.name === "string" &&
+    typeof args.path === "string" &&
+    typeof args.goal === "string";
+  const hasFallbackIntent =
+    args["no-interview"] === true ||
+    hasMinimalFallbackArgs;
+  if (!hasFallbackIntent) {
+    console.log(renderSectionCard("LongTable Start Has Moved", [
+      "`longtable start` is now a fallback for automation and scripted workspace creation.",
+      "The primary research-start experience is provider-native so LongTable can run a real interview instead of a terminal questionnaire.",
+      "",
+      "Use:",
+      "1. longtable setup --provider codex",
+      "2. cd \"<research-folder>\"",
+      "3. codex",
+      "4. $longtable-interview",
+      "",
+      "For automation, pass `--no-interview --json` with `--name`, `--path`, and `--goal`."
+    ]));
+    return;
+  }
+
   const setupPath = typeof args.setup === "string" ? args.setup : undefined;
   const existingSetup = await loadOptionalSetup(setupPath);
 

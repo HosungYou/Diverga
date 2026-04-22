@@ -45,7 +45,7 @@ longtable-state
 Direct run:
 
 ```bash
-npx -y @longtable/mcp@0.1.31
+npx -y @longtable/mcp@0.1.32
 longtable-state --self-test
 ```
 
@@ -94,6 +94,14 @@ The first tool set is intentionally narrow:
 - `read_session`: read the current session record
 - `inspect_workspace`: summarize workspace state and optionally read
   `CURRENT.md` and project `AGENTS.md`
+- `create_workspace`: create `.longtable/` for provider-native
+  `$longtable-interview`
+- `begin_interview`: create or resume the active LongTable interview hook
+- `append_interview_turn`: record one natural-language interview turn with
+  answer-quality metadata
+- `summarize_interview`: store the provisional First Research Shape
+- `confirm_first_research_shape`: request MCP form elicitation for the final
+  First Research Shape confirmation
 - `pending_questions`: list pending Researcher Checkpoints
 - `evaluate_checkpoint`: classify natural-language context without writing
   state

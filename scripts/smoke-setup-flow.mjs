@@ -55,6 +55,9 @@ if (setupJson.setup.initialState.explicitState.installScope !== "none") {
 if (setupJson.setup.initialState.explicitState.runtimeSurfaces !== "cli_only") {
   throw new Error("Setup did not record runtime surface.");
 }
+if (setupJson.setup.initialState.explicitState.officialStartSurface !== "$longtable-interview") {
+  throw new Error("Setup should point researchers to $longtable-interview.");
+}
 if (["t", "muxMode"].join("") in setupJson.setup.initialState.explicitState) {
   throw new Error("Setup should not record a console-specific mode.");
 }
@@ -95,6 +98,7 @@ const startJson = JSON.parse(runCli([
   "--protected-decision", "measurement",
   "--perspectives", "measurement_auditor",
   "--disagreement", "show_on_conflict",
+  "--no-interview",
   "--json"
 ]));
 
@@ -115,8 +119,11 @@ if (!current.includes("Research object: measurement_instrument")) {
 if (current.includes("knowledge gap, a coding rule gap, or a data gap")) {
   throw new Error("CURRENT.md still uses the deprecated taxonomy-style start question.");
 }
-if (!current.includes("show up most concretely")) {
-  throw new Error("CURRENT.md does not use the scene/material/evidence start question.");
+if (current.includes("reader need to understand differently") || current.includes("reader or reviewer")) {
+  throw new Error("CURRENT.md should not ask reader/reviewer contribution during early start.");
+}
+if (!current.includes("usable first research handle")) {
+  throw new Error("CURRENT.md should point toward a first research handle.");
 }
 
 const activeText = [
@@ -127,33 +134,26 @@ if (activeText.includes("Before we begin, which research field")) {
   throw new Error("Deprecated research-field setup prompt is still present.");
 }
 
-const adaptiveInput = [
-  "Adaptive Project",
-  tmp,
-  "A classroom trust judgment made me want to study this",
-  "Why trust judgments shift without clear evidence",
-  "Readers should understand where trust calibration fails",
-  "Interview transcripts and prior literature"
-].join("\n") + "\n";
-runCli([
-  "start",
-  "--setup", setupPath
+const movedStart = runCli([
+  "start"
 ], {
-  input: adaptiveInput,
-  stdio: ["pipe", "pipe", "pipe"]
+  stdio: ["ignore", "pipe", "pipe"]
 });
-const adaptiveSession = JSON.parse(readFileSync(
-  join(tmp, "Adaptive-Project", ".longtable", "current-session.json"),
-  "utf8"
-));
-if (!adaptiveSession.startInterview) {
-  throw new Error("Adaptive start did not persist startInterview.");
+if (!movedStart.includes("$longtable-interview")) {
+  throw new Error("Interactive longtable start should direct researchers to $longtable-interview.");
 }
-if (adaptiveSession.startInterview.turnCount < 3) {
-  throw new Error("Adaptive start interview should collect several research turns.");
+
+const skillsDir = join(tmp, "codex-skills");
+const installOutput = runCli(["codex", "install-skills", "--dir", skillsDir]);
+if (!installOutput.includes("longtable-interview")) {
+  throw new Error("Codex skill install should include longtable-interview.");
 }
-if (adaptiveSession.openQuestions.join("\n").includes("knowledge gap, a coding rule gap")) {
-  throw new Error("Adaptive start persisted a deprecated taxonomy-style open question.");
+const interviewSkill = readFileSync(join(skillsDir, "longtable-interview", "SKILL.md"), "utf8");
+if (!interviewSkill.includes("First Research Shape")) {
+  throw new Error("longtable-interview skill should document First Research Shape.");
+}
+if (!interviewSkill.includes("Do not begin with reader/reviewer")) {
+  throw new Error("longtable-interview skill should forbid early reader/reviewer prompts.");
 }
 
 console.log("setup/start smoke passed");

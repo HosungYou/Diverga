@@ -20,17 +20,18 @@ Collect:
 - install scope
 - approved runtime surfaces
 - intervention intensity
-- project workspace preference
+- provider-native interview launch preference
 
-### Stage 2: Project Start
+### Stage 2: Provider-Native Project Interview
 
-Collect when `longtable start` creates a workspace:
+Collect when `$longtable-interview` creates or resumes a workspace:
 
-- current project object
-- current goal
-- current blocker
-- likely gap/tacit risk
-- protected decision
+- rough research interest
+- still-hard-to-say problem
+- concrete scene, case, material, text, dataset, or decision
+- answer-quality signals
+- provisional First Research Shape
+- final structured confirmation
 
 ### Stage 3: Progressive Calibration
 

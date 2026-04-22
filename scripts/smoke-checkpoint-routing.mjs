@@ -5,6 +5,7 @@ import { join, resolve } from "node:path";
 
 const repoRoot = resolve(new URL("..", import.meta.url).pathname);
 const cli = join(repoRoot, "packages", "longtable", "dist", "cli.js");
+const mcpServer = join(repoRoot, "packages", "longtable-mcp", "dist", "server.js");
 const { classifyCheckpointTrigger } = await import(join(repoRoot, "packages", "longtable-checkpoints", "dist", "index.js"));
 const {
   answerWorkspaceQuestion,
@@ -12,6 +13,16 @@ const {
   loadProjectContextFromDirectory
 } = await import(join(repoRoot, "packages", "longtable", "dist", "index.js"));
 const { renderQuestionRecordPrompt } = await import(join(repoRoot, "packages", "longtable-provider-codex", "dist", "index.js"));
+
+const mcpSelfTest = JSON.parse(execFileSync("node", [mcpServer, "--self-test"], {
+  cwd: repoRoot,
+  encoding: "utf8"
+}));
+for (const tool of ["create_workspace", "begin_interview", "append_interview_turn", "summarize_interview", "confirm_first_research_shape"]) {
+  if (!mcpSelfTest.tools.includes(tool)) {
+    throw new Error(`MCP self-test is missing interview tool: ${tool}`);
+  }
+}
 
 function assertEqual(actual, expected, label) {
   if (actual !== expected) {
@@ -82,6 +93,7 @@ runCli([
   "--protected-decision", "method",
   "--perspectives", "auto",
   "--disagreement", "always_visible",
+  "--no-interview",
   "--json"
 ]);
 

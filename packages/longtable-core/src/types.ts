@@ -382,6 +382,71 @@ export interface NarrativeTrace {
   linkedDecisionRecordId?: string;
 }
 
+export type LongTableHookKind =
+  | "longtable_interview"
+  | "quality_probe"
+  | "checkpoint"
+  | "panel_decision";
+
+export type LongTableHookStatus =
+  | "pending"
+  | "active"
+  | "ready_to_confirm"
+  | "confirmed"
+  | "deferred"
+  | "cancelled";
+
+export type InterviewTurnQuality = "thin" | "usable" | "rich";
+
+export type InterviewDepth =
+  | "gathering_context"
+  | "forming_first_handle"
+  | "ready_to_summarize";
+
+export interface LongTableInterviewTurn {
+  id: string;
+  index: number;
+  createdAt: string;
+  question: string;
+  answer: string;
+  reflection?: string;
+  quality: InterviewTurnQuality;
+  needsFollowUp: boolean;
+  followUpQuestion?: string;
+  rationale?: string[];
+}
+
+export interface FirstResearchShape {
+  handle: string;
+  currentGoal: string;
+  currentBlocker?: string;
+  researchObject?: string;
+  gapRisk?: string;
+  protectedDecision?: string;
+  openQuestions: string[];
+  nextAction: string;
+  confidence: ConfidenceLevel;
+  sourceHookId?: string;
+  confirmedAt?: string;
+}
+
+export interface LongTableHookRun {
+  id: string;
+  kind: LongTableHookKind;
+  status: LongTableHookStatus;
+  createdAt: string;
+  updatedAt: string;
+  targetOutcome?: "first_research_handle" | string;
+  depth?: InterviewDepth;
+  provider?: ProviderKind;
+  turns?: LongTableInterviewTurn[];
+  firstResearchShape?: FirstResearchShape;
+  qualityNotes?: string[];
+  rationale?: string[];
+  linkedQuestionRecordIds?: string[];
+  linkedDecisionRecordIds?: string[];
+}
+
 export interface RuntimeGuidance {
   mode: InteractionMode;
   minimumQuestions: number;
@@ -415,6 +480,8 @@ export interface StudyContract {
 export interface ResearchState {
   explicitState: Record<string, unknown>;
   workingState: Record<string, unknown>;
+  hooks?: LongTableHookRun[];
+  firstResearchShape?: FirstResearchShape;
   inferredHypotheses: InferredHypothesis[];
   openTensions: string[];
   decisionLog: DecisionRecord[];

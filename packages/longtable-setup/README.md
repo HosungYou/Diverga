@@ -32,8 +32,11 @@ Global setup should answer:
 - where LongTable may install runtime support
 - which provider surfaces are approved
 - how strongly LongTable may interrupt research decisions
+- whether setup should show the provider-native `$longtable-interview` launch steps
 
-Project and session intake belongs to `longtable start`, not library-level setup helpers.
+Project and session intake belongs to `$longtable-interview` inside Codex or
+Claude Code, not library-level setup helpers. `longtable start` is a fallback
+for scripts and automation, not the primary research-start experience.
 
 ## Included Outputs
 

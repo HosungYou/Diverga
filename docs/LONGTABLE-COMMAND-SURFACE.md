@@ -2,10 +2,11 @@
 
 ## Decision
 
-The researcher-facing surface should center on two setup steps:
+The researcher-facing surface should center on one CLI setup step and one
+provider-native interview:
 
 - `longtable setup`
-- `longtable start`
+- `$longtable-interview`
 
 After that, most work should continue in natural language from inside the
 project directory.
@@ -27,14 +28,15 @@ LongTable's primary surface should answer three questions:
 1. What runtime permissions has the researcher approved?
    Use `longtable setup`.
 2. What project is starting now?
-   Use `longtable start`.
+   Use `$longtable-interview` inside Codex or Claude Code.
 3. Where does the work continue?
-   Open Codex or Claude Code inside the generated project directory.
+   Continue in the same provider session after the First Research Shape is
+   confirmed.
 
 ## Current Primary Surface
 
 - `longtable setup`
-- `longtable start`
+- `$longtable-interview`
 - `longtable resume`
 - natural in-session forms such as `lt explore: ...`, `lt review: ...`, and
   `lt panel: ...`
@@ -52,8 +54,8 @@ Supporting surfaces:
 
 The important distinction is:
 
-- `setup` and `start` are shell setup commands
-- Codex or Claude Code is opened inside the project directory
+- `setup` is the shell permission command
+- `$longtable-interview` is the provider-native project-start interview
 - the actual research conversation should then proceed in natural language
 
 ## Surface Roles
@@ -66,24 +68,21 @@ Global setup:
 - install scope
 - runtime surfaces
 - intervention level
-- project workspace preference
+- interview launch preference
 
 `longtable init` remains a deprecated compatibility alias and should not be
 documented as the primary researcher path.
 
-### `longtable start`
+### `$longtable-interview`
 
-Project start interview:
+Provider-native project start interview:
 
-- project name
-- project path
-- current goal
-- current blocker
-- research object
-- gap/tacit risk
-- protected decision
-- requested perspectives
-- disagreement visibility
+- create or resume `.longtable/`
+- ask one natural-language question at a time
+- reflect with `LongTable hears: ...`
+- evaluate thin answers before classifying them
+- build a provisional First Research Shape
+- use structured option UI only at final confirmation
 
 It creates:
 
@@ -94,6 +93,10 @@ It creates:
 - `.longtable/sessions/`
 - project `AGENTS.md`
 - `CURRENT.md`
+
+`longtable start` remains as a deprecated automation fallback for scripted
+workspace creation. It should not be presented as the main research-start
+experience.
 
 ### `longtable ask`
 
@@ -252,9 +255,10 @@ Codex:
 longtable codex install-skills
 ```
 
-This generates Codex `SKILL.md` files under `~/.codex/skills/longtable-*`.
-When an explicit trigger is needed, use the installed `$longtable` skill entry
-if the current Codex build exposes skills that way. `/prompts` is not a stable
+This generates Codex `SKILL.md` files under `~/.codex/skills/longtable-*`,
+including `longtable-interview`. When an explicit trigger is needed, use
+`$longtable-interview` for project start and `$longtable` for general routing if
+the current Codex build exposes skills that way. `/prompts` is not a stable
 LongTable product surface because some Codex builds do not expose custom prompt
 files as slash commands.
 
@@ -264,9 +268,9 @@ Claude Code:
 longtable claude install-skills
 ```
 
-This generates Claude Code `SKILL.md` files under `~/.claude/skills/longtable-*`.
-The provider surface may look OMC-like, but role definitions are generated from
-LongTable's shared registry.
+This generates Claude Code `SKILL.md` files under `~/.claude/skills/longtable-*`,
+including `longtable-interview`. The provider surface may look OMC-like, but
+role definitions are generated from LongTable's shared registry.
 
 ### `longtable resume`
 

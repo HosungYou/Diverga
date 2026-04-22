@@ -65,8 +65,8 @@ In one sentence:
 
 - A durable `.longtable/` workspace for each research project
 - A human-readable `CURRENT.md` status page regenerated from project state
-- An adaptive `longtable start` interview that begins from the scene or problem
-  that made the research worth starting
+- A provider-native `$longtable-interview` that starts from the researcher's
+  rough problem and builds a provisional First Research Shape
 - Provider-native Codex and Claude Code skills when you approve installation
 - Researcher Checkpoints for decisions that should not be skipped silently,
   shown as UI prompts when the provider supports them and as numbered fallback
@@ -98,11 +98,11 @@ which longtable
 
 ## The Recommended Flow
 
-LongTable has two main setup steps:
+LongTable has one CLI setup step and one provider-native research-start step:
 
 1. `longtable setup` decides what LongTable is allowed to install.
-2. `longtable start` creates a research workspace through a short adaptive
-   interview.
+2. `$longtable-interview` creates or resumes a research workspace inside Codex
+   or Claude Code.
 
 ### 1. Configure Runtime Support
 
@@ -123,7 +123,7 @@ longtable setup --provider claude
 - Where may LongTable install runtime support?
 - Which surfaces should be enabled?
 - How strongly may LongTable interrupt research decisions?
-- Should LongTable create a project workspace now?
+- Should setup show the provider-native interview launch steps?
 
 Each option includes a short explanation of why the choice matters, what you
 get, and the tradeoff. Setup intentionally avoids heavy researcher-profile
@@ -133,39 +133,41 @@ inferred later or asked only when the project context makes them relevant.
 `longtable init` still exists as a deprecated compatibility alias, but new users
 should use `longtable setup`.
 
-### 2. Create A Project Workspace
+### 2. Start The Research Interview
 
 ```bash
-longtable start
-cd "<project-path>"
+cd "<research-folder>"
 codex
+```
+
+Then invoke:
+
+```text
+$longtable-interview
 ```
 
 For Claude Code:
 
 ```bash
-longtable start
-cd "<project-path>"
+cd "<research-folder>"
 claude
 ```
 
-`start` first asks where the workspace should live, then begins a short
-scene/problem-first interview. It does not ask the researcher to classify the
-project up front as theory, measurement, method, evidence, or writing. Instead,
-it starts with questions like:
+`$longtable-interview` creates `.longtable/` when needed, asks one natural
+language question at a time, and records the interview as LongTable state. It
+does not ask the researcher to classify the project up front as theory,
+measurement, method, evidence, or writing. It also avoids early
+reader/reviewer-contribution questions. Instead, it starts with questions like:
 
 ```text
-What scene, problem, or moment made you want to start this research?
-In that scene, what still feels least explained or hardest to justify?
-If this research succeeds, what should a reader or reviewer understand differently?
-What material would you inspect first to make this research concrete?
+What do you want to research?
+If the problem is not clear yet, describe the part that is still hard to say.
 ```
 
-LongTable uses those answers to seed the session state. It may infer an initial
-research object, gap/tacit-risk profile, protected decision, open questions, and
-next action, but those inferences remain project state rather than final
-research truth. Researcher Checkpoints are still reserved for real commitment
-boundaries later in the work.
+The interview reflects each answer with `LongTable hears: ...`, asks follow-up
+questions when an answer is thin, and stops only when it can summarize a
+provisional First Research Shape. Structured options appear at the final
+confirmation point, not at the beginning of the interview.
 
 This creates:
 
@@ -251,10 +253,11 @@ lt panel: show disagreement before I commit this argument
 
 Provider skill shortcuts may also be available after setup. In Codex, explicit
 skill entries may appear as `$longtable` or role-specific entries such as
-`$longtable-editor`, depending on the runtime. In Claude Code, the generated
-skills use trigger phrases such as `longtable`, `lt review`, `lt panel`,
-`editor`, or `measurement auditor`. Do not treat any slash-command form as the
-LongTable contract unless your provider explicitly exposes it.
+`$longtable-interview` or `$longtable-editor`, depending on the runtime. In
+Claude Code, the generated skills use trigger phrases such as
+`$longtable-interview`, `longtable`, `lt review`, `lt panel`, `editor`, or
+`measurement auditor`. Do not treat any slash-command form as the LongTable
+contract unless your provider explicitly exposes it.
 
 ## Researcher Checkpoints
 
@@ -482,7 +485,7 @@ Default config targets:
 Run the server directly:
 
 ```bash
-npx -y @longtable/mcp@0.1.31
+npx -y @longtable/mcp@0.1.32
 longtable-state --self-test
 ```
 
@@ -491,6 +494,11 @@ Current MCP tools include:
 - `read_project`
 - `read_session`
 - `inspect_workspace`
+- `create_workspace`
+- `begin_interview`
+- `append_interview_turn`
+- `summarize_interview`
+- `confirm_first_research_shape`
 - `pending_questions`
 - `evaluate_checkpoint`
 - `create_question`
@@ -519,8 +527,10 @@ Codex does not support or allow elicitation, LongTable keeps the same
 `longtable decide`.
 
 When the MCP tool surface is available, LongTable skills should call
-`elicit_question` first. `longtable question --print` is the CLI fallback for
-clients that cannot show, accept, or approve MCP elicitation.
+`confirm_first_research_shape` at the end of `$longtable-interview` and
+`elicit_question` for later Researcher Checkpoints. `longtable question --print`
+is the CLI fallback for clients that cannot show, accept, or approve MCP
+elicitation.
 
 ## Evidence And Scholarly Search
 
@@ -591,7 +601,6 @@ Primary commands:
 
 ```bash
 longtable setup
-longtable start
 longtable resume
 longtable doctor
 longtable status
@@ -614,6 +623,9 @@ longtable search --query "..."
 Natural-language and provider-skill use should usually come before these shell
 routes. The shell routes are still useful for reproducible runs, tests, and
 debugging.
+
+`longtable start` remains as a deprecated automation fallback. For ordinary
+research starts, use `$longtable-interview` inside the provider runtime.
 
 Checkpoint commands:
 

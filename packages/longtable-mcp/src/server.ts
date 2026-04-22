@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { cwd, exit } from "node:process";
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -11,8 +11,10 @@ import { classifyCheckpointTrigger } from "@longtable/checkpoints";
 import { renderQuestionRecordInput } from "@longtable/provider-claude";
 import { renderQuestionRecordPrompt } from "@longtable/provider-codex";
 import type { ProviderKind, QuestionOption, QuestionRecord, QuestionTransportStatus } from "@longtable/core";
+import { loadSetupOutput } from "@longtable/setup";
 import {
   answerWorkspaceQuestion,
+  createOrUpdateProjectWorkspace,
   createWorkspaceQuestion,
   inspectProjectWorkspace,
   loadProjectContextFromDirectory,
@@ -21,12 +23,17 @@ import {
 } from "@longtable/cli";
 
 const SERVER_NAME = "longtable-state";
-const SERVER_VERSION = "0.1.31";
+const SERVER_VERSION = "0.1.32";
 
 const TOOL_NAMES = [
   "read_project",
   "read_session",
   "inspect_workspace",
+  "create_workspace",
+  "begin_interview",
+  "append_interview_turn",
+  "summarize_interview",
+  "confirm_first_research_shape",
   "pending_questions",
   "evaluate_checkpoint",
   "create_question",
@@ -40,11 +47,73 @@ const cwdSchema = z.object({
   cwd: z.string().optional().describe("LongTable project directory or child path. Defaults to server cwd.")
 });
 
+type InterviewTurnQuality = "thin" | "usable" | "rich";
+type InterviewDepth = "gathering_context" | "forming_first_handle" | "ready_to_summarize";
+
+interface FirstResearchShape {
+  handle: string;
+  currentGoal: string;
+  currentBlocker?: string;
+  researchObject?: string;
+  gapRisk?: string;
+  protectedDecision?: string;
+  openQuestions: string[];
+  nextAction: string;
+  confidence: "low" | "medium" | "high";
+  sourceHookId?: string;
+  confirmedAt?: string;
+}
+
+interface InterviewHookRun {
+  id: string;
+  kind: "longtable_interview";
+  status: "pending" | "active" | "ready_to_confirm" | "confirmed" | "deferred" | "cancelled";
+  createdAt: string;
+  updatedAt: string;
+  targetOutcome: "first_research_handle";
+  depth: InterviewDepth;
+  provider?: ProviderKind;
+  turns: Array<{
+    id: string;
+    index: number;
+    createdAt: string;
+    question: string;
+    answer: string;
+    reflection?: string;
+    quality: InterviewTurnQuality;
+    needsFollowUp: boolean;
+    followUpQuestion?: string;
+    rationale?: string[];
+  }>;
+  firstResearchShape?: FirstResearchShape;
+  qualityNotes: string[];
+  rationale: string[];
+  linkedQuestionRecordIds?: string[];
+  linkedDecisionRecordIds?: string[];
+}
+
+type InterviewState = Awaited<ReturnType<typeof loadWorkspaceState>> & {
+  hooks?: InterviewHookRun[];
+  firstResearchShape?: FirstResearchShape;
+};
+
 const questionOptionSchema = z.object({
   value: z.string().min(1),
   label: z.string().min(1),
   description: z.string().optional(),
   recommended: z.boolean().optional()
+});
+
+const firstResearchShapeSchema = z.object({
+  handle: z.string().min(1),
+  currentGoal: z.string().min(1),
+  currentBlocker: z.string().optional(),
+  researchObject: z.string().optional(),
+  gapRisk: z.string().optional(),
+  protectedDecision: z.string().optional(),
+  openQuestions: z.array(z.string().min(1)).default([]),
+  nextAction: z.string().min(1),
+  confidence: z.enum(["low", "medium", "high"]).default("medium")
 });
 
 function textResult(structuredContent: Record<string, unknown>): CallToolResult {
@@ -83,6 +152,221 @@ async function requireContext(startPath?: string) {
   return context;
 }
 
+function createId(prefix: string): string {
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function asInterviewState(state: Awaited<ReturnType<typeof loadWorkspaceState>>): InterviewState {
+  return state as InterviewState;
+}
+
+function activeInterviewHook(state: InterviewState, hookId?: string): InterviewHookRun | undefined {
+  const hooks = state.hooks ?? [];
+  if (hookId) {
+    return hooks.find((hook) => hook.id === hookId);
+  }
+  return [...hooks].reverse().find((hook) =>
+    hook.kind === "longtable_interview" &&
+    (hook.status === "pending" || hook.status === "active" || hook.status === "ready_to_confirm")
+  );
+}
+
+function upsertInterviewHook(state: InterviewState, hook: InterviewHookRun): InterviewState {
+  const hooks = state.hooks ?? [];
+  const nextHooks = hooks.some((candidate) => candidate.id === hook.id)
+    ? hooks.map((candidate) => candidate.id === hook.id ? hook : candidate)
+    : [...hooks, hook];
+  return {
+    ...state,
+    hooks: nextHooks
+  };
+}
+
+function interviewDepth(turns: InterviewHookRun["turns"]): InterviewDepth {
+  const usableTurns = turns.filter((turn) => turn.quality !== "thin").length;
+  if (usableTurns >= 3) return "ready_to_summarize";
+  if (usableTurns >= 1) return "forming_first_handle";
+  return "gathering_context";
+}
+
+function normalizeInterviewQuality(answer: string, quality?: InterviewTurnQuality): InterviewTurnQuality {
+  if (quality) return quality;
+  const trimmed = answer.trim();
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+  if (trimmed.length < 12 || wordCount < 3) return "thin";
+  if (trimmed.length > 80 || wordCount >= 12) return "rich";
+  return "usable";
+}
+
+function defaultFollowUpQuestion(answer: string): string {
+  return answer.trim().length < 12
+    ? "Say one more sentence about where this problem appears or why it matters before LongTable tries to classify it."
+    : "What concrete scene, case, material, text, dataset, or decision would make that problem easier to inspect first?";
+}
+
+async function beginInterviewHook(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  options: { provider?: ProviderKind; openingQuestion?: string; seedAnswer?: string }
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const existing = activeInterviewHook(state);
+  if (existing) {
+    return { hook: existing, state };
+  }
+  const timestamp = new Date().toISOString();
+  const hook: InterviewHookRun = {
+    id: createId("hook_interview"),
+    kind: "longtable_interview",
+    status: "active",
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    targetOutcome: "first_research_handle",
+    depth: "gathering_context",
+    provider: options.provider,
+    turns: [],
+    qualityNotes: [],
+    rationale: [
+      "Official LongTable research start surface is provider-native `$longtable-interview`, not the CLI start questionnaire."
+    ]
+  };
+  const updated = upsertInterviewHook(state, hook);
+  updated.workingState = {
+    ...updated.workingState,
+    activeInterviewHookId: hook.id,
+    interviewSurface: "$longtable-interview",
+    ...(options.openingQuestion ? { interviewOpeningQuestion: options.openingQuestion } : {}),
+    ...(options.seedAnswer ? { interviewSeedAnswer: options.seedAnswer } : {})
+  };
+  await writeFile(context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { hook, state: updated };
+}
+
+async function appendInterviewTurn(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  options: {
+    hookId?: string;
+    question: string;
+    answer: string;
+    reflection?: string;
+    quality?: InterviewTurnQuality;
+    needsFollowUp?: boolean;
+    followUpQuestion?: string;
+    rationale?: string[];
+  }
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const existing = activeInterviewHook(state, options.hookId);
+  if (!existing) {
+    throw new Error("No active LongTable interview hook was found. Run begin_interview first.");
+  }
+  const quality = normalizeInterviewQuality(options.answer, options.quality);
+  const needsFollowUp = options.needsFollowUp ?? quality === "thin";
+  const followUpQuestion = needsFollowUp
+    ? options.followUpQuestion ?? defaultFollowUpQuestion(options.answer)
+    : options.followUpQuestion;
+  const timestamp = new Date().toISOString();
+  const turn = {
+    id: createId("interview_turn"),
+    index: existing.turns.length + 1,
+    createdAt: timestamp,
+    question: options.question.trim(),
+    answer: options.answer.trim(),
+    ...(options.reflection?.trim() ? { reflection: options.reflection.trim() } : {}),
+    quality,
+    needsFollowUp,
+    ...(followUpQuestion?.trim() ? { followUpQuestion: followUpQuestion.trim() } : {}),
+    ...(options.rationale && options.rationale.length > 0 ? { rationale: options.rationale } : {})
+  };
+  const turns = [...existing.turns, turn];
+  const depth = interviewDepth(turns);
+  const hook: InterviewHookRun = {
+    ...existing,
+    status: depth === "ready_to_summarize" ? "ready_to_confirm" : "active",
+    updatedAt: timestamp,
+    depth,
+    turns,
+    qualityNotes: [
+      ...existing.qualityNotes,
+      ...(needsFollowUp ? [`Turn ${turn.index} needs follow-up: ${followUpQuestion}`] : [])
+    ]
+  };
+  const updated = upsertInterviewHook(state, hook);
+  await writeFile(context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { hook, turn, state: updated };
+}
+
+async function summarizeInterviewHook(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  options: { hookId?: string; shape: FirstResearchShape }
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const existing = activeInterviewHook(state, options.hookId);
+  if (!existing) {
+    throw new Error("No active LongTable interview hook was found. Run begin_interview first.");
+  }
+  const timestamp = new Date().toISOString();
+  const shape: FirstResearchShape = {
+    ...options.shape,
+    handle: options.shape.handle.trim(),
+    currentGoal: options.shape.currentGoal.trim(),
+    openQuestions: options.shape.openQuestions.map((question) => question.trim()).filter(Boolean),
+    nextAction: options.shape.nextAction.trim(),
+    sourceHookId: existing.id
+  };
+  const hook: InterviewHookRun = {
+    ...existing,
+    status: "ready_to_confirm",
+    updatedAt: timestamp,
+    depth: "ready_to_summarize",
+    firstResearchShape: shape
+  };
+  const session = {
+    ...context.session,
+    lastUpdatedAt: timestamp,
+    currentGoal: shape.currentGoal,
+    ...(shape.currentBlocker ? { currentBlocker: shape.currentBlocker } : {}),
+    ...(shape.researchObject ? { researchObject: shape.researchObject } : {}),
+    ...(shape.gapRisk ? { gapRisk: shape.gapRisk } : {}),
+    ...(shape.protectedDecision ? { protectedDecision: shape.protectedDecision } : {}),
+    nextAction: shape.nextAction,
+    openQuestions: shape.openQuestions,
+    firstResearchShape: shape,
+    resumeHint: `I want to continue from the First Research Shape: ${shape.handle}.`
+  };
+  context.session = session;
+  const updated = upsertInterviewHook(state, hook);
+  updated.firstResearchShape = shape;
+  updated.workingState = {
+    ...updated.workingState,
+    currentGoal: shape.currentGoal,
+    ...(shape.currentBlocker ? { currentBlocker: shape.currentBlocker } : {}),
+    ...(shape.researchObject ? { researchObject: shape.researchObject } : {}),
+    ...(shape.gapRisk ? { gapRisk: shape.gapRisk } : {}),
+    ...(shape.protectedDecision ? { protectedDecision: shape.protectedDecision } : {}),
+    openQuestions: shape.openQuestions,
+    nextAction: shape.nextAction,
+    firstResearchShape: shape
+  };
+  if (shape.currentBlocker && !updated.openTensions.includes(shape.currentBlocker)) {
+    updated.openTensions.push(shape.currentBlocker);
+  }
+  updated.narrativeTraces.push({
+    id: createId("narrative_trace"),
+    timestamp,
+    source: "$longtable-interview",
+    traceType: "judgment",
+    summary: `First Research Shape: ${shape.handle}.`,
+    visibility: "explicit",
+    importance: shape.confidence
+  });
+  await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { hook, shape, state: updated, session };
+}
+
 function findQuestion(records: QuestionRecord[], questionId?: string): QuestionRecord | null {
   if (questionId) {
     return records.find((record) => record.id === questionId) ?? null;
@@ -102,7 +386,7 @@ async function markQuestionTransport(
   status: QuestionTransportStatus,
   message?: string
 ): Promise<QuestionRecord | null> {
-  const state = await loadWorkspaceState(context);
+  const state = asInterviewState(await loadWorkspaceState(context));
   let updatedQuestion: QuestionRecord | null = null;
   state.questionLog = (state.questionLog ?? []).map((record: QuestionRecord) => {
     if (record.id !== questionId) {
@@ -175,6 +459,82 @@ function acceptedAnswer(result: ElicitResult): { answer: string } | null {
   return {
     answer
   };
+}
+
+function buildFirstResearchShapeQuestion(shape: FirstResearchShape): {
+  prompt: string;
+  title: string;
+  question: string;
+  checkpointKey: string;
+  options: QuestionOption[];
+  displayReason: string;
+} {
+  return {
+    prompt: [
+      "Confirm the LongTable First Research Shape.",
+      `Handle: ${shape.handle}`,
+      `Goal: ${shape.currentGoal}`,
+      shape.currentBlocker ? `Blocker: ${shape.currentBlocker}` : undefined,
+      `Next action: ${shape.nextAction}`
+    ].filter(Boolean).join("\n"),
+    title: "First Research Shape",
+    question: "How should LongTable treat this first research handle?",
+    checkpointKey: "first_research_shape_confirmation",
+    displayReason: "This is the first structured handoff from open interview to durable project state.",
+    options: [
+      { value: "confirm", label: "Confirm this handle", description: "Use this as the provisional research handle.", recommended: true },
+      { value: "revise", label: "Revise the handle", description: "Keep interviewing before recording this shape." },
+      { value: "gather_context", label: "Gather more context", description: "Ask for one more scene, case, source, or material first." },
+      { value: "defer", label: "Keep it open", description: "Do not treat the research handle as ready yet." }
+    ]
+  };
+}
+
+async function markFirstResearchShapeConfirmation(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  shape: FirstResearchShape,
+  answer: string,
+  questionId?: string,
+  decisionId?: string
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const timestamp = new Date().toISOString();
+  const confirmedShape = answer === "confirm"
+    ? { ...shape, confirmedAt: timestamp }
+    : shape;
+  state.firstResearchShape = confirmedShape;
+  state.workingState = {
+    ...state.workingState,
+    firstResearchShape: confirmedShape
+  };
+  state.hooks = (state.hooks ?? []).map((hook: InterviewHookRun) => {
+    if (hook.id !== shape.sourceHookId) {
+      return hook;
+    }
+    return {
+      ...hook,
+      status: answer === "confirm" ? "confirmed" : answer === "defer" ? "deferred" : "active",
+      updatedAt: timestamp,
+      firstResearchShape: confirmedShape,
+      linkedQuestionRecordIds: questionId
+        ? [...(hook.linkedQuestionRecordIds ?? []), questionId]
+        : hook.linkedQuestionRecordIds,
+      linkedDecisionRecordIds: decisionId
+        ? [...(hook.linkedDecisionRecordIds ?? []), decisionId]
+        : hook.linkedDecisionRecordIds
+    };
+  });
+
+  const session = {
+    ...context.session,
+    firstResearchShape: confirmedShape,
+    lastUpdatedAt: timestamp
+  };
+  context.session = session;
+  await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(state, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { state, session, shape: confirmedShape };
 }
 
 function statusForElicitationError(error: unknown): QuestionTransportStatus {
@@ -280,6 +640,240 @@ export function createLongTableMcpServer(): McpServer {
           inspection,
           files: await readAllowedProjectFiles(context)
         });
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "create_workspace",
+    {
+      title: "Create LongTable Workspace",
+      description: "Create a .longtable workspace in the current folder for provider-native $longtable-interview.",
+      inputSchema: cwdSchema.extend({
+        projectName: z.string().optional(),
+        projectPath: z.string().optional(),
+        seedGoal: z.string().optional(),
+        setupPath: z.string().optional(),
+        provider: z.enum(["codex", "claude"]).default("codex")
+      })
+    },
+    async ({ cwd: inputCwd, projectName, projectPath, seedGoal, setupPath, provider }) => {
+      try {
+        const targetPath = resolveStartPath(projectPath ?? inputCwd);
+        const setup = await loadSetupOutput(setupPath);
+        const context = await createOrUpdateProjectWorkspace({
+          projectName: projectName?.trim() || basename(targetPath) || "LongTable Research",
+          projectPath: targetPath,
+          currentGoal: seedGoal?.trim() || "First research handle pending",
+          requestedPerspectives: [],
+          disagreementPreference: setup.profileSeed.panelPreference ?? "show_on_conflict",
+          setup
+        });
+        const interview = await beginInterviewHook(context, {
+          provider: provider as ProviderKind,
+          openingQuestion: "What do you want to research? If it is not clear yet, describe the problem in its rough form.",
+          seedAnswer: seedGoal
+        });
+        return textResult({
+          project: context.project,
+          session: context.session,
+          hook: interview.hook,
+          files: {
+            project: context.projectFilePath,
+            session: context.sessionFilePath,
+            state: context.stateFilePath,
+            current: context.currentFilePath
+          },
+          nextQuestion: "What do you want to research? If it is not clear yet, describe the problem in its rough form."
+        });
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "begin_interview",
+    {
+      title: "Begin LongTable Interview",
+      description: "Create or resume the active $longtable-interview hook in an existing workspace.",
+      inputSchema: cwdSchema.extend({
+        openingQuestion: z.string().optional(),
+        seedAnswer: z.string().optional(),
+        provider: z.enum(["codex", "claude"]).default("codex")
+      })
+    },
+    async ({ cwd: inputCwd, openingQuestion, seedAnswer, provider }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const result = await beginInterviewHook(context, {
+          provider: provider as ProviderKind,
+          openingQuestion,
+          seedAnswer
+        });
+        return textResult(result);
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "append_interview_turn",
+    {
+      title: "Append LongTable Interview Turn",
+      description: "Record one natural-language interview question and answer, including quality/follow-up metadata.",
+      inputSchema: cwdSchema.extend({
+        hookId: z.string().optional(),
+        question: z.string().min(1),
+        answer: z.string().min(1),
+        reflection: z.string().optional(),
+        quality: z.enum(["thin", "usable", "rich"]).optional(),
+        needsFollowUp: z.boolean().optional(),
+        followUpQuestion: z.string().optional(),
+        rationale: z.array(z.string()).optional()
+      })
+    },
+    async ({ cwd: inputCwd, hookId, question, answer, reflection, quality, needsFollowUp, followUpQuestion, rationale }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const result = await appendInterviewTurn(context, {
+          hookId,
+          question,
+          answer,
+          reflection,
+          quality: quality as InterviewTurnQuality | undefined,
+          needsFollowUp,
+          followUpQuestion,
+          rationale
+        });
+        return textResult(result);
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "summarize_interview",
+    {
+      title: "Summarize LongTable Interview",
+      description: "Store the provisional First Research Shape after enough interview context has accumulated.",
+      inputSchema: cwdSchema.extend({
+        hookId: z.string().optional(),
+        shape: firstResearchShapeSchema
+      })
+    },
+    async ({ cwd: inputCwd, hookId, shape }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const result = await summarizeInterviewHook(context, {
+          hookId,
+          shape: shape as FirstResearchShape
+        });
+        return textResult(result);
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "confirm_first_research_shape",
+    {
+      title: "Confirm First Research Shape",
+      description: "Use MCP form elicitation to confirm, revise, defer, or request more context for the First Research Shape.",
+      inputSchema: cwdSchema.extend({
+        shape: firstResearchShapeSchema.optional(),
+        provider: z.enum(["codex", "claude"]).default("codex"),
+        fallbackOnly: z.boolean().default(false)
+      })
+    },
+    async ({ cwd: inputCwd, shape: inputShape, provider, fallbackOnly }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const state = asInterviewState(await loadWorkspaceState(context));
+        const shape = (inputShape as FirstResearchShape | undefined) ?? state.firstResearchShape;
+        if (!shape) {
+          return errorResult("No First Research Shape was found to confirm. Run summarize_interview first.");
+        }
+        const spec = buildFirstResearchShapeQuestion(shape);
+        const created = await createWorkspaceQuestion({
+          context,
+          prompt: spec.prompt,
+          title: spec.title,
+          question: spec.question,
+          checkpointKey: spec.checkpointKey,
+          questionOptions: spec.options,
+          displayReason: spec.displayReason,
+          provider: provider as ProviderKind,
+          required: true
+        });
+        const fallback = renderQuestionFallback(created.question, provider as ProviderKind);
+        if (fallbackOnly) {
+          const marked = await markQuestionTransport(context, created.question.id, "fallback_rendered", "MCP elicitation skipped by fallbackOnly.");
+          return textResult({
+            question: marked ?? created.question,
+            shape,
+            elicitation: { attempted: false, reason: "fallbackOnly" },
+            fallback
+          });
+        }
+
+        try {
+          await markQuestionTransport(context, created.question.id, "attempted");
+          const elicited = await server.server.elicitInput(buildElicitationParams(created.question));
+          const accepted = acceptedAnswer(elicited);
+          if (!accepted) {
+            const status = elicited.action === "decline" || elicited.action === "cancel"
+              ? "declined"
+              : "fallback_rendered";
+            const marked = await markQuestionTransport(context, created.question.id, status, `MCP elicitation returned action: ${elicited.action}.`);
+            return textResult({
+              question: marked ?? created.question,
+              shape,
+              elicitation: { attempted: true, action: elicited.action },
+              fallback
+            });
+          }
+          const decided = await answerWorkspaceQuestion({
+            context,
+            questionId: created.question.id,
+            answer: accepted.answer,
+            provider: provider as ProviderKind,
+            surface: "mcp_elicitation"
+          });
+          const marked = await markQuestionTransport(context, created.question.id, "accepted");
+          const confirmation = await markFirstResearchShapeConfirmation(
+            context,
+            shape,
+            accepted.answer,
+            created.question.id,
+            decided.decision.id
+          );
+          return textResult({
+            shape: confirmation.shape,
+            question: marked ? { ...decided.question, transportStatus: marked.transportStatus } : decided.question,
+            decision: decided.decision,
+            elicitation: { attempted: true, action: elicited.action }
+          });
+        } catch (elicitationError) {
+          const status = statusForElicitationError(elicitationError);
+          const message = elicitationError instanceof Error ? elicitationError.message : String(elicitationError);
+          const marked = await markQuestionTransport(context, created.question.id, status, message);
+          return textResult({
+            question: marked ?? created.question,
+            shape,
+            elicitation: {
+              attempted: true,
+              supported: status !== "unsupported" ? undefined : false,
+              error: message
+            },
+            fallback
+          });
+        }
       } catch (error) {
         return errorResult(error instanceof Error ? error.message : String(error));
       }

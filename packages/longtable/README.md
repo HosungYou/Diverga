@@ -8,9 +8,9 @@ Claude skills, and future MCP surfaces remain generated adapter artifacts.
 
 The basic contract is:
 
-1. seed the researcher profile once
-2. create a workspace for each project
-3. continue the research conversation inside that workspace
+1. approve provider/runtime support once
+2. start each project inside the provider with `$longtable-interview`
+3. create or resume a workspace from that interview
 4. preserve decisions, tensions, and evidence as durable project state
 
 ## Install
@@ -26,15 +26,17 @@ config, hooks, or provider runtime files without explicit setup approval.
 
 ```bash
 longtable setup --provider codex
-longtable start
-cd "<project-path>"
+cd "<research-folder>"
 codex
 ```
 
+Then invoke `$longtable-interview` inside Codex.
+
 `longtable setup --provider codex` is the permission-first setup route. It asks
 where LongTable may install support, which runtime surfaces it may enable, how
-strongly it may interrupt research decisions, and whether to create a project
-workspace now. `longtable init` remains only as a deprecated compatibility alias.
+strongly it may interrupt research decisions, and whether to show the
+provider-native interview launch steps. `longtable init` remains only as a
+deprecated compatibility alias.
 
 Return later:
 
@@ -44,7 +46,7 @@ longtable resume
 codex
 ```
 
-## What `longtable start` Creates
+## What `$longtable-interview` Creates
 
 ```text
 <project>/
@@ -84,7 +86,6 @@ This is how LongTable avoids turning tacit knowledge into fake certainty.
 
 ```bash
 longtable setup
-longtable start
 longtable resume --cwd "<project-path>"
 longtable roles
 longtable ask --cwd "<project-path>" --prompt "..."
@@ -136,12 +137,14 @@ longtable claude install-skills
 
 Codex skills include `longtable`, `longtable-panel`, and generated role-specific
 skills such as `longtable-methods-critic`. If your Codex build exposes explicit
-skill shortcuts, `$longtable` is the manual entry. Do not depend on `/prompts`;
-current Codex builds may reject it.
+skill shortcuts, `$longtable-interview` is the research-start entry and
+`$longtable` is the general router. Do not depend on `/prompts`; current Codex
+builds may reject it.
 
 Claude Code skills include `longtable`, `longtable-panel`, and generated
-role-specific skills such as `longtable-methods-critic`. They are adapter files
-generated from the LongTable role registry.
+role-specific skills such as `longtable-methods-critic`. They also include
+`longtable-interview` for the First Research Shape workflow. They are adapter
+files generated from the LongTable role registry.
 
 ## Panel Orchestration
 

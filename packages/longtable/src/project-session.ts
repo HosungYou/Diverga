@@ -54,6 +54,62 @@ export interface StartInterviewSession {
   summary: string;
 }
 
+export type InterviewTurnQuality = "thin" | "usable" | "rich";
+
+export type InterviewDepth =
+  | "gathering_context"
+  | "forming_first_handle"
+  | "ready_to_summarize";
+
+export interface FirstResearchShape {
+  handle: string;
+  currentGoal: string;
+  currentBlocker?: string;
+  researchObject?: string;
+  gapRisk?: string;
+  protectedDecision?: string;
+  openQuestions: string[];
+  nextAction: string;
+  confidence: "low" | "medium" | "high";
+  sourceHookId?: string;
+  confirmedAt?: string;
+}
+
+export interface LongTableInterviewTurn {
+  id: string;
+  index: number;
+  createdAt: string;
+  question: string;
+  answer: string;
+  reflection?: string;
+  quality: InterviewTurnQuality;
+  needsFollowUp: boolean;
+  followUpQuestion?: string;
+  rationale?: string[];
+}
+
+export interface LongTableHookRun {
+  id: string;
+  kind: "longtable_interview" | "quality_probe" | "checkpoint" | "panel_decision";
+  status: "pending" | "active" | "ready_to_confirm" | "confirmed" | "deferred" | "cancelled";
+  createdAt: string;
+  updatedAt: string;
+  targetOutcome?: "first_research_handle" | string;
+  depth?: InterviewDepth;
+  provider?: ProviderKind;
+  turns?: LongTableInterviewTurn[];
+  firstResearchShape?: FirstResearchShape;
+  qualityNotes?: string[];
+  rationale?: string[];
+  linkedQuestionRecordIds?: string[];
+  linkedDecisionRecordIds?: string[];
+}
+
+export type LongTableWorkspaceState = ResearchState & {
+  hooks?: LongTableHookRun[];
+  firstResearchShape?: FirstResearchShape;
+};
+
 export interface LongTableProjectRecord {
   schemaVersion: 1;
   product: "LongTable";
@@ -88,6 +144,7 @@ export interface LongTableSessionRecord {
   nextAction?: string;
   openQuestions?: string[];
   startInterview?: StartInterviewSession;
+  firstResearchShape?: FirstResearchShape;
   requestedPerspectives: string[];
   disagreementPreference: ProjectDisagreementPreference;
   activeModes?: string[];
@@ -228,6 +285,9 @@ function resolveUserLocale(): "ko" | "en" {
 }
 
 function buildFirstQuestion(session: LongTableSessionRecord): string {
+  if (session.firstResearchShape?.openQuestions?.[0]) {
+    return session.firstResearchShape.openQuestions[0];
+  }
   return session.currentBlocker
     ? `Where does "${session.currentBlocker}" show up most concretely in the scene, material, or evidence?`
     : `What scene, case, text, data, or draft would make "${session.currentGoal}" easiest to inspect first?`;
@@ -239,22 +299,26 @@ function buildOpenQuestions(session: LongTableSessionRecord): string[] {
   if (session.startInterview) {
     return [
       firstQuestion,
-      `What would a reader need to understand differently if "${session.currentGoal}" becomes a strong research project?`
+      `What still feels hardest to name or make concrete in "${session.currentGoal}"?`
     ];
   }
 
   return session.currentBlocker
     ? [
         firstQuestion,
-        `What would a reader need to understand differently if "${session.currentBlocker}" becomes a strong research problem?`
+        `What would give "${session.currentBlocker}" a usable first research handle without forcing a final research question yet?`
       ]
     : [
         firstQuestion,
-        `What would count as a good first outcome for "${session.currentGoal}" in this session?`
+        `What would give this project a usable first research handle without pretending the question is settled?`
       ];
 }
 
 function buildNextAction(session: LongTableSessionRecord): string {
+  if (session.firstResearchShape) {
+    return session.firstResearchShape.nextAction;
+  }
+
   if (session.startInterview) {
     return session.currentBlocker
       ? `Begin from the start-interview brief, then make "${session.currentBlocker}" concrete with one scene, source, case, or dataset.`
@@ -267,6 +331,10 @@ function buildNextAction(session: LongTableSessionRecord): string {
 }
 
 function buildResumeHint(session: LongTableSessionRecord): string {
+  if (session.firstResearchShape) {
+    return `I want to continue from the First Research Shape: ${session.firstResearchShape.handle}.`;
+  }
+
   if (session.startInterview) {
     return session.currentBlocker
       ? `I want to continue from the LongTable start interview. The first unresolved issue is ${session.currentBlocker}.`
@@ -306,6 +374,7 @@ function buildCurrentGuide(
       ...(session.researchObject ? [`- 연구 객체: ${session.researchObject}`] : []),
       ...(session.gapRisk ? [`- 공백/암묵지 위험: ${session.gapRisk}`] : []),
       ...(session.protectedDecision ? [`- 보호할 결정: ${session.protectedDecision}`] : []),
+      ...(session.firstResearchShape ? [`- First Research Shape: ${session.firstResearchShape.handle}`] : []),
       ...(session.startInterview ? [`- start interview: ${session.startInterview.summary}`] : []),
       `- 다음 액션: ${nextAction}`,
       `- 관점: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
@@ -337,10 +406,19 @@ function buildCurrentGuide(
       "",
       "## 다시 시작 문장",
       `- "${resumeHint}"`,
+      ...(session.firstResearchShape
+        ? [
+            "",
+            "## First Research Shape",
+            `- Handle: ${session.firstResearchShape.handle}`,
+            `- Confidence: ${session.firstResearchShape.confidence}`,
+            ...session.firstResearchShape.openQuestions.map((question) => `- Open question: ${question}`)
+          ]
+        : []),
       "",
       "## 빠른 시작",
       "- 이 디렉토리에서 `codex`를 엽니다.",
-      `- 첫 메시지는 보통 \`${suggestedPrompt}\` 정도면 충분합니다.`,
+      `- 첫 메시지는 보통 \`${session.firstResearchShape ? suggestedPrompt : "$longtable-interview"}\` 정도면 충분합니다.`,
       "",
       "## 증거 규칙",
       "- 외부 사실이나 현재 정보는 source를 붙이거나 inference로 낮춥니다."
@@ -360,6 +438,7 @@ function buildCurrentGuide(
     ...(session.researchObject ? [`- Research object: ${session.researchObject}`] : []),
     ...(session.gapRisk ? [`- Gap/tacit risk: ${session.gapRisk}`] : []),
     ...(session.protectedDecision ? [`- Protected decision: ${session.protectedDecision}`] : []),
+    ...(session.firstResearchShape ? [`- First Research Shape: ${session.firstResearchShape.handle}`] : []),
     ...(session.startInterview ? [`- Start interview: ${session.startInterview.summary}`] : []),
     `- Next action: ${nextAction}`,
     `- Perspectives: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
@@ -391,26 +470,37 @@ function buildCurrentGuide(
     "",
     "## Restart Prompt",
     `- "${resumeHint}"`,
+    ...(session.firstResearchShape
+      ? [
+          "",
+          "## First Research Shape",
+          `- Handle: ${session.firstResearchShape.handle}`,
+          `- Confidence: ${session.firstResearchShape.confidence}`,
+          ...session.firstResearchShape.openQuestions.map((question) => `- Open question: ${question}`)
+        ]
+      : []),
     "",
     "## Quick Start",
     "- Open `codex` in this directory.",
-    `- A good first message is usually \`${suggestedPrompt}\`.`,
+    `- A good first message is usually \`${session.firstResearchShape ? suggestedPrompt : "$longtable-interview"}\`.`,
     "",
     "## Evidence Rule",
     "- External or current claims should carry a source link or be labeled as inference."
   ].join("\n");
 }
 
-async function loadResearchState(stateFilePath: string): Promise<ResearchState> {
+async function loadResearchState(stateFilePath: string): Promise<LongTableWorkspaceState> {
   if (!existsSync(stateFilePath)) {
-    return createEmptyResearchState();
+    return createEmptyResearchState() as LongTableWorkspaceState;
   }
 
-  const parsed = JSON.parse(await readFile(stateFilePath, "utf8")) as Partial<ResearchState>;
+  const parsed = JSON.parse(await readFile(stateFilePath, "utf8")) as Partial<LongTableWorkspaceState>;
   return {
     ...parsed,
     explicitState: parsed.explicitState ?? {},
     workingState: parsed.workingState ?? {},
+    hooks: parsed.hooks ?? [],
+    ...(parsed.firstResearchShape ? { firstResearchShape: parsed.firstResearchShape } : {}),
     inferredHypotheses: parsed.inferredHypotheses ?? [],
     openTensions: parsed.openTensions ?? [],
     decisionLog: parsed.decisionLog ?? [],
@@ -422,7 +512,7 @@ async function loadResearchState(stateFilePath: string): Promise<ResearchState> 
   };
 }
 
-export async function loadWorkspaceState(context: LongTableProjectContext): Promise<ResearchState> {
+export async function loadWorkspaceState(context: LongTableProjectContext): Promise<LongTableWorkspaceState> {
   return loadResearchState(context.stateFilePath);
 }
 
@@ -543,13 +633,16 @@ function buildProjectAgentsMd(
     "- Treat `AGENTS.md` as runtime guidance, not as the researcher-facing resume artifact.",
     "",
     "## Invocation Rules",
+    "- If the user message starts with `$longtable-interview`, run the LongTable interview flow before generic research advice.",
     "- If the user message starts with `lt `, `longtable `, `long table `, or `롱테이블 ` followed by a directive and `:`, treat it as an explicit LongTable invocation.",
-    "- Supported explicit directives are: explore, review, critique, draft, commit, panel, status, editor, reviewer, methods, theory, measurement, ethics, voice, venue.",
+    "- Supported explicit directives are: interview, explore, review, critique, draft, commit, panel, status, editor, reviewer, methods, theory, measurement, ethics, voice, venue.",
     "- For explicit LongTable invocations, do not begin by scanning the workspace. Use the current session files first and answer as LongTable immediately.",
     "- For general research requests in this workspace, prefer LongTable behavior before generic coding behavior.",
     "",
     "## Research Behavior",
     "- Begin exploratory work with clarifying or tension questions before recommending a direction.",
+    "- For `$longtable-interview`, ask one natural-language question at a time, reflect with `LongTable hears: ...`, and avoid early reader/reviewer or theory/method/measurement classification.",
+    "- Use structured options only at the final First Research Shape confirmation or at true checkpoint boundaries.",
     "- If you foreground role perspectives, disclose them with `LongTable consulted: ...`.",
     "- Keep one accountable synthesis, but do not hide meaningful disagreement.",
     ...(session.disagreementPreference === "always_visible"
@@ -566,6 +659,7 @@ function buildProjectAgentsMd(
     ...(session.researchObject ? [`- Research object: ${session.researchObject}`] : []),
     ...(session.gapRisk ? [`- Gap/tacit risk: ${session.gapRisk}`] : []),
     ...(session.protectedDecision ? [`- Protected decision: ${session.protectedDecision}`] : []),
+    ...(session.firstResearchShape ? [`- First Research Shape: ${session.firstResearchShape.handle}`] : []),
     ...(session.startInterview ? [`- Start interview summary: ${session.startInterview.summary}`] : []),
     `- Requested perspectives: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
     `- Disagreement visibility: ${session.disagreementPreference}`,
@@ -578,7 +672,7 @@ function buildStateSeed(
   session: LongTableSessionRecord,
   setup: SetupPersistedOutput
 ): string {
-  const state = createEmptyResearchState();
+  const state = createEmptyResearchState() as LongTableWorkspaceState;
   state.explicitState = {
     field: setup.profileSeed.field ?? "unspecified",
     careerStage: setup.profileSeed.careerStage ?? "unspecified",
@@ -599,6 +693,10 @@ function buildStateSeed(
     ...(session.startInterview ? { startInterview: session.startInterview } : {}),
     ...(session.resumeHint ? { resumeHint: session.resumeHint } : {})
   };
+  if (session.firstResearchShape) {
+    state.firstResearchShape = session.firstResearchShape;
+    state.workingState.firstResearchShape = session.firstResearchShape;
+  }
   if (session.currentBlocker) {
     state.openTensions.push(session.currentBlocker);
   }
@@ -687,7 +785,7 @@ export async function appendInvocationRecordToWorkspace(
   context: LongTableProjectContext,
   invocation: InvocationRecord,
   questions: QuestionRecord[] = []
-): Promise<ResearchState> {
+): Promise<LongTableWorkspaceState> {
   const state = await loadResearchState(context.stateFilePath);
   const withInvocation = appendInvocationToResearchState(state, invocation);
   const updated = questions.length > 0
@@ -695,11 +793,240 @@ export async function appendInvocationRecordToWorkspace(
     : withInvocation;
   await writeFile(context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
   await syncCurrentWorkspaceView(context);
-  return updated;
+  return updated as LongTableWorkspaceState;
 }
 
 function createId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function normalizeInterviewQuality(answer: string, quality?: InterviewTurnQuality): InterviewTurnQuality {
+  if (quality) {
+    return quality;
+  }
+  const trimmed = answer.trim();
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+  if (trimmed.length < 12 || wordCount < 3) {
+    return "thin";
+  }
+  if (trimmed.length > 80 || wordCount >= 12) {
+    return "rich";
+  }
+  return "usable";
+}
+
+function defaultFollowUpQuestion(answer: string): string {
+  const trimmed = answer.trim();
+  if (trimmed.length < 12) {
+    return "Say one more sentence about where this problem appears or why it matters before LongTable tries to classify it.";
+  }
+  return "What concrete scene, case, material, text, dataset, or decision would make that problem easier to inspect first?";
+}
+
+function depthForInterview(turns: LongTableHookRun["turns"] = []): InterviewDepth {
+  const usableTurns = turns.filter((turn) => turn.quality !== "thin").length;
+  if (usableTurns >= 3) {
+    return "ready_to_summarize";
+  }
+  if (usableTurns >= 1) {
+    return "forming_first_handle";
+  }
+  return "gathering_context";
+}
+
+function activeInterviewHook(state: LongTableWorkspaceState, hookId?: string): LongTableHookRun | undefined {
+  const hooks = state.hooks ?? [];
+  if (hookId) {
+    return hooks.find((hook) => hook.id === hookId);
+  }
+  return [...hooks].reverse().find((hook) =>
+    hook.kind === "longtable_interview" &&
+    (hook.status === "pending" || hook.status === "active" || hook.status === "ready_to_confirm")
+  );
+}
+
+function upsertHook(state: LongTableWorkspaceState, hook: LongTableHookRun): LongTableWorkspaceState {
+  const hooks = state.hooks ?? [];
+  const existingIndex = hooks.findIndex((candidate) => candidate.id === hook.id);
+  const nextHooks = existingIndex >= 0
+    ? hooks.map((candidate) => candidate.id === hook.id ? hook : candidate)
+    : [...hooks, hook];
+  return {
+    ...state,
+    hooks: nextHooks
+  };
+}
+
+export async function beginLongTableInterview(options: {
+  context: LongTableProjectContext;
+  provider?: ProviderKind;
+  openingQuestion?: string;
+  seedAnswer?: string;
+}): Promise<{ hook: LongTableHookRun; state: LongTableWorkspaceState }> {
+  const state = await loadResearchState(options.context.stateFilePath);
+  const existing = activeInterviewHook(state);
+  if (existing) {
+    return { hook: existing, state };
+  }
+
+  const timestamp = nowIso();
+  const hook: LongTableHookRun = {
+    id: createId("hook_interview"),
+    kind: "longtable_interview",
+    status: "active",
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    targetOutcome: "first_research_handle",
+    depth: "gathering_context",
+    provider: options.provider,
+    turns: [],
+    qualityNotes: [],
+    rationale: [
+      "Official LongTable research start surface is provider-native `$longtable-interview`, not the CLI start questionnaire.",
+      "The hook keeps early research ambiguity open until a first research handle can be summarized."
+    ]
+  };
+
+  let updated = upsertHook(state, hook);
+  updated.workingState = {
+    ...updated.workingState,
+    activeInterviewHookId: hook.id,
+    interviewSurface: "$longtable-interview",
+    ...(options.openingQuestion ? { interviewOpeningQuestion: options.openingQuestion } : {}),
+    ...(options.seedAnswer ? { interviewSeedAnswer: options.seedAnswer } : {})
+  };
+  await writeFile(options.context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(options.context);
+  return { hook, state: updated };
+}
+
+export async function appendLongTableInterviewTurn(options: {
+  context: LongTableProjectContext;
+  hookId?: string;
+  question: string;
+  answer: string;
+  reflection?: string;
+  quality?: InterviewTurnQuality;
+  needsFollowUp?: boolean;
+  followUpQuestion?: string;
+  rationale?: string[];
+}): Promise<{ hook: LongTableHookRun; turn: NonNullable<LongTableHookRun["turns"]>[number]; state: LongTableWorkspaceState }> {
+  const state = await loadResearchState(options.context.stateFilePath);
+  const existing = activeInterviewHook(state, options.hookId);
+  if (!existing) {
+    throw new Error("No active LongTable interview hook was found. Run begin_interview first.");
+  }
+
+  const quality = normalizeInterviewQuality(options.answer, options.quality);
+  const needsFollowUp = options.needsFollowUp ?? quality === "thin";
+  const followUpQuestion = needsFollowUp
+    ? options.followUpQuestion ?? defaultFollowUpQuestion(options.answer)
+    : options.followUpQuestion;
+  const timestamp = nowIso();
+  const turns = existing.turns ?? [];
+  const turn = {
+    id: createId("interview_turn"),
+    index: turns.length + 1,
+    createdAt: timestamp,
+    question: options.question.trim(),
+    answer: options.answer.trim(),
+    ...(options.reflection?.trim() ? { reflection: options.reflection.trim() } : {}),
+    quality,
+    needsFollowUp,
+    ...(followUpQuestion?.trim() ? { followUpQuestion: followUpQuestion.trim() } : {}),
+    ...(options.rationale && options.rationale.length > 0 ? { rationale: options.rationale } : {})
+  };
+  const nextTurns = [...turns, turn];
+  const depth = depthForInterview(nextTurns);
+  const hook: LongTableHookRun = {
+    ...existing,
+    status: depth === "ready_to_summarize" ? "ready_to_confirm" : "active",
+    updatedAt: timestamp,
+    depth,
+    turns: nextTurns,
+    qualityNotes: [
+      ...(existing.qualityNotes ?? []),
+      ...(needsFollowUp ? [`Turn ${turn.index} needs follow-up: ${followUpQuestion}`] : [])
+    ]
+  };
+  const updated = upsertHook(state, hook);
+  await writeFile(options.context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(options.context);
+  return { hook, turn, state: updated };
+}
+
+export async function summarizeLongTableInterview(options: {
+  context: LongTableProjectContext;
+  hookId?: string;
+  shape: FirstResearchShape;
+}): Promise<{ hook: LongTableHookRun; shape: FirstResearchShape; state: LongTableWorkspaceState; session: LongTableSessionRecord }> {
+  const state = await loadResearchState(options.context.stateFilePath);
+  const existing = activeInterviewHook(state, options.hookId);
+  if (!existing) {
+    throw new Error("No active LongTable interview hook was found. Run begin_interview first.");
+  }
+
+  const timestamp = nowIso();
+  const shape: FirstResearchShape = {
+    ...options.shape,
+    handle: options.shape.handle.trim(),
+    currentGoal: options.shape.currentGoal.trim(),
+    openQuestions: options.shape.openQuestions.map((question) => question.trim()).filter(Boolean),
+    nextAction: options.shape.nextAction.trim(),
+    sourceHookId: existing.id
+  };
+  const hook: LongTableHookRun = {
+    ...existing,
+    status: "ready_to_confirm",
+    updatedAt: timestamp,
+    depth: "ready_to_summarize",
+    firstResearchShape: shape
+  };
+  const session: LongTableSessionRecord = {
+    ...options.context.session,
+    lastUpdatedAt: timestamp,
+    currentGoal: shape.currentGoal,
+    ...(shape.currentBlocker ? { currentBlocker: shape.currentBlocker } : {}),
+    ...(shape.researchObject ? { researchObject: shape.researchObject } : {}),
+    ...(shape.gapRisk ? { gapRisk: shape.gapRisk } : {}),
+    ...(shape.protectedDecision ? { protectedDecision: shape.protectedDecision } : {}),
+    nextAction: shape.nextAction,
+    openQuestions: shape.openQuestions,
+    firstResearchShape: shape,
+    resumeHint: `I want to continue from the First Research Shape: ${shape.handle}.`
+  };
+  options.context.session = session;
+
+  let updated = upsertHook(state, hook);
+  updated.firstResearchShape = shape;
+  updated.workingState = {
+    ...updated.workingState,
+    currentGoal: shape.currentGoal,
+    ...(shape.currentBlocker ? { currentBlocker: shape.currentBlocker } : {}),
+    ...(shape.researchObject ? { researchObject: shape.researchObject } : {}),
+    ...(shape.gapRisk ? { gapRisk: shape.gapRisk } : {}),
+    ...(shape.protectedDecision ? { protectedDecision: shape.protectedDecision } : {}),
+    openQuestions: shape.openQuestions,
+    nextAction: shape.nextAction,
+    firstResearchShape: shape
+  };
+  if (shape.currentBlocker && !updated.openTensions.includes(shape.currentBlocker)) {
+    updated.openTensions.push(shape.currentBlocker);
+  }
+  updated.narrativeTraces.push({
+    id: createId("narrative_trace"),
+    timestamp,
+    source: "$longtable-interview",
+    traceType: "judgment",
+    summary: `First Research Shape: ${shape.handle}.`,
+    visibility: "explicit",
+    importance: shape.confidence
+  });
+
+  await writeFile(options.context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(options.context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(options.context);
+  return { hook, shape, state: updated, session };
 }
 
 function findQuestionForDecision(
@@ -1596,6 +1923,7 @@ export function renderProjectWorkspaceSummary(context: LongTableProjectContext):
     `Goal: ${context.session.currentGoal}`,
     ...(context.session.currentBlocker ? [`Blocker: ${context.session.currentBlocker}`] : []),
     ...(context.session.researchObject ? [`Working object: ${context.session.researchObject}`] : []),
+    ...(context.session.firstResearchShape ? [`First Research Shape: ${context.session.firstResearchShape.handle}`] : []),
     ...(context.session.startInterview ? [`Start interview: ${context.session.startInterview.summary}`] : []),
     "└───────────────────────────────────────────────────────┘",
     "",
