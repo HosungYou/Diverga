@@ -12,7 +12,7 @@ source of truth and numbered fallback remains available.
 - Added `elicit_question` to `@longtable/mcp`.
 - Added Codex setup support for `--checkpoint-ui off|interactive|strong`.
 - Added explicit Codex MCP elicitation approval when checkpoint UI is enabled:
-  `approval_policy = { granular = { mcp_elicitations = true } }`.
+  `approval_policy = { granular = { sandbox_approval = false, rules = false, mcp_elicitations = true } }`.
 - Kept Codex `supportsStructuredQuestions` false; MCP elicitation is a
   transport capability, not the canonical question protocol.
 - Added knowledge-gap and tacit-assumption checkpoint triggers.

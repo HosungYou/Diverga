@@ -199,7 +199,7 @@ const ANSI = {
 };
 
 const LONGTABLE_MCP_SERVER_NAME = "longtable-state";
-const LONGTABLE_MCP_PACKAGE_VERSION = "0.1.22";
+const LONGTABLE_MCP_PACKAGE_VERSION = "0.1.23";
 const LONGTABLE_MCP_MARKER_START = "# LongTable state MCP START";
 const LONGTABLE_MCP_MARKER_END = "# LongTable state MCP END";
 
@@ -1631,7 +1631,7 @@ function renderCodexMcpBlock(serverName: string, command: string, mcpArgs: strin
 }
 
 function codexElicitationApprovalLine(): string {
-  return "approval_policy = { granular = { mcp_elicitations = true } }";
+  return "approval_policy = { granular = { sandbox_approval = false, rules = false, mcp_elicitations = true } }";
 }
 
 function enableCodexMcpElicitations(existing: string): string {

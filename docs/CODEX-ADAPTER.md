@@ -33,7 +33,7 @@ chooses `--checkpoint-ui interactive` or `--checkpoint-ui strong` with an MCP
 runtime surface. The config change is explicit because it writes:
 
 ```toml
-approval_policy = { granular = { mcp_elicitations = true } }
+approval_policy = { granular = { sandbox_approval = false, rules = false, mcp_elicitations = true } }
 ```
 
 If the client rejects, cancels, or does not support elicitation, LongTable keeps

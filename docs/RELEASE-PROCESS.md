@@ -45,9 +45,25 @@ npm run pack:check
 For the `0.1.x` line:
 
 ```bash
-git tag -a v0.1.21 -m "Release LongTable 0.1.21"
-git push origin v0.1.21
+git tag -a v0.1.23 -m "Release LongTable 0.1.23
+
+Technical changes:
+- fix Codex granular approval policy emitted for checkpoint UI
+- keep MCP elicitation checkpoint transport opt-in
+- preserve numbered checkpoint fallback when elicitation is unavailable
+
+Verification:
+- npm run test
+- npm run pack:check
+- codex debug prompt-input with generated granular approval policy"
+git push origin v0.1.23
 ```
+
+Annotated tag messages and GitHub Release notes should be technical and
+specific. Include changed package surfaces, config/schema changes, migration or
+fallback behavior, and the exact verification commands. Avoid generic release
+messages when the change affects provider runtime configuration, checkpoint
+policy, MCP tools, setup behavior, or state files.
 
 The release workflow publishes all public workspaces when a `v0.1.*` tag is
 pushed. It requires `NPM_TOKEN` to be configured in GitHub repository secrets.
