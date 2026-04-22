@@ -42,10 +42,11 @@ export type ProviderKind = "claude" | "codex";
 
 export type RoleKey = string;
 
-export type InvocationKind = "single_role" | "panel" | "team_debate" | "status";
+export type InvocationKind = "single_role" | "panel" | "team" | "team_debate" | "status";
 
 export type InvocationSurface =
   | "native_parallel"
+  | "native_subagents"
   | "generated_skill"
   | "prompt_alias"
   | "sequential_fallback"
@@ -54,6 +55,8 @@ export type InvocationSurface =
   | "mcp_transport";
 
 export type InvocationStatus = "planned" | "running" | "completed" | "blocked" | "degraded" | "error";
+
+export type InteractionDepth = "independent" | "cross_reviewed" | "debated";
 
 export type PanelVisibility = "synthesis_only" | "show_on_conflict" | "always_visible";
 
@@ -187,6 +190,7 @@ export interface PanelResult {
   synthesis?: string;
   conflictSummary?: string;
   decisionPrompt?: string;
+  interactionDepth?: InteractionDepth;
   linkedQuestionRecordIds: string[];
   linkedDecisionRecordIds: string[];
 }
@@ -204,6 +208,8 @@ export interface TeamDebateContribution {
   role: RoleKey;
   label: string;
   targetRole?: RoleKey;
+  respondsToContributionId?: string;
+  stance?: "agree" | "disagree" | "conditional" | "defer";
   summary: string;
   claims: string[];
   objections: string[];
@@ -243,7 +249,8 @@ export interface TeamDebateRun {
   roles: PanelMember[];
   status: InvocationStatus;
   surface: InvocationSurface;
-  roundPolicy: "fixed";
+  interactionDepth: InteractionDepth;
+  roundPolicy: "fixed" | "team_cross_review";
   roundCount: number;
   artifactRoot: string;
   rounds: TeamDebateRound[];
@@ -259,6 +266,7 @@ export interface InvocationRecord {
   status: InvocationStatus;
   provider?: ProviderKind;
   surface: InvocationSurface;
+  interactionDepth?: InteractionDepth;
   panelPlan?: PanelPlan;
   panelResult?: PanelResult;
   teamDebateRun?: TeamDebateRun;
@@ -306,6 +314,7 @@ export interface QuestionPrompt {
   otherLabel?: string;
   required: boolean;
   source: "checkpoint" | "setup" | "runtime_guidance" | "manual";
+  displayReason?: string;
   rationale: string[];
   preferredSurfaces: QuestionSurface[];
 }
@@ -322,12 +331,30 @@ export interface QuestionAnswer {
 
 export type QuestionRecordStatus = "pending" | "answered" | "cleared" | "error";
 
+export type QuestionTransportStatus =
+  | "not_attempted"
+  | "attempted"
+  | "accepted"
+  | "declined"
+  | "unsupported"
+  | "timeout"
+  | "error"
+  | "fallback_rendered";
+
+export interface QuestionTransportState {
+  surface: QuestionSurface;
+  status: QuestionTransportStatus;
+  updatedAt: string;
+  message?: string;
+}
+
 export interface QuestionRecord {
   id: string;
   createdAt: string;
   updatedAt: string;
   status: QuestionRecordStatus;
   prompt: QuestionPrompt;
+  transportStatus?: QuestionTransportState;
   answer?: QuestionAnswer;
   error?: string;
   decisionRecordId?: string;

@@ -190,6 +190,24 @@ longtable review --role methods_critic,measurement_auditor --panel --prompt "rev
 longtable decide --answer evidence --rationale "Need citation support before continuing."
 ```
 
+### `longtable team`
+
+File-backed agent-team review. The default `team` path is not only parallel role
+listing; it records independent review, cross-review, and a coordinator
+synthesis/checkpoint.
+
+Examples:
+
+```bash
+longtable team --prompt "review this measurement plan" --role editor,measurement_auditor --json
+longtable team --tmux --prompt "review this measurement plan"
+longtable team --debate --prompt "debate this study design" --role theory_critic,methods_critic --json
+```
+
+`team --debate` adds rebuttal and convergence rounds. See
+`docs/AGENT-TEAM-README.md` for user-facing guidance and
+`docs/TEAM-DEBATE-ORCHESTRATION.md` for the artifact contract.
+
 ### `longtable roles`
 
 Lists the research perspectives LongTable can consult.

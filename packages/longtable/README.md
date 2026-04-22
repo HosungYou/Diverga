@@ -92,6 +92,7 @@ longtable ask --cwd "<project-path>" --prompt "..."
 longtable panel --prompt "..."
 longtable sentinel --prompt "Should I define a new measurement construct?"
 longtable hud --watch
+longtable team --prompt "Review this measurement plan." --role editor,measurement_auditor --json
 longtable team --tmux --prompt "Review this measurement plan."
 longtable team --debate --prompt "Review this measurement plan." --role editor,measurement_auditor --json
 longtable codex install-skills
@@ -164,7 +165,7 @@ Default panel roles include:
 
 Use `--role` to constrain the panel when the research problem is already clear.
 
-## Sentinel, HUD, And Tmux Team
+## Sentinel, HUD, And Agent Team
 
 `longtable sentinel` is an explicit gap/tacit check for prompts that may contain
 measurement, theory, method, evidence, authorship, or tacit-assumption risks.
@@ -175,15 +176,21 @@ unconfirmed inferred hypothesis.
 blocker, pending checkpoints, recent decisions, and invocation counts.
 `longtable hud --tmux` opens that view in a tmux pane.
 
-`longtable team --tmux` opens role-specific panes for research discussion and
-writes logs under `.longtable/team/<id>/`. This is panel discussion, not merely
-parallel execution: role panes are prompted to state claims, objections, open
-questions, and likely disagreement.
+`longtable team` creates a file-backed agent-team review under
+`.longtable/team/<id>/`: independent review, cross-review, and
+synthesis/checkpoint. Use it when roles should inspect each other's concerns
+before LongTable proposes a researcher decision.
+
+`longtable team --tmux` opens role-specific panes for live discussion. The panes
+can add logs, but the file-backed team artifact remains the source of truth.
 
 `longtable team --debate` creates a fixed five-round debate record under
 `.longtable/team/<id>/`: independent review, cross-review, rebuttal,
 convergence, and synthesis/checkpoint. Tmux can show live role panes, but the
 file-backed artifact directory is the source of truth.
+
+See `docs/AGENT-TEAM-README.md` in the repository for a user-facing guide to
+panel, team, debate, and tmux surfaces.
 
 ## Evidence And Search Direction
 

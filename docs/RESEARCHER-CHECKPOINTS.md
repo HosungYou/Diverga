@@ -72,7 +72,7 @@ Research risk detected
 LongTable currently stores checkpoints through these records:
 
 - `QuestionRecord`: the pending or answered prompt
-- `QuestionPrompt`: title, question, options, rationale, required flag, preferred surfaces
+- `QuestionPrompt`: title, question, options, display reason, rationale, required flag, preferred surfaces
 - `QuestionAnswer`: selected value, label, optional rationale, provider, surface
 - `DecisionRecord`: durable commitment made from the answer
 - `InvocationRecord`: panel or role call that produced the checkpoint
@@ -143,7 +143,7 @@ A good Researcher Checkpoint has:
 - one focused question
 - two to four meaningful options
 - an `other` option when the offered categories may not cover the researcher's judgment
-- an optional rationale field
+- an optional rationale path for logs, not mandatory UI friction
 - a clear record target
 
 Bad checkpoint patterns:

@@ -8,8 +8,10 @@ const cli = join(repoRoot, "packages", "longtable", "dist", "cli.js");
 const { classifyCheckpointTrigger } = await import(join(repoRoot, "packages", "longtable-checkpoints", "dist", "index.js"));
 const {
   answerWorkspaceQuestion,
+  createWorkspaceQuestion,
   loadProjectContextFromDirectory
 } = await import(join(repoRoot, "packages", "longtable", "dist", "index.js"));
+const { renderQuestionRecordPrompt } = await import(join(repoRoot, "packages", "longtable-provider-codex", "dist", "index.js"));
 
 function assertEqual(actual, expected, label) {
   if (actual !== expected) {
@@ -108,5 +110,63 @@ const decided = await answerWorkspaceQuestion({
 });
 
 assertEqual(decided.question.answer?.surface, "mcp_elicitation", "accepted MCP surface");
+
+const overridden = await createWorkspaceQuestion({
+  context,
+  prompt: "Theory and construct words should not override the explicit checkpoint.",
+  checkpointKey: "explore_runtime_guidance",
+  question: "Which uncertainty should LongTable resolve first?",
+  questionOptions: [
+    { value: "surface_tensions", label: "Surface tensions first" },
+    { value: "gather_context", label: "Gather context first" }
+  ],
+  displayReason: "The UI should ask the concrete decision instead of exposing internal trigger rationale.",
+  required: false,
+  provider: "codex"
+});
+assertEqual(overridden.question.prompt.checkpointKey, "explore_runtime_guidance", "explicit checkpoint override");
+assertEqual(overridden.question.prompt.options[0]?.value, "surface_tensions", "explicit option override");
+const rendered = renderQuestionRecordPrompt(overridden.question).prompt;
+if (rendered.includes("Why now:")) {
+  throw new Error("Codex question fallback should not render repeated Why now lines.");
+}
+if (!rendered.includes("Decision context: The UI should ask the concrete decision")) {
+  throw new Error("Codex question fallback should render the display reason.");
+}
+
+const teamTmp = mkdtempSync(join(tmpdir(), "longtable-team-cross-review-"));
+const team = JSON.parse(execFileSync("node", [
+  cli,
+  "team",
+  "--cwd", teamTmp,
+  "--prompt", "Review this measurement plan as an agent team.",
+  "--role", "editor,measurement_auditor",
+  "--json"
+], {
+  cwd: teamTmp,
+  encoding: "utf8"
+}));
+assertEqual(team.run.interactionDepth, "cross_reviewed", "team interaction depth");
+assertEqual(team.run.roundCount, 3, "team round count");
+const crossRound = team.run.rounds.find((round) => round.kind === "cross_review");
+if (!crossRound?.contributions.every((contribution) => typeof contribution.respondsToContributionId === "string")) {
+  throw new Error("Team cross-review contributions must reference independent contributions.");
+}
+
+const debateTmp = mkdtempSync(join(tmpdir(), "longtable-team-debate-"));
+const debate = JSON.parse(execFileSync("node", [
+  cli,
+  "team",
+  "--cwd", debateTmp,
+  "--prompt", "Debate this measurement plan before I commit.",
+  "--role", "editor,measurement_auditor",
+  "--debate",
+  "--json"
+], {
+  cwd: debateTmp,
+  encoding: "utf8"
+}));
+assertEqual(debate.run.interactionDepth, "debated", "debate interaction depth");
+assertEqual(debate.run.roundCount, 5, "debate round count");
 
 console.log("checkpoint routing smoke passed");

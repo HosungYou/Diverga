@@ -19,6 +19,7 @@
 - `docs/LONGTABLE-COMMAND-SURFACE.md`
 - `docs/CODEX-ALIAS-OVERLAY.md`
 - `docs/IN-CODEX-SETUP.md`
+- `docs/AGENT-TEAM-README.md`
 
 ## Existing Inputs To Preserve
 

@@ -213,6 +213,7 @@ export function createPlannedPanelQuestionRecord(
         "Panel review creates disagreement or risk visibility that should connect to an explicit researcher decision.",
         `Panel checkpoint sensitivity: ${plan.checkpointSensitivity}.`
       ],
+      displayReason: "Panel review can surface role disagreement that should not be collapsed without researcher approval.",
       preferredSurfaces: provider === "claude"
         ? ["native_structured", "numbered"]
         : ["mcp_elicitation", "numbered"]
@@ -234,6 +235,7 @@ export function createPlannedPanelResult(
     provider,
     surface: "sequential_fallback",
     status: "planned",
+    interactionDepth: "independent",
     memberResults: plan.members.map((member) => ({
       role: member.role,
       label: member.label,
@@ -259,6 +261,7 @@ export function createPlannedInvocationRecord(options: {
     status: "planned",
     provider: options.provider,
     surface: "sequential_fallback",
+    interactionDepth: "independent",
     panelPlan: options.plan,
     panelResult: options.result,
     degradationReason: "Native provider team execution is optional; sequential fallback is the stable LongTable surface."

@@ -35,6 +35,8 @@ export interface TeamDebateBundle {
   questionRecord: QuestionRecord;
 }
 
+type TeamRunKind = "team" | "debate";
+
 function nowIso(): string {
   return new Date().toISOString();
 }
@@ -69,6 +71,8 @@ function contribution(options: {
   role: RoleKey;
   label: string;
   targetRole?: RoleKey;
+  respondsToContributionId?: string;
+  stance?: TeamDebateContribution["stance"];
   artifactPath: string;
   summary: string;
   claims: string[];
@@ -123,6 +127,7 @@ function crossReviewContribution(
   label: string,
   targetRole: RoleKey,
   targetLabel: string,
+  targetContribution: TeamDebateContribution,
   artifactPath: string
 ): TeamDebateContribution {
   return contribution({
@@ -130,9 +135,12 @@ function crossReviewContribution(
     role,
     label,
     targetRole,
+    respondsToContributionId: targetContribution.id,
+    stance: "conditional",
     artifactPath,
-    summary: `${label} challenges ${targetLabel}'s likely blind spot before synthesis.`,
+    summary: `${label} cross-reviews ${targetLabel}'s independent contribution (${targetContribution.id}) before synthesis.`,
     claims: [
+      `Responds to ${targetLabel}'s claim: ${targetContribution.claims[0]}`,
       `${targetLabel}'s concern is useful only if it does not erase ${label}'s domain-specific risk.`,
       "The debate should expose disagreement as a researcher decision point rather than normalize it away."
     ],
@@ -224,12 +232,13 @@ function convergenceContribution(roundId: string, plan: PanelPlan, role: RoleKey
   });
 }
 
-function buildSynthesis(plan: PanelPlan, artifactPath: string): TeamDebateSynthesis {
+function buildSynthesis(plan: PanelPlan, artifactPath: string, kind: TeamRunKind): TeamDebateSynthesis {
   const labels = plan.members.map((member) => member.label);
   const highSensitivity = plan.checkpointSensitivity === "high";
+  const runLabel = kind === "debate" ? "debate" : "team review";
   return {
     artifactPath,
-    summary: `The debate completed fixed 5-round review across ${labels.join(", ")}. It should slow closure by turning role disagreement into an explicit researcher decision.`,
+    summary: `The ${runLabel} completed across ${labels.join(", ")}. It should slow closure by turning role disagreement into an explicit researcher decision.`,
     consensus: [
       "The researcher should see role disagreement before LongTable drafts, commits, or submits a conclusion.",
       "Evidence gaps and tacit assumptions should remain visible instead of being smoothed into fluent prose."
@@ -247,13 +256,14 @@ function buildSynthesis(plan: PanelPlan, artifactPath: string): TeamDebateSynthe
       "Choose whether the debate should affect the current artifact, the research design, or only the decision log."
     ],
     recommendedCheckpoint: highSensitivity
-      ? "The debate surfaced high-sensitivity disagreement. What should LongTable treat as the next human decision before closure?"
-      : "The debate surfaced role disagreement. Should LongTable revise, verify evidence, proceed, or keep the tension open?"
+      ? `The ${runLabel} surfaced high-sensitivity disagreement. What should LongTable treat as the next human decision before closure?`
+      : `The ${runLabel} surfaced role disagreement. Should LongTable revise, verify evidence, proceed, or keep the tension open?`
   };
 }
 
 export function createTeamDebateQuestionRecord(run: TeamDebateRun, provider?: ProviderKind): QuestionRecord {
   const createdAt = nowIso();
+  const isDebate = run.interactionDepth === "debated";
   return {
     id: createId("question_record"),
     createdAt,
@@ -262,7 +272,7 @@ export function createTeamDebateQuestionRecord(run: TeamDebateRun, provider?: Pr
     prompt: {
       id: createId("question_prompt"),
       checkpointKey: "team_debate_next_decision",
-      title: "Team debate follow-up decision",
+      title: isDebate ? "Team debate follow-up decision" : "Agent team follow-up decision",
       question: run.synthesis.recommendedCheckpoint,
       type: "single_choice",
       options: [
@@ -294,10 +304,15 @@ export function createTeamDebateQuestionRecord(run: TeamDebateRun, provider?: Pr
         return key ? getPersonaDefinition(key).checkpointSensitivity === "high" : false;
       }),
       source: "runtime_guidance",
+      displayReason: isDebate
+        ? "Role rebuttals and convergence should connect to an explicit researcher decision."
+        : "Cross-review created role disagreement that should connect to an explicit researcher decision.",
       rationale: [
-        "Autonomous team debate is a research harness surface, not a substitute for researcher judgment.",
-        "The fixed debate rounds created disagreement that should connect to an explicit researcher decision.",
-        `Team debate run: ${run.id}.`
+        "Agent team orchestration is a research harness surface, not a substitute for researcher judgment.",
+        isDebate
+          ? "The fixed debate rounds created disagreement that should connect to an explicit researcher decision."
+          : "The cross-review round created disagreement that should connect to an explicit researcher decision.",
+        `Agent team run: ${run.id}.`
       ],
       preferredSurfaces: provider === "claude"
         ? ["native_structured", "numbered"]
@@ -306,10 +321,13 @@ export function createTeamDebateQuestionRecord(run: TeamDebateRun, provider?: Pr
   };
 }
 
-export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBundle {
-  const roundCount = options.roundCount ?? 5;
-  if (roundCount !== 5) {
-    throw new Error("LongTable debate v1 supports fixed 5-round debate only.");
+function buildTeamBundle(options: BuildTeamDebateOptions, kind: TeamRunKind): TeamDebateBundle {
+  const roundCount = options.roundCount ?? (kind === "debate" ? 5 : 3);
+  const expectedRounds = kind === "debate" ? 5 : 3;
+  if (roundCount !== expectedRounds) {
+    throw new Error(kind === "debate"
+      ? "LongTable debate v1 supports fixed 5-round debate only."
+      : "LongTable team v1 supports fixed 3-round cross-review only.");
   }
 
   const createdAt = nowIso();
@@ -323,6 +341,9 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
 
   const rounds: TeamDebateRound[] = [];
   const round1Id = createId("team_round");
+  const independentContributions = plan.members.map((member) =>
+    independentContribution(round1Id, plan, member.role, member.label, join("round-1-independent", `${member.role}.json`))
+  );
   rounds.push({
     id: round1Id,
     index: 1,
@@ -330,9 +351,7 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
     title: "Independent review",
     status: "completed",
     artifactDir: join(options.teamDir, "round-1-independent"),
-    contributions: plan.members.map((member) =>
-      independentContribution(round1Id, plan, member.role, member.label, join("round-1-independent", `${member.role}.json`))
-    )
+    contributions: independentContributions
   });
 
   const round2Id = createId("team_round");
@@ -347,6 +366,7 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
           member.label,
           target.role,
           target.label,
+          independentContributions.find((contribution) => contribution.role === target.role) as TeamDebateContribution,
           join("round-2-cross-review", `${member.role}-on-${target.role}.json`)
         )
       )
@@ -361,33 +381,35 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
     contributions: crossContributions
   });
 
-  const round3Id = createId("team_round");
-  rounds.push({
-    id: round3Id,
-    index: 3,
-    kind: "rebuttal",
-    title: "Rebuttal and revision",
-    status: "completed",
-    artifactDir: join(options.teamDir, "round-3-rebuttal"),
-    contributions: plan.members.map((member) =>
-      rebuttalContribution(round3Id, member.role, member.label, join("round-3-rebuttal", `${member.role}.json`))
-    )
-  });
+  if (kind === "debate") {
+    const round3Id = createId("team_round");
+    rounds.push({
+      id: round3Id,
+      index: 3,
+      kind: "rebuttal",
+      title: "Rebuttal and revision",
+      status: "completed",
+      artifactDir: join(options.teamDir, "round-3-rebuttal"),
+      contributions: plan.members.map((member) =>
+        rebuttalContribution(round3Id, member.role, member.label, join("round-3-rebuttal", `${member.role}.json`))
+      )
+    });
 
-  const round4Id = createId("team_round");
-  rounds.push({
-    id: round4Id,
-    index: 4,
-    kind: "convergence",
-    title: "Convergence and unresolved gaps",
-    status: "completed",
-    artifactDir: join(options.teamDir, "round-4-convergence"),
-    contributions: plan.members.map((member) =>
-      convergenceContribution(round4Id, plan, member.role, member.label, join("round-4-convergence", `${member.role}.json`))
-    )
-  });
+    const round4Id = createId("team_round");
+    rounds.push({
+      id: round4Id,
+      index: 4,
+      kind: "convergence",
+      title: "Convergence and unresolved gaps",
+      status: "completed",
+      artifactDir: join(options.teamDir, "round-4-convergence"),
+      contributions: plan.members.map((member) =>
+        convergenceContribution(round4Id, plan, member.role, member.label, join("round-4-convergence", `${member.role}.json`))
+      )
+    });
+  }
 
-  const synthesis = buildSynthesis(plan, "synthesis.json");
+  const synthesis = buildSynthesis(plan, "synthesis.json", kind);
   const run: TeamDebateRun = {
     id: createId("team_debate_run"),
     teamId: options.teamId,
@@ -397,14 +419,15 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
     roles: plan.members,
     status: "completed",
     surface: options.tmux ? "tmux_console" : "file_backed_debate",
-    roundPolicy: "fixed",
+    interactionDepth: kind === "debate" ? "debated" : "cross_reviewed",
+    roundPolicy: kind === "debate" ? "fixed" : "team_cross_review",
     roundCount,
     artifactRoot: options.teamDir,
     rounds: [
       ...rounds,
       {
         id: createId("team_round"),
-        index: 5,
+        index: roundCount,
         kind: "synthesis",
         title: "Coordinator synthesis and checkpoint",
         status: "completed",
@@ -426,11 +449,13 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
     visibility: plan.visibility,
     checkpointSensitivity: plan.checkpointSensitivity,
     rationale: [
-      "Autonomous debate requested through LongTable team orchestration.",
-      "File-backed fixed rounds keep disagreement inspectable before researcher closure."
+      kind === "debate"
+        ? "Autonomous debate requested through LongTable team orchestration."
+        : "Agent team cross-review requested through LongTable team orchestration.",
+      "File-backed rounds keep disagreement inspectable before researcher closure."
     ]
   });
-  intent.kind = "team_debate";
+  intent.kind = kind === "debate" ? "team_debate" : "team";
   intent.requestedSurface = run.surface;
 
   const invocationRecord: InvocationRecord = {
@@ -441,6 +466,7 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
     status: "completed",
     provider: options.provider,
     surface: run.surface,
+    interactionDepth: run.interactionDepth,
     panelPlan: plan,
     teamDebateRun: run,
     degradationReason: options.tmux
@@ -457,12 +483,21 @@ export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBund
   };
 }
 
+export function buildTeamReview(options: BuildTeamDebateOptions): TeamDebateBundle {
+  return buildTeamBundle(options, "team");
+}
+
+export function buildTeamDebate(options: BuildTeamDebateOptions): TeamDebateBundle {
+  return buildTeamBundle(options, "debate");
+}
+
 export function renderTeamDebateSummary(run: TeamDebateRun): string {
   return [
     "LongTable Team Debate",
     `- team: ${run.teamId}`,
     `- surface: ${run.surface}`,
-    `- rounds: ${run.roundCount} fixed`,
+    `- interaction depth: ${run.interactionDepth}`,
+    `- rounds: ${run.roundCount} ${run.roundPolicy}`,
     `- roles: ${run.roles.map((role) => `${role.label} (${role.role})`).join(", ")}`,
     `- artifacts: ${run.artifactRoot}`,
     "",

@@ -1,5 +1,8 @@
 # Team Debate Orchestration
 
+For user-facing guidance on choosing `panel`, `team`, `team --debate`, or
+`team --tmux`, see `docs/AGENT-TEAM-README.md`.
+
 ## Decision
 
 LongTable team debate is an inspectable research-harness protocol, not a
@@ -13,14 +16,16 @@ and live-note surface; it is not the source of truth.
 ## Command Surface
 
 ```bash
+longtable team --prompt "Review this measurement plan." --role editor,measurement_auditor
 longtable team --debate --prompt "Review this measurement plan." --role editor,measurement_auditor,theory_critic
 longtable team --debate --tmux --prompt "Review this measurement plan."
 longtable team --debate --json --prompt "Review this measurement plan."
 ```
 
-The v1 protocol uses fixed five-round debate. `--rounds 5` is accepted for
-explicitness; other round counts are intentionally rejected until the protocol
-has enough evaluation evidence.
+The v1 `team` protocol uses fixed three-round cross-review. `--rounds 3` is
+accepted for explicitness. The v1 `team --debate` protocol uses fixed five-round
+debate. `--rounds 5` is accepted for explicitness. Other round counts are
+intentionally rejected until the protocols have enough evaluation evidence.
 
 ## Artifact Contract
 
@@ -35,6 +40,11 @@ checkpoint.json
 synthesis.json
 round-1-independent/
 round-2-cross-review/
+```
+
+Debate runs also include:
+
+```text
 round-3-rebuttal/
 round-4-convergence/
 ```
@@ -46,7 +56,19 @@ Workspace loading uses the current directory where `.longtable/` is found as
 the authoritative project root, so moved or synced workspaces do not write to an
 old absolute `projectPath` from another machine.
 
-## Five-Round Protocol
+## Three-Round Team Protocol
+
+1. Independent review
+   - each role states claims, objections, open questions, evidence needs, tacit
+     assumptions, and checkpoint triggers
+2. Cross-review
+   - each role responds to another role's independent contribution and records
+     the referenced contribution id
+3. Coordinator synthesis and checkpoint
+   - LongTable records consensus, disagreement, unresolved gaps, and a
+     researcher-facing checkpoint
+
+## Five-Round Debate Protocol
 
 1. Independent review
    - each role states claims, objections, open questions, evidence needs, tacit

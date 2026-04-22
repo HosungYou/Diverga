@@ -161,11 +161,11 @@ export function questionRecordToNumberedCheckpointSpec(
     title: record.prompt.title,
     instructions: [
       record.prompt.question,
-      ...record.prompt.rationale.map((entry) => `Why now: ${entry}`),
+      record.prompt.displayReason ? `Decision context: ${record.prompt.displayReason}` : undefined,
       `Question id: ${record.id}`,
       `Checkpoint: ${record.prompt.checkpointKey ?? "manual"}`,
       `Required: ${record.prompt.required ? "yes" : "no"}`
-    ].join("\n"),
+    ].filter(Boolean).join("\n"),
     options,
     allowRationale: true
   };

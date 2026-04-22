@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { cwd, exit } from "node:process";
@@ -10,7 +10,7 @@ import { z } from "zod";
 import { classifyCheckpointTrigger } from "@longtable/checkpoints";
 import { renderQuestionRecordInput } from "@longtable/provider-claude";
 import { renderQuestionRecordPrompt } from "@longtable/provider-codex";
-import type { ProviderKind, QuestionRecord } from "@longtable/core";
+import type { ProviderKind, QuestionOption, QuestionRecord, QuestionTransportStatus } from "@longtable/core";
 import {
   answerWorkspaceQuestion,
   createWorkspaceQuestion,
@@ -21,7 +21,7 @@ import {
 } from "@longtable/cli";
 
 const SERVER_NAME = "longtable-state";
-const SERVER_VERSION = "0.1.24";
+const SERVER_VERSION = "0.1.25";
 
 const TOOL_NAMES = [
   "read_project",
@@ -38,6 +38,13 @@ const TOOL_NAMES = [
 
 const cwdSchema = z.object({
   cwd: z.string().optional().describe("LongTable project directory or child path. Defaults to server cwd.")
+});
+
+const questionOptionSchema = z.object({
+  value: z.string().min(1),
+  label: z.string().min(1),
+  description: z.string().optional(),
+  recommended: z.boolean().optional()
 });
 
 function textResult(structuredContent: Record<string, unknown>): CallToolResult {
@@ -89,6 +96,35 @@ function renderQuestionFallback(record: QuestionRecord, provider: ProviderKind =
     : renderQuestionRecordPrompt(record);
 }
 
+async function markQuestionTransport(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  questionId: string,
+  status: QuestionTransportStatus,
+  message?: string
+): Promise<QuestionRecord | null> {
+  const state = await loadWorkspaceState(context);
+  let updatedQuestion: QuestionRecord | null = null;
+  state.questionLog = (state.questionLog ?? []).map((record: QuestionRecord) => {
+    if (record.id !== questionId) {
+      return record;
+    }
+    updatedQuestion = {
+      ...record,
+      updatedAt: new Date().toISOString(),
+      transportStatus: {
+        surface: "mcp_elicitation",
+        status,
+        updatedAt: new Date().toISOString(),
+        ...(message ? { message } : {})
+      }
+    };
+    return updatedQuestion;
+  });
+  await writeFile(context.stateFilePath, JSON.stringify(state, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return updatedQuestion;
+}
+
 function buildElicitationParams(record: QuestionRecord): ElicitRequestFormParams {
   const choices = [
     ...record.prompt.options.map((option) => ({
@@ -111,8 +147,8 @@ function buildElicitationParams(record: QuestionRecord): ElicitRequestFormParams
     message: [
       record.prompt.title,
       record.prompt.question,
-      ...record.prompt.rationale.slice(0, 2).map((entry) => `Why now: ${entry}`)
-    ].join("\n"),
+      record.prompt.displayReason ? `Decision context: ${record.prompt.displayReason}` : undefined
+    ].filter(Boolean).join("\n"),
     requestedSchema: {
       type: "object",
       properties: {
@@ -121,11 +157,6 @@ function buildElicitationParams(record: QuestionRecord): ElicitRequestFormParams
           title: "Decision",
           oneOf: choices,
           default: choices[0]?.const
-        },
-        rationale: {
-          type: "string",
-          title: "Rationale",
-          description: "Optional short note for the LongTable decision log."
         }
       },
       required: ["answer"]
@@ -133,7 +164,7 @@ function buildElicitationParams(record: QuestionRecord): ElicitRequestFormParams
   };
 }
 
-function acceptedAnswer(result: ElicitResult): { answer: string; rationale?: string } | null {
+function acceptedAnswer(result: ElicitResult): { answer: string } | null {
   if (result.action !== "accept") {
     return null;
   }
@@ -141,11 +172,20 @@ function acceptedAnswer(result: ElicitResult): { answer: string; rationale?: str
   if (typeof answer !== "string" || answer.length === 0) {
     return null;
   }
-  const rationale = result.content?.rationale;
   return {
-    answer,
-    ...(typeof rationale === "string" && rationale.length > 0 ? { rationale } : {})
+    answer
   };
+}
+
+function statusForElicitationError(error: unknown): QuestionTransportStatus {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/timed?\s*out|timeout/i.test(message)) {
+    return "timeout";
+  }
+  if (/unsupported|not supported|unavailable|does not support/i.test(message)) {
+    return "unsupported";
+  }
+  return "error";
 }
 
 async function readAllowedProjectFiles(context: Awaited<ReturnType<typeof requireContext>>) {
@@ -305,11 +345,14 @@ export function createLongTableMcpServer(): McpServer {
         prompt: z.string().min(1),
         title: z.string().optional(),
         question: z.string().optional(),
+        checkpointKey: z.string().optional(),
+        options: z.array(questionOptionSchema).optional(),
+        displayReason: z.string().optional(),
         provider: z.enum(["codex", "claude"]).optional(),
         required: z.boolean().optional()
       })
     },
-    async ({ cwd: inputCwd, prompt, title, question, provider, required }) => {
+    async ({ cwd: inputCwd, prompt, title, question, checkpointKey, options, displayReason, provider, required }) => {
       try {
         const context = await requireContext(inputCwd);
         const result = await createWorkspaceQuestion({
@@ -317,6 +360,9 @@ export function createLongTableMcpServer(): McpServer {
           prompt,
           title,
           question,
+          checkpointKey,
+          questionOptions: options as QuestionOption[] | undefined,
+          displayReason,
           provider,
           required
         });
@@ -339,12 +385,15 @@ export function createLongTableMcpServer(): McpServer {
         prompt: z.string().min(1),
         title: z.string().optional(),
         question: z.string().optional(),
+        checkpointKey: z.string().optional(),
+        options: z.array(questionOptionSchema).optional(),
+        displayReason: z.string().optional(),
         provider: z.enum(["codex", "claude"]).default("codex"),
         required: z.boolean().optional(),
         fallbackOnly: z.boolean().default(false).describe("Create and render the checkpoint without calling MCP elicitation.")
       })
     },
-    async ({ cwd: inputCwd, prompt, title, question, provider, required, fallbackOnly }) => {
+    async ({ cwd: inputCwd, prompt, title, question, checkpointKey, options, displayReason, provider, required, fallbackOnly }) => {
       try {
         const context = await requireContext(inputCwd);
         const created = await createWorkspaceQuestion({
@@ -352,13 +401,17 @@ export function createLongTableMcpServer(): McpServer {
           prompt,
           title,
           question,
+          checkpointKey,
+          questionOptions: options as QuestionOption[] | undefined,
+          displayReason,
           provider,
           required
         });
         const fallback = renderQuestionFallback(created.question, provider as ProviderKind);
         if (fallbackOnly) {
+          const marked = await markQuestionTransport(context, created.question.id, "fallback_rendered", "MCP elicitation skipped by fallbackOnly.");
           return textResult({
-            question: created.question,
+            question: marked ?? created.question,
             elicitation: { attempted: false, reason: "fallbackOnly" },
             fallback,
             nextAction: `longtable decide --question ${created.question.id} --answer <value>`
@@ -366,11 +419,16 @@ export function createLongTableMcpServer(): McpServer {
         }
 
         try {
+          await markQuestionTransport(context, created.question.id, "attempted");
           const elicited = await server.server.elicitInput(buildElicitationParams(created.question));
           const accepted = acceptedAnswer(elicited);
           if (!accepted) {
+            const status = elicited.action === "decline" || elicited.action === "cancel"
+              ? "declined"
+              : "fallback_rendered";
+            const marked = await markQuestionTransport(context, created.question.id, status, `MCP elicitation returned action: ${elicited.action}.`);
             return textResult({
-              question: created.question,
+              question: marked ?? created.question,
               elicitation: { attempted: true, action: elicited.action },
               fallback,
               nextAction: `longtable decide --question ${created.question.id} --answer <value>`
@@ -380,22 +438,25 @@ export function createLongTableMcpServer(): McpServer {
             context,
             questionId: created.question.id,
             answer: accepted.answer,
-            rationale: accepted.rationale,
             provider: provider as ProviderKind,
             surface: "mcp_elicitation"
           });
+          const marked = await markQuestionTransport(context, created.question.id, "accepted");
           return textResult({
-            question: decided.question,
+            question: marked ? { ...decided.question, transportStatus: marked.transportStatus } : decided.question,
             decision: decided.decision,
             elicitation: { attempted: true, action: elicited.action }
           });
         } catch (elicitationError) {
+          const status = statusForElicitationError(elicitationError);
+          const message = elicitationError instanceof Error ? elicitationError.message : String(elicitationError);
+          const marked = await markQuestionTransport(context, created.question.id, status, message);
           return textResult({
-            question: created.question,
+            question: marked ?? created.question,
             elicitation: {
               attempted: true,
-              supported: false,
-              error: elicitationError instanceof Error ? elicitationError.message : String(elicitationError)
+              supported: status !== "unsupported" ? undefined : false,
+              error: message
             },
             fallback,
             nextAction: `longtable decide --question ${created.question.id} --answer <value>`

@@ -75,6 +75,7 @@ import {
 } from "./project-session.js";
 import {
   buildTeamDebate,
+  buildTeamReview,
   renderTeamDebateSummary,
   type TeamDebateBundle
 } from "./debate.js";
@@ -199,7 +200,7 @@ const ANSI = {
 };
 
 const LONGTABLE_MCP_SERVER_NAME = "longtable-state";
-const LONGTABLE_MCP_PACKAGE_VERSION = "0.1.24";
+const LONGTABLE_MCP_PACKAGE_VERSION = "0.1.25";
 const LONGTABLE_MCP_MARKER_START = "# LongTable state MCP START";
 const LONGTABLE_MCP_MARKER_END = "# LongTable state MCP END";
 
@@ -251,7 +252,7 @@ function usage(): string {
     "  longtable install [--json] [--path <file>] [--runtime-path <file>]",
     "  longtable mcp install [--provider codex|claude|all] [--write] [--checkpoint-ui off|interactive|strong] [--json] [--codex-config <path>] [--claude-settings <path>] [--package <spec>]",
     "  longtable sentinel --prompt <text> [--cwd <path>] [--json] [--record]",
-    "  longtable team --prompt <text> [--role <role[,role]>] [--tmux] [--debate] [--rounds 5] [--cwd <path>] [--json]",
+    "  longtable team --prompt <text> [--role <role[,role]>] [--tmux] [--debate] [--rounds 3|5] [--cwd <path>] [--json]",
     "  longtable ask [--prompt <text>] [--print] [--json] [--setup <path>] [--cwd <path>]",
     "  longtable clarify --prompt <task-context> [--provider codex|claude] [--required|--advisory] [--print] [--cwd <path>] [--json] [--force]",
     "  longtable question --prompt <decision-context> [--title <text>] [--text <question>] [--provider codex|claude] [--required|--advisory] [--print] [--cwd <path>] [--json]",
@@ -2992,9 +2993,13 @@ async function runTeam(args: Record<string, string | boolean>): Promise<void> {
   if (!prompt) {
     throw new Error("A prompt is required.");
   }
-  const rounds = typeof args.rounds === "string" ? Number(args.rounds) : 5;
-  if (!Number.isInteger(rounds) || rounds !== 5) {
-    throw new Error("LongTable team debate v1 supports `--rounds 5` only.");
+  const isDebate = args.debate === true;
+  const expectedRounds = isDebate ? 5 : 3;
+  const rounds = typeof args.rounds === "string" ? Number(args.rounds) : expectedRounds;
+  if (!Number.isInteger(rounds) || rounds !== expectedRounds) {
+    throw new Error(isDebate
+      ? "LongTable team debate v1 supports `--rounds 5` only."
+      : "LongTable team v1 supports `--rounds 3` cross-review only.");
   }
   const setup = await loadOptionalSetup(typeof args.setup === "string" ? args.setup : undefined);
   const projectContext = await loadProjectContextFromDirectory(workingDirectory);
@@ -3002,17 +3007,10 @@ async function runTeam(args: Record<string, string | boolean>): Promise<void> {
     await assertWorkspaceNotBlocked(projectContext);
   }
   const projectAware = await buildProjectAwarePrompt(prompt, workingDirectory);
-  const fallback = buildPanelFallback({
-    prompt,
-    mode: "review",
-    roleFlag: typeof args.role === "string" ? args.role : undefined,
-    provider: setup?.providerSelection.provider as ProviderKind | undefined,
-    visibility: "always_visible"
-  });
   const teamId = localId("team");
   const teamDir = join(workingDirectory, ".longtable", "team", teamId);
 
-  if (args.debate === true) {
+  if (isDebate) {
     const debate = buildTeamDebate({
       teamId,
       teamDir,
@@ -3096,19 +3094,51 @@ async function runTeam(args: Record<string, string | boolean>): Promise<void> {
     return;
   }
 
-  await mkdir(teamDir, { recursive: true });
-  await writeFile(join(teamDir, "prompt.txt"), prompt, "utf8");
-  await writeFile(join(teamDir, "plan.json"), JSON.stringify(fallback.plan, null, 2), "utf8");
+  const team = buildTeamReview({
+    teamId,
+    teamDir,
+    prompt: projectAware.prompt,
+    roleFlag: typeof args.role === "string" ? args.role : undefined,
+    provider: setup?.providerSelection.provider as ProviderKind | undefined,
+    visibility: "always_visible",
+    roundCount: rounds,
+    tmux: args.tmux === true
+  });
+  await writeTeamDebateArtifacts(team, teamDir, prompt);
+
+  const canRecordWorkspace = projectAware.projectContextFound && projectContext && existsSync(projectContext.stateFilePath);
+  if (canRecordWorkspace) {
+    await appendInvocationRecordToWorkspace(projectContext, team.invocationRecord, [team.questionRecord]);
+  }
 
   if (args.json === true) {
-    console.log(JSON.stringify({ teamId, teamDir, plan: fallback.plan }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          teamId,
+          teamDir,
+          plan: team.plan,
+          run: team.run,
+          questionRecord: team.questionRecord,
+          invocationRecord: team.invocationRecord,
+          execution: {
+            status: "completed",
+            surface: team.run.surface,
+            interactionDepth: team.run.interactionDepth,
+            projectContextFound: projectAware.projectContextFound,
+            invocationLogged: canRecordWorkspace
+          }
+        },
+        null,
+        2
+      )
+    );
     return;
   }
 
   if (args.tmux !== true) {
-    console.log(renderPanelSummary(fallback.plan));
-    console.log("");
-    console.log("Run with `--tmux` to launch role panes for parallel discussion.");
+    console.log(renderTeamDebateSummary(team.run));
+    console.log(`- checkpoint: ${team.questionRecord.id}`);
     return;
   }
 
@@ -3117,14 +3147,14 @@ async function runTeam(args: Record<string, string | boolean>): Promise<void> {
   const launcher = process.argv[1] ?? "longtable";
   const leaderCommand = [
     `echo ${shellEscape(`LongTable team ${teamId}`)}`,
-    `echo ${shellEscape(`Logs: ${teamDir}`)}`,
-    "echo 'Role panes are running. Review logs, then run:'",
-    `echo ${shellEscape(`longtable panel --role ${fallback.plan.members.map((member) => member.role).join(",")} --prompt ${JSON.stringify(prompt)}`)}`,
+    `echo ${shellEscape(`Artifacts: ${teamDir}`)}`,
+    `echo ${shellEscape("Cross-review artifacts are recorded. Role panes can add live review logs.")}`,
+    `echo ${shellEscape(`Checkpoint: ${team.questionRecord.id}`)}`,
     `exec ${shellEscape(shell)}`
   ].join("; ");
   execFileSync("tmux", ["new-session", "-d", "-s", sessionName, "-c", workingDirectory, leaderCommand], { stdio: "inherit" });
 
-  for (const member of fallback.plan.members) {
+  for (const member of team.plan.members) {
     const rolePrompt = [
       `LongTable team discussion role: ${member.label} (${member.role}).`,
       "Give claims, objections, open questions, and evidence needs. Address likely disagreement with other roles.",

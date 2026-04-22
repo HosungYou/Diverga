@@ -1070,6 +1070,9 @@ export async function createWorkspaceQuestion(options: {
   prompt: string;
   title?: string;
   question?: string;
+  checkpointKey?: string;
+  questionOptions?: QuestionOption[];
+  displayReason?: string;
   provider?: ProviderKind;
   required?: boolean;
 }): Promise<{
@@ -1081,6 +1084,7 @@ export async function createWorkspaceQuestion(options: {
     unresolvedTensions: state.openTensions ?? [],
     studyContract: state.studyContract
   });
+  const checkpointKey = options.checkpointKey ?? trigger.signal.checkpointKey;
   const createdAt = nowIso();
   const question: QuestionRecord = {
     id: createId("question_record"),
@@ -1089,15 +1093,16 @@ export async function createWorkspaceQuestion(options: {
     status: "pending",
     prompt: {
       id: createId("question_prompt"),
-      checkpointKey: trigger.signal.checkpointKey,
-      title: options.title ?? questionTitleForCheckpoint(trigger.family, trigger.signal.checkpointKey),
-      question: options.question ?? questionTextForCheckpoint(trigger.family, options.prompt, trigger.signal.checkpointKey),
+      checkpointKey,
+      title: options.title ?? questionTitleForCheckpoint(trigger.family, checkpointKey),
+      question: options.question ?? questionTextForCheckpoint(trigger.family, options.prompt, checkpointKey),
       type: "single_choice",
-      options: optionsForCheckpointTrigger(trigger.family, trigger.signal.checkpointKey),
+      options: options.questionOptions ?? optionsForCheckpointTrigger(trigger.family, checkpointKey),
       allowOther: true,
       otherLabel: "Other decision",
       required: options.required ?? trigger.requiresQuestionBeforeClosure,
       source: "checkpoint",
+      displayReason: options.displayReason ?? trigger.rationale[0],
       rationale: [
         ...trigger.rationale,
         `Trigger family: ${trigger.family}.`,

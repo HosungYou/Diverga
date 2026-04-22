@@ -254,7 +254,7 @@ Example:
 
 ```text
 Researcher Checkpoint
-Why now: This measurement choice will shape the validity of the paper.
+Decision context: This measurement choice will shape the validity of the paper.
 Question: What should LongTable treat as the next human decision?
 Options:
 1. Use an established instrument
@@ -341,7 +341,7 @@ longtable roles
 That command is a discovery and debugging surface. Normal research use should
 not require learning role ids first.
 
-## Panel And Debate
+## Panel, Team, And Debate
 
 Use a panel when disagreement matters more than a quick answer.
 
@@ -361,6 +361,16 @@ not the default researcher path:
 longtable review --role methods_critic,measurement_auditor --panel --prompt "Review this design." --json
 ```
 
+Use an agent team when you want roles to inspect each other before synthesis:
+
+```bash
+longtable team --prompt "Review this measurement plan." --role editor,measurement_auditor --json
+```
+
+Team mode records three steps: independent review, cross-review, and coordinator
+synthesis/checkpoint. It is the default for agent-team requests because it gives
+users visible role interaction without making every review a long debate.
+
 For deeper agent-to-agent disagreement:
 
 ```bash
@@ -377,6 +387,9 @@ Debate mode records a fixed five-round protocol:
 
 The result is written under `.longtable/team/<id>/`. The debate can surface
 conflict, but the researcher still answers the final decision.
+
+For user-facing guidance on which surface to choose, see
+[`docs/AGENT-TEAM-README.md`](docs/AGENT-TEAM-README.md).
 
 ## Tmux Team Console
 
@@ -468,7 +481,7 @@ Default config targets:
 Run the server directly:
 
 ```bash
-npx -y @longtable/mcp@0.1.24
+npx -y @longtable/mcp@0.1.25
 longtable-state --self-test
 ```
 
@@ -593,6 +606,7 @@ Runtime and provider commands:
 
 ```bash
 longtable team --tmux --prompt "..."
+longtable team --prompt "..."
 longtable team --debate --prompt "..."
 longtable codex install-skills
 longtable claude install-skills

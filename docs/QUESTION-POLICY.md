@@ -77,7 +77,7 @@ state에 남기는 것이다.
 
 ```text
 Researcher Checkpoint
-Why now: 지금 닫으면 downstream research choice가 바뀐다.
+Decision context: 지금 닫으면 downstream research choice가 바뀐다.
 Question: 무엇을 LongTable가 다음 인간 결정으로 취급해야 하는가?
 Options: revise / gather evidence / proceed / defer
 Record: QuestionRecord -> DecisionRecord
@@ -85,7 +85,7 @@ Record: QuestionRecord -> DecisionRecord
 
 필수 속성:
 
-- 왜 지금 묻는지 설명한다.
+- 질문이 필요한 맥락을 짧게 설명한다.
 - 하나의 판단만 묻는다.
 - 선택지는 2-4개로 제한한다.
 
@@ -147,7 +147,7 @@ LongTable 자체에 관한 결정도 Researcher Checkpoint 대상이다.
 
 ```text
 Researcher Checkpoint
-Why now: 이 이름은 README, docs, provider skills 전체에 퍼지는 제품 언어가 됩니다.
+Decision context: 이 이름은 README, docs, provider skills 전체에 퍼지는 제품 언어가 됩니다.
 Question: LongTable의 질문 장치 이름을 무엇으로 확정할까요?
 Options: Researcher Checkpoint / Research Judgment Checkpoint / Reflective Checkpoint / other
 ```

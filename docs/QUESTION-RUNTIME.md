@@ -30,7 +30,7 @@ At the product level, this lifecycle is described as:
 Researcher Checkpoint -> QuestionRecord -> DecisionRecord
 ```
 
-`QuestionPrompt` is provider-neutral. It carries the checkpoint key, question text, options, required/blocking posture, source, rationale, and preferred surfaces.
+`QuestionPrompt` is provider-neutral. It carries the checkpoint key, question text, options, required/blocking posture, source, a short display reason, internal rationale, and preferred surfaces.
 
 `QuestionAnswer` is normalized. Claude native choices, Codex numbered responses, and future web form selections should all become the same shape before they update LongTable state.
 
@@ -112,7 +112,7 @@ available and fall back to numbered checkpoints otherwise.
 Flow:
 
 1. checkpoint engine resolves `blocking` and runtime guidance
-2. MCP transport requests Codex/client elicitation when `elicit_question` is available
+2. MCP transport requests Codex/client elicitation when `elicit_question` is available; the form asks for the decision only
 3. Codex adapter renders numbered options with strict parsing as the fallback
 4. invalid numbered answers re-prompt
 5. the selected answer is normalized into LongTable state
