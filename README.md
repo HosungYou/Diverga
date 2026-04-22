@@ -65,6 +65,8 @@ In one sentence:
 
 - A durable `.longtable/` workspace for each research project
 - A human-readable `CURRENT.md` status page regenerated from project state
+- An adaptive `longtable start` interview that begins from the scene or problem
+  that made the research worth starting
 - Provider-native Codex and Claude Code skills when you approve installation
 - Researcher Checkpoints for decisions that should not be skipped silently,
   shown as UI prompts when the provider supports them and as numbered fallback
@@ -99,7 +101,8 @@ which longtable
 LongTable has two main setup steps:
 
 1. `longtable setup` decides what LongTable is allowed to install.
-2. `longtable start` creates or enters a research workspace.
+2. `longtable start` creates a research workspace through a short adaptive
+   interview.
 
 ### 1. Configure Runtime Support
 
@@ -146,17 +149,23 @@ cd "<project-path>"
 claude
 ```
 
-`start` asks project-specific questions:
+`start` first asks where the workspace should live, then begins a short
+scene/problem-first interview. It does not ask the researcher to classify the
+project up front as theory, measurement, method, evidence, or writing. Instead,
+it starts with questions like:
 
-- What is the project called?
-- Where should the project live?
-- What is the current goal?
-- What is the current blocker?
-- What kind of research object are you working on?
-- What kind of gap or tacit assumption risk is present?
-- Which kind of decision should LongTable avoid skipping?
-- Which perspectives should be consulted?
-- How visible should perspective disagreement be?
+```text
+What scene, problem, or moment made you want to start this research?
+In that scene, what still feels least explained or hardest to justify?
+If this research succeeds, what should a reader or reviewer understand differently?
+What material would you inspect first to make this research concrete?
+```
+
+LongTable uses those answers to seed the session state. It may infer an initial
+research object, gap/tacit-risk profile, protected decision, open questions, and
+next action, but those inferences remain project state rather than final
+research truth. Researcher Checkpoints are still reserved for real commitment
+boundaries later in the work.
 
 This creates:
 
@@ -666,7 +675,8 @@ provider skills are the preferred adapter surface.
 - Checkpoints should interrupt commitments, not every conversation.
 - Provider-specific tools are adapters; `.longtable/` state is the contract.
 - Setup should ask for permissions, not a full biography.
-- Project start should ask what research object and decision risk are active.
+- Project start should interview from the researcher's scene or problem first,
+  then infer early research shape without pretending it is settled.
 
 ## Development
 
