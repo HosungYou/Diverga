@@ -149,6 +149,26 @@ Equivalent Codex form:
 codex -C "<research-folder>"
 ```
 
+Example paths:
+
+```bash
+# macOS / Linux
+cd "/Users/yourname/Research/My-Research-Project"
+codex
+
+# same effect without changing the current shell directory
+codex -C "/Users/yourname/Research/My-Research-Project"
+```
+
+```powershell
+# Windows PowerShell
+Set-Location "C:\Users\YourName\Documents\Research\My-Research-Project"
+codex
+
+# same effect without changing the current shell directory
+codex -C "C:\Users\YourName\Documents\Research\My-Research-Project"
+```
+
 Then invoke:
 
 ```text

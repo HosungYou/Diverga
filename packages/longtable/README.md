@@ -37,6 +37,18 @@ You can use `codex -C "<research-folder>"` instead of `cd` plus `codex`.
 Changing directories after Codex is already running does not change that
 session's workspace root or rerun LongTable's `SessionStart` hook.
 
+Examples:
+
+```bash
+# macOS / Linux
+codex -C "/Users/yourname/Research/My-Research-Project"
+```
+
+```powershell
+# Windows PowerShell
+codex -C "C:\Users\YourName\Documents\Research\My-Research-Project"
+```
+
 Then invoke `$longtable-interview` inside Codex.
 
 `longtable setup --provider codex` is the permission-first setup route. It asks
