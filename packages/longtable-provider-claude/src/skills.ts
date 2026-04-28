@@ -78,7 +78,7 @@ function baseSkillSpecs(): ClaudeSkillSpec[] {
         "- Treat Claude's structured question surface as transport; LongTable state records are the source of truth.",
         "- When an MCP `elicit_question` tool is available in the client, use it first so the checkpoint can be shown through the native elicitation surface and recorded in LongTable state.",
         "- Use `longtable question --print --provider claude --prompt \"...\"` only as a fallback when MCP/native structured elicitation is unavailable, unsupported, declined, canceled, or blocked by the client.",
-        "- If `CURRENT.md` shows a pending required checkpoint, do not proceed until `longtable decide --question <id> --answer <value>` records the researcher's choice.",
+        "- If `CURRENT.md` shows a pending required checkpoint, ask the researcher for a selection and wait. Do not choose or record `longtable decide --question <id> --answer <value>` unless the researcher explicitly provides that value.",
         "- Preserve open tensions and authorship instead of forcing closure.",
         "- Disclose consulted roles with `LongTable consulted: ...` when a role is foregrounded.",
         "- Label unsupported external claims as inference or estimate.",

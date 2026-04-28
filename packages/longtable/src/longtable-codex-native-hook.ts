@@ -251,7 +251,8 @@ function buildPendingQuestionContext(question: QuestionRecord): string {
   return [
     `Required Researcher Checkpoint is still pending: ${question.prompt.question}`,
     `Options: ${formatQuestionOptions(question)}`,
-    `Record it with longtable decide --question ${question.id} --answer <value> if you are outside MCP elicitation.`
+    `Record it with longtable decide --question ${question.id} --answer <value> if you are outside MCP elicitation.`,
+    "Do not choose or record an answer unless the researcher explicitly provides the selection."
   ].join("\n");
 }
 
@@ -266,6 +267,7 @@ function buildGeneratedQuestionsContext(questions: QuestionRecord[], created: bo
     lines.push(`  Options: ${formatQuestionOptions(question)}`);
     lines.push(`  Record it with longtable decide --question ${question.id} --answer <value> if you are outside MCP elicitation.`);
   }
+  lines.push("Do not choose or record answers for these checkpoints unless the researcher explicitly provides the selections.");
   return lines.join("\n");
 }
 
@@ -431,20 +433,7 @@ function postToolUseOutput(runtime: LongTableRuntime, payload: CodexHookPayload)
 }
 
 function stopOutput(runtime: LongTableRuntime): Record<string, unknown> | null {
-  const blockingQuestion = pendingRequiredQuestions(runtime.state)[0];
-  if (blockingQuestion) {
-    return buildStopBlockOutput(
-      "A required LongTable Researcher Checkpoint is still pending.",
-    );
-  }
-
-  const blockingObligation = pendingObligations(runtime.state)[0];
-  if (blockingObligation) {
-    return buildStopBlockOutput(
-      "A LongTable research obligation is still pending.",
-    );
-  }
-
+  void runtime;
   return null;
 }
 

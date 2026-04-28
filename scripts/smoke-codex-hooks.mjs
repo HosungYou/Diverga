@@ -188,7 +188,15 @@ const created = await createWorkspaceQuestion({
 });
 
 const stopBlocked = await dispatchCodexHook({ hook_event_name: "Stop" }, workspaceTmp);
-assertEqual(stopBlocked?.decision, "block", "Stop hook should block on pending required question");
+assertEqual(stopBlocked, null, "Stop hook should let Codex wait for the researcher when a required question is pending");
+
+const promptWithPendingQuestion = await dispatchCodexHook({
+  hook_event_name: "UserPromptSubmit",
+  prompt: "Continue the research work."
+}, workspaceTmp);
+const pendingQuestionContext = promptWithPendingQuestion?.hookSpecificOutput?.additionalContext ?? "";
+assert(pendingQuestionContext.includes("Required Researcher Checkpoint is still pending"), "UserPromptSubmit should surface pending required question context");
+assert(pendingQuestionContext.includes("Do not choose or record an answer"), "Pending checkpoint context should preserve researcher choice");
 
 await answerWorkspaceQuestion({
   context,
@@ -214,7 +222,7 @@ const staleQuestion = await createWorkspaceQuestion({
   provider: "codex"
 });
 const stopBeforeClear = await dispatchCodexHook({ hook_event_name: "Stop" }, workspaceTmp);
-assertEqual(stopBeforeClear?.decision, "block", "Stop hook should block before clearing a stale required question");
+assertEqual(stopBeforeClear, null, "Stop hook should not force an auto-continue loop before clearing a stale required question");
 await clearWorkspaceQuestion({
   context,
   questionId: staleQuestion.question.id,

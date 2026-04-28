@@ -1,6 +1,6 @@
 {
   "name": "longtable-monorepo",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "private": true,
   "description": "Monorepo for the LongTable product surface and provider-neutral runtime packages",
   "workspaces": [

@@ -92,7 +92,7 @@ function baseSkillSpecs(): CodexSkillSpec[] {
         "- For `$longtable-interview`, use natural-language turns for the interview and reserve MCP option UI for the final research-facing First Research Shape checkpoint.",
         "- When the `mcp__longtable_state__.elicit_question` tool is available, use it first for researcher checkpoints so Codex can show the MCP elicitation UI and LongTable can record the answer as `mcp_elicitation`.",
         "- Use `longtable question --print --provider codex --prompt \"...\"` only as a fallback when the MCP tool is unavailable, unsupported, declined, canceled, or blocked by the client.",
-        "- If `CURRENT.md` shows a pending required checkpoint, do not proceed until `longtable decide --question <id> --answer <value>` records the researcher's choice.",
+        "- If `CURRENT.md` shows a pending required checkpoint, ask the researcher for a selection and wait. Do not choose or record `longtable decide --question <id> --answer <value>` unless the researcher explicitly provides that value.",
         "- Preserve open tensions and authorship instead of forcing closure.",
         "- Label unsupported external claims as inference or estimate."
       ]
