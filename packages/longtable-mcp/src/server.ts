@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
 import { basename, resolve } from "node:path";
 import { cwd, exit } from "node:process";
 import { fileURLToPath } from "node:url";
@@ -29,7 +30,8 @@ import {
 } from "./first-research-shape.js";
 
 const SERVER_NAME = "longtable-state";
-const SERVER_VERSION = "0.1.39";
+const require = createRequire(import.meta.url);
+const SERVER_VERSION = String((require("../package.json") as { version?: unknown }).version ?? "0.0.0");
 
 const TOOL_NAMES = [
   "read_project",
