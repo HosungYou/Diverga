@@ -2,9 +2,11 @@ import { pathToFileURL } from "node:url";
 import type {
   LongTableHookRun,
   LongTableQuestionObligation,
+  QuestionOpportunity,
   QuestionRecord
 } from "@longtable/core";
 import {
+  buildQuestionOpportunitySpecs,
   createWorkspaceFollowUpQuestions,
   type LongTableProjectContext,
   loadProjectContextFromDirectory,
@@ -164,27 +166,56 @@ function looksLikeClosurePrompt(prompt: string): boolean {
   if (!normalized) {
     return false;
   }
-  return /\b(final|finalize|commit|ship|submit|revise|rewrite|draft|publish|implement|fix)\b/i.test(normalized)
-    || /최종|확정|커밋|제출|수정|초안|구현|진행|고쳐/.test(normalized);
+  return /\b(final|finalize|commit|ship|submit|publish|freeze|settle|decide|lock|record|apply|incorporate)\b/i.test(normalized)
+    || /최종|확정|커밋|제출|투고|고정|결정|기록|반영/.test(normalized);
 }
 
-function looksLikeLongTableEngineeringPrompt(prompt: string): boolean {
+function looksLikeLongTableProductOrToolingPrompt(prompt: string): boolean {
   const normalized = prompt.trim();
   if (!normalized) {
     return false;
   }
-  return /\b(longtable|hook|checkpoint|mcp|agent|skill|skills|ux|interface|setup|install|cli|npm|version|global|publish|release|deploy|git)\b/i.test(normalized)
-    || /롱테이블|훅|체크포인트|에이전트|스킬|사용성|인터페이스|설치|세팅|글로벌|배포|버전|릴리즈|깃|깃허브/.test(normalized);
+  return /\b(longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(normalized)
+    || /롱테이블|훅|체크포인트|에이전트|스킬|사용성|인터페이스|설치|세팅|글로벌|배포|버전|릴리즈|깃|깃허브|문서화된\s*절차|패키지|라우터|자동완성|시뮬레이션\s*테스트/.test(normalized);
 }
 
-function shouldAutoCreateQuestionsForPrompt(prompt: string): boolean {
-  return !looksLikeLongTableEngineeringPrompt(prompt);
+function looksLikeResearchDomainPrompt(prompt: string): boolean {
+  const normalized = prompt.trim();
+  if (!normalized) {
+    return false;
+  }
+  return /\b(research|study|paper|manuscript|journal|article|method|methodology|measurement|construct|theory|analysis|model|data|participant|sample|scale|survey|instrument|validity|hypothesis|literature|meta[- ]?analysis|gold standard|coding|trust|reliance|calibration)\b/i.test(normalized)
+    || /연구|논문|원고|저널|방법론|방법|연구\s*설계|측정|구성개념|개념|이론|분석|모형|모델|데이터|참가자|표본|샘플|척도|설문|도구|타당도|가설|문헌|메타\s*분석|골드\s*스탠더드|코딩|신뢰|의존|캘리브레이션|교정|보정/.test(normalized);
+}
+
+function looksLikeResearchCommitmentPrompt(prompt: string): boolean {
+  return looksLikeResearchDomainPrompt(prompt) && looksLikeClosurePrompt(prompt);
+}
+
+function buildResponseOnlyAdvisoryQuestions(prompt: string): QuestionOpportunity[] {
+  if (looksLikeLongTableProductOrToolingPrompt(prompt)) {
+    return [];
+  }
+  const opportunities = buildQuestionOpportunitySpecs(prompt, {
+    includeFallback: false,
+    autoOnly: true
+  });
+  if (opportunities.length === 0) {
+    return [];
+  }
+  if (!looksLikeResearchDomainPrompt(prompt) && !/\b(needed questions?|necessary questions?|clarifying questions?|question generation|assumptions?|uncertain|not sure|gap|tension|trade[- ]?off)\b/i.test(prompt) && !/필요한\s*질문|질문\s*생성|물어봐|질문해|전제|가정|불확실|모르겠|공백|긴장|상충|균형/.test(prompt)) {
+    return [];
+  }
+  return opportunities.slice(0, 3);
+}
+
+function shouldCreateRequiredQuestionsForPrompt(prompt: string): boolean {
+  return !looksLikeLongTableProductOrToolingPrompt(prompt) && looksLikeResearchCommitmentPrompt(prompt);
 }
 
 function shouldApplyProtectedDecisionClosure(runtime: LongTableRuntime, prompt: string): boolean {
   return Boolean(runtime.context.session.protectedDecision) &&
-    looksLikeClosurePrompt(prompt) &&
-    !looksLikeLongTableEngineeringPrompt(prompt);
+    shouldCreateRequiredQuestionsForPrompt(prompt);
 }
 
 function protectedDecisionClosurePrompt(prompt: string): string {
@@ -262,6 +293,17 @@ function buildGeneratedQuestionsContext(questions: QuestionRecord[], created: bo
   return lines.join("\n");
 }
 
+function buildAdvisoryQuestionsContext(questions: QuestionOpportunity[]): string {
+  const lines = [
+    `LongTable surfaced ${questions.length} response-only advisory question${questions.length === 1 ? "" : "s"} for this prompt.`,
+    "Use these only if they help the reply. Do not create QuestionRecord entries, call longtable decide, or answer for the researcher unless the prompt explicitly asks to commit a research decision."
+  ];
+  for (const question of questions) {
+    lines.push(`- ${question.title}: ${question.question}`);
+  }
+  return lines.join("\n");
+}
+
 function buildPendingObligationContext(obligation: LongTableQuestionObligation): string {
   return [
     `Pending LongTable research obligation: ${obligation.prompt}`,
@@ -319,13 +361,14 @@ async function userPromptSubmitContext(runtime: LongTableRuntime, prompt: string
 
   const generatedQuestions: QuestionRecord[] = [];
   let createdQuestions = false;
-  if (shouldAutoCreateQuestionsForPrompt(prompt)) {
+  if (shouldCreateRequiredQuestionsForPrompt(prompt)) {
     const generated = await createWorkspaceFollowUpQuestions({
       context: runtime.context,
       prompt,
       provider: "codex",
       required: true,
-      auto: true
+      auto: true,
+      requiredOnly: true
     });
     generatedQuestions.push(...generated.questions);
     createdQuestions = createdQuestions || generated.created;
@@ -337,7 +380,8 @@ async function userPromptSubmitContext(runtime: LongTableRuntime, prompt: string
       prompt: protectedDecisionClosurePrompt(prompt),
       provider: "codex",
       required: true,
-      auto: true
+      auto: true,
+      requiredOnly: true
     });
     generatedQuestions.push(
       ...protectedGenerated.questions.filter((question) =>
@@ -351,11 +395,9 @@ async function userPromptSubmitContext(runtime: LongTableRuntime, prompt: string
     return buildGeneratedQuestionsContext(generatedQuestions, createdQuestions);
   }
 
-  if (shouldApplyProtectedDecisionClosure(runtime, prompt)) {
-    return [
-      `This workspace marks ${runtime.context.session.protectedDecision} as a protected decision.`,
-      "Before you settle it through drafting, revision, or closure, surface one researcher-facing checkpoint grounded in the current blocker or open questions."
-    ].join("\n");
+  const advisoryQuestions = buildResponseOnlyAdvisoryQuestions(prompt);
+  if (advisoryQuestions.length > 0) {
+    return buildAdvisoryQuestionsContext(advisoryQuestions);
   }
 
   return null;

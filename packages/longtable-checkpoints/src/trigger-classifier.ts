@@ -24,8 +24,8 @@ const RULES: CueRule[] = [
     family: "meta_decision",
     checkpointKey: "meta_decision",
     stage: "problem_framing",
-    mode: "commit",
-    level: "adaptive_required",
+    mode: "review",
+    level: "recommended",
     cues: [
       /\brename\b/i,
       /\bnaming\b/i,
@@ -36,7 +36,7 @@ const RULES: CueRule[] = [
       /\bmake .*authoritative\b/i,
       /이름|명명|리드미|체크포인트 정책|플랫폼 용어|제품 언어/
     ],
-    rationale: "Platform language and checkpoint policy shape future LongTable behavior."
+    rationale: "Platform language and checkpoint policy should be discussed without creating a research-state checkpoint."
   },
   {
     family: "submission",
@@ -177,7 +177,7 @@ const RULES: CueRule[] = [
     checkpointKey: "knowledge_gap_probe",
     stage: "problem_framing",
     mode: "explore",
-    level: "adaptive_required",
+    level: "recommended",
     cues: [
       /\bknowledge gap\b/i,
       /\bgap in (my|our|the) knowledge\b/i,
@@ -192,14 +192,14 @@ const RULES: CueRule[] = [
       /\bhelp me narrow\b/i,
       /지식의 공백|지식 공백|모르겠|불확실|놓치고 있|빠뜨리고 있/
     ],
-    rationale: "A named knowledge gap should be surfaced before LongTable narrows or closes the problem."
+    rationale: "A named knowledge gap should be surfaced as response-only guidance unless a research commitment is being made."
   },
   {
     family: "review",
     checkpointKey: "tacit_assumption_probe",
     stage: "problem_framing",
     mode: "review",
-    level: "adaptive_required",
+    level: "recommended",
     cues: [
       /\btacit\b/i,
       /\bimplicit\b/i,
@@ -209,7 +209,7 @@ const RULES: CueRule[] = [
       /\bhidden constraint\b/i,
       /암묵지|암묵적|전제|가정|사각지대|숨은 제약|암묵/
     ],
-    rationale: "Tacit assumptions can silently shift research responsibility and need an explicit researcher-facing check."
+    rationale: "Tacit assumptions should be made visible without becoming a durable checkpoint unless they block a research commitment."
   },
   {
     family: "exploration",
@@ -297,12 +297,24 @@ function requiresQuestion(level: CheckpointLevel, mode: InteractionMode, family:
   );
 }
 
+function looksLikeCommitmentCue(prompt: string): boolean {
+  return /\b(final|finalize|commit|ship|submit|publish|freeze|settle|decide|lock|record|apply|incorporate)\b/i.test(prompt)
+    || /최종|확정|커밋|제출|투고|고정|결정|기록|반영/.test(prompt);
+}
+
+function ruleRequiresQuestionForPrompt(rule: CueRule, prompt: string): boolean {
+  if (rule.family === "commitment" && !looksLikeCommitmentCue(prompt)) {
+    return false;
+  }
+  return requiresQuestion(rule.level, rule.mode ?? "review", rule.family);
+}
+
 function pickBestRule(prompt: string): { rule: CueRule; matches: string[] } | null {
   const candidates = RULES.map((rule) => ({ rule, matches: matchCues(prompt, rule) }))
     .filter((candidate) => candidate.matches.length > 0)
     .sort((a, b) => {
-      const requiredDelta = Number(requiresQuestion(b.rule.level, b.rule.mode ?? "review", b.rule.family)) -
-        Number(requiresQuestion(a.rule.level, a.rule.mode ?? "review", a.rule.family));
+      const requiredDelta = Number(ruleRequiresQuestionForPrompt(b.rule, prompt)) -
+        Number(ruleRequiresQuestionForPrompt(a.rule, prompt));
       if (requiredDelta !== 0) return requiredDelta;
       const genericDelta = Number(a.rule.checkpointKey === "research_question_freeze") -
         Number(b.rule.checkpointKey === "research_question_freeze");
@@ -357,18 +369,45 @@ function fallbackLevel(mode: InteractionMode): CheckpointLevel {
   }
 }
 
+function looksLikeProductOrToolingPrompt(prompt: string): boolean {
+  return /\b(longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(prompt)
+    || /롱테이블|훅|체크포인트|에이전트|스킬|사용성|인터페이스|설치|세팅|글로벌|배포|버전|릴리즈|깃|깃허브|문서화된\s*절차|패키지|라우터|자동완성|시뮬레이션\s*테스트/.test(prompt);
+}
+
 export function classifyCheckpointTrigger(
   prompt: string,
   options: CheckpointTriggerClassificationOptions = {}
 ): CheckpointTriggerClassification {
   const normalizedPrompt = prompt.trim();
+  if (looksLikeProductOrToolingPrompt(normalizedPrompt)) {
+    return {
+      signal: {
+        checkpointKey: options.checkpointKey ?? "product_runtime_guidance",
+        baseLevel: "recommended",
+        mode: options.preferredMode ?? options.fallbackMode ?? "review",
+        artifactStakes: options.artifactStakes ?? "private_note",
+        researchStage: options.researchStage ?? "problem_framing",
+        ...(options.unresolvedTensions ? { unresolvedTensions: options.unresolvedTensions } : {}),
+        ...(options.studyContract ? { studyContract: options.studyContract } : {})
+      },
+      family: "advisory",
+      confidence: "high",
+      matchedCues: ["product_tooling"],
+      requiresQuestionBeforeClosure: false,
+      advisoryOnly: true,
+      rationale: ["Product, tooling, and LongTable policy work should use response-only discussion unless the researcher explicitly records a research decision."]
+    };
+  }
+
   const best = pickBestRule(normalizedPrompt);
   const inferredMode = inferModeFromPlainCue(normalizedPrompt);
   const mode = options.preferredMode ?? best?.rule.mode ?? inferredMode ?? options.fallbackMode ?? "explore";
   const stage = options.researchStage ?? best?.rule.stage ?? fallbackStage(mode);
   const stakes = options.artifactStakes ?? best?.rule.stakes ?? fallbackStakes(mode);
-  const level = best?.rule.level ?? fallbackLevel(mode);
   const family = best?.rule.family ?? (mode === "explore" ? "exploration" : "advisory");
+  const level = family === "commitment" && !looksLikeCommitmentCue(normalizedPrompt)
+    ? "recommended"
+    : best?.rule.level ?? fallbackLevel(mode);
   const matchedCues = best?.matches ?? [];
   const checkpointKey = options.checkpointKey ?? best?.rule.checkpointKey ?? `${mode}_runtime_guidance`;
   const rationale = [

@@ -42,7 +42,7 @@ const exploration = classify(
   "explore"
 );
 assertEqual(exploration.signal.checkpointKey, "knowledge_gap_probe", "exploration checkpoint key");
-assertEqual(exploration.requiresQuestionBeforeClosure, true, "exploration requires question");
+assertEqual(exploration.requiresQuestionBeforeClosure, false, "exploration remains response-only until closure");
 
 const panel = classify(
   "The panel disagrees about whether calibration should be treated as a cognitive mismatch or a relational trust issue. Synthesize and choose the best framing.",
@@ -57,6 +57,13 @@ const draft = classify(
 );
 assertEqual(draft.signal.checkpointKey, "evidence_claim", "draft evidence key");
 assertEqual(draft.advisoryOnly, true, "draft remains advisory");
+
+const productPolicy = classify(
+  "LongTable checkpoint policy와 hook UX를 문서화된 절차에 맞게 수정해줘.",
+  "review"
+);
+assertEqual(productPolicy.signal.checkpointKey, "product_runtime_guidance", "product policy checkpoint key");
+assertEqual(productPolicy.requiresQuestionBeforeClosure, false, "product policy work remains response-only");
 
 const tmp = mkdtempSync(join(tmpdir(), "longtable-checkpoint-routing-"));
 const setupPath = join(tmp, "setup.json");

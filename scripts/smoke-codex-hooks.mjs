@@ -128,13 +128,27 @@ runCli([
 const context = await loadProjectContextFromDirectory(workspaceTmp);
 assert(context, "workspace context should exist");
 
+const advisoryQuestionHook = await dispatchCodexHook({
+  hook_event_name: "UserPromptSubmit",
+  prompt: "Trust calibration에서 subjective trust와 reliance, switch to AI를 같은 측정으로 봐도 되는지 검토해줘."
+}, workspaceTmp);
+const advisoryQuestionContext = advisoryQuestionHook?.hookSpecificOutput?.additionalContext ?? "";
+assert(advisoryQuestionContext.includes("response-only advisory"), "Research review prompts should surface advisory questions without creating checkpoints");
+const advisoryQuestionState = JSON.parse(readFileSync(join(workspaceTmp, ".longtable", "state.json"), "utf8"));
+const advisoryGeneratedQuestions = (advisoryQuestionState.questionLog ?? []).filter((question) =>
+  question.status === "pending" &&
+  question.prompt.checkpointKey?.startsWith("follow_up_")
+);
+assertEqual(advisoryGeneratedQuestions.length, 0, "Response-only advisory questions should not persist QuestionRecord entries");
+
 const autoQuestionHook = await dispatchCodexHook({
   hook_event_name: "UserPromptSubmit",
   prompt: "이 측정 모델을 원고에 반영하기 전에 주관적 신뢰와 행동 의존을 분리하기 위해 필요한 질문을 생성해줘."
 }, workspaceTmp);
 const autoQuestionContext = autoQuestionHook?.hookSpecificOutput?.additionalContext ?? "";
-assert(autoQuestionContext.includes("LongTable created"), "UserPromptSubmit should create required checkpoint questions for high-signal research prompts");
-assert(autoQuestionContext.includes("Question policy"), "Generated hook context should include the question policy prompt");
+assert(autoQuestionContext.includes("LongTable created"), "UserPromptSubmit should create required checkpoint questions for high-signal research commitment prompts");
+assert(autoQuestionContext.includes("Construct boundary"), "Generated hook context should include the required construct-boundary prompt");
+assert(!autoQuestionContext.includes("Question policy"), "Advisory question-policy prompts should not be promoted into required checkpoints");
 const autoQuestionState = JSON.parse(readFileSync(join(workspaceTmp, ".longtable", "state.json"), "utf8"));
 const generatedQuestions = (autoQuestionState.questionLog ?? []).filter((question) =>
   question.status === "pending" &&
@@ -201,9 +215,15 @@ const productUxHook = await dispatchCodexHook({
 }, workspaceTmp);
 assertEqual(productUxHook, null, "LongTable product and UX prompts should not create researcher checkpoints");
 
+const documentedProcedureHook = await dispatchCodexHook({
+  hook_event_name: "UserPromptSubmit",
+  prompt: "문서화된 절차에 따라 모든 작업을 진행해 줘."
+}, workspaceTmp);
+assertEqual(documentedProcedureHook, null, "Documented product implementation prompts should not create researcher checkpoints");
+
 const closureQuestionHook = await dispatchCodexHook({
   hook_event_name: "UserPromptSubmit",
-  prompt: "Implement the plan."
+  prompt: "이 연구 방향을 최종 확정해줘."
 }, workspaceTmp);
 const closureQuestionContext = closureQuestionHook?.hookSpecificOutput?.additionalContext ?? "";
 assert(closureQuestionContext.includes("Protected decision closure"), "Closure prompt should create a protected-decision checkpoint");

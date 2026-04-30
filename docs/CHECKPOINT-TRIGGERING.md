@@ -1,5 +1,11 @@
 # Checkpoint Triggering
 
+> Follow-up discussion: `ADVISORY-FIRST-QUESTION-HARNESS-DISCUSSION.md`
+> defines the next trigger direction: product/tooling prompts are a negative
+> gate for required Researcher Checkpoints, and missing research questions
+> should default to advisory response questions unless a research commitment is
+> being settled.
+
 ## Purpose
 
 Researcher Checkpoints must be triggered by research context, not by a fixed
@@ -27,13 +33,14 @@ The first trigger classifier lives in `@longtable/checkpoints`:
 - labels whether a question is required before closure
 - records matched cues and rationale for auditability
 
-The Codex thin wrapper now uses the classifier before generating runtime
-guidance. This means prompt cues such as submission, method design, measurement,
-evidence verification, named knowledge gaps, tacit assumptions, panel
-disagreement collapse, or LongTable product-language changes can strengthen the
-checkpoint even when the user does not use an explicit `lt commit:` command.
+The Codex native hook uses an additional advisory-first gate before writing any
+runtime question state. Product/tooling prompts return no required checkpoint.
+Research exploration, knowledge gaps, tacit assumptions, and construct-review
+prompts can surface response-only advisory questions. Durable state is written
+only when commitment and closure cues indicate that the next action would settle
+a research decision.
 
-`longtable question` uses the same classifier to write a durable
+`longtable question` remains the explicit command for writing a durable
 `QuestionRecord`. When that record is required, normal CLI progression is
 blocked until `longtable decide` records the answer.
 
@@ -52,22 +59,27 @@ Provider adapters render the same `QuestionRecord` through their own transport:
 
 LongTable currently recognizes these trigger families:
 
-- `exploration`: problem framing, narrowing, brainstorming
-- `review`: critique, audit, objection finding, tacit assumption probing
+- `exploration`: problem framing, narrowing, brainstorming; advisory by default
+- `review`: critique, audit, objection finding, tacit assumption probing;
+  advisory by default unless panel disagreement is being collapsed
 - `commitment`: research question, theory, method, measurement, or analysis decisions
 - `submission`: journal, public release, preregistration, IRB, external sharing
-- `meta_decision`: LongTable naming, README positioning, checkpoint policy, provider behavior
+- `meta_decision`: LongTable naming, README positioning, checkpoint policy,
+  provider behavior; product governance, not research-state blocking
 - `evidence`: citation, reference, source, hallucination, claim support
 - `authorship`: researcher voice, narrative trace, authorship preservation
-- knowledge gaps are represented as exploration checkpoints because they should
-  interrupt premature narrowing before they become commitments
+- knowledge gaps are represented as exploration guidance because they should
+  appear before premature narrowing, but should not create state until they
+  become commitments
 - `advisory`: low-confidence or low-stakes guidance
 
 ## Blocking Meaning
 
-The classifier does not directly block execution. It produces a `CheckpointSignal`.
-The checkpoint policy decides whether the signal is blocking after profile,
-artifact stakes, study contract, and unresolved tensions are considered.
+The classifier does not directly block execution. It produces a
+`CheckpointSignal`. The checkpoint policy and Codex advisory gate decide whether
+the signal is response-only guidance or a required checkpoint after scenario,
+commitment, artifact stakes, study contract, and unresolved tensions are
+considered.
 
 This separation matters:
 

@@ -1,5 +1,10 @@
 # Question Policy
 
+> Follow-up discussion: `ADVISORY-FIRST-QUESTION-HARNESS-DISCUSSION.md`
+> records the advisory-first policy direction. The runtime contract is:
+> response-only advisory questions for missing context, and durable Researcher
+> Checkpoints only for research commitments.
+
 ## Purpose
 
 이 문서는 LongTable가 언제 질문해야 하는지, 언제 질문 없이 진행해도 되는지, 그리고 어떤 질문을 우선해야 하는지 정의한다.
@@ -10,23 +15,26 @@
 
 하지만 더 중요한 건, 질문해야 할 순간에 질문하지 않는 시스템은 위험하다는 점이다.
 
-LongTable에서 이 질문 장치는 **Researcher Checkpoint**라고 부른다.
+LongTable에서 stateful 질문 장치는 **Researcher Checkpoint**라고 부른다.
+하지만 모든 좋은 질문이 checkpoint는 아니다. 탐색, 진단, 제품 논의, 문서화,
+설명 요청에서는 assistant response 안의 advisory question이 기본값이다.
 
 Claude Code의 AskUserQuestion-style UI나 Codex의 numbered-choice fallback은
 transport일 뿐이다. LongTable의 제품 계약은 "질문할 수 있음"이 아니라,
-연구적 책임이 넘어가기 전에 연구자의 판단을 적극적으로 확인하고 그 답을
+연구적 책임이 넘어가기 전에만 연구자의 판단을 적극적으로 확인하고 그 답을
 state에 남기는 것이다.
 
 ## Must-Ask Conditions
 
-아래 조건에서는 질문을 생략하면 안 된다.
+아래 조건에서는 질문을 생략하면 안 된다. 단, `QuestionRecord`를 만드는
+required checkpoint는 연구 책임이 실제로 이동하거나 고정될 때만 사용한다.
 
 1. 연구의 핵심 결정이 바뀔 수 있을 때
-2. ambiguity가 높고 결론이 여러 방향으로 갈릴 수 있을 때
-3. 사용자의 가치 판단이 필요한 순간일 때
-4. tacit knowledge를 inference로 해석하고자 할 때
-5. 결과를 매끄럽게 만들면 서사가 사라질 위험이 있을 때
-6. 외부 제출, 공유, 출판 책임이 걸린 순간일 때
+2. 외부 제출, 공유, 출판 책임이 걸린 순간일 때
+3. ambiguity가 높고 결론이 여러 방향으로 갈릴 수 있을 때
+4. 사용자의 가치 판단이 필요한 순간일 때
+5. tacit knowledge를 inference로 해석하고자 할 때
+6. 결과를 매끄럽게 만들면 서사가 사라질 위험이 있을 때
 
 ## Question Types
 
@@ -62,9 +70,10 @@ state에 남기는 것이다.
 - 이 프로젝트에서 당신의 개인적 경험은 어디에 들어 있는가?
 - 이 결정을 당신답게 만드는 맥락은 무엇인가?
 
-## Minimum Question Rule
+## Minimum Advisory Rule
 
-아래 경우에는 최소 2개의 질문을 먼저 제시하고 바로 결론을 내리지 않는다.
+아래 경우에는 response-only 질문을 먼저 제시하고 바로 결론을 내리지 않는다.
+상태 파일에는 쓰지 않는다.
 
 - mode가 `explore`일 때
 - 철학적/가치적 갈등이 핵심일 때
@@ -92,47 +101,50 @@ Record: QuestionRecord -> DecisionRecord
 ## Focused Follow-up Questions
 
 When the prompt contains multiple tacit decisions, LongTable should not collapse
-them into one generic checkpoint. It should ask a grouped set of focused choice
-questions for each knowledge gap LongTable would otherwise have to infer.
+them into one generic checkpoint. It should usually ask a small grouped set of
+focused advisory questions in the assistant response.
 
 Default policy:
 
-- trigger on every detected knowledge gap, not only high-stakes research
-  commitments
-- ask as many focused questions as the task requires
-- mark the recommended option visibly
-- prefer native structured UI when a provider reliably exposes it
-- prefer terminal selector UI in the CLI
-- fall back to numbered checkpoint text with strict parsing when no richer
-  renderer is available
+- surface missing-context questions without writing state
+- limit advisory questions to the smallest set that could change the next step
+- mark recommended directions only when the recommendation is low-risk
+- promote to a required checkpoint only when the next action would settle a
+  research commitment
+- reserve native structured UI, MCP elicitation, terminal selector UI, and
+  numbered checkpoint fallback for required checkpoints
 
 The question group is still provider-neutral. LongTable decides what must be
 asked; Claude, Codex, terminal, and future web renderers decide how it is shown.
 - 선택지가 실제로 의미 있는 trade-off를 가져야 한다.
-- 답변은 `QuestionRecord`를 answered 상태로 바꾸고 `DecisionRecord`를 만든다.
-- pending question은 `CURRENT.md`에 남아야 한다.
+- required checkpoint 답변은 `QuestionRecord`를 answered 상태로 바꾸고
+  `DecisionRecord`를 만든다.
+- response-only advisory question은 pending question으로 남기지 않는다.
 
 ## Proactive Triggering
 
-Researcher Checkpoint는 사용자가 "필요하면 질문해"라고 말했을 때만 나오는
-것이 아니다. 아래 순간에는 proactive하게 나타나야 한다.
+Researcher Checkpoint나 advisory question은 사용자가 "필요하면 질문해"라고
+말했을 때만 나오는 것이 아니다. 아래 순간에는 proactive하게 나타나야 한다.
 
 - 연구 질문을 freeze하려 할 때
 - theory anchor, method, measurement, analysis plan을 commit하려 할 때
-- tacit knowledge를 AI가 추론으로 채우려 할 때
+- tacit knowledge를 AI가 추론으로 채우려 할 때에는 advisory question을 우선한다
 - panel disagreement가 synthesis 하나로 접힐 위험이 있을 때
-- evidence 없이 다음 단계로 진행하려 할 때
+- evidence 없이 다음 단계로 진행하려 할 때에는 advisory question을 우선한다
 - 외부 제출, preregistration, public sharing이 가까워질 때
-- LongTable의 제품명, README positioning, provider behavior, checkpoint policy를 확정하려 할 때
+- LongTable의 제품명, README positioning, provider behavior, checkpoint policy는
+  제품 governance 논의로 다루고, 연구-state checkpoint로 기록하지 않는다
 
 단, reversible draft나 low-stakes formatting처럼 책임이 넘어가지 않는 작업은
 interrupt보다 log-only가 낫다.
 
 ## Meta-Decision Checkpoint
 
-LongTable 자체에 관한 결정도 Researcher Checkpoint 대상이다.
+LongTable 자체에 관한 결정은 기본적으로 response-only 제품 governance 대상이다.
+연구 workspace의 `QuestionRecord`로 저장하지 않는다.
 
-특히 아래 결정은 사용자의 생각과 시스템의 생각이 일치하는지 먼저 확인해야 한다.
+특히 아래 결정은 사용자의 생각과 시스템의 생각이 일치하는지 먼저 확인해야
+하지만, 확인은 일반 응답과 문서화로 처리한다.
 
 - 새로운 제품 개념명 확정
 - README의 핵심 positioning 변경
@@ -141,11 +153,12 @@ LongTable 자체에 관한 결정도 Researcher Checkpoint 대상이다.
 - provider-native tool 이름을 LongTable 제품 언어로 가져올지 여부
 
 이 경우 질문은 "승인하시겠습니까?"가 아니라 선택지를 가진 판단이어야 한다.
+다만 required checkpoint UI를 띄우지는 않는다.
 
 예:
 
 ```text
-Researcher Checkpoint
+Response-only product governance question
 Decision context: 이 이름은 README, docs, provider skills 전체에 퍼지는 제품 언어가 됩니다.
 Question: LongTable의 질문 장치 이름을 무엇으로 확정할까요?
 Options: Researcher Checkpoint / Research Judgment Checkpoint / Reflective Checkpoint / other

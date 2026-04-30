@@ -1366,6 +1366,7 @@ type FollowUpQuestionSpec = QuestionOpportunity;
 interface BuildFollowUpQuestionOptions {
   includeFallback?: boolean;
   autoOnly?: boolean;
+  requiredOnly?: boolean;
 }
 
 function includesAny(prompt: string, patterns: RegExp[]): boolean {
@@ -1394,7 +1395,7 @@ export function buildQuestionOpportunitySpecs(
   ): void {
     if (!specs.some((candidate) => candidate.key === spec.key)) {
       specs.push({
-        required: true,
+        required: false,
         confidence: "medium",
         autoEligible: false,
         cues: [],
@@ -1501,6 +1502,7 @@ export function buildQuestionOpportunitySpecs(
       ),
       confidence: "high",
       autoEligible: true,
+      required: true,
       cues: ["protected_decision", "closure_pressure"]
     });
   }
@@ -1707,7 +1709,11 @@ export function buildQuestionOpportunitySpecs(
     });
   }
 
-  return options.autoOnly === true ? specs.filter((spec) => spec.autoEligible) : specs;
+  let selected = options.autoOnly === true ? specs.filter((spec) => spec.autoEligible) : specs;
+  if (options.requiredOnly === true) {
+    selected = selected.filter((spec) => spec.kind === "research_commitment");
+  }
+  return selected;
 }
 
 function buildFollowUpQuestionSpecs(prompt: string): FollowUpQuestionSpec[] {
@@ -1739,6 +1745,7 @@ export async function createWorkspaceFollowUpQuestions(options: {
   required?: boolean;
   force?: boolean;
   auto?: boolean;
+  requiredOnly?: boolean;
 }): Promise<{
   questions: QuestionRecord[];
   state: ResearchState;
@@ -1763,7 +1770,8 @@ export async function createWorkspaceFollowUpQuestions(options: {
     : ["mcp_elicitation", "terminal_selector", "numbered"];
   const specs = buildQuestionOpportunitySpecs(options.prompt, {
     includeFallback: options.force === true ? true : options.auto !== true,
-    autoOnly: options.auto === true
+    autoOnly: options.auto === true,
+    requiredOnly: options.requiredOnly === true
   });
   if (specs.length === 0) {
     return { questions: [], state, created: false, alreadyAnswered: false };

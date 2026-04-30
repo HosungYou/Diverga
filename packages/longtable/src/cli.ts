@@ -3624,11 +3624,27 @@ async function runClarify(args: Record<string, string | boolean>): Promise<void>
   console.log(`- current: ${context.currentFilePath}`);
 }
 
+function looksLikeProductOrToolingPrompt(prompt: string): boolean {
+  return /\b(longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(prompt)
+    || /롱테이블|훅|체크포인트|에이전트|스킬|사용성|인터페이스|설치|세팅|글로벌|배포|버전|릴리즈|깃|깃허브|문서화된\s*절차|패키지|라우터|자동완성|시뮬레이션\s*테스트/.test(prompt);
+}
+
+function looksLikeResearchCommitmentPrompt(prompt: string): boolean {
+  const researchCue = /\b(research|study|paper|manuscript|journal|article|method|methodology|measurement|construct|theory|analysis|model|data|participant|sample|scale|survey|instrument|validity|hypothesis|literature|meta[- ]?analysis|gold standard|coding|trust|reliance|calibration)\b/i.test(prompt)
+    || /연구|논문|원고|저널|방법론|방법|연구\s*설계|측정|구성개념|개념|이론|분석|모형|모델|데이터|참가자|표본|샘플|척도|설문|도구|타당도|가설|문헌|메타\s*분석|골드\s*스탠더드|코딩|신뢰|의존|캘리브레이션|교정|보정/.test(prompt);
+  const closureCue = /\b(final|finalize|commit|ship|submit|publish|freeze|settle|decide|lock|record|apply|incorporate)\b/i.test(prompt)
+    || /최종|확정|커밋|제출|투고|고정|결정|기록|반영/.test(prompt);
+  return researchCue && closureCue;
+}
+
 async function runAutomaticFollowUpIfNeeded(
   prompt: string,
   args: Record<string, string | boolean>
 ): Promise<boolean> {
   if (args["no-clarify"] === true || args.print === true || args.json === true) {
+    return false;
+  }
+  if (looksLikeProductOrToolingPrompt(prompt) || !looksLikeResearchCommitmentPrompt(prompt)) {
     return false;
   }
 
@@ -3644,7 +3660,8 @@ async function runAutomaticFollowUpIfNeeded(
     prompt,
     provider,
     required: true,
-    auto: true
+    auto: true,
+    requiredOnly: true
   });
 
   if (result.questions.length === 0) {
