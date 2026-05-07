@@ -178,8 +178,9 @@ The interview is strongest when it does two things:
   the entire chat
 
 The quality gap is compression. A very rich interview can collapse into a thin
-First Research Shape. LongTable should improve this by adding an optional
-Research Specification layer after the First Research Shape:
+First Research Shape. LongTable now addresses this by adding a Research
+Specification layer after the First Research Shape when the interview has enough
+detail:
 
 - scope boundary
 - construct ontology
@@ -189,8 +190,11 @@ Research Specification layer after the First Research Shape:
 - epistemic conflicts between researcher intent, AI inference, and project state
 - panel/debate decisions that changed the direction
 
-This layer should not make setup heavier. It should be created only when the
-project needs it, usually after interview plus early panel/review work.
+This layer does not make setup heavier. It is created inside
+`$longtable-interview` through MCP `summarize_research_specification`, displayed
+as a Research Specification Preview, and confirmed through
+`confirm_research_specification`. If the researcher only wants the shorter
+handle layer, `confirm_first_research_shape` remains available.
 
 ## Operating Rule
 
@@ -211,8 +215,10 @@ researcher for clarity.
 
 1. Keep advisory hook output silent.
 2. Keep product/tooling prompts out of research-state checkpoint creation.
-3. Add or refine a Research Specification artifact only after First Research
-   Shape quality is evaluated.
+3. Keep the Research Specification artifact after First Research Shape quality
+   is evaluated, and render it in `CURRENT.md` so later agents can inspect the
+   actual scope, ontology, theory, coding, method, evidence/access, and
+   epistemic alignment commitments.
 4. Add tests for whole-work-unit stop behavior when required checkpoints are
    active.
 5. Keep release hooks as engineering safeguards, not research checkpoints.

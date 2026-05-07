@@ -86,6 +86,10 @@ Provider-native project start interview:
 - record each turn with `append_interview_turn` when MCP is available
 - summarize only from content-based readiness, not from a fixed turn count
 - build a provisional First Research Shape
+- expand substantive starts into a Research Specification covering scope,
+  construct ontology, theory framing, coding, method, evidence/access, and
+  epistemic alignment
+- show a Research Specification Preview before final confirmation
 - use structured option UI only at final confirmation
 - mark the active interview `cancelled` only when the researcher explicitly
   cancels the interview

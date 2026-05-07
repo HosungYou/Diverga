@@ -505,6 +505,59 @@ export interface FirstResearchShape {
   confirmedAt?: string;
 }
 
+export interface ResearchSpecification {
+  title: string;
+  status?: "draft" | "confirmed" | "deferred";
+  createdAt?: string;
+  updatedAt?: string;
+  sourceHookId?: string;
+  researchDirection: {
+    question?: string;
+    purpose: string;
+    scopeBoundary?: string;
+    inclusionCriteria?: string[];
+    exclusionCriteria?: string[];
+  };
+  constructOntology: {
+    coreConstructs: string[];
+    distinctions: string[];
+    termsToAvoidCollapsing?: string[];
+  };
+  theoryAndFraming: {
+    anchors: string[];
+    alternatives?: string[];
+    overreachRisks?: string[];
+  };
+  measurementCoding: {
+    variablesOrConstructs: string[];
+    evidenceTypes: string[];
+    codingRules: string[];
+    openStandards?: string[];
+  };
+  methodAnalysis: {
+    design?: string;
+    analysisOptions: string[];
+    dataSufficiencyCriteria?: string[];
+    unsettledChoices?: string[];
+  };
+  evidenceAccess: {
+    requiredSources?: string[];
+    accessRequirements?: string[];
+    evidenceStandards?: string[];
+  };
+  epistemicAlignment: {
+    researcherKnowledge?: string[];
+    projectStatePriority?: string[];
+    aiInferenceLimits?: string[];
+    conflictResolutionRule?: string;
+  };
+  protectedDecisions: string[];
+  openQuestions: string[];
+  nextActions: string[];
+  confidence: ConfidenceLevel;
+  confirmedAt?: string;
+}
+
 export interface LongTableHookRun {
   id: string;
   kind: LongTableHookKind;
@@ -516,6 +569,7 @@ export interface LongTableHookRun {
   provider?: ProviderKind;
   turns?: LongTableInterviewTurn[];
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
   qualityNotes?: string[];
   rationale?: string[];
   linkedQuestionRecordIds?: string[];
@@ -579,6 +633,7 @@ export interface ResearchState {
   workingState: Record<string, unknown>;
   hooks?: LongTableHookRun[];
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
   questionObligations?: LongTableQuestionObligation[];
   inferredHypotheses: InferredHypothesis[];
   openTensions: string[];

@@ -159,6 +159,9 @@ const interviewSkill = readFileSync(join(skillsDir, "longtable-interview", "SKIL
 if (!interviewSkill.includes("First Research Shape")) {
   throw new Error("longtable-interview skill should document First Research Shape.");
 }
+if (!interviewSkill.includes("Research Specification") || !interviewSkill.includes("confirm_research_specification")) {
+  throw new Error("longtable-interview skill should document Research Specification confirmation.");
+}
 if (!interviewSkill.includes("Do not begin with reader/reviewer")) {
   throw new Error("longtable-interview skill should forbid early reader/reviewer prompts.");
 }
@@ -167,6 +170,9 @@ if (!interviewSkill.includes("Closure Readiness") || !interviewSkill.includes("n
 }
 if (!interviewSkill.includes("append_interview_turn") || !interviewSkill.includes("readyToSummarize")) {
   throw new Error("longtable-interview skill should document durable turn recording and readiness signals.");
+}
+if (!interviewSkill.includes("summarize_research_specification")) {
+  throw new Error("longtable-interview skill should store the Research Specification through MCP.");
 }
 if (!interviewSkill.includes("one main uncertainty") || !interviewSkill.includes("mini-questionnaire")) {
   throw new Error("longtable-interview skill should softly document one-question-at-a-time behavior.");

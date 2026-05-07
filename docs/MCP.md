@@ -100,11 +100,19 @@ The first tool set is intentionally narrow:
 - `append_interview_turn`: record one natural-language interview turn with
   answer-quality metadata and optional content-based readiness rationale
 - `summarize_interview`: store the provisional First Research Shape
+- `summarize_research_specification`: store the fuller Research Specification
+  after the interview has enough scope, construct ontology, theory framing,
+  coding, method, evidence/access, and epistemic-alignment detail
+- `read_research_specification`: read the current Research Specification and
+  render the researcher-facing preview
 - `cancel_interview`: explicitly cancel an active interview without confirming a
   First Research Shape
 - `confirm_first_research_shape`: request MCP form elicitation for the final
-  First Research Shape confirmation; already-confirmed shapes return without
-  opening a new form
+  First Research Shape confirmation when the researcher stops at the short
+  handle layer; already-confirmed shapes return without opening a new form
+- `confirm_research_specification`: request MCP form elicitation for the final
+  Research Specification confirmation, including options to save, ask one more
+  question, revise a section, or keep the draft open
 - `pending_questions`: list pending Researcher Checkpoints
 - `evaluate_checkpoint`: classify natural-language context without writing
   state

@@ -86,8 +86,17 @@ summary without starting a provider session.
 - `CURRENT.md`: human-facing current view regenerated from state
 - `.longtable/project.json`: stable project identity
 - `.longtable/current-session.json`: current session cursor
-- `.longtable/state.json`: layered memory state
+- `.longtable/state.json`: layered memory state, including First Research
+  Shape and Research Specification when the interview has produced them
 - `.longtable/sessions/`: historical snapshots
+
+`$longtable-interview` first stabilizes a short First Research Shape. When the
+conversation is substantive enough, it should also preserve a Research
+Specification covering scope, construct ontology, theory framing,
+measurement/coding, method options, evidence/access requirements, epistemic
+alignment, protected decisions, open questions, and next actions. `CURRENT.md`
+renders that specification so later agents do not need to reconstruct the full
+interview from memory.
 
 ## Why This Shape
 

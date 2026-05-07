@@ -20,7 +20,17 @@ const mcpSelfTest = JSON.parse(execFileSync("node", [mcpServer, "--self-test"], 
   cwd: repoRoot,
   encoding: "utf8"
 }));
-for (const tool of ["create_workspace", "begin_interview", "append_interview_turn", "summarize_interview", "cancel_interview", "confirm_first_research_shape"]) {
+for (const tool of [
+  "create_workspace",
+  "begin_interview",
+  "append_interview_turn",
+  "summarize_interview",
+  "summarize_research_specification",
+  "read_research_specification",
+  "cancel_interview",
+  "confirm_first_research_shape",
+  "confirm_research_specification"
+]) {
   if (!mcpSelfTest.tools.includes(tool)) {
     throw new Error(`MCP self-test is missing interview tool: ${tool}`);
   }

@@ -15,7 +15,8 @@ const {
   pruneWorkspaceQuestions
 } = await import(join(repoRoot, "packages", "longtable", "dist", "index.js"));
 const {
-  buildFirstResearchShapeQuestion
+  buildFirstResearchShapeQuestion,
+  buildResearchSpecificationQuestion
 } = await import(join(repoRoot, "packages", "longtable-mcp", "dist", "index.js"));
 
 function assert(condition, message) {
@@ -108,6 +109,44 @@ assert(koreanShapeQuestion.options.some((option) => option.value === "stabilize_
 assert(koreanShapeQuestion.options.some((option) => option.value === "gather_context" && option.label === "한 질문 더"), "Korean shape question should show one-more-question option");
 assert(koreanShapeQuestion.options.some((option) => option.value === "revise_shape" && option.label === "수정"), "Korean shape question should show revise option");
 assert(koreanShapeQuestion.options.some((option) => option.value === "keep_open" && option.label === "열어두기"), "Korean shape question should show keep-open option");
+
+const researchSpecificationQuestion = buildResearchSpecificationQuestion({
+  title: "SME GenAI adoption specification",
+  researchDirection: {
+    purpose: "Explain organizational GenAI adoption in SMEs through capacity and constraint conditions.",
+    scopeBoundary: "SME organization-level adoption studies."
+  },
+  constructOntology: {
+    coreConstructs: ["organizational capacity", "implementation constraints"],
+    distinctions: ["intention versus actual use"]
+  },
+  theoryAndFraming: {
+    anchors: ["TOE", "JD-R as a demand/resource lens"]
+  },
+  measurementCoding: {
+    variablesOrConstructs: ["leadership support", "resource readiness"],
+    evidenceTypes: ["correlation", "SEM path"],
+    codingRules: ["Code directionality separately from construct family."]
+  },
+  methodAnalysis: {
+    analysisOptions: ["random-effects meta-analysis", "MASEM if correlation matrices are sufficient"]
+  },
+  evidenceAccess: {
+    requiredSources: ["primary quantitative studies"]
+  },
+  epistemicAlignment: {
+    conflictResolutionRule: "Ask the researcher when project state, AI inference, and researcher knowledge conflict."
+  },
+  protectedDecisions: ["sector/domain boundary"],
+  openQuestions: ["Are SME studies sufficient for quantitative synthesis?"],
+  nextActions: ["Run pilot extraction."],
+  confidence: "medium"
+});
+assertEqual(researchSpecificationQuestion.title, "Research Specification Confirmation", "Research Specification question should use explicit confirmation title");
+assertEqual(researchSpecificationQuestion.question, "How should LongTable handle this Research Specification?", "Research Specification question should use explicit confirmation question");
+assert(researchSpecificationQuestion.prompt.includes("Research Specification Preview"), "Research Specification question should include the preview in the prompt");
+assert(researchSpecificationQuestion.options.some((option) => option.value === "confirm_specification"), "Research Specification question should offer confirmation");
+assert(researchSpecificationQuestion.options.some((option) => option.value === "revise_section"), "Research Specification question should allow section-level revision");
 
 const workspaceTmp = mkdtempSync(join(tmpdir(), "longtable-codex-hook-runtime-"));
 const setupPath = join(workspaceTmp, "setup.json");

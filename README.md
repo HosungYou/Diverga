@@ -98,7 +98,8 @@ architecture and overengineering analysis.
 - A durable `.longtable/` workspace for each research project
 - A human-readable `CURRENT.md` status page regenerated from project state
 - A provider-native `$longtable-interview` that starts from the researcher's
-  rough problem and builds a provisional First Research Shape
+  rough problem, builds a provisional First Research Shape, and then preserves
+  a fuller Research Specification when the interview is ready
 - Provider-native Codex and Claude Code skills when you approve installation
 - Researcher Checkpoints for decisions that should not be skipped silently,
   shown as UI prompts when the provider supports them and as numbered fallback
@@ -232,8 +233,12 @@ If the problem is not clear yet, describe the part that is still hard to say.
 
 The interview reflects each answer with `LongTable hears: ...`, asks follow-up
 questions when an answer is thin, and stops only when it can summarize a
-provisional First Research Shape. Structured options appear at the final
-confirmation point, not at the beginning of the interview.
+provisional First Research Shape. For substantive starts, LongTable then expands
+that short handle into a Research Specification covering scope, construct
+ontology, theory framing, measurement/coding, method options, evidence/access
+requirements, epistemic alignment, protected decisions, open questions, and next
+actions. Structured options appear at the final specification confirmation
+point, not at the beginning of the interview.
 
 This creates:
 
@@ -568,8 +573,11 @@ Current MCP tools include:
 - `begin_interview`
 - `append_interview_turn`
 - `summarize_interview`
+- `summarize_research_specification`
+- `read_research_specification`
 - `cancel_interview`
 - `confirm_first_research_shape`
+- `confirm_research_specification`
 - `pending_questions`
 - `evaluate_checkpoint`
 - `create_question`
@@ -598,11 +606,14 @@ Codex does not support or allow elicitation, LongTable keeps the same
 `longtable decide`.
 
 When the MCP tool surface is available, LongTable skills should call
-`confirm_first_research_shape` at the end of `$longtable-interview`,
-`cancel_interview` only when the researcher explicitly cancels the interview, and
-`elicit_question` for later Researcher Checkpoints. `longtable question --print`
-is the CLI fallback for clients that cannot show, accept, or approve MCP
-elicitation.
+`summarize_interview` first, then `summarize_research_specification` and
+`confirm_research_specification` at the end of a substantive
+`$longtable-interview`. `confirm_first_research_shape` remains available when a
+researcher intentionally wants to stop at the shorter handle layer.
+`cancel_interview` is only for explicit interview cancellation, and
+`elicit_question` is for later Researcher Checkpoints. `longtable
+question --print` is the CLI fallback for clients that cannot show, accept, or
+approve MCP elicitation.
 
 ## Evidence And Scholarly Search
 

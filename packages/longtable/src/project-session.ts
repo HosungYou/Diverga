@@ -84,6 +84,59 @@ export interface FirstResearchShape {
   confirmedAt?: string;
 }
 
+export interface ResearchSpecification {
+  title: string;
+  status?: "draft" | "confirmed" | "deferred";
+  createdAt?: string;
+  updatedAt?: string;
+  sourceHookId?: string;
+  researchDirection: {
+    question?: string;
+    purpose: string;
+    scopeBoundary?: string;
+    inclusionCriteria?: string[];
+    exclusionCriteria?: string[];
+  };
+  constructOntology: {
+    coreConstructs: string[];
+    distinctions: string[];
+    termsToAvoidCollapsing?: string[];
+  };
+  theoryAndFraming: {
+    anchors: string[];
+    alternatives?: string[];
+    overreachRisks?: string[];
+  };
+  measurementCoding: {
+    variablesOrConstructs: string[];
+    evidenceTypes: string[];
+    codingRules: string[];
+    openStandards?: string[];
+  };
+  methodAnalysis: {
+    design?: string;
+    analysisOptions: string[];
+    dataSufficiencyCriteria?: string[];
+    unsettledChoices?: string[];
+  };
+  evidenceAccess: {
+    requiredSources?: string[];
+    accessRequirements?: string[];
+    evidenceStandards?: string[];
+  };
+  epistemicAlignment: {
+    researcherKnowledge?: string[];
+    projectStatePriority?: string[];
+    aiInferenceLimits?: string[];
+    conflictResolutionRule?: string;
+  };
+  protectedDecisions: string[];
+  openQuestions: string[];
+  nextActions: string[];
+  confidence: "low" | "medium" | "high";
+  confirmedAt?: string;
+}
+
 export interface LongTableInterviewTurn {
   id: string;
   index: number;
@@ -110,6 +163,7 @@ export interface LongTableHookRun {
   provider?: ProviderKind;
   turns?: LongTableInterviewTurn[];
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
   qualityNotes?: string[];
   rationale?: string[];
   linkedQuestionRecordIds?: string[];
@@ -119,6 +173,7 @@ export interface LongTableHookRun {
 export type LongTableWorkspaceState = ResearchState & {
   hooks?: LongTableHookRun[];
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
 };
 
 export interface LongTableProjectRecord {
@@ -156,6 +211,7 @@ export interface LongTableSessionRecord {
   openQuestions?: string[];
   startInterview?: StartInterviewSession;
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
   requestedPerspectives: string[];
   disagreementPreference: ProjectDisagreementPreference;
   activeModes?: string[];
@@ -188,6 +244,11 @@ export interface LongTableWorkspaceInspection {
     currentBlocker?: string;
     requestedPerspectives: string[];
     disagreementPreference: ProjectDisagreementPreference;
+    researchSpecification?: {
+      title: string;
+      status: "draft" | "confirmed" | "deferred";
+      confidence: "low" | "medium" | "high";
+    };
   };
   files?: {
     project: string;
@@ -350,6 +411,10 @@ function buildNextAction(session: LongTableSessionRecord): string {
 }
 
 function buildResumeHint(session: LongTableSessionRecord): string {
+  if (session.researchSpecification) {
+    return `I want to continue from the Research Specification: ${session.researchSpecification.title}.`;
+  }
+
   if (session.firstResearchShape) {
     return `I want to continue from the First Research Shape: ${session.firstResearchShape.handle}.`;
   }
@@ -363,6 +428,55 @@ function buildResumeHint(session: LongTableSessionRecord): string {
   return session.currentBlocker
     ? `I want to continue ${session.currentGoal}. The unresolved blocker is ${session.currentBlocker}.`
     : `I want to continue ${session.currentGoal}.`;
+}
+
+function renderResearchSpecificationSummary(
+  specification: ResearchSpecification,
+  locale: "en" | "ko"
+): string[] {
+  const korean = locale === "ko";
+  const lines: string[] = [
+    "",
+    korean ? "## Research Specification" : "## Research Specification",
+    `- ${korean ? "제목" : "Title"}: ${specification.title}`,
+    `- ${korean ? "상태" : "Status"}: ${specification.confirmedAt ? "confirmed" : specification.status ?? "draft"}`,
+    `- ${korean ? "신뢰도" : "Confidence"}: ${specification.confidence}`
+  ];
+  if (specification.researchDirection.question) {
+    lines.push(`- ${korean ? "연구 질문" : "Question"}: ${specification.researchDirection.question}`);
+  }
+  lines.push(`- ${korean ? "목적" : "Purpose"}: ${specification.researchDirection.purpose}`);
+  if (specification.researchDirection.scopeBoundary) {
+    lines.push(`- ${korean ? "범위 경계" : "Scope boundary"}: ${specification.researchDirection.scopeBoundary}`);
+  }
+  if (specification.constructOntology.coreConstructs.length > 0) {
+    lines.push(`- ${korean ? "핵심 construct" : "Core constructs"}: ${specification.constructOntology.coreConstructs.join("; ")}`);
+  }
+  if (specification.constructOntology.distinctions.length > 0) {
+    lines.push(`- ${korean ? "구분해야 할 차이" : "Key distinctions"}: ${specification.constructOntology.distinctions.join("; ")}`);
+  }
+  if (specification.theoryAndFraming.anchors.length > 0) {
+    lines.push(`- ${korean ? "이론 앵커" : "Theory anchors"}: ${specification.theoryAndFraming.anchors.join("; ")}`);
+  }
+  if (specification.measurementCoding.codingRules.length > 0) {
+    lines.push(`- ${korean ? "코딩 규칙" : "Coding rules"}: ${specification.measurementCoding.codingRules.join("; ")}`);
+  }
+  if (specification.methodAnalysis.analysisOptions.length > 0) {
+    lines.push(`- ${korean ? "분석 옵션" : "Analysis options"}: ${specification.methodAnalysis.analysisOptions.join("; ")}`);
+  }
+  if (specification.epistemicAlignment.conflictResolutionRule) {
+    lines.push(`- ${korean ? "충돌 조정 규칙" : "Conflict rule"}: ${specification.epistemicAlignment.conflictResolutionRule}`);
+  }
+  if (specification.protectedDecisions.length > 0) {
+    lines.push(...specification.protectedDecisions.map((decision) => `- ${korean ? "보호할 결정" : "Protected decision"}: ${decision}`));
+  }
+  if (specification.openQuestions.length > 0) {
+    lines.push(...specification.openQuestions.map((question) => `- ${korean ? "열린 질문" : "Open question"}: ${question}`));
+  }
+  if (specification.nextActions.length > 0) {
+    lines.push(...specification.nextActions.map((action) => `- ${korean ? "다음 행동" : "Next action"}: ${action}`));
+  }
+  return lines;
 }
 
 function buildCurrentGuide(
@@ -395,6 +509,7 @@ function buildCurrentGuide(
       ...(session.gapRisk ? [`- 공백/암묵지 위험: ${session.gapRisk}`] : []),
       ...(session.protectedDecision ? [`- 보호할 결정: ${session.protectedDecision}`] : []),
       ...(session.firstResearchShape ? [`- First Research Shape: ${session.firstResearchShape.handle}`] : []),
+      ...(session.researchSpecification ? [`- Research Specification: ${session.researchSpecification.title}`] : []),
       ...(session.startInterview ? [`- start interview: ${session.startInterview.summary}`] : []),
       `- 다음 액션: ${nextAction}`,
       `- 관점: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
@@ -445,6 +560,7 @@ function buildCurrentGuide(
             ...session.firstResearchShape.openQuestions.map((question) => `- Open question: ${question}`)
           ]
         : []),
+      ...(session.researchSpecification ? renderResearchSpecificationSummary(session.researchSpecification, locale) : []),
       "",
       "## 빠른 시작",
       "- 이 디렉토리에서 `codex`를 엽니다.",
@@ -469,6 +585,7 @@ function buildCurrentGuide(
     ...(session.gapRisk ? [`- Gap/tacit risk: ${session.gapRisk}`] : []),
     ...(session.protectedDecision ? [`- Protected decision: ${session.protectedDecision}`] : []),
     ...(session.firstResearchShape ? [`- First Research Shape: ${session.firstResearchShape.handle}`] : []),
+    ...(session.researchSpecification ? [`- Research Specification: ${session.researchSpecification.title}`] : []),
     ...(session.startInterview ? [`- Start interview: ${session.startInterview.summary}`] : []),
     `- Next action: ${nextAction}`,
     `- Perspectives: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
@@ -519,6 +636,7 @@ function buildCurrentGuide(
           ...session.firstResearchShape.openQuestions.map((question) => `- Open question: ${question}`)
         ]
       : []),
+    ...(session.researchSpecification ? renderResearchSpecificationSummary(session.researchSpecification, locale) : []),
     "",
     "## Quick Start",
     "- Open `codex` in this directory.",
@@ -541,6 +659,7 @@ async function loadResearchState(stateFilePath: string): Promise<LongTableWorksp
     workingState: parsed.workingState ?? {},
     hooks: parsed.hooks ?? [],
     ...(parsed.firstResearchShape ? { firstResearchShape: parsed.firstResearchShape } : {}),
+    ...(parsed.researchSpecification ? { researchSpecification: parsed.researchSpecification } : {}),
     questionObligations: parsed.questionObligations ?? [],
     inferredHypotheses: parsed.inferredHypotheses ?? [],
     openTensions: parsed.openTensions ?? [],
@@ -616,7 +735,18 @@ function summarizeWorkspaceInspection(
       currentGoal: context.session.currentGoal,
       ...(context.session.currentBlocker ? { currentBlocker: context.session.currentBlocker } : {}),
       requestedPerspectives: context.session.requestedPerspectives,
-      disagreementPreference: context.session.disagreementPreference
+      disagreementPreference: context.session.disagreementPreference,
+      ...(context.session.researchSpecification
+        ? {
+            researchSpecification: {
+              title: context.session.researchSpecification.title,
+              status: context.session.researchSpecification.confirmedAt
+                ? "confirmed"
+                : context.session.researchSpecification.status ?? "draft",
+              confidence: context.session.researchSpecification.confidence
+            }
+          }
+        : {})
     },
     files: {
       project: context.projectFilePath,
@@ -710,6 +840,7 @@ function buildProjectAgentsMd(
     "- Begin exploratory work with clarifying or tension questions before recommending a direction.",
     "- For `$longtable-interview`, ask one natural-language question at a time, reflect with `LongTable hears: ...`, record turns when MCP is available, and avoid early reader/reviewer or theory/method/measurement classification.",
     "- Do not summarize `$longtable-interview` because a fixed number of turns has passed; wait for content-based readiness around research object, focal uncertainty, boundary, evidence/material, protected decision, and next action.",
+    "- After the First Research Shape, create a Research Specification when the interview has enough detail to preserve scope, construct ontology, theory framing, coding rules, method options, evidence/access requirements, epistemic alignment, protected decisions, open questions, and next actions.",
     "- Do not let unrelated pending Researcher Checkpoints interrupt `$longtable-interview`; mention them only as separate unresolved checkpoints unless the researcher is confirming, saving, or recording a research decision.",
     "- Use structured options only at the final First Research Shape confirmation or at true checkpoint boundaries.",
     "- If you foreground role perspectives, disclose them with `LongTable consulted: ...`.",
@@ -729,6 +860,7 @@ function buildProjectAgentsMd(
     ...(session.gapRisk ? [`- Gap/tacit risk: ${session.gapRisk}`] : []),
     ...(session.protectedDecision ? [`- Protected decision: ${session.protectedDecision}`] : []),
     ...(session.firstResearchShape ? [`- First Research Shape: ${session.firstResearchShape.handle}`] : []),
+    ...(session.researchSpecification ? [`- Research Specification: ${session.researchSpecification.title}`] : []),
     ...(session.startInterview ? [`- Start interview summary: ${session.startInterview.summary}`] : []),
     `- Requested perspectives: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
     `- Disagreement visibility: ${session.disagreementPreference}`,
@@ -765,6 +897,10 @@ function buildStateSeed(
   if (session.firstResearchShape) {
     state.firstResearchShape = session.firstResearchShape;
     state.workingState.firstResearchShape = session.firstResearchShape;
+  }
+  if (session.researchSpecification) {
+    state.researchSpecification = session.researchSpecification;
+    state.workingState.researchSpecification = session.researchSpecification;
   }
   if (session.currentBlocker) {
     state.openTensions.push(session.currentBlocker);
@@ -840,9 +976,18 @@ async function removeLegacyRootFiles(projectPath: string): Promise<void> {
 
 export async function syncCurrentWorkspaceView(context: LongTableProjectContext): Promise<string> {
   const state = await loadResearchState(context.stateFilePath);
+  const session: LongTableSessionRecord = {
+    ...context.session,
+    ...(context.session.firstResearchShape ?? state.firstResearchShape
+      ? { firstResearchShape: context.session.firstResearchShape ?? state.firstResearchShape }
+      : {}),
+    ...(context.session.researchSpecification ?? state.researchSpecification
+      ? { researchSpecification: context.session.researchSpecification ?? state.researchSpecification }
+      : {})
+  };
   const body = buildCurrentGuide(
     context.project,
-    context.session,
+    session,
     recentInvocationRecords(state),
     recentPendingQuestions(state),
     recentPendingObligations(state)
@@ -1119,6 +1264,141 @@ export async function summarizeLongTableInterview(options: {
   await writeFile(options.context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
   await syncCurrentWorkspaceView(options.context);
   return { hook, shape, state: updated, session };
+}
+
+function normalizeStringArray(values: string[] | undefined): string[] {
+  return (values ?? []).map((value) => value.trim()).filter(Boolean);
+}
+
+function normalizeOptionalString(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : undefined;
+}
+
+function normalizeResearchSpecification(
+  input: ResearchSpecification,
+  sourceHookId: string | undefined,
+  timestamp: string
+): ResearchSpecification {
+  const title = input.title.trim();
+  if (!title) {
+    throw new Error("Research Specification title is required.");
+  }
+  const purpose = input.researchDirection.purpose.trim();
+  if (!purpose) {
+    throw new Error("Research Specification researchDirection.purpose is required.");
+  }
+
+  return {
+    title,
+    status: input.confirmedAt ? "confirmed" : input.status ?? "draft",
+    createdAt: input.createdAt ?? timestamp,
+    updatedAt: timestamp,
+    ...(sourceHookId ? { sourceHookId } : {}),
+    researchDirection: {
+      ...(normalizeOptionalString(input.researchDirection.question) ? { question: normalizeOptionalString(input.researchDirection.question) } : {}),
+      purpose,
+      ...(normalizeOptionalString(input.researchDirection.scopeBoundary) ? { scopeBoundary: normalizeOptionalString(input.researchDirection.scopeBoundary) } : {}),
+      inclusionCriteria: normalizeStringArray(input.researchDirection.inclusionCriteria),
+      exclusionCriteria: normalizeStringArray(input.researchDirection.exclusionCriteria)
+    },
+    constructOntology: {
+      coreConstructs: normalizeStringArray(input.constructOntology.coreConstructs),
+      distinctions: normalizeStringArray(input.constructOntology.distinctions),
+      termsToAvoidCollapsing: normalizeStringArray(input.constructOntology.termsToAvoidCollapsing)
+    },
+    theoryAndFraming: {
+      anchors: normalizeStringArray(input.theoryAndFraming.anchors),
+      alternatives: normalizeStringArray(input.theoryAndFraming.alternatives),
+      overreachRisks: normalizeStringArray(input.theoryAndFraming.overreachRisks)
+    },
+    measurementCoding: {
+      variablesOrConstructs: normalizeStringArray(input.measurementCoding.variablesOrConstructs),
+      evidenceTypes: normalizeStringArray(input.measurementCoding.evidenceTypes),
+      codingRules: normalizeStringArray(input.measurementCoding.codingRules),
+      openStandards: normalizeStringArray(input.measurementCoding.openStandards)
+    },
+    methodAnalysis: {
+      ...(normalizeOptionalString(input.methodAnalysis.design) ? { design: normalizeOptionalString(input.methodAnalysis.design) } : {}),
+      analysisOptions: normalizeStringArray(input.methodAnalysis.analysisOptions),
+      dataSufficiencyCriteria: normalizeStringArray(input.methodAnalysis.dataSufficiencyCriteria),
+      unsettledChoices: normalizeStringArray(input.methodAnalysis.unsettledChoices)
+    },
+    evidenceAccess: {
+      requiredSources: normalizeStringArray(input.evidenceAccess.requiredSources),
+      accessRequirements: normalizeStringArray(input.evidenceAccess.accessRequirements),
+      evidenceStandards: normalizeStringArray(input.evidenceAccess.evidenceStandards)
+    },
+    epistemicAlignment: {
+      researcherKnowledge: normalizeStringArray(input.epistemicAlignment.researcherKnowledge),
+      projectStatePriority: normalizeStringArray(input.epistemicAlignment.projectStatePriority),
+      aiInferenceLimits: normalizeStringArray(input.epistemicAlignment.aiInferenceLimits),
+      ...(normalizeOptionalString(input.epistemicAlignment.conflictResolutionRule)
+        ? { conflictResolutionRule: normalizeOptionalString(input.epistemicAlignment.conflictResolutionRule) }
+        : {})
+    },
+    protectedDecisions: normalizeStringArray(input.protectedDecisions),
+    openQuestions: normalizeStringArray(input.openQuestions),
+    nextActions: normalizeStringArray(input.nextActions),
+    confidence: input.confidence,
+    ...(input.confirmedAt ? { confirmedAt: input.confirmedAt } : {})
+  };
+}
+
+export async function summarizeLongTableResearchSpecification(options: {
+  context: LongTableProjectContext;
+  hookId?: string;
+  specification: ResearchSpecification;
+}): Promise<{ hook?: LongTableHookRun; specification: ResearchSpecification; state: LongTableWorkspaceState; session: LongTableSessionRecord }> {
+  const state = await loadResearchState(options.context.stateFilePath);
+  const sourceHookId = options.hookId
+    ?? options.specification.sourceHookId
+    ?? state.firstResearchShape?.sourceHookId;
+  const existing = sourceHookId
+    ? (state.hooks ?? []).find((hook) => hook.id === sourceHookId)
+    : activeInterviewHook(state);
+  const timestamp = nowIso();
+  const specification = normalizeResearchSpecification(
+    options.specification,
+    existing?.id ?? sourceHookId,
+    timestamp
+  );
+  const hook = existing
+    ? {
+        ...existing,
+        status: "ready_to_confirm" as const,
+        updatedAt: timestamp,
+        researchSpecification: specification
+      }
+    : undefined;
+  const session: LongTableSessionRecord = {
+    ...options.context.session,
+    lastUpdatedAt: timestamp,
+    researchSpecification: specification,
+    resumeHint: `I want to continue from the Research Specification: ${specification.title}.`
+  };
+  options.context.session = session;
+
+  let updated = hook ? upsertHook(state, hook) : state;
+  updated.researchSpecification = specification;
+  updated.workingState = {
+    ...updated.workingState,
+    researchSpecification: specification
+  };
+  updated.narrativeTraces.push({
+    id: createId("narrative_trace"),
+    timestamp,
+    source: "$longtable-interview",
+    traceType: "judgment",
+    summary: `Research Specification draft: ${specification.title}.`,
+    visibility: "explicit",
+    importance: specification.confidence
+  });
+
+  await writeFile(options.context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(options.context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(options.context);
+  return { hook, specification, state: updated, session };
 }
 
 function findQuestionForDecision(

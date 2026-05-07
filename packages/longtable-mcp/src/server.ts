@@ -28,6 +28,12 @@ import {
   firstResearchShapeAnswerConfirms,
   firstResearchShapeAnswerStatus
 } from "./first-research-shape.js";
+import {
+  buildResearchSpecificationQuestion,
+  renderResearchSpecificationPreview,
+  researchSpecificationAnswerConfirms,
+  researchSpecificationAnswerStatus
+} from "./research-specification.js";
 
 const SERVER_NAME = "longtable-state";
 const require = createRequire(import.meta.url);
@@ -41,8 +47,11 @@ const TOOL_NAMES = [
   "begin_interview",
   "append_interview_turn",
   "summarize_interview",
+  "summarize_research_specification",
+  "read_research_specification",
   "cancel_interview",
   "confirm_first_research_shape",
+  "confirm_research_specification",
   "pending_questions",
   "evaluate_checkpoint",
   "create_question",
@@ -73,6 +82,59 @@ interface FirstResearchShape {
   confirmedAt?: string;
 }
 
+interface ResearchSpecification {
+  title: string;
+  status?: "draft" | "confirmed" | "deferred";
+  createdAt?: string;
+  updatedAt?: string;
+  sourceHookId?: string;
+  researchDirection: {
+    question?: string;
+    purpose: string;
+    scopeBoundary?: string;
+    inclusionCriteria?: string[];
+    exclusionCriteria?: string[];
+  };
+  constructOntology: {
+    coreConstructs: string[];
+    distinctions: string[];
+    termsToAvoidCollapsing?: string[];
+  };
+  theoryAndFraming: {
+    anchors: string[];
+    alternatives?: string[];
+    overreachRisks?: string[];
+  };
+  measurementCoding: {
+    variablesOrConstructs: string[];
+    evidenceTypes: string[];
+    codingRules: string[];
+    openStandards?: string[];
+  };
+  methodAnalysis: {
+    design?: string;
+    analysisOptions: string[];
+    dataSufficiencyCriteria?: string[];
+    unsettledChoices?: string[];
+  };
+  evidenceAccess: {
+    requiredSources?: string[];
+    accessRequirements?: string[];
+    evidenceStandards?: string[];
+  };
+  epistemicAlignment: {
+    researcherKnowledge?: string[];
+    projectStatePriority?: string[];
+    aiInferenceLimits?: string[];
+    conflictResolutionRule?: string;
+  };
+  protectedDecisions: string[];
+  openQuestions: string[];
+  nextActions: string[];
+  confidence: "low" | "medium" | "high";
+  confirmedAt?: string;
+}
+
 interface InterviewHookRun {
   id: string;
   kind: "longtable_interview";
@@ -97,6 +159,7 @@ interface InterviewHookRun {
     rationale?: string[];
   }>;
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
   qualityNotes: string[];
   rationale: string[];
   linkedQuestionRecordIds?: string[];
@@ -118,6 +181,7 @@ interface QuestionObligation {
 
 type InterviewState = Awaited<ReturnType<typeof loadWorkspaceState>> & {
   firstResearchShape?: FirstResearchShape;
+  researchSpecification?: ResearchSpecification;
   questionObligations?: QuestionObligation[];
 };
 
@@ -139,6 +203,61 @@ const firstResearchShapeSchema = z.object({
   nextAction: z.string().min(1),
   confidence: z.enum(["low", "medium", "high"]).default("medium"),
   sourceHookId: z.string().optional(),
+  confirmedAt: z.string().optional()
+});
+
+const optionalStringArraySchema = z.array(z.string().min(1)).optional();
+
+const researchSpecificationSchema = z.object({
+  title: z.string().min(1),
+  status: z.enum(["draft", "confirmed", "deferred"]).optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  sourceHookId: z.string().optional(),
+  researchDirection: z.object({
+    question: z.string().optional(),
+    purpose: z.string().min(1),
+    scopeBoundary: z.string().optional(),
+    inclusionCriteria: optionalStringArraySchema,
+    exclusionCriteria: optionalStringArraySchema
+  }),
+  constructOntology: z.object({
+    coreConstructs: z.array(z.string().min(1)).default([]),
+    distinctions: z.array(z.string().min(1)).default([]),
+    termsToAvoidCollapsing: optionalStringArraySchema
+  }),
+  theoryAndFraming: z.object({
+    anchors: z.array(z.string().min(1)).default([]),
+    alternatives: optionalStringArraySchema,
+    overreachRisks: optionalStringArraySchema
+  }),
+  measurementCoding: z.object({
+    variablesOrConstructs: z.array(z.string().min(1)).default([]),
+    evidenceTypes: z.array(z.string().min(1)).default([]),
+    codingRules: z.array(z.string().min(1)).default([]),
+    openStandards: optionalStringArraySchema
+  }),
+  methodAnalysis: z.object({
+    design: z.string().optional(),
+    analysisOptions: z.array(z.string().min(1)).default([]),
+    dataSufficiencyCriteria: optionalStringArraySchema,
+    unsettledChoices: optionalStringArraySchema
+  }),
+  evidenceAccess: z.object({
+    requiredSources: optionalStringArraySchema,
+    accessRequirements: optionalStringArraySchema,
+    evidenceStandards: optionalStringArraySchema
+  }),
+  epistemicAlignment: z.object({
+    researcherKnowledge: optionalStringArraySchema,
+    projectStatePriority: optionalStringArraySchema,
+    aiInferenceLimits: optionalStringArraySchema,
+    conflictResolutionRule: z.string().optional()
+  }),
+  protectedDecisions: z.array(z.string().min(1)).default([]),
+  openQuestions: z.array(z.string().min(1)).default([]),
+  nextActions: z.array(z.string().min(1)).default([]),
+  confidence: z.enum(["low", "medium", "high"]).default("medium"),
   confirmedAt: z.string().optional()
 });
 
@@ -504,6 +623,136 @@ async function summarizeInterviewHook(
   return { hook, shape, state: updated, session };
 }
 
+function normalizeStringArray(values: string[] | undefined): string[] {
+  return (values ?? []).map((value) => value.trim()).filter(Boolean);
+}
+
+function normalizeOptionalString(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : undefined;
+}
+
+function normalizeResearchSpecification(
+  input: ResearchSpecification,
+  sourceHookId: string | undefined,
+  timestamp: string
+): ResearchSpecification {
+  const title = input.title.trim();
+  const purpose = input.researchDirection.purpose.trim();
+  if (!title || !purpose) {
+    throw new Error("Research Specification title and researchDirection.purpose are required.");
+  }
+
+  return {
+    title,
+    status: input.confirmedAt ? "confirmed" : input.status ?? "draft",
+    createdAt: input.createdAt ?? timestamp,
+    updatedAt: timestamp,
+    ...(sourceHookId ? { sourceHookId } : {}),
+    researchDirection: {
+      ...(normalizeOptionalString(input.researchDirection.question) ? { question: normalizeOptionalString(input.researchDirection.question) } : {}),
+      purpose,
+      ...(normalizeOptionalString(input.researchDirection.scopeBoundary) ? { scopeBoundary: normalizeOptionalString(input.researchDirection.scopeBoundary) } : {}),
+      inclusionCriteria: normalizeStringArray(input.researchDirection.inclusionCriteria),
+      exclusionCriteria: normalizeStringArray(input.researchDirection.exclusionCriteria)
+    },
+    constructOntology: {
+      coreConstructs: normalizeStringArray(input.constructOntology.coreConstructs),
+      distinctions: normalizeStringArray(input.constructOntology.distinctions),
+      termsToAvoidCollapsing: normalizeStringArray(input.constructOntology.termsToAvoidCollapsing)
+    },
+    theoryAndFraming: {
+      anchors: normalizeStringArray(input.theoryAndFraming.anchors),
+      alternatives: normalizeStringArray(input.theoryAndFraming.alternatives),
+      overreachRisks: normalizeStringArray(input.theoryAndFraming.overreachRisks)
+    },
+    measurementCoding: {
+      variablesOrConstructs: normalizeStringArray(input.measurementCoding.variablesOrConstructs),
+      evidenceTypes: normalizeStringArray(input.measurementCoding.evidenceTypes),
+      codingRules: normalizeStringArray(input.measurementCoding.codingRules),
+      openStandards: normalizeStringArray(input.measurementCoding.openStandards)
+    },
+    methodAnalysis: {
+      ...(normalizeOptionalString(input.methodAnalysis.design) ? { design: normalizeOptionalString(input.methodAnalysis.design) } : {}),
+      analysisOptions: normalizeStringArray(input.methodAnalysis.analysisOptions),
+      dataSufficiencyCriteria: normalizeStringArray(input.methodAnalysis.dataSufficiencyCriteria),
+      unsettledChoices: normalizeStringArray(input.methodAnalysis.unsettledChoices)
+    },
+    evidenceAccess: {
+      requiredSources: normalizeStringArray(input.evidenceAccess.requiredSources),
+      accessRequirements: normalizeStringArray(input.evidenceAccess.accessRequirements),
+      evidenceStandards: normalizeStringArray(input.evidenceAccess.evidenceStandards)
+    },
+    epistemicAlignment: {
+      researcherKnowledge: normalizeStringArray(input.epistemicAlignment.researcherKnowledge),
+      projectStatePriority: normalizeStringArray(input.epistemicAlignment.projectStatePriority),
+      aiInferenceLimits: normalizeStringArray(input.epistemicAlignment.aiInferenceLimits),
+      ...(normalizeOptionalString(input.epistemicAlignment.conflictResolutionRule)
+        ? { conflictResolutionRule: normalizeOptionalString(input.epistemicAlignment.conflictResolutionRule) }
+        : {})
+    },
+    protectedDecisions: normalizeStringArray(input.protectedDecisions),
+    openQuestions: normalizeStringArray(input.openQuestions),
+    nextActions: normalizeStringArray(input.nextActions),
+    confidence: input.confidence,
+    ...(input.confirmedAt ? { confirmedAt: input.confirmedAt } : {})
+  };
+}
+
+async function summarizeResearchSpecificationHook(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  options: { hookId?: string; specification: ResearchSpecification }
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const sourceHookId = options.hookId
+    ?? options.specification.sourceHookId
+    ?? state.firstResearchShape?.sourceHookId;
+  const existing = sourceHookId
+    ? (state.hooks ?? []).find((hook): hook is InterviewHookRun => isInterviewHookRun(hook) && hook.id === sourceHookId)
+    : activeInterviewHook(state);
+  const timestamp = new Date().toISOString();
+  const specification = normalizeResearchSpecification(
+    options.specification,
+    existing?.id ?? sourceHookId,
+    timestamp
+  );
+  const hook = existing
+    ? {
+        ...existing,
+        status: "ready_to_confirm" as const,
+        updatedAt: timestamp,
+        researchSpecification: specification
+      }
+    : undefined;
+  const session = {
+    ...(context.session as typeof context.session & { researchSpecification?: ResearchSpecification }),
+    lastUpdatedAt: timestamp,
+    researchSpecification: specification,
+    resumeHint: `I want to continue from the Research Specification: ${specification.title}.`
+  };
+  context.session = session;
+
+  const updated = hook ? upsertInterviewHook(state, hook) : state;
+  updated.researchSpecification = specification;
+  updated.workingState = {
+    ...updated.workingState,
+    researchSpecification: specification
+  };
+  updated.narrativeTraces.push({
+    id: createId("narrative_trace"),
+    timestamp,
+    source: "$longtable-interview",
+    traceType: "judgment",
+    summary: `Research Specification draft: ${specification.title}.`,
+    visibility: "explicit",
+    importance: specification.confidence
+  });
+  await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(updated, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { hook, specification, state: updated, session };
+}
+
 async function cancelInterviewHook(
   context: Awaited<ReturnType<typeof requireContext>>,
   options: { hookId?: string; reason?: string }
@@ -581,6 +830,7 @@ function compactInterviewHook(hook: InterviewHookRun | undefined) {
     provider: hook.provider,
     turnCount: hook.turns?.length ?? 0,
     firstResearchShape: hook.firstResearchShape?.handle,
+    researchSpecification: hook.researchSpecification?.title,
     createdAt: hook.createdAt,
     updatedAt: hook.updatedAt
   };
@@ -763,6 +1013,100 @@ async function markAlreadyConfirmedFirstResearchShape(
   await writeFile(context.stateFilePath, JSON.stringify(nextState, null, 2), "utf8");
   await syncCurrentWorkspaceView(context);
   return { state: nextState, session, shape: confirmedShape };
+}
+
+async function markResearchSpecificationConfirmation(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  specification: ResearchSpecification,
+  answer: string,
+  questionId?: string,
+  decisionId?: string
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const timestamp = new Date().toISOString();
+  const confirmedSpecification = researchSpecificationAnswerConfirms(answer)
+    ? { ...specification, status: "confirmed" as const, confirmedAt: timestamp, updatedAt: timestamp }
+    : {
+        ...specification,
+        status: researchSpecificationAnswerStatus(answer) === "deferred" ? "deferred" as const : "draft" as const,
+        updatedAt: timestamp
+      };
+  state.researchSpecification = confirmedSpecification;
+  state.workingState = {
+    ...state.workingState,
+    researchSpecification: confirmedSpecification
+  };
+  state.hooks = (state.hooks ?? []).map((hook) => {
+    if (hook.id !== specification.sourceHookId || !isInterviewHookRun(hook)) {
+      return hook;
+    }
+    return {
+      ...hook,
+      status: researchSpecificationAnswerStatus(answer),
+      updatedAt: timestamp,
+      researchSpecification: confirmedSpecification,
+      linkedQuestionRecordIds: questionId
+        ? [...(hook.linkedQuestionRecordIds ?? []), questionId]
+        : hook.linkedQuestionRecordIds,
+      linkedDecisionRecordIds: decisionId
+        ? [...(hook.linkedDecisionRecordIds ?? []), decisionId]
+        : hook.linkedDecisionRecordIds
+    };
+  });
+
+  const session = {
+    ...context.session,
+    researchSpecification: confirmedSpecification,
+    lastUpdatedAt: timestamp
+  };
+  context.session = session;
+  await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(state, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { state, session, specification: confirmedSpecification };
+}
+
+async function markAlreadyConfirmedResearchSpecification(
+  context: Awaited<ReturnType<typeof requireContext>>,
+  specification: ResearchSpecification
+) {
+  const state = asInterviewState(await loadWorkspaceState(context));
+  const timestamp = new Date().toISOString();
+  const confirmedSpecification = specification.confirmedAt
+    ? specification
+    : { ...specification, status: "confirmed" as const, confirmedAt: timestamp, updatedAt: timestamp };
+  state.researchSpecification = confirmedSpecification;
+  state.workingState = {
+    ...state.workingState,
+    researchSpecification: confirmedSpecification
+  };
+  state.hooks = (state.hooks ?? []).map((hook) => {
+    if (!isInterviewHookRun(hook)) {
+      return hook;
+    }
+    const matchesSource = specification.sourceHookId && hook.id === specification.sourceHookId;
+    const matchesTitle = !specification.sourceHookId && hook.researchSpecification?.title === specification.title;
+    if (!matchesSource && !matchesTitle) {
+      return hook;
+    }
+    return {
+      ...hook,
+      status: "confirmed",
+      updatedAt: timestamp,
+      researchSpecification: confirmedSpecification
+    };
+  });
+
+  const session = {
+    ...context.session,
+    researchSpecification: confirmedSpecification,
+    lastUpdatedAt: timestamp
+  };
+  context.session = session;
+  await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(state, null, 2), "utf8");
+  await syncCurrentWorkspaceView(context);
+  return { state, session, specification: confirmedSpecification };
 }
 
 function statusForElicitationError(error: unknown): QuestionTransportStatus {
@@ -1033,6 +1377,71 @@ export function createLongTableMcpServer(): McpServer {
   );
 
   server.registerTool(
+    "summarize_research_specification",
+    {
+      title: "Summarize LongTable Research Specification",
+      description: "Store the fuller Research Specification after a First Research Shape has enough interview context to preserve scope, constructs, theory, coding, method, evidence/access, and epistemic alignment.",
+      inputSchema: cwdSchema.extend({
+        hookId: z.string().optional(),
+        specification: researchSpecificationSchema
+      })
+    },
+    async ({ cwd: inputCwd, hookId, specification }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const result = await summarizeResearchSpecificationHook(context, {
+          hookId,
+          specification: specification as ResearchSpecification
+        });
+        return textResult({
+          hook: compactInterviewHook(result.hook as InterviewHookRun | undefined),
+          specification: result.specification,
+          preview: renderResearchSpecificationPreview(result.specification as ResearchSpecification),
+          session: {
+            currentGoal: result.session.currentGoal,
+            currentBlocker: result.session.currentBlocker,
+            nextAction: result.session.nextAction,
+            firstResearchShape: result.session.firstResearchShape,
+            researchSpecification: result.session.researchSpecification
+          }
+        });
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "read_research_specification",
+    {
+      title: "Read LongTable Research Specification",
+      description: "Read the current Research Specification and render the researcher-facing preview.",
+      inputSchema: cwdSchema
+    },
+    async ({ cwd: inputCwd }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const state = asInterviewState(await loadWorkspaceState(context));
+        const session = context.session as typeof context.session & { researchSpecification?: ResearchSpecification };
+        const specification = state.researchSpecification ?? session.researchSpecification;
+        if (!specification) {
+          return textResult({
+            found: false,
+            message: "No Research Specification was found. Run summarize_research_specification first."
+          });
+        }
+        return textResult({
+          found: true,
+          specification,
+          preview: renderResearchSpecificationPreview(specification)
+        });
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
     "cancel_interview",
     {
       title: "Cancel LongTable Interview",
@@ -1167,6 +1576,128 @@ export function createLongTableMcpServer(): McpServer {
           return textResult({
             question: marked ?? created.question,
             shape,
+            elicitation: {
+              attempted: true,
+              supported: status !== "unsupported" ? undefined : false,
+              error: message
+            },
+            fallback
+          });
+        }
+      } catch (error) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    }
+  );
+
+  server.registerTool(
+    "confirm_research_specification",
+    {
+      title: "Confirm Research Specification",
+      description: "Use MCP form elicitation to confirm, revise, defer, or request one more question for the full Research Specification.",
+      inputSchema: cwdSchema.extend({
+        specification: researchSpecificationSchema.optional(),
+        provider: z.enum(["codex", "claude"]).default("codex"),
+        fallbackOnly: z.boolean().default(false)
+      })
+    },
+    async ({ cwd: inputCwd, specification: inputSpecification, provider, fallbackOnly }) => {
+      try {
+        const context = await requireContext(inputCwd);
+        const state = asInterviewState(await loadWorkspaceState(context));
+        const session = context.session as typeof context.session & { researchSpecification?: ResearchSpecification };
+        const specification = (inputSpecification as ResearchSpecification | undefined)
+          ?? state.researchSpecification
+          ?? session.researchSpecification;
+        if (!specification) {
+          return errorResult("No Research Specification was found to confirm. Run summarize_research_specification first.");
+        }
+        if (specification.confirmedAt) {
+          const confirmation = await markAlreadyConfirmedResearchSpecification(context, specification);
+          return textResult({
+            specification: confirmation.specification,
+            preview: renderResearchSpecificationPreview(confirmation.specification),
+            elicitation: { attempted: false, reason: "already_confirmed" }
+          });
+        }
+        const spec = buildResearchSpecificationQuestion(specification);
+        const created = await createWorkspaceQuestion({
+          context,
+          prompt: spec.prompt,
+          title: spec.title,
+          question: spec.question,
+          checkpointKey: spec.checkpointKey,
+          questionOptions: spec.options,
+          displayReason: spec.displayReason,
+          provider: provider as ProviderKind,
+          required: true
+        });
+        const fallback = renderQuestionFallback(created.question, provider as ProviderKind);
+        if (fallbackOnly) {
+          const marked = await markQuestionTransport(context, created.question.id, "fallback_rendered", "MCP elicitation skipped by fallbackOnly.");
+          return textResult({
+            question: marked ?? created.question,
+            specification,
+            preview: renderResearchSpecificationPreview(specification),
+            elicitation: { attempted: false, reason: "fallbackOnly" },
+            fallback
+          });
+        }
+
+        try {
+          await markQuestionTransport(context, created.question.id, "attempted");
+          const elicited = await server.server.elicitInput(buildElicitationParams(created.question));
+          const accepted = acceptedAnswer(elicited);
+          if (!accepted) {
+            const status = elicited.action === "decline" || elicited.action === "cancel"
+              ? "declined"
+              : "fallback_rendered";
+            const marked = await markQuestionTransport(context, created.question.id, status, `MCP elicitation returned action: ${elicited.action}.`);
+            const cleared = status === "declined"
+              ? await clearWorkspaceQuestion({
+                  context,
+                  questionId: created.question.id,
+                  reason: `MCP elicitation returned action: ${elicited.action}; Research Specification confirmation was deferred.`
+                })
+              : undefined;
+            return textResult({
+              question: cleared?.question ?? marked ?? created.question,
+              specification,
+              preview: renderResearchSpecificationPreview(specification),
+              elicitation: { attempted: true, action: elicited.action },
+              fallback
+            });
+          }
+          const decided = await answerWorkspaceQuestion({
+            context,
+            questionId: created.question.id,
+            answer: accepted.answer,
+            provider: provider as ProviderKind,
+            surface: "mcp_elicitation"
+          });
+          const marked = await markQuestionTransport(context, created.question.id, "accepted");
+          const confirmation = await markResearchSpecificationConfirmation(
+            context,
+            specification,
+            accepted.answer,
+            created.question.id,
+            decided.decision.id
+          );
+          return textResult({
+            specification: confirmation.specification,
+            preview: renderResearchSpecificationPreview(confirmation.specification),
+            question: marked ? { ...decided.question, transportStatus: marked.transportStatus } : decided.question,
+            decision: decided.decision,
+            elicitation: { attempted: true, action: elicited.action }
+          });
+        } catch (elicitationError) {
+          const status = statusForElicitationError(elicitationError);
+          const message = elicitationError instanceof Error ? elicitationError.message : String(elicitationError);
+          const marked = await markQuestionTransport(context, created.question.id, status, message);
+          return textResult({
+            question: marked ?? created.question,
+            specification,
+            preview: renderResearchSpecificationPreview(specification),
             elicitation: {
               attempted: true,
               supported: status !== "unsupported" ? undefined : false,

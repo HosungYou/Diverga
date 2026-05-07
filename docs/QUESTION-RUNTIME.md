@@ -174,6 +174,8 @@ Current MCP tools can:
 - evaluate checkpoint triggers without writing state
 - write normalized question records
 - elicit a Researcher Checkpoint through MCP form elicitation when the client supports it, recording accepted answers with surface `mcp_elicitation`
+- store and confirm `$longtable-interview` Research Specifications after the
+  shorter First Research Shape layer
 - render provider-specific question transport
 - append decision records
 - regenerate `CURRENT.md`
