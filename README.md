@@ -61,6 +61,38 @@ In one sentence:
 > LongTable is a thin but strict harness for protecting research judgment, not a
 > larger machine for replacing it.
 
+## Runtime Boundary
+
+LongTable does not try to replace Codex or Claude Code. Provider wrappers are
+still responsible for ordinary task execution. LongTable's job is narrower: it
+intervenes when a research judgment is becoming unclear, hidden, or prematurely
+settled.
+
+The boundary matters because not all LongTable surfaces have the same force:
+
+- README files and generated skills are soft policy.
+- Hooks, MCP elicitation, CLI gates, and `.longtable/` state are the hard or
+  near-hard enforcement layers.
+- Provider-native UI is transport, not the LongTable contract.
+
+LongTable should ask and stop before acting when the next step would change or
+settle any of these four commitment families:
+
+1. Research question or scope
+2. Theory frame or construct map
+3. Measurement, coding, or extraction standard
+4. Method design or analysis strategy
+
+For low-risk, reversible, or presentational gaps, LongTable should proceed with
+explicit assumptions instead of interrupting. This keeps Codex useful as an
+execution agent while still preserving epistemic trace. If human knowledge, AI
+inference, and durable project state conflict, LongTable should prefer the most
+explicit durable state; if that state is not explicit enough, it should ask the
+researcher for clarity.
+
+See [Runtime Boundary Audit](docs/RUNTIME-BOUNDARY-AUDIT.md) for the full
+architecture and overengineering analysis.
+
 ## What LongTable Gives You
 
 - A durable `.longtable/` workspace for each research project
@@ -523,7 +555,7 @@ Default config targets:
 Run the server directly:
 
 ```bash
-npx -y @longtable/mcp@0.1.35
+npx -y @longtable/mcp@0.1.43
 longtable-state --self-test
 ```
 
@@ -751,6 +783,7 @@ git diff --check
 
 - [Command Surface](docs/LONGTABLE-COMMAND-SURFACE.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Runtime Boundary Audit](docs/RUNTIME-BOUNDARY-AUDIT.md)
 - [MCP Transport](docs/MCP.md)
 - [Question Runtime](docs/QUESTION-RUNTIME.md)
 - [Checkpoint Triggering](docs/CHECKPOINT-TRIGGERING.md)

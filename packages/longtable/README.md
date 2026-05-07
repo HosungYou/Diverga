@@ -140,6 +140,25 @@ That setup writes the MCP configuration and Codex elicitation approval needed
 for form-style checkpoint prompts. Without it, LongTable keeps the same
 `QuestionRecord` pending and falls back to numbered text.
 
+## Runtime Boundary
+
+LongTable is not a replacement wrapper for Codex. Markdown docs and generated
+skills are soft policy; hooks, MCP elicitation, CLI gates, and `.longtable/`
+state are the enforcement layers.
+
+LongTable should ask and stop before acting when the next step would change or
+settle one of four high-risk research commitments:
+
+1. Research question or scope
+2. Theory frame or construct map
+3. Measurement, coding, or extraction standard
+4. Method design or analysis strategy
+
+Low-risk reversible work should continue with visible assumptions instead of a
+hook interruption. If human knowledge, AI inference, and durable project state
+conflict, LongTable should prefer the most explicit durable state; if that state
+is not explicit enough, it should ask the researcher for clarity.
+
 Explicit short forms are available when needed:
 
 ```text

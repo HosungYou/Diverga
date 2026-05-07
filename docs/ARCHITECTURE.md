@@ -66,6 +66,10 @@ Refactor LongTable from a Claude-centered plugin architecture into a provider-ne
 
 Transport does not own LongTable semantics. It exposes shared package behavior to a provider runtime.
 
+See `RUNTIME-BOUNDARY-AUDIT.md` for the enforcement boundary between soft
+documentation/skills and hard or near-hard runtime layers such as hooks, MCP,
+CLI gates, and `.longtable/` state.
+
 The first MCP transport is `longtable-state` in `@longtable/mcp`. It exposes
 workspace inspection, checkpoint evaluation, question creation/rendering,
 decision append, and `CURRENT.md` regeneration over the existing `.longtable/`
