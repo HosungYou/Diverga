@@ -70,6 +70,22 @@ pushed. It requires `NPM_TOKEN` to be configured in GitHub repository secrets.
 Packages are published in dependency order: core, memory, checkpoints, setup,
 provider adapters, CLI, then MCP.
 
+`NPM_TOKEN` must be an npm automation/granular access token with `read-write`
+access to every published `@longtable/*` package. A token scoped to another npm
+organization can still authenticate but fail at publish time with a registry
+`404 Not Found` for `@longtable/<package>`. The release workflow therefore
+preflights:
+
+```bash
+npm whoami
+npm access list packages @longtable --json
+```
+
+The required packages must all report `read-write`: `@longtable/core`,
+`@longtable/memory`, `@longtable/checkpoints`, `@longtable/setup`,
+`@longtable/provider-codex`, `@longtable/provider-claude`, `@longtable/cli`,
+and `@longtable/mcp`.
+
 If the packages were already published manually, the release workflow should
 skip existing versions and still create the GitHub Release. Confirm the workflow
 completed successfully before treating GitHub deployment as done.

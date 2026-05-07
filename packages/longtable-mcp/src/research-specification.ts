@@ -110,6 +110,22 @@ export function renderResearchSpecificationPreview(specification: ResearchSpecif
   return lines.join("\n");
 }
 
+function renderResearchSpecificationDecisionContext(specification: ResearchSpecification): string {
+  const korean = usesKorean(specification);
+  const lines = [
+    korean ? "Research Specification Preview" : "Research Specification Preview",
+    `${korean ? "제목" : "Title"}: ${specification.title}`,
+    `${korean ? "목적" : "Purpose"}: ${specification.researchDirection.purpose}`,
+    `${korean ? "핵심 construct" : "Core constructs"}: ${compactList(specification.constructOntology.coreConstructs, 2)}`,
+    `${korean ? "열린 질문" : "Open questions"}: ${compactList(specification.openQuestions, 1)}`,
+    `${korean ? "다음 행동" : "Next actions"}: ${compactList(specification.nextActions, 1)}`,
+    korean
+      ? "전체 명세는 tool output과 저장 후 CURRENT.md에서 확인합니다."
+      : "The full specification remains in the tool output and, after saving, CURRENT.md."
+  ];
+  return lines.join("\n");
+}
+
 function baseOptions(specification: ResearchSpecification): QuestionOption[] {
   const korean = usesKorean(specification);
   return [
@@ -149,6 +165,7 @@ function baseOptions(specification: ResearchSpecification): QuestionOption[] {
 export function buildResearchSpecificationQuestion(specification: ResearchSpecification): ResearchSpecificationQuestionSpec {
   const korean = usesKorean(specification);
   const preview = renderResearchSpecificationPreview(specification);
+  const decisionContext = renderResearchSpecificationDecisionContext(specification);
   return {
     prompt: preview,
     title: korean ? "Research Specification 확인" : "Research Specification Confirmation",
@@ -158,8 +175,8 @@ export function buildResearchSpecificationQuestion(specification: ResearchSpecif
     checkpointKey: "research_specification_confirmation",
     options: baseOptions(specification),
     displayReason: korean
-      ? `${preview}\n\n인터뷰가 단순한 방향 요약을 넘어 연구 명세를 만들 만큼 구체화되었습니다. 저장 전에 범위, construct, 이론, 코딩, 방법, 접근, 정렬을 명시적으로 확인해야 합니다.`
-      : `${preview}\n\nThe interview has moved beyond a short direction summary into a research specification. Scope, constructs, theory, coding, method, access, and epistemic alignment should be explicit before saving.`
+      ? `${decisionContext}\n\n인터뷰가 연구 명세를 만들 만큼 구체화되었습니다. 저장 전 핵심 범위와 다음 행동만 UI에서 확인합니다.`
+      : `${decisionContext}\n\nThe interview is ready for a research specification. The UI shows only the core scope and next action before saving.`
   };
 }
 

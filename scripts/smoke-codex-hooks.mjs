@@ -145,6 +145,9 @@ const researchSpecificationQuestion = buildResearchSpecificationQuestion({
 assertEqual(researchSpecificationQuestion.title, "Research Specification Confirmation", "Research Specification question should use explicit confirmation title");
 assertEqual(researchSpecificationQuestion.question, "How should LongTable handle this Research Specification?", "Research Specification question should use explicit confirmation question");
 assert(researchSpecificationQuestion.prompt.includes("Research Specification Preview"), "Research Specification question should include the preview in the prompt");
+assert(researchSpecificationQuestion.displayReason.includes("Research Specification Preview"), "Research Specification question should include a compact UI preview");
+assert(researchSpecificationQuestion.displayReason.length < researchSpecificationQuestion.prompt.length, "Research Specification UI context should be shorter than the full preview");
+assert(!researchSpecificationQuestion.displayReason.includes("Coding rules: Code directionality"), "Research Specification UI context should not duplicate every full-preview field");
 assert(researchSpecificationQuestion.options.some((option) => option.value === "confirm_specification"), "Research Specification question should offer confirmation");
 assert(researchSpecificationQuestion.options.some((option) => option.value === "revise_section"), "Research Specification question should allow section-level revision");
 
