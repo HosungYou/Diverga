@@ -2,11 +2,9 @@ import { pathToFileURL } from "node:url";
 import type {
   LongTableHookRun,
   LongTableQuestionObligation,
-  QuestionOpportunity,
   QuestionRecord
 } from "@longtable/core";
 import {
-  buildQuestionOpportunitySpecs,
   createWorkspaceFollowUpQuestions,
   type LongTableProjectContext,
   loadProjectContextFromDirectory,
@@ -175,7 +173,7 @@ function looksLikeLongTableProductOrToolingPrompt(prompt: string): boolean {
   if (!normalized) {
     return false;
   }
-  return /\b(longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(normalized)
+  return /\b(longtable|longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(normalized)
     || /롱테이블|훅|체크포인트|에이전트|스킬|사용성|인터페이스|설치|세팅|글로벌|배포|버전|릴리즈|깃|깃허브|문서화된\s*절차|패키지|라우터|자동완성|시뮬레이션\s*테스트/.test(normalized);
 }
 
@@ -184,12 +182,43 @@ function looksLikeResearchDomainPrompt(prompt: string): boolean {
   if (!normalized) {
     return false;
   }
-  return /\b(research|study|paper|manuscript|journal|article|method|methodology|measurement|construct|theory|analysis|model|data|participant|sample|scale|survey|instrument|validity|hypothesis|literature|meta[- ]?analysis|gold standard|coding|trust|reliance|calibration)\b/i.test(normalized)
-    || /연구|논문|원고|저널|방법론|방법|연구\s*설계|측정|구성개념|개념|이론|분석|모형|모델|데이터|참가자|표본|샘플|척도|설문|도구|타당도|가설|문헌|메타\s*분석|골드\s*스탠더드|코딩|신뢰|의존|캘리브레이션|교정|보정/.test(normalized);
+  return /\b(research|research question|research direction|scope|boundary|study|paper|manuscript|journal|article|method|methodology|measurement|construct|theory|framework|analysis|analysis plan|model|data|participant|sample|scale|survey|instrument|validity|hypothesis|literature|meta[- ]?analysis|gold standard|coding|criteria|trust|reliance|calibration)\b/i.test(normalized)
+    || /연구|연구\s*질문|연구\s*방향|범위|경계|논문|원고|저널|방법론|방법|연구\s*설계|측정|구성개념|개념|이론|프레임워크|분석|분석\s*계획|모형|모델|데이터|참가자|표본|샘플|척도|설문|도구|타당도|가설|문헌|메타\s*분석|골드\s*스탠더드|코딩|기준|신뢰|의존|캘리브레이션|교정|보정/.test(normalized);
 }
 
 function looksLikeResearchCommitmentPrompt(prompt: string): boolean {
-  return looksLikeResearchDomainPrompt(prompt) && looksLikeClosurePrompt(prompt);
+  return looksLikeResearchDomainPrompt(prompt) && (
+    looksLikeClosurePrompt(prompt) ||
+    /\b(change|revise|update|replace|reframe|modify|alter)\b/i.test(prompt) ||
+    /바꾸|변경|수정|교체|전환|재설정/.test(prompt)
+  );
+}
+
+function looksLikeQuestionGenerationPrompt(prompt: string): boolean {
+  return /\b(needed questions?|necessary questions?|question generation|clarifying questions?|ask questions?)\b/i.test(prompt)
+    || /필요한\s*질문|질문을\s*(모두|많이|생성)|질문\s*생성|물어봐|질문해/.test(prompt);
+}
+
+function looksLikeMultiCommitmentChangePrompt(prompt: string): boolean {
+  const normalized = prompt.trim();
+  const actionCue = /\b(change|revise|update|replace|reframe|modify|alter)\b/i.test(normalized)
+    || /바꾸|변경|수정|교체|전환|재설정/.test(normalized);
+  if (!actionCue) {
+    return false;
+  }
+  const categories = [
+    /\b(research question|research direction|scope|boundary|inclusion criteria|exclusion criteria)\b/i.test(normalized)
+      || /연구\s*질문|연구\s*문제|연구\s*방향|범위|경계|포함\s*기준|제외\s*기준/.test(normalized),
+    /\b(theory|framework|conceptual model|construct map)\b/i.test(normalized)
+      || /이론|프레임워크|개념\s*모형|구성개념\s*지도|컨스트럭트/.test(normalized),
+    /\b(measure|measurement|scale|instrument|coding|coding rule|extraction rule|operationali[sz]ation)\b/i.test(normalized)
+      || /측정|척도|도구|코딩|코딩\s*규칙|코딩\s*기준|추출\s*규칙|추출\s*기준|조작화/.test(normalized),
+    /\b(method|methodology|study design|sampling|sample)\b/i.test(normalized)
+      || /방법론|방법|연구\s*설계|표본|샘플링/.test(normalized),
+    /\b(analysis plan|analysis method|meta[- ]?analysis|masem|(?:statistical|structural|path|analysis) model|moderator|random[- ]?effects)\b/i.test(normalized)
+      || /분석\s*계획|분석\s*방법|메타\s*분석|분석\s*(?:모형|모델)|통계\s*(?:모형|모델)|구조\s*방정식|경로\s*모형|조절효과|랜덤\s*효과/.test(normalized)
+  ];
+  return categories.filter(Boolean).length >= 2;
 }
 
 function looksLikeExplicitInterviewPrompt(prompt: string): boolean {
@@ -222,30 +251,15 @@ function shouldSurfaceInterviewContext(prompt: string): boolean {
   return looksLikeExplicitInterviewPrompt(prompt) || looksLikeResearchStateConfirmationPrompt(prompt);
 }
 
-function buildResponseOnlyAdvisoryQuestions(prompt: string): QuestionOpportunity[] {
-  if (looksLikeLongTableProductOrToolingPrompt(prompt)) {
-    return [];
-  }
-  const opportunities = buildQuestionOpportunitySpecs(prompt, {
-    includeFallback: false,
-    autoOnly: true
-  });
-  if (opportunities.length === 0) {
-    return [];
-  }
-  if (!looksLikeResearchDomainPrompt(prompt) && !/\b(needed questions?|necessary questions?|clarifying questions?|question generation|assumptions?|uncertain|not sure|gap|tension|trade[- ]?off)\b/i.test(prompt) && !/필요한\s*질문|질문\s*생성|물어봐|질문해|전제|가정|불확실|모르겠|공백|긴장|상충|균형/.test(prompt)) {
-    return [];
-  }
-  return opportunities.slice(0, 3);
-}
-
 function shouldCreateRequiredQuestionsForPrompt(prompt: string): boolean {
   return !looksLikeLongTableProductOrToolingPrompt(prompt) && looksLikeResearchCommitmentPrompt(prompt);
 }
 
 function shouldApplyProtectedDecisionClosure(runtime: LongTableRuntime, prompt: string): boolean {
   return Boolean(runtime.context.session.protectedDecision) &&
-    shouldCreateRequiredQuestionsForPrompt(prompt);
+    shouldCreateRequiredQuestionsForPrompt(prompt) &&
+    !looksLikeQuestionGenerationPrompt(prompt) &&
+    !looksLikeMultiCommitmentChangePrompt(prompt);
 }
 
 function protectedDecisionClosurePrompt(prompt: string): string {
@@ -340,17 +354,6 @@ function buildGeneratedQuestionsContext(questions: QuestionRecord[], created: bo
   return lines.join("\n");
 }
 
-function buildAdvisoryQuestionsContext(questions: QuestionOpportunity[]): string {
-  const lines = [
-    `LongTable surfaced ${questions.length} response-only advisory question${questions.length === 1 ? "" : "s"} for this prompt.`,
-    "Use these only if they help the reply. Do not create QuestionRecord entries, call longtable decide, or answer for the researcher unless the prompt explicitly asks to commit a research decision."
-  ];
-  for (const question of questions) {
-    lines.push(`- ${question.title}: ${question.question}`);
-  }
-  return lines.join("\n");
-}
-
 function buildPendingObligationContext(obligation: LongTableQuestionObligation): string {
   return [
     `Pending LongTable research obligation: ${obligation.prompt}`,
@@ -433,7 +436,18 @@ async function userPromptSubmitContext(runtime: LongTableRuntime, prompt: string
 
   const generatedQuestions: QuestionRecord[] = [];
   let createdQuestions = false;
-  if (shouldCreateRequiredQuestionsForPrompt(prompt)) {
+  if (shouldApplyProtectedDecisionClosure(runtime, prompt)) {
+    const protectedGenerated = await createWorkspaceFollowUpQuestions({
+      context: runtime.context,
+      prompt: protectedDecisionClosurePrompt(prompt),
+      provider: "codex",
+      required: true,
+      auto: true,
+      requiredOnly: true
+    });
+    generatedQuestions.push(...protectedGenerated.questions);
+    createdQuestions = createdQuestions || protectedGenerated.created;
+  } else if (shouldCreateRequiredQuestionsForPrompt(prompt)) {
     const generated = await createWorkspaceFollowUpQuestions({
       context: runtime.context,
       prompt,
@@ -446,30 +460,8 @@ async function userPromptSubmitContext(runtime: LongTableRuntime, prompt: string
     createdQuestions = createdQuestions || generated.created;
   }
 
-  if (shouldApplyProtectedDecisionClosure(runtime, prompt)) {
-    const protectedGenerated = await createWorkspaceFollowUpQuestions({
-      context: runtime.context,
-      prompt: protectedDecisionClosurePrompt(prompt),
-      provider: "codex",
-      required: true,
-      auto: true,
-      requiredOnly: true
-    });
-    generatedQuestions.push(
-      ...protectedGenerated.questions.filter((question) =>
-        !generatedQuestions.some((existing) => existing.id === question.id)
-      )
-    );
-    createdQuestions = createdQuestions || protectedGenerated.created;
-  }
-
   if (generatedQuestions.length > 0) {
     return buildGeneratedQuestionsContext(generatedQuestions, createdQuestions);
-  }
-
-  const advisoryQuestions = buildResponseOnlyAdvisoryQuestions(prompt);
-  if (advisoryQuestions.length > 0) {
-    return buildAdvisoryQuestionsContext(advisoryQuestions);
   }
 
   return null;

@@ -36,9 +36,10 @@ The first trigger classifier lives in `@longtable/checkpoints`:
 The Codex native hook uses an additional advisory-first gate before writing any
 runtime question state. Product/tooling prompts return no required checkpoint.
 Research exploration, knowledge gaps, tacit assumptions, and construct-review
-prompts can surface response-only advisory questions. Durable state is written
-only when commitment and closure cues indicate that the next action would settle
-a research decision.
+prompts may produce response-only questions inside the assistant response or
+explicit audit output, but the hook must stay quiet. Durable state is written
+only when commitment and closure/change cues indicate that the next action would
+settle or materially change a research decision.
 
 `longtable question` remains the explicit command for writing a durable
 `QuestionRecord`. When that record is required, normal CLI progression is
@@ -63,6 +64,9 @@ LongTable currently recognizes these trigger families:
 - `review`: critique, audit, objection finding, tacit assumption probing;
   advisory by default unless panel disagreement is being collapsed
 - `commitment`: research question, theory, method, measurement, or analysis decisions
+- scope changes, theory-frame changes, measurement/coding standard changes,
+  method-design changes, and analysis-strategy changes are grouped as
+  high-risk commitments when more than one appears in the same prompt
 - `submission`: journal, public release, preregistration, IRB, external sharing
 - `meta_decision`: LongTable naming, README positioning, checkpoint policy,
   provider behavior; product governance, not research-state blocking
@@ -72,6 +76,10 @@ LongTable currently recognizes these trigger families:
   appear before premature narrowing, but should not create state until they
   become commitments
 - `advisory`: low-confidence or low-stakes guidance
+
+Product/tooling detection must include the normal `LongTable` spelling as well
+as malformed autocomplete text such as `$longlongtable`; otherwise product
+debugging prompts can be mistaken for research commitments.
 
 ## Blocking Meaning
 

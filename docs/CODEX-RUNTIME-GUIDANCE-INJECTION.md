@@ -93,6 +93,9 @@ blocking decision 근처에서만 적용.
 - 장문의 철학 문서 원문
 - 모든 checkpoint history
 - 긴 memory dump
+- `LongTable surfaced response-only advisory questions...` 같은 내부 하네싱
+  문구
+- state에 쓰이지 않는 advisory 질문 목록을 hook context로 주입하는 것
 
 Codex는 context pollution에 약하므로, injection은 짧고 강해야 한다.
 
@@ -136,6 +139,16 @@ Do not provide a recommendation until the mandatory questions have been surfaced
 
 - recommendation 전에 human commitment question
 - stakes 명시
+- research question/scope, theory frame, measurement/coding standard, method
+  design, analysis strategy 변경은 먼저 묻고 멈춤
+- 여러 commitment가 동시에 바뀌면 하나의 grouped high-leverage question으로
+  우선순위를 묻고, 긴 questionnaire로 확장하지 않음
+
+### Epistemic Conflict
+
+- 이전 요청과 새 요청이 충돌하는지 확인
+- 인간 지식, AI 추론, project state가 같은 방향을 가리키는지 확인
+- 인간 명료함이 필요한 순간이면 recommendation 전에 질문
 
 ### Submit
 

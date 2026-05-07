@@ -66,12 +66,15 @@ const RULES: CueRule[] = [
     level: "adaptive_required",
     cues: [
       /\bresearch question\b/i,
+      /\bresearch direction\b/i,
+      /\bscope\b/i,
+      /\bboundary\b/i,
       /\bfreeze\b/i,
       /\bfinali[sz]e\b/i,
       /\bsettle\b/i,
       /\bdecide\b/i,
       /\bcommit\b/i,
-      /연구문제|연구 질문|확정|결정|고정|커밋/
+      /연구문제|연구 질문|연구\s*방향|범위|경계|확정|결정|고정|커밋/
     ],
     rationale: "Freezing the research question converts ambiguity into a human commitment."
   },
@@ -132,11 +135,14 @@ const RULES: CueRule[] = [
     cues: [
       /\banalysis plan\b/i,
       /\banaly[sz]e\b/i,
-      /\bmodel\b/i,
+      /\bstatistical model\b/i,
+      /\bstructural model\b/i,
+      /\bpath model\b/i,
+      /\banalysis model\b/i,
       /\bstatistical\b/i,
       /\bregression\b/i,
       /\bqualitative coding\b/i,
-      /분석 계획|분석|모형|모델|통계|회귀|코딩/
+      /분석 계획|분석|분석\s*(?:모형|모델)|통계\s*(?:모형|모델)|구조\s*방정식|경로\s*모형|통계|회귀|코딩/
     ],
     rationale: "Analysis choices affect inference and should remain inspectable."
   },
@@ -298,8 +304,8 @@ function requiresQuestion(level: CheckpointLevel, mode: InteractionMode, family:
 }
 
 function looksLikeCommitmentCue(prompt: string): boolean {
-  return /\b(final|finalize|commit|ship|submit|publish|freeze|settle|decide|lock|record|apply|incorporate)\b/i.test(prompt)
-    || /최종|확정|커밋|제출|투고|고정|결정|기록|반영/.test(prompt);
+  return /\b(final|finalize|commit|ship|submit|publish|freeze|settle|decide|lock|record|apply|incorporate|change|revise|update|replace|reframe|modify|alter)\b/i.test(prompt)
+    || /최종|확정|커밋|제출|투고|고정|결정|기록|반영|바꾸|변경|수정|교체|전환|재설정/.test(prompt);
 }
 
 function ruleRequiresQuestionForPrompt(rule: CueRule, prompt: string): boolean {
@@ -370,7 +376,7 @@ function fallbackLevel(mode: InteractionMode): CheckpointLevel {
 }
 
 function looksLikeProductOrToolingPrompt(prompt: string): boolean {
-  return /\b(longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(prompt)
+  return /\b(longtable|longlongtable|hook|checkpoint|mcp|agents?|skills?|ux|interface|setup|install|cli|npm|version|global|release|deploy|git|github|readme|docs?|documentation|workflow|package|router|autocomplete|simulation test)\b/i.test(prompt)
     || /롱테이블|훅|체크포인트|에이전트|스킬|사용성|인터페이스|설치|세팅|글로벌|배포|버전|릴리즈|깃|깃허브|문서화된\s*절차|패키지|라우터|자동완성|시뮬레이션\s*테스트/.test(prompt);
 }
 

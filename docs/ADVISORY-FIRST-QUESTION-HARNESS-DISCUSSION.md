@@ -38,6 +38,22 @@ The platform should prefer normal response questions for missing context and
 use checkpoints only when the assistant would otherwise settle a research
 commitment on behalf of the researcher.
 
+## 0.1.43 Correction: Quiet Advisory Hooks
+
+The first advisory-first implementation still leaked response-only advisory
+questions through Codex `UserPromptSubmit` hook context. That produced internal
+messages such as `LongTable surfaced 2 response-only advisory questions...`
+before the assistant response. This is now treated as a product failure:
+
+- advisory questions may appear in the assistant response when useful
+- advisory questions may appear in explicit audit output
+- advisory questions must not be injected as raw hook context
+- product/tooling prompts, including normal `LongTable` spelling, are a negative
+  gate for research-state checkpointing
+
+Required hook output is now reserved for durable Researcher Checkpoints and
+separate blocking state that the researcher must explicitly answer.
+
 ## Interview Handoff And Quiet Hook Policy
 
 The advisory-first principle also applies to `$longtable-interview`. A pending
@@ -135,6 +151,10 @@ Common required-checkpoint cases:
 - Choosing an analysis/modeling assumption that changes interpretation.
 - Applying a disputed protected decision to a manuscript.
 - Moving to submission, preregistration, public sharing, or IRB-sensitive use.
+- Changing research question/scope, theory frame, measurement/coding standard,
+  method design, or analysis strategy.
+- Collapsing conflicts between prior/new user requests, researcher knowledge,
+  AI inference, and durable project state into a single direction.
 
 Do not create a required checkpoint for:
 
@@ -163,6 +183,8 @@ Do not create a required checkpoint for:
 
 3. Add commitment and reversibility detection.
    - Distinguish "explain/plan/discuss" from "apply/finalize/submit/record."
+   - Distinguish a variable name like "switch to AI" from an action cue such as
+     changing the research direction.
    - Treat reversible drafts as advisory unless protected research decisions are
      being silently settled.
 

@@ -148,14 +148,19 @@ const advisoryQuestionHook = await dispatchCodexHook({
   hook_event_name: "UserPromptSubmit",
   prompt: "Trust calibration에서 subjective trust와 reliance, switch to AI를 같은 측정으로 봐도 되는지 검토해줘."
 }, workspaceTmp);
-const advisoryQuestionContext = advisoryQuestionHook?.hookSpecificOutput?.additionalContext ?? "";
-assert(advisoryQuestionContext.includes("response-only advisory"), "Research review prompts should surface advisory questions without creating checkpoints");
+assertEqual(advisoryQuestionHook, null, "Research review prompts should not dump response-only advisory questions through hook context");
 const advisoryQuestionState = JSON.parse(readFileSync(join(workspaceTmp, ".longtable", "state.json"), "utf8"));
 const advisoryGeneratedQuestions = (advisoryQuestionState.questionLog ?? []).filter((question) =>
   question.status === "pending" &&
   question.prompt.checkpointKey?.startsWith("follow_up_")
 );
-assertEqual(advisoryGeneratedQuestions.length, 0, "Response-only advisory questions should not persist QuestionRecord entries");
+assertEqual(advisoryGeneratedQuestions.length, 0, "Response-only advisory questions should remain out of QuestionRecord state");
+
+const productHarnessComplaintHook = await dispatchCodexHook({
+  hook_event_name: "UserPromptSubmit",
+  prompt: "이 연구에 대한 대화는 종료하고, Longtable 수정을 위한 작업을 시작하자. 필요한 질문을 모두 해줘. 의미 없는 hook과 질문 하네싱을 고쳐줘."
+}, workspaceTmp);
+assertEqual(productHarnessComplaintHook, null, "LongTable product harness prompts should stay quiet even when they mention needed questions");
 
 const autoQuestionHook = await dispatchCodexHook({
   hook_event_name: "UserPromptSubmit",
@@ -176,6 +181,27 @@ for (const question of generatedQuestions) {
     context,
     questionId: question.id,
     reason: "Cleared after verifying automatic hook question generation in smoke test."
+  });
+}
+
+const directionChangeHook = await dispatchCodexHook({
+  hook_event_name: "UserPromptSubmit",
+  prompt: "연구 질문의 범위와 이론 프레임, 분석 방법을 변경해서 원고에 반영해줘."
+}, workspaceTmp);
+const directionChangeContext = directionChangeHook?.hookSpecificOutput?.additionalContext ?? "";
+assert(directionChangeContext.includes("Research direction change"), "Multi-commitment research changes should create one high-priority direction-change checkpoint");
+assert(!directionChangeContext.includes("response-only advisory"), "Required checkpoint hook output should not include advisory harness wording");
+const directionChangeState = JSON.parse(readFileSync(join(workspaceTmp, ".longtable", "state.json"), "utf8"));
+const directionChangeQuestions = (directionChangeState.questionLog ?? []).filter((question) =>
+  question.status === "pending" &&
+  question.prompt.checkpointKey === "follow_up_research_direction_change_commitment"
+);
+assertEqual(directionChangeQuestions.length, 1, "Multi-commitment research changes should collapse into one grouped checkpoint");
+for (const question of directionChangeQuestions) {
+  await clearWorkspaceQuestion({
+    context,
+    questionId: question.id,
+    reason: "Cleared after verifying multi-commitment research change checkpoint generation in smoke test."
   });
 }
 

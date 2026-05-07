@@ -1399,6 +1399,30 @@ function includesAny(prompt: string, patterns: RegExp[]): boolean {
   return patterns.some((pattern) => pattern.test(prompt));
 }
 
+function questionPriority(spec: FollowUpQuestionSpec): number {
+  const byKey: Record<string, number> = {
+    protected_decision_closure: 100,
+    research_direction_change_commitment: 96,
+    construct_boundary_commitment: 94,
+    measurement_coding_standard: 92,
+    analysis_strategy_commitment: 90,
+    theory_frame_commitment: 88,
+    method_design_commitment: 86,
+    research_scope_boundary: 84,
+    epistemic_alignment_boundary: 82,
+    value_conflict_boundary: 80,
+    source_authority: 70,
+    knowledge_gap_probe: 68,
+    tacit_assumption_probe: 66,
+    needed_question_policy: 60,
+    philosophical_checkpoint_boundary: 58,
+    harness_question_harness: 55
+  };
+  const confidenceWeight = spec.confidence === "high" ? 10 : spec.confidence === "medium" ? 5 : 0;
+  const requiredWeight = spec.kind === "research_commitment" || spec.required ? 20 : 0;
+  return (byKey[spec.key] ?? 0) + confidenceWeight + requiredWeight;
+}
+
 function followUpQuestionOptions(
   first: QuestionOption,
   second: QuestionOption,
@@ -1428,6 +1452,201 @@ export function buildQuestionOpportunitySpecs(
         ...spec
       });
     }
+  }
+
+  const decisionActionCue = includesAny(normalized, [
+    /\b(final|finalize|commit|decide|settle|freeze|lock|record|apply|incorporate|change|revise|update|replace|reframe|modify|alter)\b/i,
+    /최종|확정|결정|고정|기록|반영|바꾸|변경|수정|교체|전환|재설정/
+  ]);
+  const scopeCue = includesAny(normalized, [
+    /\bresearch question\b/i,
+    /\bresearch direction\b/i,
+    /\bscope\b/i,
+    /\bboundary\b/i,
+    /\binclusion criteria\b/i,
+    /\bexclusion criteria\b/i,
+    /연구\s*질문|연구\s*문제|연구\s*방향|범위|경계|포함\s*기준|제외\s*기준/
+  ]);
+  const theoryCue = includesAny(normalized, [
+    /\btheory\b/i,
+    /\bframework\b/i,
+    /\bconceptual model\b/i,
+    /\bconstruct map\b/i,
+    /이론|프레임워크|개념\s*모형|구성개념\s*지도|컨스트럭트/
+  ]);
+  const measurementCodingCue = includesAny(normalized, [
+    /\bmeasure\b/i,
+    /\bmeasurement\b/i,
+    /\bscale\b/i,
+    /\binstrument\b/i,
+    /\bcoding\b/i,
+    /\bcoding rule\b/i,
+    /\bextraction rule\b/i,
+    /\boperationali[sz]ation\b/i,
+    /측정|척도|도구|코딩|코딩\s*규칙|코딩\s*기준|추출\s*규칙|추출\s*기준|조작화/
+  ]);
+  const methodCue = includesAny(normalized, [
+    /\bmethod\b/i,
+    /\bmethodology\b/i,
+    /\bstudy design\b/i,
+    /\bsampling\b/i,
+    /\bsample\b/i,
+    /방법론|방법|연구\s*설계|표본|샘플링/
+  ]);
+  const analysisCue = includesAny(normalized, [
+    /\banalysis plan\b/i,
+    /\banalysis method\b/i,
+    /\bmeta[- ]?analysis\b/i,
+    /\bmasem\b/i,
+    /\b(statistical|structural|path|analysis) model\b/i,
+    /\bmoderator\b/i,
+    /\brandom[- ]?effects\b/i,
+    /분석\s*계획|분석\s*방법|메타\s*분석|분석\s*(?:모형|모델)|통계\s*(?:모형|모델)|구조\s*방정식|경로\s*모형|조절효과|랜덤\s*효과/
+  ]);
+  const decisionFamilyCount = [scopeCue, theoryCue, measurementCodingCue, methodCue, analysisCue]
+    .filter(Boolean).length;
+
+  if (decisionActionCue && decisionFamilyCount >= 2) {
+    push({
+      key: "research_direction_change_commitment",
+      kind: "research_commitment",
+      title: "Research direction change",
+      question: "Which high-risk research commitment should LongTable clarify first before changing the project direction?",
+      whyNow: "The prompt touches multiple protected research commitments; proceeding silently would let LongTable choose the priority order for the researcher.",
+      options: followUpQuestionOptions(
+        { value: "scope_first", label: "Scope or research question first", description: "Clarify what the study includes, excludes, or asks before changing downstream work.", recommended: true },
+        { value: "theory_first", label: "Theory or construct frame first", description: "Clarify the conceptual frame before changing methods or analysis." },
+        { value: "method_analysis_first", label: "Method or analysis first", description: "Clarify design, data, or analysis implications before changing the artifact." },
+        { value: "defer", label: "Keep the direction open", description: "Do not change the research direction until the commitment order is explicit." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      required: true,
+      cues: ["research_direction", "multi_commitment_change"]
+    });
+  }
+
+  if (decisionActionCue && scopeCue) {
+    push({
+      key: "research_scope_boundary",
+      kind: "research_commitment",
+      title: "Research scope boundary",
+      question: "What scope boundary should LongTable keep explicit before treating the research direction as changed?",
+      whyNow: "Scope changes can redefine the population, domain, corpus, or research question before the researcher has explicitly chosen the boundary.",
+      options: followUpQuestionOptions(
+        { value: "revise_scope", label: "Revise the scope", description: "Change the inclusion boundary before downstream work continues.", recommended: true },
+        { value: "compare_boundaries", label: "Compare boundaries first", description: "Keep candidate scopes visible before choosing one." },
+        { value: "proceed_with_scope_assumption", label: "Proceed with scope assumption", description: "Continue only after stating the assumed boundary." },
+        { value: "defer", label: "Keep scope open", description: "Do not settle the scope yet." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      cues: ["research_scope", "boundary"]
+    });
+  }
+
+  if (decisionActionCue && theoryCue) {
+    push({
+      key: "theory_frame_commitment",
+      kind: "research_commitment",
+      title: "Theory frame",
+      question: "Which theory or construct frame should LongTable treat as the candidate commitment before revising the model?",
+      whyNow: "Theory-frame changes can make later measurement, coding, and analysis choices look settled when they are only inferred.",
+      options: followUpQuestionOptions(
+        { value: "compare_theories", label: "Compare theory frames first", description: "Keep competing theoretical anchors visible before choosing one.", recommended: true },
+        { value: "revise_theory", label: "Revise the frame", description: "Change the framework and record the conceptual tradeoff." },
+        { value: "use_current_frame", label: "Use current frame tentatively", description: "Proceed but mark the theory choice as provisional." },
+        { value: "defer", label: "Keep theory open", description: "Do not settle the theory frame yet." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      cues: ["theory", "framework", "construct"]
+    });
+  }
+
+  if (decisionActionCue && measurementCodingCue) {
+    push({
+      key: "measurement_coding_standard",
+      kind: "research_commitment",
+      title: "Measurement and coding standard",
+      question: "What measurement or coding rule should LongTable ask you to fix before extracting or revising data?",
+      whyNow: "Measurement and coding rules decide what counts as evidence; changing them silently can make later synthesis non-reproducible.",
+      options: followUpQuestionOptions(
+        { value: "define_construct_rule", label: "Define construct rule first", description: "Clarify what counts as the construct or variable before extraction.", recommended: true },
+        { value: "define_extraction_rule", label: "Define extraction rule first", description: "Clarify correlation, path, beta, or qualitative evidence extraction rules." },
+        { value: "pilot_code", label: "Pilot the coding rule", description: "Test the rule on a small sample before committing." },
+        { value: "defer", label: "Keep coding open", description: "Do not settle measurement or coding yet." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      cues: ["measurement", "coding", "extraction"]
+    });
+  }
+
+  if (decisionActionCue && methodCue) {
+    push({
+      key: "method_design_commitment",
+      kind: "research_commitment",
+      title: "Method design",
+      question: "Which method-design choice should LongTable keep explicit before changing the study plan?",
+      whyNow: "Method changes affect the defensible claim, sample, evidence standard, and ethics boundary.",
+      options: followUpQuestionOptions(
+        { value: "revise_design", label: "Revise design first", description: "Change the design or sample boundary before proceeding.", recommended: true },
+        { value: "check_feasibility", label: "Check feasibility first", description: "Inspect whether data, evidence, and access support the method." },
+        { value: "proceed_with_method_assumption", label: "Proceed with method assumption", description: "Continue only after stating the assumed method." },
+        { value: "defer", label: "Keep method open", description: "Do not commit the method yet." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      cues: ["method", "study_design", "sample"]
+    });
+  }
+
+  if (decisionActionCue && analysisCue) {
+    push({
+      key: "analysis_strategy_commitment",
+      kind: "research_commitment",
+      title: "Analysis strategy",
+      question: "What analysis strategy should LongTable treat as unsettled before revising or running the synthesis?",
+      whyNow: "Analysis choices determine what effect sizes, moderators, and interpretations become defensible.",
+      options: followUpQuestionOptions(
+        { value: "choose_analysis_family", label: "Choose analysis family first", description: "Clarify MASEM, family-level meta-analysis, moderator analysis, or narrative synthesis.", recommended: true },
+        { value: "check_data_sufficiency", label: "Check data sufficiency first", description: "Inspect whether primary quantitative effects support the analysis." },
+        { value: "proceed_with_analysis_assumption", label: "Proceed with assumption", description: "Continue only after stating the analysis assumption." },
+        { value: "defer", label: "Keep analysis open", description: "Do not settle the analysis plan yet." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      cues: ["analysis", "model", "meta_analysis"]
+    });
+  }
+
+  if (decisionActionCue && includesAny(normalized, [
+    /\bconflict\b/i,
+    /\bcontradict/i,
+    /\bontology\b/i,
+    /\bepistem/i,
+    /\bhuman knowledge\b/i,
+    /\bai knowledge\b/i,
+    /\balignment\b/i,
+    /충돌|상충|모순|존재론|인식론|지식|인간의\s*지식|ai의\s*지식|정렬|방향성/
+  ])) {
+    push({
+      key: "epistemic_alignment_boundary",
+      kind: "value_conflict",
+      title: "Knowledge alignment",
+      question: "When researcher knowledge, AI inference, and project state conflict, what should LongTable privilege before acting?",
+      whyNow: "The prompt asks LongTable to mediate knowledge conflict; that mediation should be visible rather than hidden inside an implementation choice.",
+      options: followUpQuestionOptions(
+        { value: "ask_researcher", label: "Ask researcher clarity first", description: "Pause when human meaning or priority is underspecified.", recommended: true },
+        { value: "inspect_project_state", label: "Inspect project state first", description: "Use durable files and prior decisions before inferring intent." },
+        { value: "proceed_with_trace", label: "Proceed with explicit trace", description: "Continue only after naming the conflict and assumption." },
+        { value: "defer", label: "Keep conflict open", description: "Do not collapse the conflict into one answer yet." }
+      ),
+      confidence: "high",
+      autoEligible: true,
+      cues: ["knowledge_conflict", "epistemic_alignment"]
+    });
   }
 
   if (includesAny(normalized, [
@@ -1739,7 +1958,12 @@ export function buildQuestionOpportunitySpecs(
   if (options.requiredOnly === true) {
     selected = selected.filter((spec) => spec.kind === "research_commitment");
   }
-  return selected;
+  if (normalized.includes("protected decision closure pressure")) {
+    selected = selected.filter((spec) => spec.key === "protected_decision_closure");
+  } else if (options.requiredOnly === true && selected.some((spec) => spec.key === "research_direction_change_commitment")) {
+    selected = selected.filter((spec) => spec.key === "research_direction_change_commitment");
+  }
+  return selected.sort((a, b) => questionPriority(b) - questionPriority(a));
 }
 
 function buildFollowUpQuestionSpecs(prompt: string): FollowUpQuestionSpec[] {

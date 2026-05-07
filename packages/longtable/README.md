@@ -188,6 +188,12 @@ Inside a LongTable project workspace, panel planning also appends an
 `InvocationRecord` to `.longtable/state.json`, creates a pending follow-up
 `QuestionRecord`, and refreshes `CURRENT.md`.
 
+Panel output should remain inspectable. A panel or debate result is expected to
+show the consulted roles, each role's main claim or objection, the disagreement
+map, decision options, a defensible recommendation when one exists, and the
+exact researcher-facing question before a high-stakes decision is treated as
+settled.
+
 Default panel roles include:
 
 - `reviewer`
@@ -203,6 +209,12 @@ Use `--role` to constrain the panel when the research problem is already clear.
 measurement, theory, method, evidence, authorship, or tacit-assumption risks.
 Use `--record` inside a LongTable workspace to store the finding as an
 unconfirmed inferred hypothesis.
+
+The Codex hook stays quiet for advisory-only questions. Required hook context is
+reserved for durable Researcher Checkpoints, especially when a prompt would
+change the research question/scope, theory frame, measurement/coding standard,
+method design, or analysis strategy. Low-risk reversible work should proceed
+with visible assumptions rather than a noisy hook interruption.
 
 `longtable team` creates a file-backed agent-team review under
 `.longtable/team/<id>/`: independent review, cross-review, and
