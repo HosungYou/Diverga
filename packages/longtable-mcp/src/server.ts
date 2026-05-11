@@ -32,6 +32,7 @@ import {
   buildResearchSpecificationQuestion,
   renderResearchSpecificationPreview,
   researchSpecificationAnswerConfirms,
+  researchSpecificationAnswerNeedsFollowUp,
   researchSpecificationAnswerStatus
 } from "./research-specification.js";
 
@@ -168,7 +169,7 @@ interface InterviewHookRun {
 
 interface QuestionObligation {
   id: string;
-  kind: "required_question" | "first_research_shape_confirmation";
+  kind: "required_question" | "first_research_shape_confirmation" | "research_specification_confirmation";
   status: "pending" | "satisfied" | "cleared";
   createdAt: string;
   updatedAt: string;
@@ -179,7 +180,10 @@ interface QuestionObligation {
   sourceHookId?: string;
 }
 
-type InterviewState = Awaited<ReturnType<typeof loadWorkspaceState>> & {
+type InterviewState = Omit<
+  Awaited<ReturnType<typeof loadWorkspaceState>>,
+  "firstResearchShape" | "researchSpecification" | "questionObligations"
+> & {
   firstResearchShape?: FirstResearchShape;
   researchSpecification?: ResearchSpecification;
   questionObligations?: QuestionObligation[];
@@ -395,6 +399,82 @@ function resolveFirstResearchShapeObligation(
       const matches = obligation.kind === "first_research_shape_confirmation" && (
         (options.sourceHookId && obligation.sourceHookId === options.sourceHookId) ||
         (options.questionId && obligation.questionId === options.questionId)
+      );
+      if (!matches || obligation.status !== "pending") {
+        return obligation;
+      }
+      return {
+        ...obligation,
+        status: options.status ?? "satisfied",
+        updatedAt: new Date().toISOString(),
+        ...(options.questionId ? { questionId: options.questionId } : obligation.questionId ? { questionId: obligation.questionId } : {}),
+        ...(options.decisionId ? { decisionId: options.decisionId } : obligation.decisionId ? { decisionId: obligation.decisionId } : {})
+      };
+    })
+  };
+}
+
+function researchSpecificationFollowUpReason(answer: string): string {
+  if (answer === "ask_one_more") {
+    return "The researcher chose one more question before saving; after that answer, LongTable must update or read the Research Specification and return to confirmation.";
+  }
+  if (answer === "revise_section") {
+    return "The researcher chose section revision; after the section is revised, LongTable must return to the Research Specification Preview for confirmation.";
+  }
+  return "Research Specification confirmation remains open.";
+}
+
+function ensureResearchSpecificationConfirmationObligation(
+  state: InterviewState,
+  specification: ResearchSpecification,
+  options: {
+    answer: string;
+    questionId?: string;
+    decisionId?: string;
+  }
+): InterviewState {
+  const existing = (state.questionObligations ?? []).find((obligation) =>
+    obligation.kind === "research_specification_confirmation" &&
+    obligation.status === "pending" &&
+    (
+      (specification.sourceHookId && obligation.sourceHookId === specification.sourceHookId) ||
+      (!specification.sourceHookId && obligation.prompt.includes(specification.title))
+    )
+  );
+  const timestamp = new Date().toISOString();
+  const next: QuestionObligation = {
+    ...(existing ?? {
+      id: createId("question_obligation"),
+      kind: "research_specification_confirmation" as const,
+      status: "pending" as const,
+      createdAt: timestamp
+    }),
+    updatedAt: timestamp,
+    prompt: `Return to Research Specification Preview before ending the interview: ${specification.title}`,
+    reason: researchSpecificationFollowUpReason(options.answer),
+    ...(specification.sourceHookId ? { sourceHookId: specification.sourceHookId } : {}),
+    ...(options.questionId ? { questionId: options.questionId } : existing?.questionId ? { questionId: existing.questionId } : {}),
+    ...(options.decisionId ? { decisionId: options.decisionId } : existing?.decisionId ? { decisionId: existing.decisionId } : {})
+  };
+  return upsertQuestionObligation(state, next);
+}
+
+function resolveResearchSpecificationConfirmationObligation(
+  state: InterviewState,
+  specification: ResearchSpecification,
+  options: {
+    questionId?: string;
+    decisionId?: string;
+    status?: "satisfied" | "cleared";
+  } = {}
+): InterviewState {
+  return {
+    ...state,
+    questionObligations: (state.questionObligations ?? []).map((obligation) => {
+      const matches = obligation.kind === "research_specification_confirmation" && (
+        (specification.sourceHookId && obligation.sourceHookId === specification.sourceHookId) ||
+        (options.questionId && obligation.questionId === options.questionId) ||
+        (!specification.sourceHookId && obligation.prompt.includes(specification.title))
       );
       if (!matches || obligation.status !== "pending") {
         return obligation;
@@ -1053,6 +1133,23 @@ async function markResearchSpecificationConfirmation(
         : hook.linkedDecisionRecordIds
     };
   });
+  const nextState = researchSpecificationAnswerConfirms(answer)
+    ? resolveResearchSpecificationConfirmationObligation(state, confirmedSpecification, {
+        questionId,
+        decisionId,
+        status: "satisfied"
+      })
+    : researchSpecificationAnswerNeedsFollowUp(answer)
+      ? ensureResearchSpecificationConfirmationObligation(state, confirmedSpecification, {
+          answer,
+          questionId,
+          decisionId
+        })
+      : resolveResearchSpecificationConfirmationObligation(state, confirmedSpecification, {
+          questionId,
+          decisionId,
+          status: "cleared"
+        });
 
   const session = {
     ...context.session,
@@ -1061,9 +1158,9 @@ async function markResearchSpecificationConfirmation(
   };
   context.session = session;
   await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
-  await writeFile(context.stateFilePath, JSON.stringify(state, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(nextState, null, 2), "utf8");
   await syncCurrentWorkspaceView(context);
-  return { state, session, specification: confirmedSpecification };
+  return { state: nextState, session, specification: confirmedSpecification };
 }
 
 async function markAlreadyConfirmedResearchSpecification(
@@ -1096,6 +1193,9 @@ async function markAlreadyConfirmedResearchSpecification(
       researchSpecification: confirmedSpecification
     };
   });
+  const nextState = resolveResearchSpecificationConfirmationObligation(state, confirmedSpecification, {
+    status: "satisfied"
+  });
 
   const session = {
     ...context.session,
@@ -1104,9 +1204,9 @@ async function markAlreadyConfirmedResearchSpecification(
   };
   context.session = session;
   await writeFile(context.sessionFilePath, JSON.stringify(session, null, 2), "utf8");
-  await writeFile(context.stateFilePath, JSON.stringify(state, null, 2), "utf8");
+  await writeFile(context.stateFilePath, JSON.stringify(nextState, null, 2), "utf8");
   await syncCurrentWorkspaceView(context);
-  return { state, session, specification: confirmedSpecification };
+  return { state: nextState, session, specification: confirmedSpecification };
 }
 
 function statusForElicitationError(error: unknown): QuestionTransportStatus {

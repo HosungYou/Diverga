@@ -232,13 +232,16 @@ If the problem is not clear yet, describe the part that is still hard to say.
 ```
 
 The interview reflects each answer with `LongTable hears: ...`, asks follow-up
-questions when an answer is thin, and stops only when it can summarize a
-provisional First Research Shape. For substantive starts, LongTable then expands
-that short handle into a Research Specification covering scope, construct
+questions when an answer is thin, and stops only when it can produce a Research
+Specification. A provisional First Research Shape may still be stored as a
+short handle/resume index, but it is not the default endpoint. For substantive
+starts, LongTable creates a Research Specification covering scope, construct
 ontology, theory framing, measurement/coding, method options, evidence/access
 requirements, epistemic alignment, protected decisions, open questions, and next
 actions. Structured options appear at the final specification confirmation
-point, not at the beginning of the interview.
+point, not at the beginning of the interview. If the researcher asks one more
+question or revises a section at that checkpoint, LongTable returns to the
+Research Specification Preview before ending.
 
 This creates:
 

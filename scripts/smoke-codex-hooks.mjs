@@ -16,7 +16,8 @@ const {
 } = await import(join(repoRoot, "packages", "longtable", "dist", "index.js"));
 const {
   buildFirstResearchShapeQuestion,
-  buildResearchSpecificationQuestion
+  buildResearchSpecificationQuestion,
+  researchSpecificationAnswerNeedsFollowUp
 } = await import(join(repoRoot, "packages", "longtable-mcp", "dist", "index.js"));
 
 function assert(condition, message) {
@@ -150,6 +151,9 @@ assert(researchSpecificationQuestion.displayReason.length < researchSpecificatio
 assert(!researchSpecificationQuestion.displayReason.includes("Coding rules: Code directionality"), "Research Specification UI context should not duplicate every full-preview field");
 assert(researchSpecificationQuestion.options.some((option) => option.value === "confirm_specification"), "Research Specification question should offer confirmation");
 assert(researchSpecificationQuestion.options.some((option) => option.value === "revise_section"), "Research Specification question should allow section-level revision");
+assert(researchSpecificationAnswerNeedsFollowUp("ask_one_more"), "Research Specification ask_one_more should require returning to preview");
+assert(researchSpecificationAnswerNeedsFollowUp("revise_section"), "Research Specification revise_section should require returning to preview");
+assert(!researchSpecificationAnswerNeedsFollowUp("keep_open"), "Research Specification keep_open should not create a preview-return obligation");
 
 const workspaceTmp = mkdtempSync(join(tmpdir(), "longtable-codex-hook-runtime-"));
 const setupPath = join(workspaceTmp, "setup.json");

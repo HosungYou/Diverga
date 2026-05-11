@@ -29,3 +29,9 @@
 
 8. speed optimization은 carefulness를 압도하면 안 된다.
    빠른 진행은 가치가 있지만, epistemic defensibility를 훼손하는 수준이면 중단해야 한다.
+
+9. 짧은 handle은 연구 ontology를 대신할 수 없다.
+   First Research Shape는 resume과 orientation을 위한 장치일 뿐이며, substantive interview의 기본 종료 artifact는 Research Specification이어야 한다.
+
+10. provider UI는 의미의 원천이 아니다.
+    MCP elicitation, Codex UI, Claude structured question, numbered fallback은 transport일 뿐이고, 의미는 `.longtable/` state와 researcher-readable artifact가 소유해야 한다.

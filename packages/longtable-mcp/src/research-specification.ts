@@ -187,6 +187,10 @@ export function researchSpecificationAnswerConfirms(answer: string): boolean {
   return answer === "confirm_specification";
 }
 
+export function researchSpecificationAnswerNeedsFollowUp(answer: string): boolean {
+  return answer === "ask_one_more" || answer === "revise_section";
+}
+
 export function researchSpecificationAnswerStatus(answer: string): "confirmed" | "active" | "deferred" {
   if (researchSpecificationAnswerConfirms(answer)) {
     return "confirmed";

@@ -152,7 +152,7 @@ only durable source of truth.
 
 ## First Research Shape Quality
 
-The current `$longtable-interview` produces a useful First Research Shape:
+The current `$longtable-interview` may produce a useful First Research Shape:
 
 - handle
 - current goal
@@ -164,11 +164,11 @@ The current `$longtable-interview` produces a useful First Research Shape:
 - next action
 - confidence
 
-That is enough to orient a later AI session, but it is not yet a full research
-specification. If an AI reviews only the First Research Shape, it can understand
-the broad direction and the next move, but it may not recover the researcher's
-full ontology, evidence boundaries, philosophical commitments, or why one
-alternative was rejected.
+That is enough to orient a later AI session, but it is not a closure artifact.
+If an AI reviews only the First Research Shape, it can understand the broad
+direction and the next move, but it may not recover the researcher's full
+ontology, evidence boundaries, philosophical commitments, or why one alternative
+was rejected.
 
 The interview is strongest when it does two things:
 
@@ -178,9 +178,10 @@ The interview is strongest when it does two things:
   the entire chat
 
 The quality gap is compression. A very rich interview can collapse into a thin
-First Research Shape. LongTable now addresses this by adding a Research
-Specification layer after the First Research Shape when the interview has enough
-detail:
+First Research Shape. LongTable addresses this by treating Research
+Specification as the default substantive artifact. First Research Shape can feed
+that artifact, but it is not a required gate when the specification fields are
+already clear:
 
 - scope boundary
 - construct ontology
@@ -194,7 +195,32 @@ This layer does not make setup heavier. It is created inside
 `$longtable-interview` through MCP `summarize_research_specification`, displayed
 as a Research Specification Preview, and confirmed through
 `confirm_research_specification`. If the researcher only wants the shorter
-handle layer, `confirm_first_research_shape` remains available.
+handle layer, `confirm_first_research_shape` remains available as an explicit
+short-stop path.
+
+When the researcher chooses `ask_one_more` or `revise_section` at the
+specification checkpoint, LongTable must not drift into open-ended discussion
+and silently end. It should answer or revise the missing part, then return to
+the Research Specification Preview. This is the harness guarantee: a discussion
+may deepen, but the artifact boundary remains visible.
+
+## Ontology Harness Boundary
+
+LongTable's ontology work should be carried by durable research artifacts, not
+by provider personality or a hidden prompt.
+
+| Layer | Ontology role | Harness rule |
+|---|---|---|
+| First Research Shape | Short handle for resume and orientation | Useful but optional; not closure |
+| Research Specification | Scope, constructs, distinctions, coding, evidence/access, epistemic alignment | Default substantive interview artifact |
+| QuestionRecord | A focused human judgment that must be answered before a research commitment moves | Use only for research commitments |
+| DecisionRecord | The selected answer and rationale that changed state | Must link to the commitment it settles |
+| CURRENT.md | Researcher-readable projection of current state | Must expose missing or draft specification state |
+| MCP/provider UI | Transport for state changes and elicitation | Must not own semantics |
+
+This keeps LongTable aligned with the researcher's ontology while avoiding a
+large always-on wrapper. The system becomes stronger not by adding more agents,
+but by making the few artifact transitions inspectable and hard to confuse.
 
 ## Operating Rule
 
@@ -219,8 +245,10 @@ researcher for clarity.
    is evaluated, and render it in `CURRENT.md` so later agents can inspect the
    actual scope, ontology, theory, coding, method, evidence/access, and
    epistemic alignment commitments.
-4. Add tests for whole-work-unit stop behavior when required checkpoints are
+4. Treat `ask_one_more` and `revise_section` at Research Specification
+   confirmation as a return-to-preview obligation.
+5. Add tests for whole-work-unit stop behavior when required checkpoints are
    active.
-5. Keep release hooks as engineering safeguards, not research checkpoints.
-6. Keep state files interpretable; avoid adding durable records that have no
+6. Keep release hooks as engineering safeguards, not research checkpoints.
+7. Keep state files interpretable; avoid adding durable records that have no
    researcher-facing meaning.

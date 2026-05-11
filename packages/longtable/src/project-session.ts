@@ -488,6 +488,50 @@ function renderResearchSpecificationSummary(
   return lines;
 }
 
+function renderResearchSpecificationStatus(
+  session: LongTableSessionRecord,
+  locale: "en" | "ko"
+): string[] {
+  if (!session.firstResearchShape && !session.researchSpecification) {
+    return [];
+  }
+
+  const korean = locale === "ko";
+  if (!session.researchSpecification) {
+    return [
+      "",
+      korean ? "## Research Specification 상태" : "## Research Specification Status",
+      korean
+        ? "- 상태: First Research Shape는 있지만 Research Specification은 아직 없습니다."
+        : "- Status: First Research Shape exists, but Research Specification is missing.",
+      korean
+        ? "- 의미: First Research Shape는 짧은 핸들/재개 인덱스이며, 인터뷰 종료나 연구 명세 확정이 아닙니다."
+        : "- Meaning: First Research Shape is a short handle/resume index, not interview closure or a confirmed research specification.",
+      korean
+        ? "- 다음 프로토콜: 충분한 내용이 있으면 `summarize_research_specification`으로 preview를 만들고 `confirm_research_specification`으로 저장/한 질문 더/섹션 수정/열어두기를 확인합니다."
+        : "- Next protocol: when enough detail exists, run `summarize_research_specification` to create the preview, then `confirm_research_specification` to confirm, ask one more question, revise a section, or keep it open."
+    ];
+  }
+
+  const status = session.researchSpecification.confirmedAt
+    ? "confirmed"
+    : session.researchSpecification.status ?? "draft";
+  if (status === "confirmed") {
+    return [];
+  }
+
+  return [
+    "",
+    korean ? "## Research Specification 상태" : "## Research Specification Status",
+    korean
+      ? `- 상태: ${status}. Research Specification은 저장되어 있지만 아직 확정된 종료 지점이 아닙니다.`
+      : `- Status: ${status}. Research Specification exists, but it is not a confirmed closure point yet.`,
+    korean
+      ? "- 다음 프로토콜: 명세를 업데이트한 뒤 `confirm_research_specification`으로 다시 preview 확인을 받아야 합니다."
+      : "- Next protocol: update the specification, then return to `confirm_research_specification` for another preview confirmation."
+  ];
+}
+
 function buildCurrentGuide(
   project: LongTableProjectRecord,
   session: LongTableSessionRecord,
@@ -523,6 +567,7 @@ function buildCurrentGuide(
       `- 다음 액션: ${nextAction}`,
       `- 관점: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
       `- disagreement: ${session.disagreementPreference}`,
+      ...renderResearchSpecificationStatus(session, locale),
       "",
       "## 열린 질문",
       ...openQuestions.map((question) => `- ${question}`),
@@ -599,6 +644,7 @@ function buildCurrentGuide(
     `- Next action: ${nextAction}`,
     `- Perspectives: ${session.requestedPerspectives.length > 0 ? session.requestedPerspectives.join(", ") : "auto"}`,
     `- Disagreement: ${session.disagreementPreference}`,
+    ...renderResearchSpecificationStatus(session, locale),
     "",
     "## Open Questions",
     ...openQuestions.map((question) => `- ${question}`),
@@ -849,9 +895,12 @@ function buildProjectAgentsMd(
     "- Begin exploratory work with clarifying or tension questions before recommending a direction.",
     "- For `$longtable-interview`, ask one natural-language question at a time, reflect with `LongTable hears: ...`, record turns when MCP is available, and avoid early reader/reviewer or theory/method/measurement classification.",
     "- Do not summarize `$longtable-interview` because a fixed number of turns has passed; wait for content-based readiness around research object, focal uncertainty, boundary, evidence/material, protected decision, and next action.",
+    "- First Research Shape is a short handle/resume index, not the default closure point.",
     "- After the First Research Shape, create a Research Specification when the interview has enough detail to preserve scope, construct ontology, theory framing, coding rules, method options, evidence/access requirements, epistemic alignment, protected decisions, open questions, and next actions.",
+    "- If a confirmed First Research Shape exists without a Research Specification, continue directly into the next Research Specification question instead of asking shape-level continue/revise/restart questions.",
+    "- If the researcher chooses `ask_one_more` or `revise_section` at Research Specification confirmation, answer that gap and return to the Research Specification Preview before ending the interview.",
     "- Do not let unrelated pending Researcher Checkpoints interrupt `$longtable-interview`; mention them only as separate unresolved checkpoints unless the researcher is confirming, saving, or recording a research decision.",
-    "- Use structured options only at the final First Research Shape confirmation or at true checkpoint boundaries.",
+    "- Use structured options at the final Research Specification confirmation, at explicit short-handle stop points, or at true checkpoint boundaries.",
     "- If you foreground role perspectives, disclose them with `LongTable consulted: ...`.",
     "- Keep one accountable synthesis, but do not hide meaningful disagreement.",
     ...(session.disagreementPreference === "always_visible"

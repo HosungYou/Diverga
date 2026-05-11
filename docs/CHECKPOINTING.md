@@ -65,10 +65,12 @@ Researcher Checkpoint는 아래 순서를 지켜야 한다.
 6. 답변을 `DecisionRecord`로 남긴다.
 7. `CURRENT.md`를 재생성해 pending/answered 상태를 노출한다.
 
-초기 인터뷰에서 First Research Shape를 만드는 경우에도 마지막 질문은
-`Confirm this handle` 같은 기술적 확인이 아니라, 현재 blocker,
-protected decision, open question 중 무엇을 다음 연구 움직임에서
-명시적으로 붙들어야 하는지 묻는 연구자-facing checkpoint여야 한다.
+초기 인터뷰에서 First Research Shape를 만드는 경우에도 그것은 짧은
+핸들/재개 인덱스이지 기본 종료 지점이 아니다. 마지막 연구자-facing
+checkpoint는 Research Specification preview를 놓고 저장/한 질문
+더/섹션 수정/열어두기를 묻는 형태여야 한다. 연구자가 한 질문 더 또는
+섹션 수정을 고르면 LongTable은 그 빈칸을 처리한 뒤 다시 Research
+Specification Preview로 돌아와야 한다.
 
 ## Codex Note
 

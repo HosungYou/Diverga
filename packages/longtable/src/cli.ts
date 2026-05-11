@@ -171,6 +171,10 @@ interface CodexSkillHealth extends ProviderSkillHealth {
   mcpConfigPath: string;
   mcpConfigExists: boolean;
   longtableMcpConfigured: boolean;
+  mcpPackageSpec?: string;
+  expectedMcpPackageSpec: string;
+  missingMcpTools: string[];
+  missingResearchSpecificationMcpTools: string[];
   mcpElicitationsAllowed: boolean;
   hooksPath: string;
   hooksExists: boolean;
@@ -260,8 +264,35 @@ const require = createRequire(import.meta.url);
 const LONGTABLE_PACKAGE_VERSION = String((require("../package.json") as { version?: unknown }).version ?? "0.0.0");
 const LONGTABLE_MCP_SERVER_NAME = "longtable-state";
 const LONGTABLE_MCP_PACKAGE_VERSION = LONGTABLE_PACKAGE_VERSION;
+const LONGTABLE_MCP_PACKAGE_SPEC = `@longtable/mcp@${LONGTABLE_MCP_PACKAGE_VERSION}`;
 const LONGTABLE_MCP_MARKER_START = "# LongTable state MCP START";
 const LONGTABLE_MCP_MARKER_END = "# LongTable state MCP END";
+const LONGTABLE_MCP_MANAGED_TOOLS = [
+  "read_project",
+  "read_session",
+  "inspect_workspace",
+  "create_workspace",
+  "begin_interview",
+  "append_interview_turn",
+  "summarize_interview",
+  "summarize_research_specification",
+  "read_research_specification",
+  "cancel_interview",
+  "confirm_first_research_shape",
+  "confirm_research_specification",
+  "pending_questions",
+  "evaluate_checkpoint",
+  "create_question",
+  "elicit_question",
+  "render_question",
+  "append_decision",
+  "regenerate_current"
+] as const;
+const LONGTABLE_MCP_RESEARCH_SPECIFICATION_TOOLS = [
+  "summarize_research_specification",
+  "read_research_specification",
+  "confirm_research_specification"
+] as const;
 
 function style(text: string, prefix: string): string {
   return `${prefix}${text}${ANSI.reset}`;
@@ -299,7 +330,7 @@ function renderInterviewLaunchSteps(provider: ProviderKind): string {
     `2. run \`${command}\``,
     "3. invoke `$longtable-interview`",
     "",
-    "The interview will create or resume `.longtable/`, build a First Research Shape, and use option UI only for the final confirmation."
+    "The interview will create or resume `.longtable/`, may store a short First Research Shape handle, and uses option UI for the final Research Specification confirmation."
   ]);
 }
 
@@ -1610,7 +1641,7 @@ function resolveMcpProviders(value?: string | boolean): McpProviderTarget[] {
 function resolveMcpPackageSpec(args: Record<string, string | boolean>): string {
   return typeof args.package === "string" && args.package.trim()
     ? args.package.trim()
-    : `@longtable/mcp@${LONGTABLE_MCP_PACKAGE_VERSION}`;
+    : LONGTABLE_MCP_PACKAGE_SPEC;
 }
 
 function resolveCodexMcpConfigPath(args: Record<string, string | boolean>): string {
@@ -1656,6 +1687,12 @@ function renderCodexMcpBlock(serverName: string, command: string, mcpArgs: strin
     `[mcp_servers.${serverName}]`,
     `command = ${escapeTomlString(command)}`,
     `args = [${mcpArgs.map((arg) => escapeTomlString(arg)).join(", ")}]`,
+    "",
+    ...LONGTABLE_MCP_MANAGED_TOOLS.flatMap((tool) => [
+      `[mcp_servers.${serverName}.tools.${tool}]`,
+      "approval_mode = \"approve\"",
+      ""
+    ]),
     LONGTABLE_MCP_MARKER_END
   ].join("\n");
 }
@@ -1684,16 +1721,67 @@ function codexLongTableMcpConfigured(config: string): boolean {
   return new RegExp(`\\[mcp_servers\\.${LONGTABLE_MCP_SERVER_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\]`).test(config);
 }
 
+function codexLongTableMcpPackageSpec(config: string): string | undefined {
+  const serverName = LONGTABLE_MCP_SERVER_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = new RegExp(`\\[mcp_servers\\.${serverName}\\][\\s\\S]*?(?=\\n\\[|$)`).exec(config);
+  if (!match) {
+    return undefined;
+  }
+  const packageMatch = /@longtable\/mcp@[A-Za-z0-9._~+:-]+/.exec(match[0]);
+  return packageMatch?.[0];
+}
+
+function codexLongTableMcpToolConfigured(config: string, tool: string): boolean {
+  const serverName = LONGTABLE_MCP_SERVER_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedTool = tool.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\[mcp_servers\\.${serverName}\\.tools\\.${escapedTool}\\]`).test(config);
+}
+
+function missingCodexLongTableMcpTools(config: string): string[] {
+  if (!codexLongTableMcpConfigured(config)) {
+    return [...LONGTABLE_MCP_MANAGED_TOOLS];
+  }
+  return LONGTABLE_MCP_MANAGED_TOOLS.filter((tool) => !codexLongTableMcpToolConfigured(config, tool));
+}
+
+function preserveNonLongTableSectionsFromMarkedBlock(block: string, serverName: string): string {
+  const body = block
+    .replace(LONGTABLE_MCP_MARKER_START, "")
+    .replace(LONGTABLE_MCP_MARKER_END, "")
+    .trim();
+  if (!body) {
+    return "";
+  }
+
+  const sections = body.split(/(?=^\[[^\]]+\])/m);
+  const serverHeader = `[mcp_servers.${serverName}]`;
+  const toolPrefix = `[mcp_servers.${serverName}.tools.`;
+  return sections
+    .map((section) => section.trim())
+    .filter(Boolean)
+    .filter((section) => {
+      const header = section.split(/\r?\n/, 1)[0]?.trim() ?? "";
+      return header !== serverHeader && !header.startsWith(toolPrefix);
+    })
+    .join("\n\n");
+}
+
 function replaceMarkedCodexMcpBlock(existing: string, block: string, serverName: string): string {
   const markerPattern = new RegExp(
-    `${LONGTABLE_MCP_MARKER_START.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?${LONGTABLE_MCP_MARKER_END.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\n?`,
-    "m"
+    `${LONGTABLE_MCP_MARKER_START.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?${LONGTABLE_MCP_MARKER_END.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\n?`
   );
   const serverPattern = new RegExp(
-    `\\n?\\[mcp_servers\\.${serverName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\][\\s\\S]*?(?=\\n\\[|$)`,
-    "m"
+    `\\n?\\[mcp_servers\\.${serverName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\][\\s\\S]*?(?=\\n\\[|$)`
   );
-  const trimmed = existing.replace(markerPattern, "").replace(serverPattern, "").trimEnd();
+  const toolPattern = new RegExp(
+    `\\n?\\[mcp_servers\\.${serverName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.tools\\.[^\\]]+\\][\\s\\S]*?(?=\\n\\[|$)`,
+    "g"
+  );
+  const withoutMarked = existing.replace(markerPattern, (matched) => {
+    const preserved = preserveNonLongTableSectionsFromMarkedBlock(matched, serverName);
+    return preserved ? `${preserved}\n\n` : "";
+  });
+  const trimmed = withoutMarked.replace(toolPattern, "").replace(serverPattern, "").trimEnd();
   return trimmed ? `${trimmed}\n\n${block}\n` : `${block}\n`;
 }
 
@@ -2024,6 +2112,8 @@ async function collectDoctorStatus(args: Record<string, string | boolean>): Prom
   const codexMcpConfig = existsSync(codexMcpConfigPath)
     ? await readFile(codexMcpConfigPath, "utf8")
     : "";
+  const codexMcpPackageSpec = codexLongTableMcpPackageSpec(codexMcpConfig);
+  const missingMcpTools = missingCodexLongTableMcpTools(codexMcpConfig);
   const codexHooksPath = resolveCodexHooksPath(args);
   const codexHooksContent = existsSync(codexHooksPath)
     ? await readFile(codexHooksPath, "utf8")
@@ -2060,6 +2150,12 @@ async function collectDoctorStatus(args: Record<string, string | boolean>): Prom
         mcpConfigPath: codexMcpConfigPath,
         mcpConfigExists: existsSync(codexMcpConfigPath),
         longtableMcpConfigured: codexLongTableMcpConfigured(codexMcpConfig),
+        ...(codexMcpPackageSpec ? { mcpPackageSpec: codexMcpPackageSpec } : {}),
+        expectedMcpPackageSpec: LONGTABLE_MCP_PACKAGE_SPEC,
+        missingMcpTools,
+        missingResearchSpecificationMcpTools: missingMcpTools.filter((tool) =>
+          LONGTABLE_MCP_RESEARCH_SPECIFICATION_TOOLS.includes(tool as typeof LONGTABLE_MCP_RESEARCH_SPECIFICATION_TOOLS[number])
+        ),
         mcpElicitationsAllowed: codexMcpElicitationsAllowed(codexMcpConfig),
         hooksPath: codexHooksPath,
         hooksExists: existsSync(codexHooksPath),
@@ -2107,6 +2203,11 @@ function renderDoctorStatus(status: LongTableDoctorStatus): string {
       : []),
     `- MCP config: ${status.providers.codex.mcpConfigExists ? "present" : "missing"} (${status.providers.codex.mcpConfigPath})`,
     `- LongTable MCP: ${status.providers.codex.longtableMcpConfigured ? "configured" : "missing"}`,
+    `- MCP package: ${status.providers.codex.mcpPackageSpec ?? "unknown"}${status.providers.codex.mcpPackageSpec === status.providers.codex.expectedMcpPackageSpec ? "" : ` (expected ${status.providers.codex.expectedMcpPackageSpec})`}`,
+    `- MCP managed tools: ${LONGTABLE_MCP_MANAGED_TOOLS.length - status.providers.codex.missingMcpTools.length}/${LONGTABLE_MCP_MANAGED_TOOLS.length} configured`,
+    ...(status.providers.codex.missingResearchSpecificationMcpTools.length > 0
+      ? [`- Research Specification MCP tools: missing ${status.providers.codex.missingResearchSpecificationMcpTools.join(", ")}`]
+      : ["- Research Specification MCP tools: complete"]),
     `- MCP elicitation approval: ${status.providers.codex.mcpElicitationsAllowed ? "allowed" : "not allowed"}`,
     `- Codex hooks file: ${status.providers.codex.hooksExists ? "present" : "missing"} (${status.providers.codex.hooksPath})`,
     `- codex_hooks feature: ${status.providers.codex.codexHooksEnabled ? "enabled" : "missing"}`,
@@ -2165,6 +2266,9 @@ function renderDoctorStatus(status: LongTableDoctorStatus): string {
     status.providers.codex.missingSkills.length > 0 ||
     status.providers.claude.missingSkills.length > 0 ||
     status.providers.codex.legacyPromptFilesInstalled.length > 0 ||
+    !status.providers.codex.longtableMcpConfigured ||
+    status.providers.codex.mcpPackageSpec !== status.providers.codex.expectedMcpPackageSpec ||
+    status.providers.codex.missingMcpTools.length > 0 ||
     !status.providers.codex.codexHooksEnabled ||
     status.providers.codex.missingManagedHookEvents.length > 0 ||
     (status.setupExists &&
@@ -2175,6 +2279,13 @@ function renderDoctorStatus(status: LongTableDoctorStatus): string {
   }
   if (!status.providers.codex.codexHooksEnabled || status.providers.codex.missingManagedHookEvents.length > 0) {
     nextActions.push("longtable codex install-hooks");
+  }
+  if (
+    !status.providers.codex.longtableMcpConfigured ||
+    status.providers.codex.mcpPackageSpec !== status.providers.codex.expectedMcpPackageSpec ||
+    status.providers.codex.missingMcpTools.length > 0
+  ) {
+    nextActions.push("longtable mcp install --provider codex --write");
   }
   if (!status.setupExists) {
     nextActions.push("longtable setup --provider codex");
@@ -2218,7 +2329,7 @@ function renderRepairSummary(repair: DoctorRepairResult): string {
     }
   }
   if (repair.writtenRuntimeConfigs.length > 0) {
-    lines.push("- wrote runtime configs:");
+    lines.push("- wrote configs:");
     for (const target of repair.writtenRuntimeConfigs) {
       lines.push(`  - ${target.provider}: ${target.path}`);
     }
@@ -2279,6 +2390,23 @@ async function repairDoctorStatus(
     writtenRuntimeConfigs: [],
     skipped: []
   };
+
+  const mcpRepairNeeded =
+    !status.providers.codex.longtableMcpConfigured ||
+    status.providers.codex.mcpPackageSpec !== status.providers.codex.expectedMcpPackageSpec ||
+    status.providers.codex.missingMcpTools.length > 0;
+  if (mcpRepairNeeded) {
+    const mcpConfigPath = resolveDoctorCodexMcpConfigPath(args);
+    const block = renderCodexMcpBlock(LONGTABLE_MCP_SERVER_NAME, "npx", ["-y", LONGTABLE_MCP_PACKAGE_SPEC]);
+    await writeCodexMcpConfig(mcpConfigPath, block, LONGTABLE_MCP_SERVER_NAME, {
+      enableElicitations: status.providers.codex.mcpElicitationsAllowed
+    });
+    repair.writtenRuntimeConfigs.push({
+      provider: "codex",
+      path: mcpConfigPath,
+      format: "toml"
+    });
+  }
 
   if (status.providers.codex.missingSkills.length > 0) {
     repair.installedCodexSkills = (await installCodexSkills(roles, codexDir, skillSurface)).map((skill) => skill.name);

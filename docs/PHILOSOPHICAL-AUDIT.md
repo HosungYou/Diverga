@@ -20,6 +20,9 @@
 - 인간이 했다는 느낌은 승인만이 아니라 서사, 개인적 경험, 흔적의 축적에서 온다.
 - 초보 연구자를 돕는 기능과 숙련 연구자를 증폭하는 기능은 둘 다 필요하다.
 - 글쓰기는 경계해야 하지만, 외국인 연구자나 표현 증폭의 맥락에서는 유의미한 지원 지점이 될 수 있다.
+- First Research Shape는 연구를 다시 시작하게 해주는 짧은 handle이지, 연구 ontology를 확정하는 산출물이 아니다.
+- Research Specification은 LongTable의 기본 종료 artifact다. 이것은 scope, construct ontology, coding rule, evidence/access boundary, epistemic alignment를 보존해야 한다.
+- 좋은 harness는 AI가 더 정확해 보이게 만드는 장치가 아니라, AI가 연구자의 ontology-forming decision을 너무 빨리 닫지 못하게 만드는 검증 가능한 절차다.
 
 ## Inferred Hypotheses
 
@@ -38,6 +41,8 @@
 - researcher autonomy vs AI initiative
 - explicit governance vs tacit interpretation
 - documentation richness vs cognitive burden
+- short handle convenience vs full specification responsibility
+- AI extraction performance vs traceable ontology and evidence boundaries
 
 ## Questions For The System
 
@@ -45,6 +50,8 @@
 - 시스템은 무엇을 설명 가능하게 만들고, 무엇을 오히려 숨기는가?
 - 시스템은 연구자의 서사를 보존하는가, 아니면 결과만 매끄럽게 만드는가?
 - checkpoint는 연구자의 판단을 보호하는가, 아니면 판단을 형식화해서 빈약하게 만드는가?
+- First Research Shape가 Research Specification으로 넘어가지 못할 때, 시스템은 resume convenience를 closure로 오인하고 있지 않은가?
+- Research Specification은 실제 ontology artifact인가, 아니면 더 긴 요약문에 그치고 있는가?
 - tacit knowledge를 inference로 다룰 때, 어디서부터 오판이 되는가?
 - humanization은 문체의 문제가 아니라 narrative trace의 문제라는 점을 시스템이 다룰 수 있는가?
 - 글쓰기 지원은 voice amplification인가, authorship erosion인가?
@@ -66,6 +73,8 @@
 - checkpoint는 block/allow만이 아니라 “왜 지금 멈춰야 하는가”를 설명해야 한다.
 - humanization 기능은 style polishing보다 authorship preservation을 목표로 해야 한다.
 - 기록은 개발자 친화적 로그가 아니라 연구자 친화적 문서로도 남아야 한다.
+- Research Specification은 `.longtable/` state에만 숨어 있으면 안 되며, `CURRENT.md`와 문서화된 preview를 통해 later agent와 연구자가 함께 읽을 수 있어야 한다.
+- product/docs/release 결정은 연구 workspace의 `QuestionRecord`로 저장하지 않는다. 다만 그 결정이 checkpoint policy나 ontology harness를 바꾸면 response-only product governance discussion으로 명시해야 한다.
 
 ## Near-Term Actions
 
@@ -74,3 +83,5 @@
 3. memory 설계에 `narrative trace` 또는 유사 개념을 넣을지 결정한다.
 4. setup 질문에 “당신의 연구에서 인간의 흔적은 무엇으로 드러나는가”에 준하는 항목을 추가할지 검토한다.
 5. humanization 기능의 성공 기준을 “더 자연스러운 문장”이 아니라 “더 연구자다운 서사”로 재정의한다.
+6. First Research Shape와 Research Specification의 경계를 release/test contract로 유지한다.
+7. ontology harness 관점에서 Research Specification이 충분히 구체적인지 평가하는 smoke fixture를 추가한다.

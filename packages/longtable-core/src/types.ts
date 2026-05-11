@@ -578,7 +578,8 @@ export interface LongTableHookRun {
 
 export type LongTableQuestionObligationKind =
   | "required_question"
-  | "first_research_shape_confirmation";
+  | "first_research_shape_confirmation"
+  | "research_specification_confirmation";
 
 export type LongTableQuestionObligationStatus =
   | "pending"

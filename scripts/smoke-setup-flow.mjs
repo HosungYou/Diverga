@@ -162,6 +162,9 @@ if (!interviewSkill.includes("First Research Shape")) {
 if (!interviewSkill.includes("Research Specification") || !interviewSkill.includes("confirm_research_specification")) {
   throw new Error("longtable-interview skill should document Research Specification confirmation.");
 }
+if (!interviewSkill.includes("must not be treated as the default endpoint")) {
+  throw new Error("longtable-interview skill should demote First Research Shape from the default endpoint.");
+}
 if (!interviewSkill.includes("Do not begin with reader/reviewer")) {
   throw new Error("longtable-interview skill should forbid early reader/reviewer prompts.");
 }
@@ -186,6 +189,13 @@ const mcpInstall = JSON.parse(runCli([
 ]));
 if (mcpInstall.packageSpec !== `@longtable/mcp@${rootPackage.version}`) {
   throw new Error(`MCP install snippet should use package version ${rootPackage.version}.`);
+}
+const codexMcpContent = mcpInstall.targets.find((target) => target.provider === "codex")?.content ?? "";
+if (!codexMcpContent.includes("[mcp_servers.longtable-state.tools.summarize_research_specification]")) {
+  throw new Error("MCP install snippet should approve summarize_research_specification.");
+}
+if (!codexMcpContent.includes("[mcp_servers.longtable-state.tools.confirm_research_specification]")) {
+  throw new Error("MCP install snippet should approve confirm_research_specification.");
 }
 const fullSkillsDir = join(tmp, "codex-skills-full");
 const fullInstallOutput = runCli(["codex", "install-skills", "--surface", "full", "--dir", fullSkillsDir]);

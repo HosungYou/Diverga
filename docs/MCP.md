@@ -127,6 +127,12 @@ The first tool set is intentionally narrow:
 - `append_decision`: answer a pending question and append a `DecisionRecord`
 - `regenerate_current`: rebuild `CURRENT.md` from machine-readable state
 
+`longtable mcp install --provider codex --write` writes approval blocks for the
+full managed tool set. `longtable doctor` reports stale `@longtable/mcp`
+versions and missing Research Specification tools, because an older allowlist can
+make the interview stop at First Research Shape even when the newer server
+package supports the specification workflow.
+
 ## Access Boundary
 
 The MCP server should stay constrained to LongTable-managed state:
