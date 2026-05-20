@@ -87,7 +87,10 @@ import {
   codexHooksEnabled,
   enableCodexHooksFeature,
   getMissingManagedCodexHookEvents,
+  getMissingManagedCodexHookTrustState,
+  mergeCodexHookTrustState,
   mergeManagedCodexHooksConfig,
+  removeCodexHookTrustState,
   removeManagedCodexHooks
 } from "./codex-hooks.js";
 import {
@@ -186,6 +189,7 @@ interface CodexSkillHealth extends ProviderSkillHealth {
   hooksExists: boolean;
   codexHooksEnabled: boolean;
   missingManagedHookEvents: string[];
+  missingManagedHookTrustState: string[];
 }
 
 interface LongTableDoctorStatus {
@@ -236,6 +240,7 @@ interface CodexHookInstallResult {
   hooksPath: string;
   codexHooksEnabled: boolean;
   managedEvents: string[];
+  managedTrustEntries: number;
   write: boolean;
 }
 
@@ -1862,8 +1867,9 @@ async function installCodexNativeHooks(
   const packageRoot = resolveCliPackageRoot();
   const existingConfig = existsSync(configPath) ? await readFile(configPath, "utf8") : "";
   const existingHooks = existsSync(hooksPath) ? await readFile(hooksPath, "utf8") : "";
-  const nextConfig = enableCodexHooksFeature(existingConfig);
   const nextHooks = mergeManagedCodexHooksConfig(existingHooks, packageRoot);
+  const configWithHooksFeature = enableCodexHooksFeature(existingConfig, "hooks");
+  const nextConfig = mergeCodexHookTrustState(configWithHooksFeature, hooksPath, nextHooks);
 
   await mkdir(dirname(configPath), { recursive: true });
   await mkdir(dirname(hooksPath), { recursive: true });
@@ -1875,6 +1881,7 @@ async function installCodexNativeHooks(
     hooksPath,
     codexHooksEnabled: codexHooksEnabled(nextConfig),
     managedEvents: [...LONGTABLE_MANAGED_HOOK_EVENTS],
+    managedTrustEntries: getMissingManagedCodexHookTrustState("", hooksPath, nextHooks).length,
     write: true
   };
 }
@@ -1884,8 +1891,15 @@ async function removeCodexNativeHooks(
 ): Promise<CodexHookInstallResult> {
   const configPath = resolveCodexMcpConfigPath(args);
   const hooksPath = resolveCodexHooksPath(args);
+  const configContent = existsSync(configPath) ? await readFile(configPath, "utf8") : "";
   const existingHooks = existsSync(hooksPath) ? await readFile(hooksPath, "utf8") : "";
+  const nextConfig = existingHooks
+    ? removeCodexHookTrustState(configContent, hooksPath, existingHooks)
+    : configContent;
   const removed = existingHooks ? removeManagedCodexHooks(existingHooks) : { nextContent: null, removedCount: 0 };
+
+  await mkdir(dirname(configPath), { recursive: true });
+  await writeFile(configPath, nextConfig, "utf8");
 
   if (removed.nextContent === null) {
     await rm(hooksPath, { force: true });
@@ -1894,13 +1908,12 @@ async function removeCodexNativeHooks(
     await writeFile(hooksPath, removed.nextContent, "utf8");
   }
 
-  const configContent = existsSync(configPath) ? await readFile(configPath, "utf8") : "";
-
   return {
     configPath,
     hooksPath,
-    codexHooksEnabled: codexHooksEnabled(configContent),
+    codexHooksEnabled: codexHooksEnabled(nextConfig),
     managedEvents: removed.removedCount > 0 ? [...LONGTABLE_MANAGED_HOOK_EVENTS] : [],
+    managedTrustEntries: 0,
     write: true
   };
 }
@@ -1910,8 +1923,9 @@ function renderCodexHookInstallSummary(result: CodexHookInstallResult): string {
     "LongTable Codex hooks",
     `- config: ${result.configPath}`,
     `- hooks: ${result.hooksPath}`,
-    `- codex_hooks feature: ${result.codexHooksEnabled ? "enabled" : "missing"}`,
-    `- managed events: ${result.managedEvents.length > 0 ? result.managedEvents.join(", ") : "none"}`
+    `- hooks feature: ${result.codexHooksEnabled ? "enabled" : "missing"}`,
+    `- managed events: ${result.managedEvents.length > 0 ? result.managedEvents.join(", ") : "none"}`,
+    `- managed trust entries: ${result.managedTrustEntries}`
   ].join("\n");
 }
 
@@ -2138,6 +2152,9 @@ async function collectDoctorStatus(args: Record<string, string | boolean>): Prom
   const missingManagedHookEvents = codexHooksContent
     ? (getMissingManagedCodexHookEvents(codexHooksContent) ?? [...LONGTABLE_MANAGED_HOOK_EVENTS])
     : [...LONGTABLE_MANAGED_HOOK_EVENTS];
+  const missingManagedHookTrustState = codexHooksContent
+    ? getMissingManagedCodexHookTrustState(codexMcpConfig, codexHooksPath, codexHooksContent)
+    : [];
   const expectedCodexSkills = buildCodexSkillSpecs(roles, skillSurface).map((skill) => skill.name);
   const expectedClaudeSkills = buildClaudeSkillSpecs(roles, skillSurface).map((skill) => skill.name);
   const [codexSkills, claudeSkills, codexAliases, workspace] = await Promise.all([
@@ -2177,7 +2194,8 @@ async function collectDoctorStatus(args: Record<string, string | boolean>): Prom
         hooksPath: codexHooksPath,
         hooksExists: existsSync(codexHooksPath),
         codexHooksEnabled: codexHooksEnabled(codexMcpConfig),
-        missingManagedHookEvents
+        missingManagedHookEvents,
+        missingManagedHookTrustState
       },
       claude: {
         command: "claude",
@@ -2227,8 +2245,9 @@ function renderDoctorStatus(status: LongTableDoctorStatus): string {
       : ["- Research Specification MCP tools: complete"]),
     `- MCP elicitation approval: ${status.providers.codex.mcpElicitationsAllowed ? "allowed" : "not allowed"}`,
     `- Codex hooks file: ${status.providers.codex.hooksExists ? "present" : "missing"} (${status.providers.codex.hooksPath})`,
-    `- codex_hooks feature: ${status.providers.codex.codexHooksEnabled ? "enabled" : "missing"}`,
+    `- hooks feature: ${status.providers.codex.codexHooksEnabled ? "enabled" : "missing"}`,
     `- managed hook coverage: ${status.providers.codex.missingManagedHookEvents.length === 0 ? "complete" : `missing ${status.providers.codex.missingManagedHookEvents.join(", ")}`}`,
+    `- managed hook trust: ${status.providers.codex.missingManagedHookTrustState.length === 0 ? "current" : `missing/stale ${status.providers.codex.missingManagedHookTrustState.length}`}`,
     "",
     ...renderProviderDoctorBlock("Claude", status.providers.claude),
     "",
@@ -2288,13 +2307,18 @@ function renderDoctorStatus(status: LongTableDoctorStatus): string {
     status.providers.codex.missingMcpTools.length > 0 ||
     !status.providers.codex.codexHooksEnabled ||
     status.providers.codex.missingManagedHookEvents.length > 0 ||
+    status.providers.codex.missingManagedHookTrustState.length > 0 ||
     (status.setupExists &&
       (!status.providers.codex.runtimeExists || !status.providers.claude.runtimeExists));
 
   if (canFix) {
     nextActions.push("longtable doctor --fix");
   }
-  if (!status.providers.codex.codexHooksEnabled || status.providers.codex.missingManagedHookEvents.length > 0) {
+  if (
+    !status.providers.codex.codexHooksEnabled ||
+    status.providers.codex.missingManagedHookEvents.length > 0 ||
+    status.providers.codex.missingManagedHookTrustState.length > 0
+  ) {
     nextActions.push("longtable codex install-hooks");
   }
   if (
@@ -2434,7 +2458,11 @@ async function repairDoctorStatus(
   if (status.providers.codex.legacyPromptFilesInstalled.length > 0) {
     repair.removedLegacyPromptFiles = await removeCodexPromptAliases(codexPromptsDir);
   }
-  if (!status.providers.codex.codexHooksEnabled || status.providers.codex.missingManagedHookEvents.length > 0) {
+  if (
+    !status.providers.codex.codexHooksEnabled ||
+    status.providers.codex.missingManagedHookEvents.length > 0 ||
+    status.providers.codex.missingManagedHookTrustState.length > 0
+  ) {
     await installCodexNativeHooks(args);
     repair.installedCodexHooks = true;
   }
@@ -4725,7 +4753,10 @@ async function runCodexSubcommand(
       hooksExists: existsSync(hooksPath),
       missingManagedHookEvents: hooksContent
         ? (getMissingManagedCodexHookEvents(hooksContent) ?? [...LONGTABLE_MANAGED_HOOK_EVENTS])
-        : [...LONGTABLE_MANAGED_HOOK_EVENTS]
+        : [...LONGTABLE_MANAGED_HOOK_EVENTS],
+      missingManagedHookTrustState: hooksContent
+        ? getMissingManagedCodexHookTrustState(configContent, hooksPath, hooksContent)
+        : []
     };
 
     if (args.json === true) {
@@ -4757,9 +4788,10 @@ async function runCodexSubcommand(
       }
     }
     console.log(`- codex config: ${status.codexConfigPath}`);
-    console.log(`- codex_hooks feature: ${status.codexHooksEnabled ? "enabled" : "missing"}`);
+    console.log(`- hooks feature: ${status.codexHooksEnabled ? "enabled" : "missing"}`);
     console.log(`- hooks file: ${status.hooksExists ? "present" : "missing"} (${status.hooksPath})`);
     console.log(`- managed hook coverage: ${status.missingManagedHookEvents.length === 0 ? "complete" : `missing ${status.missingManagedHookEvents.join(", ")}`}`);
+    console.log(`- managed hook trust: ${status.missingManagedHookTrustState.length === 0 ? "current" : `missing/stale ${status.missingManagedHookTrustState.length}`}`);
     return;
   }
 

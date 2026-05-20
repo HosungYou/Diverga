@@ -135,7 +135,13 @@ Native hook support is the surrounding guard layer:
 - `SessionStart` restores current research context
 - `UserPromptSubmit` injects pending-checkpoint context
 - `Stop` blocks silent closure when obligations remain
+- `PreCompact` / `PostCompact` preserve and restore compact, decision-relevant
+  context around Codex compaction without creating new checkpoint semantics
 - `PreToolUse` / `PostToolUse` review Bash-side effects without becoming the source of truth
+
+LongTable does not currently own Codex `PermissionRequest` hooks. Permission
+policy remains a provider/runtime concern unless a future LongTable feature has
+a concrete researcher-facing permission contract.
 
 ## What Must Stay Shared
 
