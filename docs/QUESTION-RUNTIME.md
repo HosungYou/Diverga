@@ -30,9 +30,9 @@ At the product level, this lifecycle is described as:
 Researcher Checkpoint -> QuestionRecord -> DecisionRecord
 ```
 
-`QuestionPrompt` is provider-neutral. It carries the checkpoint key, question text, options, required/blocking posture, source, a short display reason, internal rationale, and preferred surfaces.
+`QuestionPrompt` is provider-neutral. It carries the checkpoint key, question text, prompt type (`single_choice`, `multi_choice`, or `free_text`), options, required/blocking posture, source, a short display reason, internal rationale, and preferred surfaces.
 
-`QuestionAnswer` is normalized. Claude native choices, Codex numbered responses, and future web form selections should all become the same shape before they update LongTable state.
+`QuestionAnswer` is normalized. Claude native choices, Codex numbered responses, MCP form arrays, and future web form selections should all become the same shape before they update LongTable state: `selectedValues` preserves all choices, `otherText` preserves researcher-supplied Other/free-text content, and the linked `DecisionRecord.selectedOption` remains a first-value compatibility field while `selectedOptions` carries the full selection.
 
 `QuestionRecord` is durable lifecycle state. It exists so a required question is not inferred from prompt text alone. It may carry two optional inspection fields, `commitmentFamily` and `epistemicBasis`, when LongTable can state them without pretending to know more than it does.
 
@@ -99,7 +99,8 @@ Provider adapters expose the same record differently:
 - Codex uses MCP `elicit_question` when available, and
   `renderQuestionRecordPrompt(record)` as the numbered fallback.
 - Claude uses `renderQuestionRecordInput(record)` to produce a structured
-  AskUserQuestion-compatible payload.
+  AskUserQuestion-compatible payload for choice questions. Free-text
+  checkpoints are rendered as a text fallback rather than a fake choice list.
 
 ## Provider Mapping
 
@@ -110,8 +111,8 @@ Claude should prefer native structured questions when available.
 Flow:
 
 1. checkpoint engine resolves `blocking` and runtime guidance
-2. Claude adapter converts the Researcher Checkpoint into `AskUserQuestion` input
-3. Claude Code presents the native question surface
+2. Claude adapter converts choice checkpoints into `AskUserQuestion` input
+3. Claude Code presents the native question surface, or LongTable uses the text fallback for free-text checkpoints
 4. the selected answer is normalized into LongTable state
 
 LongTable should not replace Claude Code's native question surface with a custom terminal UI when the native tool is available.
